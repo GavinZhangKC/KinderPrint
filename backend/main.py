@@ -13,12 +13,18 @@ app = FastAPI(title="KinderPrint API", version="0.1.0")
 
 BOUNDARY_DATA_PATH_ENV = "KINDERPRINT_BOUNDARY_DATA_PATH"
 PROFILE_DATA_PATH_ENV = "KINDERPRINT_PROFILE_DATA_PATH"
+PRIORITY_DATA_PATH_ENV = "KINDERPRINT_PRIORITY_DATA_PATH"
 DEFAULT_BOUNDARY_VERSION = "Not supplied"
 AREA_LEVEL_NOTICE = {
     "code": "area_level_information",
     "message": "This is aggregate area-level information and is not an assessment of an individual child.",
 }
 INDICATOR_STATUSES = {"available", "missing", "incompatible", "unavailable", "limited"}
+PRIORITY_DOMAINS = {"Child Development", "Social", "Environment"}
+HUMAN_DECISION_NOTICE = {
+    "code": "human_decision",
+    "message": "The system does not make the final investigation or resource-allocation decision; people do.",
+}
 
 
 def envelope(status: str, data: Any, *, metadata: dict[str, Any] | None = None,
@@ -40,6 +46,11 @@ def boundary_data_path() -> Path | None:
 
 def profile_data_path() -> Path | None:
     value = os.getenv(PROFILE_DATA_PATH_ENV)
+    return Path(value).expanduser() if value else None
+
+
+def priority_data_path() -> Path | None:
+    value = os.getenv(PRIORITY_DATA_PATH_ENV)
     return Path(value).expanduser() if value else None
 
 
@@ -144,6 +155,76 @@ def profile_metadata(profile: dict[str, Any]) -> dict[str, Any]:
         "reference_years": sorted({str(indicator["reference_year"]) for indicator in indicators}),
         "geographic_unit": profile["neighbourhood"]["geographic_unit"],
         "data_quality": source_metadata.get("data_quality", "Provided by the approved profile dataset"),
+    }
+
+
+def valid_priority_metadata(metadata: Any) -> bool:
+    return isinstance(metadata, dict) and all(
+        isinstance(metadata.get(field), (str, int)) and str(metadata[field]).strip()
+        for field in ("source", "reference_year", "geographic_unit", "data_quality")
+    )
+
+
+def valid_priority_limitation(item: Any) -> bool:
+    return isinstance(item, dict) and isinstance(item.get("code"), str) and isinstance(item.get("message"), str)
+
+
+def valid_priority_result(result: Any) -> bool:
+    """Validate that the precomputed result contains a band, never a score."""
+    if not isinstance(result, dict) or result.get("status") not in INDICATOR_STATUSES:
+        return False
+    area = result.get("neighbourhood")
+    if not isinstance(area, dict) or not all(isinstance(area.get(field), str) and area[field].strip()
+                                             for field in ("id", "name")):
+        return False
+    domains = result.get("contributing_domains")
+    if not isinstance(domains, list) or not all(domain in PRIORITY_DOMAINS for domain in domains):
+        return False
+    if result["status"] == "available":
+        return (
+            result.get("label") == "Priority for Investigation"
+            and isinstance(result.get("priority_band"), str)
+            and bool(result["priority_band"].strip())
+            and set(domains) == PRIORITY_DOMAINS
+        )
+    return (
+        result.get("label") is None
+        and result.get("priority_band") is None
+        and isinstance(result.get("limitations"), list)
+        and bool(result["limitations"])
+        and all(valid_priority_limitation(item) for item in result["limitations"])
+    )
+
+
+def load_priority_results() -> tuple[list[dict[str, Any]] | None, dict[str, Any] | None, list[dict[str, Any]]]:
+    """Load only an explicitly approved, precomputed Data Science output."""
+    source, limitations = load_json_source(priority_data_path(), PRIORITY_DATA_PATH_ENV, "priority")
+    if source is None:
+        return None, None, limitations
+    results, metadata = source.get("results"), source.get("metadata")
+    if source.get("approved") is not True or not isinstance(results, list) or not valid_priority_metadata(metadata):
+        return None, None, [limitation(
+            "priority_dataset_invalid",
+            "The priority dataset must be explicitly approved and contain results with complete provenance metadata.",
+            "priority")]
+    if not all(valid_priority_result(result) for result in results):
+        return None, None, [limitation(
+            "priority_dataset_invalid",
+            "The priority dataset contains an invalid result, an unsupported label, or a numeric priority value.",
+            "results")]
+    identifiers = [result["neighbourhood"]["id"] for result in results]
+    if len(identifiers) != len(set(identifiers)):
+        return None, None, [limitation("priority_dataset_invalid", "The priority dataset contains duplicate neighbourhood identifiers.", "results")]
+    return results, metadata, []
+
+
+def priority_data(result: dict[str, Any]) -> dict[str, Any]:
+    """Whitelist the public fields so internal source scores can never leak."""
+    return {
+        "label": result["label"],
+        "neighbourhood": result["neighbourhood"],
+        "priority_band": result["priority_band"],
+        "contributing_domains": result["contributing_domains"],
     }
 
 
@@ -277,6 +358,16 @@ def root() -> dict[str, str]:
     return {"status": "ok"}
 
 
+@app.get("/api/priority")
+def priority_shortlist() -> dict[str, Any]:
+    """Return only approved Priority for Investigation results, never a ranking score."""
+    results, metadata, limitations = load_priority_results()
+    if results is None:
+        return envelope("unavailable", [], limitations=limitations, notices=[HUMAN_DECISION_NOTICE])
+    shortlist = [priority_data(result) for result in results if result["status"] == "available"]
+    return envelope("available", shortlist, metadata=metadata, notices=[HUMAN_DECISION_NOTICE])
+
+
 @app.get("/api/neighbourhoods/search")
 def search_neighbourhoods(q: str = Query("", max_length=100),
                           geographic_unit: str | None = Query(None, max_length=50)) -> dict[str, Any]:
@@ -332,6 +423,27 @@ def neighbourhood_profile(neighbourhood_id: str) -> dict[str, Any]:
         "neighbourhood": profile["neighbourhood"],
         "domains": profile["domains"],
     }, metadata=profile_metadata(profile), limitations=profile_limitations(profile), notices=[AREA_LEVEL_NOTICE])
+
+
+@app.get("/api/neighbourhoods/{neighbourhood_id}/priority")
+def neighbourhood_priority(neighbourhood_id: str) -> dict[str, Any]:
+    """Return the approved relative priority band or withhold an unsupported result."""
+    results, metadata, limitations = load_priority_results()
+    empty = {
+        "label": None,
+        "neighbourhood": {"id": neighbourhood_id, "name": None},
+        "priority_band": None,
+        "contributing_domains": [],
+    }
+    if results is None:
+        return envelope("unavailable", empty, limitations=limitations, notices=[HUMAN_DECISION_NOTICE])
+    result = next((item for item in results if item["neighbourhood"]["id"] == neighbourhood_id), None)
+    if result is None:
+        return envelope("missing", empty, metadata=metadata, limitations=[limitation(
+            "unsupported_neighbourhood", "No approved priority result exists for this identifier.",
+            "neighbourhood_id", "priority")], notices=[HUMAN_DECISION_NOTICE])
+    return envelope(result["status"], priority_data(result), metadata=metadata,
+                    limitations=result.get("limitations", []), notices=[HUMAN_DECISION_NOTICE])
 
 
 @app.get("/api/neighbourhoods/{neighbourhood_id}/boundary")

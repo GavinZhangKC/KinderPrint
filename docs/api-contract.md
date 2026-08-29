@@ -223,7 +223,23 @@ Returns the approved priority result for one neighbourhood.
 }
 ```
 
-The contract exposes only a relative priority band, never an exact numeric score. Final bands and the Data Science output structure are TBC. The backend must use only Data Science-approved logic and results. If inputs are insufficient or geographically or temporally incompatible, `priority_band` is `null`, the status is non-available, and the reason appears in `limitations`; no result may be estimated.
+Priority results are loaded from the JSON file named by
+`KINDERPRINT_PRIORITY_DATA_PATH`; the source must set `approved` to `true`.
+It must contain source-level `metadata` (`source`, `reference_year`,
+`geographic_unit`, and `data_quality`) plus a `results` array. Every result
+contains its `neighbourhood`, `status`, `label`, `priority_band`, and
+`contributing_domains`. Available results must use the exact neutral label
+`Priority for Investigation`, provide a non-numeric band, and list Child
+Development, Social, and Environment as contributing domains.
+
+The contract exposes only a relative priority band, never an exact numeric
+score. The implementation whitelists the public output fields so an internal
+Data Science score cannot be exposed through either endpoint. If inputs are
+insufficient or geographically or temporally incompatible, the source must
+set a non-available status, use `null` for both `label` and `priority_band`,
+and provide one or more limitations. The system then withholds the result; it
+does not estimate one. The shortlist endpoint returns only available,
+approved results and both priority endpoints include the human-decision notice.
 
 ## BE-4 — Explanation Service
 
