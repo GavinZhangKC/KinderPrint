@@ -5,6 +5,7 @@ frontend/dist/
 # Backend
 backend/.venv/
 __pycache__/
+.pytest_cache/
 *.py[cod]
 
 # Environment and editor files
