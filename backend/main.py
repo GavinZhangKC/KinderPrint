@@ -3,13 +3,18 @@
 from __future__ import annotations
 
 import json
+import logging
 import os
+import time
 from pathlib import Path
 from typing import Any
 
-from fastapi import FastAPI, Query
+from fastapi import FastAPI, Query, Request
+from fastapi.exceptions import RequestValidationError
+from fastapi.responses import JSONResponse
 
 app = FastAPI(title="KinderPrint API", version="0.1.0")
+logger = logging.getLogger("kinderprint.api")
 
 BOUNDARY_DATA_PATH_ENV = "KINDERPRINT_BOUNDARY_DATA_PATH"
 PROFILE_DATA_PATH_ENV = "KINDERPRINT_PROFILE_DATA_PATH"
@@ -42,6 +47,35 @@ def envelope(status: str, data: Any, *, metadata: dict[str, Any] | None = None,
     """Return the shared Iteration 1 response envelope."""
     return {"status": status, "data": data, "metadata": metadata or {},
             "limitations": limitations or [], "notices": notices or []}
+
+
+@app.middleware("http")
+async def log_request(request: Request, call_next: Any) -> Any:
+    """Log request outcomes without logging query values, data, or secrets."""
+    started_at = time.perf_counter()
+    try:
+        response = await call_next(request)
+    except Exception:
+        logger.exception("request_failed method=%s path=%s", request.method, request.url.path)
+        return JSONResponse(
+            status_code=500,
+            content=envelope("unavailable", None, limitations=[limitation(
+                "internal_service_error", "The service could not complete this request.")]),
+        )
+    duration_ms = round((time.perf_counter() - started_at) * 1000, 2)
+    logger.info("request_complete method=%s path=%s status=%s duration_ms=%s",
+                request.method, request.url.path, response.status_code, duration_ms)
+    return response
+
+
+@app.exception_handler(RequestValidationError)
+async def request_validation_error(_: Request, __: RequestValidationError) -> JSONResponse:
+    """Keep invalid request errors in the standard public response envelope."""
+    return JSONResponse(
+        status_code=422,
+        content=envelope("unavailable", None, limitations=[limitation(
+            "invalid_request", "One or more request parameters are invalid.")]),
+    )
 
 
 def limitation(code: str, message: str, *affected_fields: str) -> dict[str, Any]:
@@ -455,6 +489,23 @@ def intersects_bbox(feature: dict[str, Any], bbox: tuple[float, float, float, fl
 @app.get("/")
 def root() -> dict[str, str]:
     return {"status": "ok"}
+
+
+@app.get("/health")
+def health() -> dict[str, Any]:
+    """Report application liveness and approved-data readiness for monitoring."""
+    profiles, profile_limitations = load_profiles()
+    boundaries, boundary_limitations = load_boundary_features()
+    priorities, _, priority_limitations = load_priority_results()
+    explanations, _, explanation_limitations = load_explanations()
+    datasets = {
+        "profiles": {"status": "available" if profiles is not None else "unavailable", "limitations": profile_limitations},
+        "boundaries": {"status": "available" if boundaries is not None else "unavailable", "limitations": boundary_limitations},
+        "priorities": {"status": "available" if priorities is not None else "unavailable", "limitations": priority_limitations},
+        "explanations": {"status": "available" if explanations is not None else "unavailable", "limitations": explanation_limitations},
+    }
+    ready = all(dataset["status"] == "available" for dataset in datasets.values())
+    return envelope("available", {"service": "KinderPrint API", "readiness": "ready" if ready else "limited", "datasets": datasets})
 
 
 @app.get("/api/priority")
