@@ -411,4 +411,3 @@ def manual_comparison_data(comparison: dict[str, Any], reverse: bool = False) ->
         "similarity_basis": comparison["similarity_basis"],
         "match_strength": comparison["match_strength"],
     }
-

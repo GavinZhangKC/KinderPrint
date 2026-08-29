@@ -26,4 +26,3 @@ def envelope(status: str, data: Any, *, metadata: dict[str, Any] | None = None,
 
 def limitation(code: str, message: str, *affected_fields: str) -> dict[str, Any]:
     return {"code": code, "message": message, "affected_fields": list(affected_fields)}
-

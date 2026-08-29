@@ -198,5 +198,3 @@ def intersects_bbox(feature: dict[str, Any], bbox: tuple[float, float, float, fl
         if any(point_in_polygon(corner, polygon) for corner in rectangle):
             return True
     return False
-
-

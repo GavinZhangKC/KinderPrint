@@ -61,5 +61,3 @@ def load_json_source(path: Path | None, env_name: str, resource_name: str) -> tu
             f"{resource_name}_dataset_invalid",
             f"The configured {resource_name} dataset must contain a JSON object.", resource_name)]
     return source, []
-
-
