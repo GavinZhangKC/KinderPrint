@@ -112,12 +112,14 @@ An indicator with missing or incompatible input must carry its own non-available
 
 ### `GET /api/neighbourhoods/search`
 
-Searches supported neighbourhoods by a provisional query interface.
+Searches supported neighbourhoods by a case-insensitive substring match against
+the approved boundary dataset. The endpoint only returns areas whose boundary
+geometry is present in that dataset.
 
 | Parameter | Requirement |
 | --- | --- |
-| `q` | Search text; exact matching behaviour is TBC |
-| `geographic_unit` | Optional; supported values are TBC |
+| `q` | Optional search text, matched case-insensitively against name and identifier |
+| `geographic_unit` | Optional exact, case-insensitive geographic-unit filter |
 
 Results use the standard envelope and return neighbourhood `id`, `name`, and `geographic_unit`. The final identifier format and geographic unit are TBC.
 
@@ -152,9 +154,19 @@ Returns one supported neighbourhood boundary.
 
 ### `GET /api/neighbourhoods/boundaries`
 
-Returns supported neighbourhood boundaries intersecting the visible map area. The bounding-box parameter format is provisional (`bbox=TBC`) until frontend map requirements are confirmed. The response uses a GeoJSON `FeatureCollection` in `data`, with each feature identifying the neighbourhood and geographic unit.
+Returns supported neighbourhood boundaries intersecting the visible map area.
+`bbox` is required and uses `west,south,east,north` WGS 84 longitude/latitude
+coordinates. The response uses a GeoJSON `FeatureCollection` in `data`, with
+each feature identifying the neighbourhood and geographic unit.
 
-All boundaries must use the confirmed geographic unit. The backend must not fabricate boundaries or subdivide a source boundary into a finer resolution. Missing or unsupported geometry returns a clear `missing` or `unavailable` state, `null` geometry where applicable, and a limitation. The final boundary dataset and version are TBC.
+All boundaries are loaded unchanged from the GeoJSON file named by
+`KINDERPRINT_BOUNDARY_DATA_PATH`. Each source feature must contain
+`properties.id`, `properties.name`, and `properties.geographic_unit`, and may
+also specify `source`, `boundary_version`, and `data_quality`. The service does
+not create boundaries from area names, centroids, or other geographies, and
+does not subdivide source boundaries. Missing, unsupported, invalid, or
+unconfigured source geometry returns a clear `missing` or `unavailable` state
+with `null` geometry where applicable and a limitation.
 
 ## BE-3 — Priority Service
 
