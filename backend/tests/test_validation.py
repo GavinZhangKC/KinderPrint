@@ -1,11 +1,13 @@
 from copy import deepcopy
 
 from validation import (
+    profile_limitations,
     profile_status,
     valid_explanation,
     valid_indicator,
     valid_priority_result,
     valid_profile,
+    valid_side_by_side_field,
 )
 
 
@@ -85,6 +87,15 @@ def test_profile_mixed_status_is_limited() -> None:
     assert profile_status(value) == "limited"
 
 
+def test_empty_profile_has_explicit_limitation() -> None:
+    value = profile()
+    for domain in value["domains"]:
+        domain["indicators"] = []
+    assert valid_profile(value)
+    assert profile_status(value) == "unavailable"
+    assert profile_limitations(value)[0]["code"] == "profile_inputs_unavailable"
+
+
 def priority_result() -> dict:
     return {
         "status": "available",
@@ -133,3 +144,17 @@ def test_explanation_rejects_inconsistent_status() -> None:
     value = deepcopy(explanation())
     value["status"] = "available"
     assert not valid_explanation(value)
+
+
+def test_available_comparison_value_cannot_be_null() -> None:
+    field = {
+        "id": "field",
+        "name": "Field",
+        "source_value": None,
+        "comparison_value": 2,
+        "source_status": "available",
+        "comparison_status": "available",
+    }
+    assert not valid_side_by_side_field(field)
+    field["source_value"] = 1
+    assert valid_side_by_side_field(field)

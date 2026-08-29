@@ -39,6 +39,53 @@ def test_unapproved_priority_dataset_is_unavailable(client, monkeypatch, write_j
     assert body["limitations"][0]["code"] == "priority_dataset_invalid"
 
 
+def test_priority_shortlist_returns_withheld_reason(client, monkeypatch, write_json) -> None:
+    source = {
+        "approved": True,
+        "metadata": METADATA,
+        "results": [{
+            "status": "incompatible",
+            "neighbourhood": {"id": "n", "name": "N"},
+            "label": "Priority for Investigation",
+            "priority_band": None,
+            "contributing_domains": [],
+            "limitations": [{"code": "incompatible", "message": "TBC"}],
+        }],
+    }
+    path = write_json("priorities.json", json.dumps(source))
+    monkeypatch.setenv(PRIORITY_DATA_PATH_ENV, str(path))
+    body = client.get("/api/priority").json()
+    assert body["status"] == "unavailable"
+    assert body["data"] == []
+    assert body["limitations"][0]["code"] == "incompatible"
+    assert "n" in body["limitations"][0]["affected_fields"]
+
+
+def test_priority_shortlist_is_limited_when_some_results_are_withheld(client, monkeypatch, write_json) -> None:
+    available = {
+        "status": "available",
+        "neighbourhood": {"id": "a", "name": "A"},
+        "label": "Priority for Investigation",
+        "priority_band": "TBC band",
+        "contributing_domains": ["Social"],
+    }
+    withheld = {
+        "status": "missing",
+        "neighbourhood": {"id": "b", "name": "B"},
+        "label": "Priority for Investigation",
+        "priority_band": None,
+        "contributing_domains": [],
+        "limitations": [{"code": "missing", "message": "TBC"}],
+    }
+    source = {"approved": True, "metadata": METADATA, "results": [available, withheld]}
+    path = write_json("priorities.json", json.dumps(source))
+    monkeypatch.setenv(PRIORITY_DATA_PATH_ENV, str(path))
+    body = client.get("/api/priority").json()
+    assert body["status"] == "limited"
+    assert [result["neighbourhood"]["id"] for result in body["data"]] == ["a"]
+    assert body["limitations"][0]["code"] == "missing"
+
+
 def test_explanation_endpoint_preserves_incomplete_input(client, monkeypatch, write_json) -> None:
     factor = {
         "id": "f", "name": "Factor", "status": "missing", "source": "approved",

@@ -101,6 +101,15 @@ def neighbourhood(feature: dict[str, Any]) -> dict[str, str]:
     return {key: properties[key] for key in ("id", "name", "geographic_unit")}
 
 
+def public_boundary_feature(feature: dict[str, Any]) -> dict[str, Any]:
+    """Expose only contract-approved identity fields and source geometry."""
+    return {
+        "type": "Feature",
+        "properties": neighbourhood(feature),
+        "geometry": feature["geometry"],
+    }
+
+
 def parse_bbox(bbox: str) -> tuple[float, float, float, float] | None:
     """Parse west,south,east,north in WGS 84 longitude/latitude order."""
     try:
@@ -189,6 +198,5 @@ def intersects_bbox(feature: dict[str, Any], bbox: tuple[float, float, float, fl
         if any(point_in_polygon(corner, polygon) for corner in rectangle):
             return True
     return False
-
 
 

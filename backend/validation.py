@@ -92,6 +92,11 @@ def aggregate_status(statuses: list[str]) -> str:
 def profile_limitations(profile: dict[str, Any]) -> list[dict[str, Any]]:
     """Surface every unavailable input rather than filling, omitting, or estimating it."""
     limitations = list(profile.get("limitations", []))
+    if not any(domain["indicators"] for domain in profile["domains"]):
+        limitations.append(limitation(
+            "profile_inputs_unavailable",
+            "No indicators are available for this neighbourhood profile.",
+            "indicators"))
     for domain in profile["domains"]:
         for indicator in domain["indicators"]:
             if indicator["status"] != "available":
@@ -121,7 +126,12 @@ def valid_priority_metadata(metadata: Any) -> bool:
 
 
 def valid_priority_limitation(item: Any) -> bool:
-    return isinstance(item, dict) and isinstance(item.get("code"), str) and isinstance(item.get("message"), str)
+    if (not isinstance(item, dict) or not isinstance(item.get("code"), str)
+            or not item["code"].strip() or not isinstance(item.get("message"), str)
+            or not item["message"].strip()):
+        return False
+    affected_fields = item.get("affected_fields", [])
+    return isinstance(affected_fields, list) and all(isinstance(field, str) for field in affected_fields)
 
 
 def valid_priority_result(result: Any) -> bool:
@@ -303,8 +313,10 @@ def valid_side_by_side_field(field: Any) -> bool:
     if field["source_status"] not in INDICATOR_STATUSES or field["comparison_status"] not in INDICATOR_STATUSES:
         return False
     return (
-        (field["source_status"] == "available" or field.get("source_value") is None)
-        and (field["comparison_status"] == "available" or field.get("comparison_value") is None)
+        ((field.get("source_value") is not None) if field["source_status"] == "available"
+         else field.get("source_value") is None)
+        and ((field.get("comparison_value") is not None) if field["comparison_status"] == "available"
+             else field.get("comparison_value") is None)
     )
 
 
@@ -399,6 +411,4 @@ def manual_comparison_data(comparison: dict[str, Any], reverse: bool = False) ->
         "similarity_basis": comparison["similarity_basis"],
         "match_strength": comparison["match_strength"],
     }
-
-
 

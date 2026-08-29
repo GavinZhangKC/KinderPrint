@@ -8,7 +8,14 @@ from fastapi import FastAPI, Query, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 
-from geography import feature_metadata, intersects_bbox, load_boundary_features, neighbourhood, parse_bbox
+from geography import (
+    feature_metadata,
+    intersects_bbox,
+    load_boundary_features,
+    neighbourhood,
+    parse_bbox,
+    public_boundary_feature,
+)
 from responses import (
     AREA_LEVEL_NOTICE, ASSOCIATION_NOTICE, COMPARABLE_NOTICE, COMPARISON_AREA_NOTICE,
     HUMAN_DECISION_NOTICE, INVESTIGATION_LEADS_NOTICE, envelope, limitation,
@@ -62,7 +69,30 @@ def priority_shortlist() -> dict[str, Any]:
     if results is None:
         return envelope("unavailable", [], limitations=limitations, notices=[HUMAN_DECISION_NOTICE])
     shortlist = [priority_data(result) for result in results if result["status"] == "available"]
-    return envelope("available", shortlist, metadata=metadata, notices=[HUMAN_DECISION_NOTICE])
+    withheld = [result for result in results if result["status"] != "available"]
+    withheld_limitations = [
+        {
+            **item,
+            "affected_fields": list(dict.fromkeys([
+                *item.get("affected_fields", []),
+                result["neighbourhood"]["id"],
+            ])),
+        }
+        for result in withheld
+        for item in result["limitations"]
+    ]
+    if withheld:
+        status = "limited" if shortlist else "unavailable"
+    elif shortlist:
+        status = "available"
+    else:
+        status = "unavailable"
+        withheld_limitations = [limitation(
+            "priority_results_unavailable",
+            "The approved priority dataset contains no available results.",
+            "priority")]
+    return envelope(status, shortlist, metadata=metadata,
+                    limitations=withheld_limitations, notices=[HUMAN_DECISION_NOTICE])
 
 
 @app.get("/api/neighbourhoods/search")
@@ -93,10 +123,11 @@ def visible_boundaries(bbox: str = Query(..., description="west,south,east,north
     features, limitations = load_boundary_features()
     if features is None:
         return envelope("unavailable", empty_collection, limitations=limitations)
-    visible = [feature for feature in features if intersects_bbox(feature, parsed_bbox)]
+    visible_sources = [feature for feature in features if intersects_bbox(feature, parsed_bbox)]
+    visible = [public_boundary_feature(feature) for feature in visible_sources]
     return envelope("available", {"type": "FeatureCollection", "features": visible}, metadata={
         "bbox": bbox, "result_count": len(visible),
-        "geographic_units": sorted({feature["properties"]["geographic_unit"] for feature in visible}),
+        "geographic_units": sorted({feature["properties"]["geographic_unit"] for feature in visible_sources}),
         "data_quality": "Source geometry supplied without transformation",
     })
 

@@ -80,3 +80,14 @@ def test_visible_boundaries_rejects_bad_bbox(client) -> None:
     body = client.get("/api/neighbourhoods/boundaries", params={"bbox": "bad"}).json()
     assert body["status"] == "unavailable"
     assert body["limitations"][0]["code"] == "invalid_bbox"
+
+
+def test_visible_boundaries_whitelists_properties(client, monkeypatch, write_json) -> None:
+    source_feature = feature()
+    source_feature["properties"]["internal_note"] = "must not be exposed"
+    collection = {"type": "FeatureCollection", "features": [source_feature]}
+    path = write_json("boundaries.json", json.dumps(collection))
+    monkeypatch.setenv(BOUNDARY_DATA_PATH_ENV, str(path))
+    body = client.get("/api/neighbourhoods/boundaries", params={"bbox": "1,1,2,2"}).json()
+    properties = body["data"]["features"][0]["properties"]
+    assert properties == {"id": "n", "name": "N", "geographic_unit": "TBC"}
