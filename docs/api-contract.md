@@ -273,6 +273,7 @@ Returns the approved explanation associated with a neighbourhood priority result
     "highlighted_factor_ids": [],
     "incomplete_inputs": [
       {
+        "indicator_id": "TBC",
         "indicator": "TBC",
         "reason": "suppressed | not_collected | unavailable_for_reference_year | incompatible_geography | TBC"
       }
@@ -298,7 +299,21 @@ Returns the approved explanation associated with a neighbourhood priority result
 }
 ```
 
-Highlighted factors must always be a subset of the full factor list. Missing inputs must not be replaced with zero, averages, neighbouring-area values, or inferred values. This endpoint introduces no recommendation or scoring rule.
+Explanations are loaded from the JSON file named by
+`KINDERPRINT_EXPLANATION_DATA_PATH`; the source must set `approved` to `true`.
+It must provide source-level metadata (`source`, `reference_year`,
+`geographic_unit`, and `data_quality`) and an `explanations` array. Every
+explanation contains a neighbourhood, status, factor domains, highlighted
+factor IDs, and incomplete inputs. Factors must provide an ID, plain-language
+name, status, source, geographic unit, and reference year.
+
+Highlighted factors must always be a subset of the full factor list. Every
+non-available factor must have a corresponding named incomplete input, using
+the factor's `indicator_id`; missing inputs must not be replaced with zero,
+averages, neighbouring-area values, or inferred values. The service returns
+the association-not-causation and investigation-lead notices with every
+response. This endpoint introduces no recommendation, scoring rule, or causal
+claim.
 
 ## BE-6 — Match and Compare Service
 

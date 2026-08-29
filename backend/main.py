@@ -14,6 +14,7 @@ app = FastAPI(title="KinderPrint API", version="0.1.0")
 BOUNDARY_DATA_PATH_ENV = "KINDERPRINT_BOUNDARY_DATA_PATH"
 PROFILE_DATA_PATH_ENV = "KINDERPRINT_PROFILE_DATA_PATH"
 PRIORITY_DATA_PATH_ENV = "KINDERPRINT_PRIORITY_DATA_PATH"
+EXPLANATION_DATA_PATH_ENV = "KINDERPRINT_EXPLANATION_DATA_PATH"
 DEFAULT_BOUNDARY_VERSION = "Not supplied"
 AREA_LEVEL_NOTICE = {
     "code": "area_level_information",
@@ -24,6 +25,14 @@ PRIORITY_DOMAINS = {"Child Development", "Social", "Environment"}
 HUMAN_DECISION_NOTICE = {
     "code": "human_decision",
     "message": "The system does not make the final investigation or resource-allocation decision; people do.",
+}
+ASSOCIATION_NOTICE = {
+    "code": "association_not_causation",
+    "message": "This is an area-level association and does not prove that any factor caused a developmental outcome.",
+}
+INVESTIGATION_LEADS_NOTICE = {
+    "code": "investigation_leads",
+    "message": "Highlighted factors are investigation leads for local validation, not proven causes.",
 }
 
 
@@ -51,6 +60,11 @@ def profile_data_path() -> Path | None:
 
 def priority_data_path() -> Path | None:
     value = os.getenv(PRIORITY_DATA_PATH_ENV)
+    return Path(value).expanduser() if value else None
+
+
+def explanation_data_path() -> Path | None:
+    value = os.getenv(EXPLANATION_DATA_PATH_ENV)
     return Path(value).expanduser() if value else None
 
 
@@ -225,6 +239,91 @@ def priority_data(result: dict[str, Any]) -> dict[str, Any]:
         "neighbourhood": result["neighbourhood"],
         "priority_band": result["priority_band"],
         "contributing_domains": result["contributing_domains"],
+    }
+
+
+def valid_explanation_factor(factor: Any) -> bool:
+    if not isinstance(factor, dict) or factor.get("status") not in INDICATOR_STATUSES:
+        return False
+    return all(isinstance(factor.get(field), (str, int)) and str(factor[field]).strip()
+               for field in ("id", "name", "source", "geographic_unit", "reference_year"))
+
+
+def valid_incomplete_input(item: Any, factor_ids: set[str]) -> bool:
+    return (
+        isinstance(item, dict)
+        and isinstance(item.get("indicator_id"), str)
+        and item["indicator_id"] in factor_ids
+        and isinstance(item.get("indicator"), str)
+        and bool(item["indicator"].strip())
+        and isinstance(item.get("reason"), str)
+        and bool(item["reason"].strip())
+    )
+
+
+def valid_explanation(explanation: Any) -> bool:
+    """Validate approved factors and preserve their complete input limitations."""
+    if not isinstance(explanation, dict) or explanation.get("status") not in INDICATOR_STATUSES:
+        return False
+    area, domains = explanation.get("neighbourhood"), explanation.get("factor_domains")
+    if not isinstance(area, dict) or not all(isinstance(area.get(field), str) and area[field].strip()
+                                             for field in ("id", "name")):
+        return False
+    if not isinstance(domains, list) or not all(isinstance(domain, dict) and domain.get("domain") in PRIORITY_DOMAINS
+                                                and isinstance(domain.get("factors"), list) for domain in domains):
+        return False
+    factors = [factor for domain in domains for factor in domain["factors"]]
+    if not all(valid_explanation_factor(factor) for factor in factors):
+        return False
+    factor_ids = [factor["id"] for factor in factors]
+    if len(factor_ids) != len(set(factor_ids)):
+        return False
+    highlighted = explanation.get("highlighted_factor_ids")
+    if not isinstance(highlighted, list) or not all(isinstance(item, str) for item in highlighted):
+        return False
+    if len(highlighted) != len(set(highlighted)) or not set(highlighted).issubset(factor_ids):
+        return False
+    incomplete_inputs = explanation.get("incomplete_inputs")
+    if not isinstance(incomplete_inputs, list) or not all(valid_incomplete_input(item, set(factor_ids)) for item in incomplete_inputs):
+        return False
+    incomplete_ids = {item["indicator_id"] for item in incomplete_inputs}
+    unavailable_ids = {factor["id"] for factor in factors if factor["status"] != "available"}
+    if not unavailable_ids.issubset(incomplete_ids):
+        return False
+    if explanation["status"] != "available":
+        return isinstance(explanation.get("limitations"), list) and bool(explanation["limitations"])
+    return True
+
+
+def load_explanations() -> tuple[list[dict[str, Any]] | None, dict[str, Any] | None, list[dict[str, Any]]]:
+    """Load an explicitly approved explanation output without recalculating it."""
+    source, limitations = load_json_source(explanation_data_path(), EXPLANATION_DATA_PATH_ENV, "explanation")
+    if source is None:
+        return None, None, limitations
+    explanations, metadata = source.get("explanations"), source.get("metadata")
+    if source.get("approved") is not True or not isinstance(explanations, list) or not valid_priority_metadata(metadata):
+        return None, None, [limitation(
+            "explanation_dataset_invalid",
+            "The explanation dataset must be explicitly approved and contain explanations with complete provenance metadata.",
+            "explanation")]
+    if not all(valid_explanation(explanation) for explanation in explanations):
+        return None, None, [limitation(
+            "explanation_dataset_invalid",
+            "The explanation dataset contains invalid factors, incomplete-input details, or highlighted factors outside the full factor list.",
+            "explanations")]
+    identifiers = [explanation["neighbourhood"]["id"] for explanation in explanations]
+    if len(identifiers) != len(set(identifiers)):
+        return None, None, [limitation("explanation_dataset_invalid", "The explanation dataset contains duplicate neighbourhood identifiers.", "explanations")]
+    return explanations, metadata, []
+
+
+def explanation_data(explanation: dict[str, Any]) -> dict[str, Any]:
+    """Expose only factors, highlights, and named gaps from the approved output."""
+    return {
+        "neighbourhood": explanation["neighbourhood"],
+        "factor_domains": explanation["factor_domains"],
+        "highlighted_factor_ids": explanation["highlighted_factor_ids"],
+        "incomplete_inputs": explanation["incomplete_inputs"],
     }
 
 
@@ -444,6 +543,28 @@ def neighbourhood_priority(neighbourhood_id: str) -> dict[str, Any]:
             "neighbourhood_id", "priority")], notices=[HUMAN_DECISION_NOTICE])
     return envelope(result["status"], priority_data(result), metadata=metadata,
                     limitations=result.get("limitations", []), notices=[HUMAN_DECISION_NOTICE])
+
+
+@app.get("/api/neighbourhoods/{neighbourhood_id}/explanation")
+def neighbourhood_explanation(neighbourhood_id: str) -> dict[str, Any]:
+    """Return the approved explanation and its investigation leads without causal claims."""
+    explanations, metadata, limitations = load_explanations()
+    notices = [ASSOCIATION_NOTICE, INVESTIGATION_LEADS_NOTICE]
+    empty = {
+        "neighbourhood": {"id": neighbourhood_id, "name": None},
+        "factor_domains": [],
+        "highlighted_factor_ids": [],
+        "incomplete_inputs": [],
+    }
+    if explanations is None:
+        return envelope("unavailable", empty, limitations=limitations, notices=notices)
+    explanation = next((item for item in explanations if item["neighbourhood"]["id"] == neighbourhood_id), None)
+    if explanation is None:
+        return envelope("missing", empty, metadata=metadata, limitations=[limitation(
+            "unsupported_neighbourhood", "No approved priority explanation exists for this identifier.",
+            "neighbourhood_id", "explanation")], notices=notices)
+    return envelope(explanation["status"], explanation_data(explanation), metadata=metadata,
+                    limitations=explanation.get("limitations", []), notices=notices)
 
 
 @app.get("/api/neighbourhoods/{neighbourhood_id}/boundary")
