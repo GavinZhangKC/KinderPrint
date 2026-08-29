@@ -32,6 +32,4 @@ environment configuration and provide the five dataset paths. Do not commit
 the datasets or any secrets. The service deliberately returns an unavailable
 or limited state when a source is not configured or cannot be validated.
 
-`GET /health` provides a liveness and data-readiness response suitable for
-basic deployment monitoring. A `readiness` value of `limited` means the API is
-running but one or more approved datasets are unavailable or invalid.
+`GET /api/health` confirms that the FastAPI application is running.

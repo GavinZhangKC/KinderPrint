@@ -106,33 +106,18 @@ Returns an aggregate neighbourhood profile. The final geographic identifier form
 }
 ```
 
-Profiles are loaded unchanged from the approved JSON file named by
-`KINDERPRINT_PROFILE_DATA_PATH`. Its root object must contain a `profiles`
-array. Every profile must contain `neighbourhood` (`id`, `name`, and
-`geographic_unit`) and `domains`; every domain contains `id`, `name`, and
-`indicators`. Every indicator must supply `id`, `name`, `value`, `status`,
-`source`, `geographic_unit`, and `reference_year`.
-
-An indicator with missing, incompatible, unavailable, or limited input must
-carry its own non-available status, a `null` value, and a returned limitation.
-Available indicators must use the profile's geographic unit. The backend does
-not calculate, generate, infer, or estimate a replacement value. If no
-approved profile dataset is configured, invalid, or unsupported for the
-requested identifier, the response has an explicit non-available status and
-the aggregate area-level notice remains present.
+An indicator with missing or incompatible input must carry its own non-available status, a `null` value, and the relevant limitation. The backend must not generate, infer, or estimate a replacement value.
 
 ## BE-2 — Geography and Boundary Service
 
 ### `GET /api/neighbourhoods/search`
 
-Searches supported neighbourhoods by a case-insensitive substring match against
-the approved boundary dataset. The endpoint only returns areas whose boundary
-geometry is present in that dataset.
+Searches supported neighbourhoods by a provisional query interface.
 
 | Parameter | Requirement |
 | --- | --- |
-| `q` | Optional search text, matched case-insensitively against name and identifier |
-| `geographic_unit` | Optional exact, case-insensitive geographic-unit filter |
+| `q` | Search text; exact matching behaviour is TBC |
+| `geographic_unit` | Optional; supported values are TBC |
 
 Results use the standard envelope and return neighbourhood `id`, `name`, and `geographic_unit`. The final identifier format and geographic unit are TBC.
 
@@ -167,19 +152,9 @@ Returns one supported neighbourhood boundary.
 
 ### `GET /api/neighbourhoods/boundaries`
 
-Returns supported neighbourhood boundaries intersecting the visible map area.
-`bbox` is required and uses `west,south,east,north` WGS 84 longitude/latitude
-coordinates. The response uses a GeoJSON `FeatureCollection` in `data`, with
-each feature identifying the neighbourhood and geographic unit.
+Returns supported neighbourhood boundaries intersecting the visible map area. The bounding-box parameter format is provisional (`bbox=TBC`) until frontend map requirements are confirmed. The response uses a GeoJSON `FeatureCollection` in `data`, with each feature identifying the neighbourhood and geographic unit.
 
-All boundaries are loaded unchanged from the GeoJSON file named by
-`KINDERPRINT_BOUNDARY_DATA_PATH`. Each source feature must contain
-`properties.id`, `properties.name`, and `properties.geographic_unit`, and may
-also specify `source`, `boundary_version`, and `data_quality`. The service does
-not create boundaries from area names, centroids, or other geographies, and
-does not subdivide source boundaries. Missing, unsupported, invalid, or
-unconfigured source geometry returns a clear `missing` or `unavailable` state
-with `null` geometry where applicable and a limitation.
+All boundaries must use the confirmed geographic unit. The backend must not fabricate boundaries or subdivide a source boundary into a finer resolution. Missing or unsupported geometry returns a clear `missing` or `unavailable` state, `null` geometry where applicable, and a limitation. The final boundary dataset and version are TBC.
 
 ## BE-3 — Priority Service
 
@@ -223,23 +198,7 @@ Returns the approved priority result for one neighbourhood.
 }
 ```
 
-Priority results are loaded from the JSON file named by
-`KINDERPRINT_PRIORITY_DATA_PATH`; the source must set `approved` to `true`.
-It must contain source-level `metadata` (`source`, `reference_year`,
-`geographic_unit`, and `data_quality`) plus a `results` array. Every result
-contains its `neighbourhood`, `status`, `label`, `priority_band`, and
-`contributing_domains`. Available results must use the exact neutral label
-`Priority for Investigation`, provide a non-numeric band, and list Child
-Development, Social, and Environment as contributing domains.
-
-The contract exposes only a relative priority band, never an exact numeric
-score. The implementation whitelists the public output fields so an internal
-Data Science score cannot be exposed through either endpoint. If inputs are
-insufficient or geographically or temporally incompatible, the source must
-set a non-available status, use `null` for both `label` and `priority_band`,
-and provide one or more limitations. The system then withholds the result; it
-does not estimate one. The shortlist endpoint returns only available,
-approved results and both priority endpoints include the human-decision notice.
+The contract exposes only a relative priority band, never an exact numeric score. Final bands and the Data Science output structure are TBC. The backend must use only Data Science-approved logic and results. If inputs are insufficient or geographically or temporally incompatible, `priority_band` is `null`, the status is non-available, and the reason appears in `limitations`; no result may be estimated.
 
 ## BE-4 — Explanation Service
 
@@ -273,7 +232,6 @@ Returns the approved explanation associated with a neighbourhood priority result
     "highlighted_factor_ids": [],
     "incomplete_inputs": [
       {
-        "indicator_id": "TBC",
         "indicator": "TBC",
         "reason": "suppressed | not_collected | unavailable_for_reference_year | incompatible_geography | TBC"
       }
@@ -299,21 +257,7 @@ Returns the approved explanation associated with a neighbourhood priority result
 }
 ```
 
-Explanations are loaded from the JSON file named by
-`KINDERPRINT_EXPLANATION_DATA_PATH`; the source must set `approved` to `true`.
-It must provide source-level metadata (`source`, `reference_year`,
-`geographic_unit`, and `data_quality`) and an `explanations` array. Every
-explanation contains a neighbourhood, status, factor domains, highlighted
-factor IDs, and incomplete inputs. Factors must provide an ID, plain-language
-name, status, source, geographic unit, and reference year.
-
-Highlighted factors must always be a subset of the full factor list. Every
-non-available factor must have a corresponding named incomplete input, using
-the factor's `indicator_id`; missing inputs must not be replaced with zero,
-averages, neighbouring-area values, or inferred values. The service returns
-the association-not-causation and investigation-lead notices with every
-response. This endpoint introduces no recommendation, scoring rule, or causal
-claim.
+Highlighted factors must always be a subset of the full factor list. Missing inputs must not be replaced with zero, averages, neighbouring-area values, or inferred values. This endpoint introduces no recommendation or scoring rule.
 
 ## BE-6 — Match and Compare Service
 
@@ -352,19 +296,7 @@ Returns a supported comparable neighbourhood, if one exists.
 }
 ```
 
-Recommended matches and manual comparisons are loaded from the JSON file named
-by `KINDERPRINT_COMPARISON_DATA_PATH`; the source must set `approved` to
-`true`. It must supply source-level metadata (`source`, `reference_year`,
-`geographic_unit`, and `data_quality`), a `matches` array, and a
-`comparisons` array. Both selected neighbourhoods carry their confirmed
-geographic unit, so supported matches can be validated as like-for-like.
-
-Only neighbourhoods with compatible confirmed geographic units and approved
-social/demographic variables may be matched. A weak match uses `limited`. If
-no suitable comparison is supportable, the response uses `no_match`, sets
-`matched_neighbourhood` and `match_strength` to `null`, and explains why; the
-backend must not force a match. Every match response includes comparable-not-
-identical and area-level-comparison notices.
+Only neighbourhoods with compatible confirmed geographic units and approved social/demographic variables may be matched. Final variables and match-strength thresholds or categories are TBC. A weak match uses `limited`. If no suitable comparison is supportable, the response uses `no_match`, sets `matched_neighbourhood` and `match_strength` to `null`, and explains why; the backend must not force a match.
 
 ### `GET /api/compare`
 
@@ -373,7 +305,7 @@ Prepares a side-by-side comparison of any two supported neighbourhoods. Provisio
 The response uses the standard envelope and supports:
 
 - both neighbourhood identifiers, names, and confirmed geographic units;
-- side-by-side comparison fields supplied by the approved data source;
+- side-by-side comparison fields (final fields TBC);
 - approved similarity variables or basis;
 - match strength, including `limited` for weak comparisons;
 - source, reference year, geographic unit, and data quality;
@@ -381,13 +313,7 @@ The response uses the standard envelope and supports:
 - an area-level comparison notice; and
 - a comparable-not-identical notice.
 
-Each source comparison record contains `source_neighbourhood`,
-`comparison_neighbourhood`, `similarity_basis`, `match_strength`, and
-`side_by_side`. Each side-by-side field includes an ID, name, source and
-comparison values, and a status for each value. The API may reverse an
-approved pair solely to present it in the practitioner’s selected order; it
-does not calculate a match or derive a comparison value. If no approved pair
-exists, it returns `no_match` rather than forcing a comparison.
+No final matching variable, threshold, strength category, or comparison field is defined by this contract.
 
 ## Error handling
 

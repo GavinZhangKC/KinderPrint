@@ -619,23 +619,10 @@ def root() -> dict[str, str]:
     return {"status": "ok"}
 
 
-@app.get("/health")
-def health() -> dict[str, Any]:
-    """Report application liveness and approved-data readiness for monitoring."""
-    profiles, profile_limitations = load_profiles()
-    boundaries, boundary_limitations = load_boundary_features()
-    priorities, _, priority_limitations = load_priority_results()
-    explanations, _, explanation_limitations = load_explanations()
-    comparisons, _, comparison_limitations = load_comparison_data()
-    datasets = {
-        "profiles": {"status": "available" if profiles is not None else "unavailable", "limitations": profile_limitations},
-        "boundaries": {"status": "available" if boundaries is not None else "unavailable", "limitations": boundary_limitations},
-        "priorities": {"status": "available" if priorities is not None else "unavailable", "limitations": priority_limitations},
-        "explanations": {"status": "available" if explanations is not None else "unavailable", "limitations": explanation_limitations},
-        "comparisons": {"status": "available" if comparisons is not None else "unavailable", "limitations": comparison_limitations},
-    }
-    ready = all(dataset["status"] == "available" for dataset in datasets.values())
-    return envelope("available", {"service": "KinderPrint API", "readiness": "ready" if ready else "limited", "datasets": datasets})
+@app.get("/api/health")
+def health() -> dict[str, str]:
+    """Confirm that the FastAPI application is running."""
+    return {"status": "available"}
 
 
 @app.get("/api/priority")
