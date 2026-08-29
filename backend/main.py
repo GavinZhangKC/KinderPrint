@@ -22,9 +22,10 @@ PRIORITY_DATA_PATH_ENV = "KINDERPRINT_PRIORITY_DATA_PATH"
 EXPLANATION_DATA_PATH_ENV = "KINDERPRINT_EXPLANATION_DATA_PATH"
 COMPARISON_DATA_PATH_ENV = "KINDERPRINT_COMPARISON_DATA_PATH"
 DEFAULT_BOUNDARY_VERSION = "Not supplied"
+TBC_NOTICE_MESSAGE = "TBC"
 AREA_LEVEL_NOTICE = {
     "code": "area_level_information",
-    "message": "This is aggregate area-level information and is not an assessment of an individual child.",
+    "message": TBC_NOTICE_MESSAGE,
 }
 INDICATOR_STATUSES = {"available", "missing", "incompatible", "unavailable", "limited"}
 PRIORITY_DOMAINS = {"Child Development", "Social", "Environment"}
@@ -34,19 +35,19 @@ HUMAN_DECISION_NOTICE = {
 }
 ASSOCIATION_NOTICE = {
     "code": "association_not_causation",
-    "message": "This is an area-level association and does not prove that any factor caused a developmental outcome.",
+    "message": TBC_NOTICE_MESSAGE,
 }
 INVESTIGATION_LEADS_NOTICE = {
     "code": "investigation_leads",
-    "message": "Highlighted factors are investigation leads for local validation, not proven causes.",
+    "message": TBC_NOTICE_MESSAGE,
 }
 COMPARABLE_NOTICE = {
     "code": "comparable_not_identical",
-    "message": "These neighbourhoods are comparable, not identical.",
+    "message": TBC_NOTICE_MESSAGE,
 }
 COMPARISON_AREA_NOTICE = {
     "code": "area_level_comparison",
-    "message": "This is a comparison between aggregate area-level neighbourhood information, not individual children.",
+    "message": TBC_NOTICE_MESSAGE,
 }
 
 

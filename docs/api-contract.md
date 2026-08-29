@@ -100,7 +100,7 @@ Returns an aggregate neighbourhood profile. The final geographic identifier form
   "notices": [
     {
       "code": "area_level_information",
-      "message": "TBC: This is aggregate area-level information and is not an assessment of an individual child."
+      "message": "TBC"
     }
   ]
 }
@@ -247,11 +247,11 @@ Returns the approved explanation associated with a neighbourhood priority result
   "notices": [
     {
       "code": "association_not_causation",
-      "message": "TBC: Association does not imply causation."
+      "message": "TBC"
     },
     {
       "code": "investigation_leads",
-      "message": "TBC: Prominent factors are leads for local validation and investigation, not proven causes."
+      "message": "TBC"
     }
   ]
 }
@@ -290,7 +290,7 @@ Returns a supported comparable neighbourhood, if one exists.
   "notices": [
     {
       "code": "comparable_not_identical",
-      "message": "TBC: Neighbourhoods are comparable, not identical."
+      "message": "TBC"
     }
   ]
 }
