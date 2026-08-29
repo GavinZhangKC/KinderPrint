@@ -33,3 +33,12 @@ the datasets or any secrets. The service deliberately returns an unavailable
 or limited state when a source is not configured or cannot be validated.
 
 `GET /api/health` confirms that the FastAPI application is running.
+
+### Backend tests
+
+```bash
+cd backend
+source .venv/bin/activate
+python -m pip install -r requirements-dev.txt
+python -m pytest
+```
