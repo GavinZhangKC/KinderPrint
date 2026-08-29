@@ -1,4 +1,4 @@
-"""KinderPrint API. BE-2 loads only approved source boundary GeoJSON."""
+"""KinderPrint API services for approved neighbourhood evidence and geography."""
 
 from __future__ import annotations
 
@@ -12,7 +12,13 @@ from fastapi import FastAPI, Query
 app = FastAPI(title="KinderPrint API", version="0.1.0")
 
 BOUNDARY_DATA_PATH_ENV = "KINDERPRINT_BOUNDARY_DATA_PATH"
+PROFILE_DATA_PATH_ENV = "KINDERPRINT_PROFILE_DATA_PATH"
 DEFAULT_BOUNDARY_VERSION = "Not supplied"
+AREA_LEVEL_NOTICE = {
+    "code": "area_level_information",
+    "message": "This is aggregate area-level information and is not an assessment of an individual child.",
+}
+INDICATOR_STATUSES = {"available", "missing", "incompatible", "unavailable", "limited"}
 
 
 def envelope(status: str, data: Any, *, metadata: dict[str, Any] | None = None,
@@ -30,6 +36,115 @@ def limitation(code: str, message: str, *affected_fields: str) -> dict[str, Any]
 def boundary_data_path() -> Path | None:
     value = os.getenv(BOUNDARY_DATA_PATH_ENV)
     return Path(value).expanduser() if value else None
+
+
+def profile_data_path() -> Path | None:
+    value = os.getenv(PROFILE_DATA_PATH_ENV)
+    return Path(value).expanduser() if value else None
+
+
+def load_json_source(path: Path | None, env_name: str, resource_name: str) -> tuple[dict[str, Any] | None, list[dict[str, Any]]]:
+    """Load an approved JSON source, reporting configuration errors in-band."""
+    if path is None:
+        return None, [limitation(
+            f"{resource_name}_dataset_not_configured",
+            f"No {resource_name} dataset is configured. Set {env_name} to an approved JSON file.",
+            resource_name)]
+    if not path.is_file():
+        return None, [limitation(
+            f"{resource_name}_dataset_unavailable",
+            f"The configured {resource_name} dataset could not be found.", resource_name)]
+    try:
+        source = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return None, [limitation(
+            f"{resource_name}_dataset_unreadable",
+            f"The configured {resource_name} dataset could not be read as valid JSON.", resource_name)]
+    if not isinstance(source, dict):
+        return None, [limitation(
+            f"{resource_name}_dataset_invalid",
+            f"The configured {resource_name} dataset must contain a JSON object.", resource_name)]
+    return source, []
+
+
+def valid_indicator(indicator: Any, profile_unit: str) -> bool:
+    """Accept only source-supplied indicators with explicit provenance and status."""
+    if not isinstance(indicator, dict) or indicator.get("status") not in INDICATOR_STATUSES:
+        return False
+    required_text = ("id", "name", "source", "geographic_unit", "reference_year")
+    if not all(isinstance(indicator.get(field), (str, int)) and str(indicator[field]).strip()
+               for field in required_text):
+        return False
+    if indicator["status"] != "available" and indicator.get("value") is not None:
+        return False
+    return indicator["status"] != "available" or indicator["geographic_unit"] == profile_unit
+
+
+def valid_profile(profile: Any) -> bool:
+    if not isinstance(profile, dict):
+        return False
+    area, domains = profile.get("neighbourhood"), profile.get("domains")
+    if not isinstance(area, dict) or not isinstance(domains, list):
+        return False
+    if not all(isinstance(area.get(field), str) and area[field].strip()
+               for field in ("id", "name", "geographic_unit")):
+        return False
+    for domain in domains:
+        if not isinstance(domain, dict) or not isinstance(domain.get("id"), str) or not isinstance(domain.get("name"), str):
+            return False
+        indicators = domain.get("indicators")
+        if not isinstance(indicators, list) or not all(valid_indicator(item, area["geographic_unit"]) for item in indicators):
+            return False
+    return True
+
+
+def load_profiles() -> tuple[list[dict[str, Any]] | None, list[dict[str, Any]]]:
+    """Load profiles exactly as prepared by the approved data pipeline."""
+    source, limitations = load_json_source(profile_data_path(), PROFILE_DATA_PATH_ENV, "profile")
+    if source is None:
+        return None, limitations
+    profiles = source.get("profiles")
+    if not isinstance(profiles, list) or not all(valid_profile(profile) for profile in profiles):
+        return None, [limitation(
+            "profile_dataset_invalid",
+            "The profile dataset must contain a profiles list with neighbourhood, domain, indicator, status, and provenance fields.",
+            "profiles")]
+    identifiers = [profile["neighbourhood"]["id"] for profile in profiles]
+    if len(identifiers) != len(set(identifiers)):
+        return None, [limitation("profile_dataset_invalid", "The profile dataset contains duplicate neighbourhood identifiers.", "profiles")]
+    return profiles, []
+
+
+def profile_status(profile: dict[str, Any]) -> str:
+    statuses = {indicator["status"] for domain in profile["domains"] for indicator in domain["indicators"]}
+    for status in ("available", "limited", "incompatible", "missing", "unavailable"):
+        if status in statuses:
+            return status
+    return "unavailable"
+
+
+def profile_limitations(profile: dict[str, Any]) -> list[dict[str, Any]]:
+    """Surface every unavailable input rather than filling, omitting, or estimating it."""
+    limitations = list(profile.get("limitations", []))
+    for domain in profile["domains"]:
+        for indicator in domain["indicators"]:
+            if indicator["status"] != "available":
+                limitations.append(limitation(
+                    f"indicator_{indicator['status']}",
+                    f"{indicator['name']} is {indicator['status']} and no value has been created.",
+                    indicator["id"]))
+    return limitations
+
+
+def profile_metadata(profile: dict[str, Any]) -> dict[str, Any]:
+    indicators = [indicator for domain in profile["domains"] for indicator in domain["indicators"]]
+    source_metadata = profile.get("metadata", {})
+    return {
+        "sources": sorted({str(indicator["source"]) for indicator in indicators}),
+        "reference_years": sorted({str(indicator["reference_year"]) for indicator in indicators}),
+        "geographic_unit": profile["neighbourhood"]["geographic_unit"],
+        "data_quality": source_metadata.get("data_quality", "Provided by the approved profile dataset"),
+    }
 
 
 def valid_boundary_feature(feature: Any) -> bool:
@@ -196,6 +311,27 @@ def visible_boundaries(bbox: str = Query(..., description="west,south,east,north
         "geographic_units": sorted({feature["properties"]["geographic_unit"] for feature in visible}),
         "data_quality": "Source geometry supplied without transformation",
     })
+
+
+@app.get("/api/neighbourhoods/{neighbourhood_id}/profile")
+def neighbourhood_profile(neighbourhood_id: str) -> dict[str, Any]:
+    """Return one approved aggregate-area profile without deriving new values."""
+    profiles, limitations = load_profiles()
+    empty = {
+        "neighbourhood": {"id": neighbourhood_id, "name": None, "geographic_unit": None},
+        "domains": [],
+    }
+    if profiles is None:
+        return envelope("unavailable", empty, limitations=limitations, notices=[AREA_LEVEL_NOTICE])
+    profile = next((item for item in profiles if item["neighbourhood"]["id"] == neighbourhood_id), None)
+    if profile is None:
+        return envelope("missing", empty, limitations=[limitation(
+            "unsupported_neighbourhood", "No supported neighbourhood profile exists for this identifier.",
+            "neighbourhood_id", "profile")], notices=[AREA_LEVEL_NOTICE])
+    return envelope(profile_status(profile), {
+        "neighbourhood": profile["neighbourhood"],
+        "domains": profile["domains"],
+    }, metadata=profile_metadata(profile), limitations=profile_limitations(profile), notices=[AREA_LEVEL_NOTICE])
 
 
 @app.get("/api/neighbourhoods/{neighbourhood_id}/boundary")

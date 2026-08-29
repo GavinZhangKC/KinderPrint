@@ -106,7 +106,20 @@ Returns an aggregate neighbourhood profile. The final geographic identifier form
 }
 ```
 
-An indicator with missing or incompatible input must carry its own non-available status, a `null` value, and the relevant limitation. The backend must not generate, infer, or estimate a replacement value.
+Profiles are loaded unchanged from the approved JSON file named by
+`KINDERPRINT_PROFILE_DATA_PATH`. Its root object must contain a `profiles`
+array. Every profile must contain `neighbourhood` (`id`, `name`, and
+`geographic_unit`) and `domains`; every domain contains `id`, `name`, and
+`indicators`. Every indicator must supply `id`, `name`, `value`, `status`,
+`source`, `geographic_unit`, and `reference_year`.
+
+An indicator with missing, incompatible, unavailable, or limited input must
+carry its own non-available status, a `null` value, and a returned limitation.
+Available indicators must use the profile's geographic unit. The backend does
+not calculate, generate, infer, or estimate a replacement value. If no
+approved profile dataset is configured, invalid, or unsupported for the
+requested identifier, the response has an explicit non-available status and
+the aggregate area-level notice remains present.
 
 ## BE-2 — Geography and Boundary Service
 
