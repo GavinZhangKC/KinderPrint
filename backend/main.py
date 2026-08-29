@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import logging
+import math
 import os
 import time
 from pathlib import Path
@@ -527,20 +528,46 @@ def manual_comparison_data(comparison: dict[str, Any], reverse: bool = False) ->
     }
 
 
+def valid_position(position: Any) -> bool:
+    if not isinstance(position, list) or len(position) < 2:
+        return False
+    if not all(isinstance(value, (int, float)) and not isinstance(value, bool) and math.isfinite(value)
+               for value in position):
+        return False
+    longitude, latitude = position[0], position[1]
+    return -180 <= longitude <= 180 and -90 <= latitude <= 90
+
+
+def valid_linear_ring(ring: Any) -> bool:
+    return (
+        isinstance(ring, list)
+        and len(ring) >= 4
+        and all(valid_position(position) for position in ring)
+        and ring[0][:2] == ring[-1][:2]
+    )
+
+
+def valid_polygon_coordinates(coordinates: Any) -> bool:
+    return isinstance(coordinates, list) and bool(coordinates) and all(valid_linear_ring(ring) for ring in coordinates)
+
+
 def valid_boundary_feature(feature: Any) -> bool:
     """Require the identity and polygon geometry supplied by the source."""
     if not isinstance(feature, dict) or feature.get("type") != "Feature":
         return False
     properties, geometry = feature.get("properties"), feature.get("geometry")
-    return (
-        isinstance(properties, dict)
-        and all(isinstance(properties.get(field), str) and properties[field].strip()
-                for field in ("id", "name", "geographic_unit"))
-        and isinstance(geometry, dict)
-        and geometry.get("type") in {"Polygon", "MultiPolygon"}
-        and isinstance(geometry.get("coordinates"), list)
-        and bool(geometry["coordinates"])
-    )
+    if not (isinstance(properties, dict)
+            and all(isinstance(properties.get(field), str) and properties[field].strip()
+                    for field in ("id", "name", "geographic_unit"))
+            and isinstance(geometry, dict)):
+        return False
+    coordinates = geometry.get("coordinates")
+    if geometry.get("type") == "Polygon":
+        return valid_polygon_coordinates(coordinates)
+    if geometry.get("type") == "MultiPolygon":
+        return isinstance(coordinates, list) and bool(coordinates) and all(
+            valid_polygon_coordinates(polygon) for polygon in coordinates)
+    return False
 
 
 def load_boundary_features() -> tuple[list[dict[str, Any]] | None, list[dict[str, Any]]]:
@@ -559,7 +586,8 @@ def load_boundary_features() -> tuple[list[dict[str, Any]] | None, list[dict[str
     except (OSError, json.JSONDecodeError):
         return None, [limitation("boundary_dataset_unreadable",
                                  "The configured boundary dataset could not be read as valid GeoJSON.", "geometry")]
-    if source.get("type") != "FeatureCollection" or not isinstance(source.get("features"), list):
+    if (not isinstance(source, dict) or source.get("type") != "FeatureCollection"
+            or not isinstance(source.get("features"), list)):
         return None, [limitation("boundary_dataset_invalid",
                                  "The configured boundary dataset is not a GeoJSON FeatureCollection.", "geometry")]
     features = source["features"]
@@ -568,6 +596,12 @@ def load_boundary_features() -> tuple[list[dict[str, Any]] | None, list[dict[str
             "boundary_dataset_invalid",
             "The boundary dataset contains a feature without a supported neighbourhood identity, geographic unit, or polygon geometry.",
             "geometry")]
+    identifiers = [feature["properties"]["id"] for feature in features]
+    if len(identifiers) != len(set(identifiers)):
+        return None, [limitation(
+            "boundary_dataset_invalid",
+            "The boundary dataset contains duplicate neighbourhood identifiers.",
+            "features")]
     return features, []
 
 
@@ -597,11 +631,11 @@ def parse_bbox(bbox: str) -> tuple[float, float, float, float] | None:
     return west, south, east, north
 
 
-def polygon_rings(feature: dict[str, Any]) -> list[list[list[float]]]:
+def feature_polygons(feature: dict[str, Any]) -> list[list[list[list[float]]]]:
     geometry = feature["geometry"]
     if geometry["type"] == "Polygon":
-        return geometry["coordinates"]
-    return [ring for polygon in geometry["coordinates"] for ring in polygon]
+        return [geometry["coordinates"]]
+    return geometry["coordinates"]
 
 
 def point_in_bbox(point: tuple[float, float], bbox: tuple[float, float, float, float]) -> bool:
@@ -614,11 +648,23 @@ def segments_intersect(first: tuple[float, float], second: tuple[float, float],
     def orientation(start: tuple[float, float], end: tuple[float, float], point: tuple[float, float]) -> float:
         return (end[0] - start[0]) * (point[1] - start[1]) - (end[1] - start[1]) * (point[0] - start[0])
 
+    def on_segment(start: tuple[float, float], end: tuple[float, float], point: tuple[float, float]) -> bool:
+        return (min(start[0], end[0]) <= point[0] <= max(start[0], end[0])
+                and min(start[1], end[1]) <= point[1] <= max(start[1], end[1]))
+
     first_side = orientation(first, second, third)
     second_side = orientation(first, second, fourth)
     third_side = orientation(third, fourth, first)
     fourth_side = orientation(third, fourth, second)
-    return first_side * second_side <= 0 and third_side * fourth_side <= 0
+    if ((first_side > 0 > second_side or first_side < 0 < second_side)
+            and (third_side > 0 > fourth_side or third_side < 0 < fourth_side)):
+        return True
+    return (
+        (first_side == 0 and on_segment(first, second, third))
+        or (second_side == 0 and on_segment(first, second, fourth))
+        or (third_side == 0 and on_segment(third, fourth, first))
+        or (fourth_side == 0 and on_segment(third, fourth, second))
+    )
 
 
 def point_in_ring(point: tuple[float, float], ring: list[list[float]]) -> bool:
@@ -633,23 +679,35 @@ def point_in_ring(point: tuple[float, float], ring: list[list[float]]) -> bool:
     return inside
 
 
+def point_on_ring(point: tuple[float, float], ring: list[list[float]]) -> bool:
+    vertices = [(float(position[0]), float(position[1])) for position in ring]
+    return any(segments_intersect(start, end, point, point) for start, end in zip(vertices, vertices[1:]))
+
+
+def point_in_polygon(point: tuple[float, float], polygon: list[list[list[float]]]) -> bool:
+    if any(point_on_ring(point, ring) for ring in polygon):
+        return True
+    return point_in_ring(point, polygon[0]) and not any(point_in_ring(point, hole) for hole in polygon[1:])
+
+
 def intersects_bbox(feature: dict[str, Any], bbox: tuple[float, float, float, float]) -> bool:
     """Check boundary geometry against the map rectangle, not only its extent."""
-    rings = polygon_rings(feature)
-    points = [(float(point[0]), float(point[1])) for ring in rings for point in ring]
-    if any(point_in_bbox(point, bbox) for point in points):
-        return True
     west, south, east, north = bbox
     rectangle = [(west, south), (east, south), (east, north), (west, north)]
-    for ring in rings:
-        vertices = [(float(point[0]), float(point[1])) for point in ring]
-        for start, end in zip(vertices, vertices[1:] + vertices[:1]):
-            for rectangle_start, rectangle_end in zip(rectangle, rectangle[1:] + rectangle[:1]):
-                if segments_intersect(start, end, rectangle_start, rectangle_end):
-                    return True
-    # A map view fully contained by a polygon has no boundary points or edges
-    # inside it. A corner inside an exterior ring still means it intersects.
-    return any(point_in_ring(corner, ring) for ring in rings for corner in rectangle)
+    rectangle_edges = list(zip(rectangle, rectangle[1:] + rectangle[:1]))
+    for polygon in feature_polygons(feature):
+        if any(point_in_bbox((float(point[0]), float(point[1])), bbox)
+               for ring in polygon for point in ring):
+            return True
+        for ring in polygon:
+            vertices = [(float(point[0]), float(point[1])) for point in ring]
+            if any(segments_intersect(start, end, rectangle_start, rectangle_end)
+                   for start, end in zip(vertices, vertices[1:])
+                   for rectangle_start, rectangle_end in rectangle_edges):
+                return True
+        if any(point_in_polygon(corner, polygon) for corner in rectangle):
+            return True
+    return False
 
 
 @app.get("/")
