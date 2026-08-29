@@ -28,7 +28,7 @@ The backend is available at `http://127.0.0.1:8000` by default.
 
 The Iteration 1 services read only approved, processed datasets. Copy
 [`backend/.env.example`](backend/.env.example) into deployment-managed
-environment configuration and provide the four dataset paths. Do not commit
+environment configuration and provide the five dataset paths. Do not commit
 the datasets or any secrets. The service deliberately returns an unavailable
 or limited state when a source is not configured or cannot be validated.
 
@@ -44,7 +44,7 @@ Build a generic deployment image from the repository root:
 docker build -t kinderprint-api ./backend
 ```
 
-At runtime, provide the four data-path environment variables and mount or
+At runtime, provide the five data-path environment variables and mount or
 otherwise securely make the approved datasets available at those paths. The
 image intentionally excludes `.env` files and JSON datasets; cloud platform,
 secret-store, and dataset-storage choices remain deployment decisions.

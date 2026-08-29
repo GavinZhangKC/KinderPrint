@@ -20,6 +20,7 @@ BOUNDARY_DATA_PATH_ENV = "KINDERPRINT_BOUNDARY_DATA_PATH"
 PROFILE_DATA_PATH_ENV = "KINDERPRINT_PROFILE_DATA_PATH"
 PRIORITY_DATA_PATH_ENV = "KINDERPRINT_PRIORITY_DATA_PATH"
 EXPLANATION_DATA_PATH_ENV = "KINDERPRINT_EXPLANATION_DATA_PATH"
+COMPARISON_DATA_PATH_ENV = "KINDERPRINT_COMPARISON_DATA_PATH"
 DEFAULT_BOUNDARY_VERSION = "Not supplied"
 AREA_LEVEL_NOTICE = {
     "code": "area_level_information",
@@ -38,6 +39,14 @@ ASSOCIATION_NOTICE = {
 INVESTIGATION_LEADS_NOTICE = {
     "code": "investigation_leads",
     "message": "Highlighted factors are investigation leads for local validation, not proven causes.",
+}
+COMPARABLE_NOTICE = {
+    "code": "comparable_not_identical",
+    "message": "These neighbourhoods are comparable, not identical.",
+}
+COMPARISON_AREA_NOTICE = {
+    "code": "area_level_comparison",
+    "message": "This is a comparison between aggregate area-level neighbourhood information, not individual children.",
 }
 
 
@@ -99,6 +108,11 @@ def priority_data_path() -> Path | None:
 
 def explanation_data_path() -> Path | None:
     value = os.getenv(EXPLANATION_DATA_PATH_ENV)
+    return Path(value).expanduser() if value else None
+
+
+def comparison_data_path() -> Path | None:
+    value = os.getenv(COMPARISON_DATA_PATH_ENV)
     return Path(value).expanduser() if value else None
 
 
@@ -361,6 +375,120 @@ def explanation_data(explanation: dict[str, Any]) -> dict[str, Any]:
     }
 
 
+def valid_comparison_area(area: Any) -> bool:
+    return isinstance(area, dict) and all(isinstance(area.get(field), str) and area[field].strip()
+                                          for field in ("id", "name", "geographic_unit"))
+
+
+def valid_similarity_basis(basis: Any) -> bool:
+    return isinstance(basis, list) and bool(basis) and all(isinstance(item, str) and item.strip() for item in basis)
+
+
+def valid_side_by_side_field(field: Any) -> bool:
+    if not isinstance(field, dict) or not all(isinstance(field.get(key), str) and field[key].strip()
+                                              for key in ("id", "name", "source_status", "comparison_status")):
+        return False
+    if field["source_status"] not in INDICATOR_STATUSES or field["comparison_status"] not in INDICATOR_STATUSES:
+        return False
+    return (
+        (field["source_status"] == "available" or field.get("source_value") is None)
+        and (field["comparison_status"] == "available" or field.get("comparison_value") is None)
+    )
+
+
+def valid_match(match: Any) -> bool:
+    if not isinstance(match, dict) or match.get("status") not in {"available", "limited", "no_match"}:
+        return False
+    if not valid_comparison_area(match.get("source_neighbourhood")):
+        return False
+    if match["status"] == "no_match":
+        return (
+            match.get("matched_neighbourhood") is None
+            and match.get("match_strength") is None
+            and match.get("similarity_basis") == []
+            and isinstance(match.get("limitations"), list)
+            and bool(match["limitations"])
+        )
+    return (
+        valid_comparison_area(match.get("matched_neighbourhood"))
+        and match["source_neighbourhood"]["geographic_unit"] == match["matched_neighbourhood"]["geographic_unit"]
+        and valid_similarity_basis(match.get("similarity_basis"))
+        and isinstance(match.get("match_strength"), str)
+        and bool(match["match_strength"].strip())
+    )
+
+
+def valid_manual_comparison(comparison: Any) -> bool:
+    if not isinstance(comparison, dict) or comparison.get("status") not in {"available", "limited", "no_match"}:
+        return False
+    source, compared = comparison.get("source_neighbourhood"), comparison.get("comparison_neighbourhood")
+    if not valid_comparison_area(source) or not valid_comparison_area(compared):
+        return False
+    if comparison["status"] == "no_match":
+        return (
+            comparison.get("match_strength") is None
+            and comparison.get("similarity_basis") == []
+            and comparison.get("side_by_side") == []
+            and isinstance(comparison.get("limitations"), list)
+            and bool(comparison["limitations"])
+        )
+    return (
+        source["geographic_unit"] == compared["geographic_unit"]
+        and valid_similarity_basis(comparison.get("similarity_basis"))
+        and isinstance(comparison.get("match_strength"), str)
+        and bool(comparison["match_strength"].strip())
+        and isinstance(comparison.get("side_by_side"), list)
+        and all(valid_side_by_side_field(field) for field in comparison["side_by_side"])
+    )
+
+
+def load_comparison_data() -> tuple[dict[str, list[dict[str, Any]]] | None, dict[str, Any] | None, list[dict[str, Any]]]:
+    """Load only approved matching outputs; the API never finds or forces a match."""
+    source, limitations = load_json_source(comparison_data_path(), COMPARISON_DATA_PATH_ENV, "comparison")
+    if source is None:
+        return None, None, limitations
+    matches, comparisons, metadata = source.get("matches"), source.get("comparisons"), source.get("metadata")
+    if (source.get("approved") is not True or not isinstance(matches, list) or not isinstance(comparisons, list)
+            or not valid_priority_metadata(metadata)):
+        return None, None, [limitation(
+            "comparison_dataset_invalid",
+            "The comparison dataset must be explicitly approved and contain matches, comparisons, and complete provenance metadata.",
+            "comparison")]
+    if not all(valid_match(match) for match in matches) or not all(valid_manual_comparison(item) for item in comparisons):
+        return None, None, [limitation(
+            "comparison_dataset_invalid",
+            "The comparison dataset contains an invalid match, comparison, strength, or side-by-side field.",
+            "comparison")]
+    match_ids = [match["source_neighbourhood"]["id"] for match in matches]
+    if len(match_ids) != len(set(match_ids)):
+        return None, None, [limitation("comparison_dataset_invalid", "The comparison dataset contains duplicate recommended-match identifiers.", "matches")]
+    return {"matches": matches, "comparisons": comparisons}, metadata, []
+
+
+def match_data(match: dict[str, Any]) -> dict[str, Any]:
+    return {key: match[key] for key in ("source_neighbourhood", "matched_neighbourhood", "similarity_basis", "match_strength")}
+
+
+def manual_comparison_data(comparison: dict[str, Any], reverse: bool = False) -> dict[str, Any]:
+    """Keep the response in the practitioner's selected order when a pair is stored reversed."""
+    fields = comparison["side_by_side"]
+    if reverse:
+        fields = [{
+            **field,
+            "source_value": field.get("comparison_value"),
+            "comparison_value": field.get("source_value"),
+            "source_status": field["comparison_status"],
+            "comparison_status": field["source_status"],
+        } for field in fields]
+    return {
+        "source_neighbourhood": comparison["comparison_neighbourhood"] if reverse else comparison["source_neighbourhood"],
+        "comparison_neighbourhood": comparison["source_neighbourhood"] if reverse else comparison["comparison_neighbourhood"],
+        "side_by_side": fields,
+        "similarity_basis": comparison["similarity_basis"],
+        "match_strength": comparison["match_strength"],
+    }
+
+
 def valid_boundary_feature(feature: Any) -> bool:
     """Require the identity and polygon geometry supplied by the source."""
     if not isinstance(feature, dict) or feature.get("type") != "Feature":
@@ -498,11 +626,13 @@ def health() -> dict[str, Any]:
     boundaries, boundary_limitations = load_boundary_features()
     priorities, _, priority_limitations = load_priority_results()
     explanations, _, explanation_limitations = load_explanations()
+    comparisons, _, comparison_limitations = load_comparison_data()
     datasets = {
         "profiles": {"status": "available" if profiles is not None else "unavailable", "limitations": profile_limitations},
         "boundaries": {"status": "available" if boundaries is not None else "unavailable", "limitations": boundary_limitations},
         "priorities": {"status": "available" if priorities is not None else "unavailable", "limitations": priority_limitations},
         "explanations": {"status": "available" if explanations is not None else "unavailable", "limitations": explanation_limitations},
+        "comparisons": {"status": "available" if comparisons is not None else "unavailable", "limitations": comparison_limitations},
     }
     ready = all(dataset["status"] == "available" for dataset in datasets.values())
     return envelope("available", {"service": "KinderPrint API", "readiness": "ready" if ready else "limited", "datasets": datasets})
@@ -616,6 +746,68 @@ def neighbourhood_explanation(neighbourhood_id: str) -> dict[str, Any]:
             "neighbourhood_id", "explanation")], notices=notices)
     return envelope(explanation["status"], explanation_data(explanation), metadata=metadata,
                     limitations=explanation.get("limitations", []), notices=notices)
+
+
+@app.get("/api/neighbourhoods/{neighbourhood_id}/match")
+def neighbourhood_match(neighbourhood_id: str) -> dict[str, Any]:
+    """Return one approved comparable neighbourhood or explicitly withhold a match."""
+    comparison_data, metadata, limitations = load_comparison_data()
+    notices = [COMPARABLE_NOTICE, COMPARISON_AREA_NOTICE]
+    empty = {
+        "source_neighbourhood": {"id": neighbourhood_id, "name": None, "geographic_unit": None},
+        "matched_neighbourhood": None,
+        "similarity_basis": [],
+        "match_strength": None,
+    }
+    if comparison_data is None:
+        return envelope("unavailable", empty, limitations=limitations, notices=notices)
+    match = next((item for item in comparison_data["matches"] if item["source_neighbourhood"]["id"] == neighbourhood_id), None)
+    if match is None:
+        return envelope("no_match", empty, metadata=metadata, limitations=[limitation(
+            "no_approved_match", "No approved comparable neighbourhood is available for this identifier.",
+            "neighbourhood_id", "match")], notices=notices)
+    return envelope(match["status"], match_data(match), metadata=metadata,
+                    limitations=match.get("limitations", []), notices=notices)
+
+
+@app.get("/api/compare")
+def manual_compare(
+    neighbourhood_id_a: str = Query(..., min_length=1, max_length=100),
+    neighbourhood_id_b: str = Query(..., min_length=1, max_length=100),
+) -> dict[str, Any]:
+    """Return an approved side-by-side comparison in the selected order."""
+    notices = [COMPARABLE_NOTICE, COMPARISON_AREA_NOTICE]
+    if neighbourhood_id_a == neighbourhood_id_b:
+        return envelope("no_match", {
+            "source_neighbourhood": {"id": neighbourhood_id_a, "name": None, "geographic_unit": None},
+            "comparison_neighbourhood": {"id": neighbourhood_id_b, "name": None, "geographic_unit": None},
+            "side_by_side": [], "similarity_basis": [], "match_strength": None,
+        }, limitations=[limitation(
+            "same_neighbourhood_selected", "Choose two different neighbourhoods for a comparison.",
+            "neighbourhood_id_a", "neighbourhood_id_b")], notices=notices)
+    comparison_data, metadata, limitations = load_comparison_data()
+    empty = {
+        "source_neighbourhood": {"id": neighbourhood_id_a, "name": None, "geographic_unit": None},
+        "comparison_neighbourhood": {"id": neighbourhood_id_b, "name": None, "geographic_unit": None},
+        "side_by_side": [], "similarity_basis": [], "match_strength": None,
+    }
+    if comparison_data is None:
+        return envelope("unavailable", empty, limitations=limitations, notices=notices)
+    comparison = next((item for item in comparison_data["comparisons"]
+                       if item["source_neighbourhood"]["id"] == neighbourhood_id_a
+                       and item["comparison_neighbourhood"]["id"] == neighbourhood_id_b), None)
+    reverse = False
+    if comparison is None:
+        comparison = next((item for item in comparison_data["comparisons"]
+                           if item["source_neighbourhood"]["id"] == neighbourhood_id_b
+                           and item["comparison_neighbourhood"]["id"] == neighbourhood_id_a), None)
+        reverse = comparison is not None
+    if comparison is None:
+        return envelope("no_match", empty, metadata=metadata, limitations=[limitation(
+            "no_approved_comparison", "No approved side-by-side comparison is available for these neighbourhoods.",
+            "neighbourhood_id_a", "neighbourhood_id_b")], notices=notices)
+    return envelope(comparison["status"], manual_comparison_data(comparison, reverse), metadata=metadata,
+                    limitations=comparison.get("limitations", []), notices=notices)
 
 
 @app.get("/api/neighbourhoods/{neighbourhood_id}/boundary")

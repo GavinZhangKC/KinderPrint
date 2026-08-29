@@ -352,7 +352,19 @@ Returns a supported comparable neighbourhood, if one exists.
 }
 ```
 
-Only neighbourhoods with compatible confirmed geographic units and approved social/demographic variables may be matched. Final variables and match-strength thresholds or categories are TBC. A weak match uses `limited`. If no suitable comparison is supportable, the response uses `no_match`, sets `matched_neighbourhood` and `match_strength` to `null`, and explains why; the backend must not force a match.
+Recommended matches and manual comparisons are loaded from the JSON file named
+by `KINDERPRINT_COMPARISON_DATA_PATH`; the source must set `approved` to
+`true`. It must supply source-level metadata (`source`, `reference_year`,
+`geographic_unit`, and `data_quality`), a `matches` array, and a
+`comparisons` array. Both selected neighbourhoods carry their confirmed
+geographic unit, so supported matches can be validated as like-for-like.
+
+Only neighbourhoods with compatible confirmed geographic units and approved
+social/demographic variables may be matched. A weak match uses `limited`. If
+no suitable comparison is supportable, the response uses `no_match`, sets
+`matched_neighbourhood` and `match_strength` to `null`, and explains why; the
+backend must not force a match. Every match response includes comparable-not-
+identical and area-level-comparison notices.
 
 ### `GET /api/compare`
 
@@ -361,7 +373,7 @@ Prepares a side-by-side comparison of any two supported neighbourhoods. Provisio
 The response uses the standard envelope and supports:
 
 - both neighbourhood identifiers, names, and confirmed geographic units;
-- side-by-side comparison fields (final fields TBC);
+- side-by-side comparison fields supplied by the approved data source;
 - approved similarity variables or basis;
 - match strength, including `limited` for weak comparisons;
 - source, reference year, geographic unit, and data quality;
@@ -369,7 +381,13 @@ The response uses the standard envelope and supports:
 - an area-level comparison notice; and
 - a comparable-not-identical notice.
 
-No final matching variable, threshold, strength category, or comparison field is defined by this contract.
+Each source comparison record contains `source_neighbourhood`,
+`comparison_neighbourhood`, `similarity_basis`, `match_strength`, and
+`side_by_side`. Each side-by-side field includes an ID, name, source and
+comparison values, and a status for each value. The API may reverse an
+approved pair solely to present it in the practitioner’s selected order; it
+does not calculate a match or derive a comparison value. If no approved pair
+exists, it returns `no_match` rather than forcing a comparison.
 
 ## Error handling
 
