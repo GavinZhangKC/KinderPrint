@@ -149,6 +149,8 @@ def valid_indicator(indicator: Any, profile_unit: str) -> bool:
     if not all(isinstance(indicator.get(field), (str, int)) and str(indicator[field]).strip()
                for field in required_text):
         return False
+    if indicator["status"] == "available" and indicator.get("value") is None:
+        return False
     if indicator["status"] != "available" and indicator.get("value") is not None:
         return False
     return indicator["status"] != "available" or indicator["geographic_unit"] == profile_unit
@@ -163,13 +165,22 @@ def valid_profile(profile: Any) -> bool:
     if not all(isinstance(area.get(field), str) and area[field].strip()
                for field in ("id", "name", "geographic_unit")):
         return False
+    if len(domains) != len(PRIORITY_DOMAINS):
+        return False
+    if {domain.get("name") for domain in domains if isinstance(domain, dict)} != PRIORITY_DOMAINS:
+        return False
+    domain_ids: list[str] = []
+    indicator_ids: list[str] = []
     for domain in domains:
-        if not isinstance(domain, dict) or not isinstance(domain.get("id"), str) or not isinstance(domain.get("name"), str):
+        if (not isinstance(domain, dict) or not isinstance(domain.get("id"), str)
+                or not domain["id"].strip() or not isinstance(domain.get("name"), str)):
             return False
+        domain_ids.append(domain["id"])
         indicators = domain.get("indicators")
         if not isinstance(indicators, list) or not all(valid_indicator(item, area["geographic_unit"]) for item in indicators):
             return False
-    return True
+        indicator_ids.extend(item["id"] for item in indicators)
+    return len(domain_ids) == len(set(domain_ids)) and len(indicator_ids) == len(set(indicator_ids))
 
 
 def load_profiles() -> tuple[list[dict[str, Any]] | None, list[dict[str, Any]]]:
@@ -190,11 +201,18 @@ def load_profiles() -> tuple[list[dict[str, Any]] | None, list[dict[str, Any]]]:
 
 
 def profile_status(profile: dict[str, Any]) -> str:
-    statuses = {indicator["status"] for domain in profile["domains"] for indicator in domain["indicators"]}
-    for status in ("available", "limited", "incompatible", "missing", "unavailable"):
-        if status in statuses:
-            return status
-    return "unavailable"
+    statuses = [indicator["status"] for domain in profile["domains"] for indicator in domain["indicators"]]
+    return aggregate_status(statuses)
+
+
+def aggregate_status(statuses: list[str]) -> str:
+    """Summarise inputs without hiding partial or incompatible coverage."""
+    if not statuses:
+        return "unavailable"
+    unique_statuses = set(statuses)
+    if len(unique_statuses) == 1:
+        return statuses[0]
+    return "limited"
 
 
 def profile_limitations(profile: dict[str, Any]) -> list[dict[str, Any]]:
@@ -240,23 +258,38 @@ def valid_priority_result(result: Any) -> bool:
     if not isinstance(area, dict) or not all(isinstance(area.get(field), str) and area[field].strip()
                                              for field in ("id", "name")):
         return False
+    if any(key in result for key in ("score", "priority_score", "numeric_score")):
+        return False
     domains = result.get("contributing_domains")
-    if not isinstance(domains, list) or not all(domain in PRIORITY_DOMAINS for domain in domains):
+    if (not isinstance(domains, list) or len(domains) != len(set(domains))
+            or not all(domain in PRIORITY_DOMAINS for domain in domains)):
         return False
     if result["status"] == "available":
+        priority_band = result.get("priority_band")
         return (
             result.get("label") == "Priority for Investigation"
-            and isinstance(result.get("priority_band"), str)
-            and bool(result["priority_band"].strip())
-            and set(domains) == PRIORITY_DOMAINS
+            and isinstance(priority_band, str)
+            and bool(priority_band.strip())
+            and not numeric_string(priority_band)
+            and bool(domains)
         )
     return (
-        result.get("label") is None
+        result.get("label") == "Priority for Investigation"
         and result.get("priority_band") is None
+        and domains == []
         and isinstance(result.get("limitations"), list)
         and bool(result["limitations"])
         and all(valid_priority_limitation(item) for item in result["limitations"])
     )
+
+
+def numeric_string(value: str) -> bool:
+    """Reject an exact numeric value presented as a priority band string."""
+    try:
+        float(value.strip())
+    except ValueError:
+        return False
+    return True
 
 
 def load_priority_results() -> tuple[list[dict[str, Any]] | None, dict[str, Any] | None, list[dict[str, Any]]]:
@@ -298,13 +331,11 @@ def valid_explanation_factor(factor: Any) -> bool:
                for field in ("id", "name", "source", "geographic_unit", "reference_year"))
 
 
-def valid_incomplete_input(item: Any, factor_ids: set[str]) -> bool:
+def valid_incomplete_input(item: Any, factor_references: set[str]) -> bool:
     return (
         isinstance(item, dict)
-        and isinstance(item.get("indicator_id"), str)
-        and item["indicator_id"] in factor_ids
         and isinstance(item.get("indicator"), str)
-        and bool(item["indicator"].strip())
+        and item["indicator"] in factor_references
         and isinstance(item.get("reason"), str)
         and bool(item["reason"].strip())
     )
@@ -321,6 +352,8 @@ def valid_explanation(explanation: Any) -> bool:
     if not isinstance(domains, list) or not all(isinstance(domain, dict) and domain.get("domain") in PRIORITY_DOMAINS
                                                 and isinstance(domain.get("factors"), list) for domain in domains):
         return False
+    if len(domains) != len(PRIORITY_DOMAINS) or {domain["domain"] for domain in domains} != PRIORITY_DOMAINS:
+        return False
     factors = [factor for domain in domains for factor in domain["factors"]]
     if not all(valid_explanation_factor(factor) for factor in factors):
         return False
@@ -333,11 +366,15 @@ def valid_explanation(explanation: Any) -> bool:
     if len(highlighted) != len(set(highlighted)) or not set(highlighted).issubset(factor_ids):
         return False
     incomplete_inputs = explanation.get("incomplete_inputs")
-    if not isinstance(incomplete_inputs, list) or not all(valid_incomplete_input(item, set(factor_ids)) for item in incomplete_inputs):
+    factor_references = set(factor_ids) | {factor["name"] for factor in factors}
+    if not isinstance(incomplete_inputs, list) or not all(valid_incomplete_input(item, factor_references) for item in incomplete_inputs):
         return False
-    incomplete_ids = {item["indicator_id"] for item in incomplete_inputs}
-    unavailable_ids = {factor["id"] for factor in factors if factor["status"] != "available"}
-    if not unavailable_ids.issubset(incomplete_ids):
+    incomplete_references = {item["indicator"] for item in incomplete_inputs}
+    unavailable_factors = [factor for factor in factors if factor["status"] != "available"]
+    if not all(factor["id"] in incomplete_references or factor["name"] in incomplete_references
+               for factor in unavailable_factors):
+        return False
+    if explanation["status"] != aggregate_status([factor["status"] for factor in factors]):
         return False
     if explanation["status"] != "available":
         return isinstance(explanation.get("limitations"), list) and bool(explanation["limitations"])
@@ -698,7 +735,7 @@ def neighbourhood_priority(neighbourhood_id: str) -> dict[str, Any]:
     """Return the approved relative priority band or withhold an unsupported result."""
     results, metadata, limitations = load_priority_results()
     empty = {
-        "label": None,
+        "label": "Priority for Investigation",
         "neighbourhood": {"id": neighbourhood_id, "name": None},
         "priority_band": None,
         "contributing_domains": [],
