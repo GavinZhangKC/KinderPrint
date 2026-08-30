@@ -10,6 +10,9 @@ __pycache__/
 
 # Environment and editor files
 .env
+.env.*
+!.env.example
+!.env.kinderprint.example
 .DS_Store
 .idea/
 .vscode/
