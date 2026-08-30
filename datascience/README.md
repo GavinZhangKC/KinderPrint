@@ -1,4 +1,4 @@
-# KinderPrint — Data Science
+# KinderPrint Data Science & Geospatial Analytics
 
 Pipeline and analytics for KinderPrint Iteration 1. Greater Melbourne, SA2, ASGS Edition 3 (2021).
 
@@ -70,7 +70,7 @@ metrics. If the test suite fails, artefacts are not published.
 | Open Space | Victorian Planning Authority | — | CC-BY-4.0 |
 
 Rejected after assessment: BoM AGCD (CC-BY-NC), Heat Vulnerability Index (built from
-SEIFA — double counts), Vicmap Tree Density (maps forest, not suburban canopy),
+SEIFA - double counts), Vicmap Tree Density (maps forest, not suburban canopy),
 Parks Victoria estate (excludes council parks), ASGS Edition 4 (incompatible boundaries).
 
 ## Key decisions
@@ -78,7 +78,7 @@ Parks Victoria estate (excludes council parks), ASGS Edition 4 (incompatible bou
 **Geography.** SA2, ASGS **Edition 3 (2021)**. Edition 4 became the ABS default in July
 2026 and its codes partially match Edition 3, so a naive join fails silently. Pinned.
 
-**Analysis unit.** AEDC reporting area — usually one SA2, but 13 of 346 are groups of
+**Analysis unit.** AEDC reporting area, usually one SA2, but 13 of 346 are groups of
 2–4 SA2s AEDC merges to meet its minimum child count. `community_sa2` bridges them.
 
 **No imputation.** Suppressed AEDC values stay suppressed. 4 communities excluded, 0 filled.
