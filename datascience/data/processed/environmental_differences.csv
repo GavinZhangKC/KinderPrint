@@ -1,0 +1,793 @@
+community_id,peer_id,indicator,label,unit,source_value,peer_value,abs_diff,std_diff,aedc_gap,aedc_sig,rank
+MEL0001,MEL0005,vegetation_pct,Tree canopy,%,11.84,8.74,3.1,0.384,10.8,False,2.0
+MEL0001,MEL0005,uhi_degc,Urban heat island,°C,8.66,8.95,-0.29,-0.158,10.8,False,3.0
+MEL0001,MEL0005,open_space_pct,Public open space,%,13.47,8.39,5.08,0.593,10.8,False,1.0
+MEL0002,MEL0004,vegetation_pct,Tree canopy,%,11.44,9.11,2.33,0.288,3.4,False,2.0
+MEL0002,MEL0004,uhi_degc,Urban heat island,°C,9.02,8.82,0.2,0.109,3.4,False,3.0
+MEL0002,MEL0004,open_space_pct,Public open space,%,7.52,0.48,7.04,0.821,3.4,False,1.0
+MEL0003,MEL0010,vegetation_pct,Tree canopy,%,10.16,14.31,-4.15,-0.513,1.0,False,2.0
+MEL0003,MEL0010,uhi_degc,Urban heat island,°C,8.99,7.91,1.08,0.588,1.0,False,1.0
+MEL0003,MEL0010,open_space_pct,Public open space,%,6.8,9.96,-3.15,-0.368,1.0,False,3.0
+MEL0004,MEL0005,vegetation_pct,Tree canopy,%,9.11,8.74,0.38,0.047,-3.2,False,3.0
+MEL0004,MEL0005,uhi_degc,Urban heat island,°C,8.82,8.95,-0.14,-0.075,-3.2,False,2.0
+MEL0004,MEL0005,open_space_pct,Public open space,%,0.48,8.39,-7.91,-0.922,-3.2,False,1.0
+MEL0005,MEL0016,vegetation_pct,Tree canopy,%,8.74,13.33,-4.59,-0.568,2.2,False,1.0
+MEL0005,MEL0016,uhi_degc,Urban heat island,°C,8.95,9.5,-0.55,-0.296,2.2,False,2.0
+MEL0005,MEL0016,open_space_pct,Public open space,%,8.39,9.14,-0.75,-0.087,2.2,False,3.0
+MEL0006,MEL0009,vegetation_pct,Tree canopy,%,11.2,11.71,-0.5,-0.062,-6.8,False,3.0
+MEL0006,MEL0009,uhi_degc,Urban heat island,°C,9.11,8.38,0.73,0.395,-6.8,False,1.0
+MEL0006,MEL0009,open_space_pct,Public open space,%,11.23,9.26,1.97,0.23,-6.8,False,2.0
+MEL0007,MEL0008,vegetation_pct,Tree canopy,%,9.85,15.47,-5.62,-0.695,1.3,False,3.0
+MEL0007,MEL0008,uhi_degc,Urban heat island,°C,8.96,7.65,1.31,0.713,1.3,False,2.0
+MEL0007,MEL0008,open_space_pct,Public open space,%,2.28,8.84,-6.56,-0.765,1.3,False,1.0
+MEL0008,MEL0009,vegetation_pct,Tree canopy,%,15.47,11.71,3.77,0.466,-1.6,False,1.0
+MEL0008,MEL0009,uhi_degc,Urban heat island,°C,7.65,8.38,-0.73,-0.397,-1.6,False,2.0
+MEL0008,MEL0009,open_space_pct,Public open space,%,8.84,9.26,-0.42,-0.049,-1.6,False,3.0
+MEL0009,MEL0008,vegetation_pct,Tree canopy,%,11.71,15.47,-3.77,-0.466,1.6,False,1.0
+MEL0009,MEL0008,uhi_degc,Urban heat island,°C,8.38,7.65,0.73,0.397,1.6,False,2.0
+MEL0009,MEL0008,open_space_pct,Public open space,%,9.26,8.84,0.42,0.049,1.6,False,3.0
+MEL0010,MEL0011,vegetation_pct,Tree canopy,%,14.31,14.94,-0.64,-0.079,-5.1,False,2.0
+MEL0010,MEL0011,uhi_degc,Urban heat island,°C,7.91,7.84,0.07,0.037,-5.1,False,3.0
+MEL0010,MEL0011,open_space_pct,Public open space,%,9.96,9.17,0.79,0.092,-5.1,False,1.0
+MEL0011,MEL0010,vegetation_pct,Tree canopy,%,14.94,14.31,0.64,0.079,5.1,False,2.0
+MEL0011,MEL0010,uhi_degc,Urban heat island,°C,7.84,7.91,-0.07,-0.037,5.1,False,3.0
+MEL0011,MEL0010,open_space_pct,Public open space,%,9.17,9.96,-0.79,-0.092,5.1,False,1.0
+MEL0012,MEL0050,vegetation_pct,Tree canopy,%,11.46,22.73,-11.26,-1.393,-3.2,False,3.0
+MEL0012,MEL0050,uhi_degc,Urban heat island,°C,9.47,6.52,2.95,1.601,-3.2,False,2.0
+MEL0012,MEL0050,open_space_pct,Public open space,%,11.71,31.59,-19.88,-2.319,-3.2,False,1.0
+MEL0014,MEL0016,vegetation_pct,Tree canopy,%,10.42,13.33,-2.91,-0.36,-1.7,False,1.0
+MEL0014,MEL0016,uhi_degc,Urban heat island,°C,9.49,9.5,-0.01,-0.003,-1.7,False,3.0
+MEL0014,MEL0016,open_space_pct,Public open space,%,7.52,9.14,-1.62,-0.189,-1.7,False,2.0
+MEL0015,MEL0010,vegetation_pct,Tree canopy,%,10.16,14.31,-4.15,-0.513,-4.7,False,2.0
+MEL0015,MEL0010,uhi_degc,Urban heat island,°C,9.43,7.91,1.52,0.824,-4.7,False,1.0
+MEL0015,MEL0010,open_space_pct,Public open space,%,8.39,9.96,-1.56,-0.182,-4.7,False,3.0
+MEL0016,MEL0014,vegetation_pct,Tree canopy,%,13.33,10.42,2.91,0.36,1.7,False,1.0
+MEL0016,MEL0014,uhi_degc,Urban heat island,°C,9.5,9.49,0.01,0.003,1.7,False,3.0
+MEL0016,MEL0014,open_space_pct,Public open space,%,9.13,7.52,1.62,0.189,1.7,False,2.0
+MEL0021,MEL0040,vegetation_pct,Tree canopy,%,13.64,18.22,-4.58,-0.566,7.2,False,3.0
+MEL0021,MEL0040,uhi_degc,Urban heat island,°C,9.04,7.49,1.54,0.837,7.2,False,2.0
+MEL0021,MEL0040,open_space_pct,Public open space,%,14.42,2.39,12.03,1.403,7.2,False,1.0
+MEL0023,MEL0039,vegetation_pct,Tree canopy,%,20.75,14.2,6.55,0.81,1.6,False,1.0
+MEL0023,MEL0039,uhi_degc,Urban heat island,°C,6.73,6.99,-0.25,-0.137,1.6,False,2.0
+MEL0023,MEL0039,open_space_pct,Public open space,%,27.47,28.15,-0.68,-0.079,1.6,False,3.0
+MEL0031,MEL0032,vegetation_pct,Tree canopy,%,9.71,11.5,-1.79,-0.222,-3.8,False,3.0
+MEL0031,MEL0032,uhi_degc,Urban heat island,°C,8.09,8.9,-0.81,-0.437,-3.8,False,2.0
+MEL0031,MEL0032,open_space_pct,Public open space,%,1.38,10.51,-9.14,-1.066,-3.8,False,1.0
+MEL0032,MEL0031,vegetation_pct,Tree canopy,%,11.5,9.71,1.79,0.222,3.8,False,3.0
+MEL0032,MEL0031,uhi_degc,Urban heat island,°C,8.9,8.09,0.81,0.437,3.8,False,2.0
+MEL0032,MEL0031,open_space_pct,Public open space,%,10.51,1.38,9.14,1.066,3.8,False,1.0
+MEL0033,MEL0037,vegetation_pct,Tree canopy,%,12.86,13.29,-0.43,-0.053,-1.2,False,3.0
+MEL0033,MEL0037,uhi_degc,Urban heat island,°C,6.11,8.2,-2.09,-1.134,-1.2,False,2.0
+MEL0033,MEL0037,open_space_pct,Public open space,%,34.38,2.1,32.28,3.764,-1.2,False,1.0
+MEL0034,MEL0040,vegetation_pct,Tree canopy,%,19.26,18.22,1.04,0.129,9.5,False,3.0
+MEL0034,MEL0040,uhi_degc,Urban heat island,°C,6.3,7.49,-1.2,-0.649,9.5,False,2.0
+MEL0034,MEL0040,open_space_pct,Public open space,%,14.31,2.39,11.92,1.39,9.5,False,1.0
+MEL0036,MEL0041,vegetation_pct,Tree canopy,%,16.43,14.84,1.59,0.196,12.8,True,2.0
+MEL0036,MEL0041,uhi_degc,Urban heat island,°C,8.02,7.65,0.37,0.198,12.8,True,1.0
+MEL0036,MEL0041,open_space_pct,Public open space,%,4.42,4.86,-0.44,-0.051,12.8,True,3.0
+MEL0037,MEL0033,vegetation_pct,Tree canopy,%,13.29,12.86,0.43,0.053,1.2,False,3.0
+MEL0037,MEL0033,uhi_degc,Urban heat island,°C,8.2,6.11,2.09,1.134,1.2,False,2.0
+MEL0037,MEL0033,open_space_pct,Public open space,%,2.1,34.38,-32.28,-3.764,1.2,False,1.0
+MEL0038,MEL0041,vegetation_pct,Tree canopy,%,15.54,14.84,0.7,0.087,13.6,True,2.0
+MEL0038,MEL0041,uhi_degc,Urban heat island,°C,8.09,7.65,0.43,0.235,13.6,True,1.0
+MEL0038,MEL0041,open_space_pct,Public open space,%,4.93,4.86,0.07,0.008,13.6,True,3.0
+MEL0039,MEL0023,vegetation_pct,Tree canopy,%,14.2,20.75,-6.55,-0.81,-1.6,False,1.0
+MEL0039,MEL0023,uhi_degc,Urban heat island,°C,6.99,6.73,0.25,0.137,-1.6,False,2.0
+MEL0039,MEL0023,open_space_pct,Public open space,%,28.15,27.47,0.68,0.079,-1.6,False,3.0
+MEL0040,MEL0034,vegetation_pct,Tree canopy,%,18.22,19.26,-1.04,-0.129,-9.5,False,3.0
+MEL0040,MEL0034,uhi_degc,Urban heat island,°C,7.49,6.3,1.2,0.649,-9.5,False,2.0
+MEL0040,MEL0034,open_space_pct,Public open space,%,2.39,14.31,-11.92,-1.39,-9.5,False,1.0
+MEL0041,MEL0045,vegetation_pct,Tree canopy,%,14.84,12.24,2.61,0.323,-17.6,True,2.0
+MEL0041,MEL0045,uhi_degc,Urban heat island,°C,7.65,7.66,-0.0,-0.002,-17.6,True,3.0
+MEL0041,MEL0045,open_space_pct,Public open space,%,4.86,15.59,-10.74,-1.252,-17.6,True,1.0
+MEL0043,MEL0038,vegetation_pct,Tree canopy,%,19.8,15.54,4.26,0.527,-9.6,False,3.0
+MEL0043,MEL0038,uhi_degc,Urban heat island,°C,6.51,8.09,-1.57,-0.854,-9.6,False,2.0
+MEL0043,MEL0038,open_space_pct,Public open space,%,19.31,4.93,14.38,1.677,-9.6,False,1.0
+MEL0044,MEL0041,vegetation_pct,Tree canopy,%,15.21,14.84,0.36,0.045,13.4,False,2.0
+MEL0044,MEL0041,uhi_degc,Urban heat island,°C,7.65,7.65,-0.0,-0.001,13.4,False,3.0
+MEL0044,MEL0041,open_space_pct,Public open space,%,2.14,4.86,-2.72,-0.317,13.4,False,1.0
+MEL0045,MEL0041,vegetation_pct,Tree canopy,%,12.24,14.84,-2.61,-0.323,17.6,True,2.0
+MEL0045,MEL0041,uhi_degc,Urban heat island,°C,7.66,7.65,0.0,0.002,17.6,True,3.0
+MEL0045,MEL0041,open_space_pct,Public open space,%,15.59,4.86,10.74,1.252,17.6,True,1.0
+MEL0046,MEL0049,vegetation_pct,Tree canopy,%,14.8,15.81,-1.01,-0.125,-6.4,False,2.0
+MEL0046,MEL0049,uhi_degc,Urban heat island,°C,8.37,8.18,0.19,0.103,-6.4,False,3.0
+MEL0046,MEL0049,open_space_pct,Public open space,%,16.61,12.17,4.44,0.517,-6.4,False,1.0
+MEL0047,MEL0052,vegetation_pct,Tree canopy,%,7.94,9.69,-1.76,-0.217,32.3,True,3.0
+MEL0047,MEL0052,uhi_degc,Urban heat island,°C,8.65,8.25,0.4,0.218,32.3,True,2.0
+MEL0047,MEL0052,open_space_pct,Public open space,%,0.27,3.8,-3.52,-0.411,32.3,True,1.0
+MEL0048,MEL0047,vegetation_pct,Tree canopy,%,11.68,7.94,3.74,0.463,-30.7,True,1.0
+MEL0048,MEL0047,uhi_degc,Urban heat island,°C,8.18,8.65,-0.47,-0.255,-30.7,True,2.0
+MEL0048,MEL0047,open_space_pct,Public open space,%,1.53,0.27,1.26,0.147,-30.7,True,3.0
+MEL0049,MEL0046,vegetation_pct,Tree canopy,%,15.81,14.8,1.01,0.125,6.4,False,2.0
+MEL0049,MEL0046,uhi_degc,Urban heat island,°C,8.18,8.37,-0.19,-0.103,6.4,False,3.0
+MEL0049,MEL0046,open_space_pct,Public open space,%,12.17,16.6,-4.44,-0.517,6.4,False,1.0
+MEL0050,MEL0012,vegetation_pct,Tree canopy,%,22.73,11.46,11.26,1.393,3.2,False,3.0
+MEL0050,MEL0012,uhi_degc,Urban heat island,°C,6.52,9.47,-2.95,-1.601,3.2,False,2.0
+MEL0050,MEL0012,open_space_pct,Public open space,%,31.59,11.71,19.88,2.319,3.2,False,1.0
+MEL0052,MEL0047,vegetation_pct,Tree canopy,%,9.69,7.94,1.76,0.217,-32.3,True,3.0
+MEL0052,MEL0047,uhi_degc,Urban heat island,°C,8.25,8.65,-0.4,-0.218,-32.3,True,2.0
+MEL0052,MEL0047,open_space_pct,Public open space,%,3.8,0.27,3.52,0.411,-32.3,True,1.0
+MEL0053,MEL0057,vegetation_pct,Tree canopy,%,17.82,19.6,-1.78,-0.22,-8.3,False,1.0
+MEL0053,MEL0057,uhi_degc,Urban heat island,°C,7.75,7.39,0.35,0.191,-8.3,False,2.0
+MEL0053,MEL0057,open_space_pct,Public open space,%,9.7,9.93,-0.23,-0.026,-8.3,False,3.0
+MEL0054,MEL0074,vegetation_pct,Tree canopy,%,19.57,17.32,2.25,0.278,-5.2,False,3.0
+MEL0054,MEL0074,uhi_degc,Urban heat island,°C,7.52,8.18,-0.65,-0.354,-5.2,False,2.0
+MEL0054,MEL0074,open_space_pct,Public open space,%,5.44,9.87,-4.42,-0.516,-5.2,False,1.0
+MEL0055,MEL0054,vegetation_pct,Tree canopy,%,18.68,19.57,-0.89,-0.111,9.4,True,3.0
+MEL0055,MEL0054,uhi_degc,Urban heat island,°C,7.92,7.52,0.4,0.215,9.4,True,2.0
+MEL0055,MEL0054,open_space_pct,Public open space,%,11.78,5.44,6.34,0.739,9.4,True,1.0
+MEL0056,MEL0077,vegetation_pct,Tree canopy,%,20.73,22.37,-1.64,-0.203,8.7,False,2.0
+MEL0056,MEL0077,uhi_degc,Urban heat island,°C,7.42,7.51,-0.1,-0.052,8.7,False,3.0
+MEL0056,MEL0077,open_space_pct,Public open space,%,5.99,1.86,4.13,0.481,8.7,False,1.0
+MEL0057,MEL0053,vegetation_pct,Tree canopy,%,19.6,17.82,1.78,0.22,8.3,False,1.0
+MEL0057,MEL0053,uhi_degc,Urban heat island,°C,7.39,7.75,-0.35,-0.191,8.3,False,2.0
+MEL0057,MEL0053,open_space_pct,Public open space,%,9.93,9.7,0.23,0.026,8.3,False,3.0
+MEL0058,MEL0061,vegetation_pct,Tree canopy,%,17.67,20.19,-2.51,-0.311,8.0,False,2.0
+MEL0058,MEL0061,uhi_degc,Urban heat island,°C,7.35,7.16,0.19,0.103,8.0,False,3.0
+MEL0058,MEL0061,open_space_pct,Public open space,%,7.55,10.66,-3.11,-0.363,8.0,False,1.0
+MEL0059,MEL0063,vegetation_pct,Tree canopy,%,26.19,18.86,7.34,0.908,-11.5,True,2.0
+MEL0059,MEL0063,uhi_degc,Urban heat island,°C,6.32,7.57,-1.25,-0.68,-11.5,True,3.0
+MEL0059,MEL0063,open_space_pct,Public open space,%,15.87,4.59,11.27,1.315,-11.5,True,1.0
+MEL0060,MEL0053,vegetation_pct,Tree canopy,%,23.13,17.82,5.31,0.657,7.1,False,1.0
+MEL0060,MEL0053,uhi_degc,Urban heat island,°C,6.79,7.75,-0.95,-0.517,7.1,False,3.0
+MEL0060,MEL0053,open_space_pct,Public open space,%,4.53,9.7,-5.17,-0.603,7.1,False,2.0
+MEL0061,MEL0058,vegetation_pct,Tree canopy,%,20.19,17.67,2.51,0.311,-8.0,False,2.0
+MEL0061,MEL0058,uhi_degc,Urban heat island,°C,7.16,7.35,-0.19,-0.103,-8.0,False,3.0
+MEL0061,MEL0058,open_space_pct,Public open space,%,10.66,7.55,3.11,0.363,-8.0,False,1.0
+MEL0062,MEL0058,vegetation_pct,Tree canopy,%,18.72,17.67,1.04,0.129,4.1,False,1.0
+MEL0062,MEL0058,uhi_degc,Urban heat island,°C,7.3,7.35,-0.06,-0.03,4.1,False,2.5
+MEL0062,MEL0058,open_space_pct,Public open space,%,7.81,7.55,0.26,0.03,4.1,False,2.5
+MEL0063,MEL0064,vegetation_pct,Tree canopy,%,18.86,24.89,-6.04,-0.747,11.5,True,2.0
+MEL0063,MEL0064,uhi_degc,Urban heat island,°C,7.57,6.81,0.76,0.414,11.5,True,3.0
+MEL0063,MEL0064,open_space_pct,Public open space,%,4.59,27.19,-22.6,-2.635,11.5,True,1.0
+MEL0064,MEL0063,vegetation_pct,Tree canopy,%,24.89,18.86,6.04,0.747,-11.5,True,2.0
+MEL0064,MEL0063,uhi_degc,Urban heat island,°C,6.81,7.57,-0.76,-0.414,-11.5,True,3.0
+MEL0064,MEL0063,open_space_pct,Public open space,%,27.19,4.59,22.6,2.635,-11.5,True,1.0
+MEL0065,MEL0068,vegetation_pct,Tree canopy,%,18.91,17.71,1.21,0.149,-4.9,False,3.0
+MEL0065,MEL0068,uhi_degc,Urban heat island,°C,7.48,8.58,-1.09,-0.593,-4.9,False,2.0
+MEL0065,MEL0068,open_space_pct,Public open space,%,21.0,15.33,5.67,0.661,-4.9,False,1.0
+MEL0066,MEL0070,vegetation_pct,Tree canopy,%,14.22,14.08,0.14,0.018,6.4,False,3.0
+MEL0066,MEL0070,uhi_degc,Urban heat island,°C,8.52,8.65,-0.13,-0.069,6.4,False,2.0
+MEL0066,MEL0070,open_space_pct,Public open space,%,10.75,5.59,5.16,0.602,6.4,False,1.0
+MEL0068,MEL0065,vegetation_pct,Tree canopy,%,17.71,18.91,-1.21,-0.149,4.9,False,3.0
+MEL0068,MEL0065,uhi_degc,Urban heat island,°C,8.58,7.48,1.09,0.593,4.9,False,2.0
+MEL0068,MEL0065,open_space_pct,Public open space,%,15.33,21.0,-5.67,-0.661,4.9,False,1.0
+MEL0069,MEL0076,vegetation_pct,Tree canopy,%,16.53,12.58,3.95,0.489,14.4,True,1.0
+MEL0069,MEL0076,uhi_degc,Urban heat island,°C,8.5,8.46,0.04,0.024,14.4,True,3.0
+MEL0069,MEL0076,open_space_pct,Public open space,%,10.57,8.21,2.37,0.276,14.4,True,2.0
+MEL0070,MEL0066,vegetation_pct,Tree canopy,%,14.08,14.22,-0.14,-0.018,-6.4,False,3.0
+MEL0070,MEL0066,uhi_degc,Urban heat island,°C,8.65,8.52,0.13,0.069,-6.4,False,2.0
+MEL0070,MEL0066,open_space_pct,Public open space,%,5.59,10.75,-5.16,-0.602,-6.4,False,1.0
+MEL0071,MEL0072,vegetation_pct,Tree canopy,%,22.07,17.12,4.95,0.613,-1.6,False,1.0
+MEL0071,MEL0072,uhi_degc,Urban heat island,°C,7.45,8.15,-0.69,-0.376,-1.6,False,2.0
+MEL0071,MEL0072,open_space_pct,Public open space,%,11.03,8.97,2.06,0.24,-1.6,False,3.0
+MEL0072,MEL0071,vegetation_pct,Tree canopy,%,17.12,22.07,-4.95,-0.613,1.6,False,1.0
+MEL0072,MEL0071,uhi_degc,Urban heat island,°C,8.15,7.45,0.69,0.376,1.6,False,2.0
+MEL0072,MEL0071,open_space_pct,Public open space,%,8.97,11.03,-2.06,-0.24,1.6,False,3.0
+MEL0073,MEL0075,vegetation_pct,Tree canopy,%,16.7,17.44,-0.75,-0.092,0.7,False,2.0
+MEL0073,MEL0075,uhi_degc,Urban heat island,°C,7.61,7.74,-0.13,-0.068,0.7,False,3.0
+MEL0073,MEL0075,open_space_pct,Public open space,%,8.43,14.08,-5.66,-0.66,0.7,False,1.0
+MEL0074,MEL0071,vegetation_pct,Tree canopy,%,17.32,22.07,-4.74,-0.587,5.1,False,1.0
+MEL0074,MEL0071,uhi_degc,Urban heat island,°C,8.18,7.45,0.72,0.393,5.1,False,2.0
+MEL0074,MEL0071,open_space_pct,Public open space,%,9.87,11.03,-1.16,-0.136,5.1,False,3.0
+MEL0075,MEL0073,vegetation_pct,Tree canopy,%,17.44,16.7,0.75,0.092,-0.7,False,2.0
+MEL0075,MEL0073,uhi_degc,Urban heat island,°C,7.74,7.61,0.13,0.068,-0.7,False,3.0
+MEL0075,MEL0073,open_space_pct,Public open space,%,14.09,8.43,5.66,0.66,-0.7,False,1.0
+MEL0076,MEL0066,vegetation_pct,Tree canopy,%,12.58,14.22,-1.64,-0.203,-10.1,True,2.0
+MEL0076,MEL0066,uhi_degc,Urban heat island,°C,8.46,8.52,-0.06,-0.034,-10.1,True,3.0
+MEL0076,MEL0066,open_space_pct,Public open space,%,8.21,10.75,-2.54,-0.297,-10.1,True,1.0
+MEL0077,MEL0056,vegetation_pct,Tree canopy,%,22.37,20.73,1.64,0.203,-8.7,False,2.0
+MEL0077,MEL0056,uhi_degc,Urban heat island,°C,7.51,7.42,0.1,0.052,-8.7,False,3.0
+MEL0077,MEL0056,open_space_pct,Public open space,%,1.86,5.98,-4.13,-0.481,-8.7,False,1.0
+MEL0078,MEL0083,vegetation_pct,Tree canopy,%,19.4,16.97,2.43,0.3,-4.9,False,2.0
+MEL0078,MEL0083,uhi_degc,Urban heat island,°C,6.75,6.68,0.07,0.038,-4.9,False,3.0
+MEL0078,MEL0083,open_space_pct,Public open space,%,7.87,12.04,-4.17,-0.486,-4.9,False,1.0
+MEL0079,MEL0080,vegetation_pct,Tree canopy,%,16.51,16.5,0.01,0.001,-5.4,False,3.0
+MEL0079,MEL0080,uhi_degc,Urban heat island,°C,7.3,8.37,-1.07,-0.579,-5.4,False,1.0
+MEL0079,MEL0080,open_space_pct,Public open space,%,7.8,6.98,0.81,0.095,-5.4,False,2.0
+MEL0080,MEL0079,vegetation_pct,Tree canopy,%,16.5,16.51,-0.01,-0.001,5.4,False,3.0
+MEL0080,MEL0079,uhi_degc,Urban heat island,°C,8.37,7.3,1.07,0.579,5.4,False,1.0
+MEL0080,MEL0079,open_space_pct,Public open space,%,6.99,7.8,-0.81,-0.095,5.4,False,2.0
+MEL0081,MEL0099,vegetation_pct,Tree canopy,%,14.05,9.87,4.18,0.517,-1.8,False,2.0
+MEL0081,MEL0099,uhi_degc,Urban heat island,°C,8.01,8.53,-0.52,-0.283,-1.8,False,3.0
+MEL0081,MEL0099,open_space_pct,Public open space,%,3.25,13.82,-10.58,-1.233,-1.8,False,1.0
+MEL0082,MEL0103,vegetation_pct,Tree canopy,%,14.55,19.09,-4.54,-0.562,1.6,False,1.0
+MEL0082,MEL0103,uhi_degc,Urban heat island,°C,7.39,7.63,-0.25,-0.134,1.6,False,3.0
+MEL0082,MEL0103,open_space_pct,Public open space,%,9.54,7.3,2.24,0.261,1.6,False,2.0
+MEL0083,MEL0078,vegetation_pct,Tree canopy,%,16.97,19.4,-2.43,-0.3,4.9,False,2.0
+MEL0083,MEL0078,uhi_degc,Urban heat island,°C,6.68,6.75,-0.07,-0.038,4.9,False,3.0
+MEL0083,MEL0078,open_space_pct,Public open space,%,12.04,7.87,4.17,0.486,4.9,False,1.0
+MEL0084,MEL0092,vegetation_pct,Tree canopy,%,11.16,9.54,1.62,0.2,-14.3,True,2.0
+MEL0084,MEL0092,uhi_degc,Urban heat island,°C,8.69,9.17,-0.49,-0.264,-14.3,True,1.0
+MEL0084,MEL0092,open_space_pct,Public open space,%,4.61,3.44,1.17,0.137,-14.3,True,3.0
+MEL0085,MEL0090,vegetation_pct,Tree canopy,%,11.65,13.21,-1.56,-0.193,-0.5,False,2.0
+MEL0085,MEL0090,uhi_degc,Urban heat island,°C,8.44,8.43,0.01,0.004,-0.5,False,3.0
+MEL0085,MEL0090,open_space_pct,Public open space,%,4.97,8.56,-3.59,-0.419,-0.5,False,1.0
+MEL0086,MEL0088,vegetation_pct,Tree canopy,%,14.96,15.32,-0.36,-0.044,6.0,False,2.0
+MEL0086,MEL0088,uhi_degc,Urban heat island,°C,8.0,8.07,-0.07,-0.041,6.0,False,3.0
+MEL0086,MEL0088,open_space_pct,Public open space,%,5.62,1.35,4.26,0.497,6.0,False,1.0
+MEL0087,MEL0082,vegetation_pct,Tree canopy,%,12.95,14.55,-1.6,-0.198,12.6,True,3.0
+MEL0087,MEL0082,uhi_degc,Urban heat island,°C,8.68,7.39,1.3,0.703,12.6,True,2.0
+MEL0087,MEL0082,open_space_pct,Public open space,%,3.23,9.54,-6.32,-0.737,12.6,True,1.0
+MEL0088,MEL0091,vegetation_pct,Tree canopy,%,15.32,12.76,2.56,0.317,-8.5,False,2.0
+MEL0088,MEL0091,uhi_degc,Urban heat island,°C,8.07,8.78,-0.71,-0.386,-8.5,False,1.0
+MEL0088,MEL0091,open_space_pct,Public open space,%,1.35,3.44,-2.09,-0.244,-8.5,False,3.0
+MEL0089,MEL0091,vegetation_pct,Tree canopy,%,11.84,12.76,-0.92,-0.114,-3.1,False,3.0
+MEL0089,MEL0091,uhi_degc,Urban heat island,°C,8.53,8.78,-0.25,-0.136,-3.1,False,2.0
+MEL0089,MEL0091,open_space_pct,Public open space,%,1.75,3.44,-1.7,-0.198,-3.1,False,1.0
+MEL0090,MEL0085,vegetation_pct,Tree canopy,%,13.21,11.65,1.56,0.193,0.5,False,2.0
+MEL0090,MEL0085,uhi_degc,Urban heat island,°C,8.43,8.44,-0.01,-0.004,0.5,False,3.0
+MEL0090,MEL0085,open_space_pct,Public open space,%,8.56,4.97,3.59,0.419,0.5,False,1.0
+MEL0091,MEL0089,vegetation_pct,Tree canopy,%,12.76,11.84,0.92,0.114,3.1,False,3.0
+MEL0091,MEL0089,uhi_degc,Urban heat island,°C,8.78,8.53,0.25,0.136,3.1,False,2.0
+MEL0091,MEL0089,open_space_pct,Public open space,%,3.44,1.75,1.7,0.198,3.1,False,1.0
+MEL0092,MEL0084,vegetation_pct,Tree canopy,%,9.54,11.16,-1.62,-0.2,14.3,True,2.0
+MEL0092,MEL0084,uhi_degc,Urban heat island,°C,9.17,8.69,0.49,0.264,14.3,True,1.0
+MEL0092,MEL0084,open_space_pct,Public open space,%,3.44,4.61,-1.17,-0.137,14.3,True,3.0
+MEL0093,MEL0101,vegetation_pct,Tree canopy,%,11.58,8.31,3.27,0.405,1.8,False,1.0
+MEL0093,MEL0101,uhi_degc,Urban heat island,°C,8.75,8.82,-0.07,-0.04,1.8,False,3.0
+MEL0093,MEL0101,open_space_pct,Public open space,%,4.45,6.02,-1.57,-0.184,1.8,False,2.0
+MEL0095,MEL0100,vegetation_pct,Tree canopy,%,8.57,10.2,-1.62,-0.201,-9.5,False,3.0
+MEL0095,MEL0100,uhi_degc,Urban heat island,°C,8.0,8.71,-0.71,-0.385,-9.5,False,2.0
+MEL0095,MEL0100,open_space_pct,Public open space,%,21.3,6.21,15.09,1.76,-9.5,False,1.0
+MEL0096,MEL0098,vegetation_pct,Tree canopy,%,8.82,9.81,-0.99,-0.123,-0.9,False,3.0
+MEL0096,MEL0098,uhi_degc,Urban heat island,°C,8.72,9.93,-1.21,-0.657,-0.9,False,2.0
+MEL0096,MEL0098,open_space_pct,Public open space,%,16.75,7.71,9.03,1.054,-0.9,False,1.0
+MEL0097,MEL0101,vegetation_pct,Tree canopy,%,9.05,8.31,0.74,0.091,-2.8,False,3.0
+MEL0097,MEL0101,uhi_degc,Urban heat island,°C,9.03,8.82,0.21,0.116,-2.8,False,2.0
+MEL0097,MEL0101,open_space_pct,Public open space,%,26.17,6.02,20.14,2.349,-2.8,False,1.0
+MEL0098,MEL0100,vegetation_pct,Tree canopy,%,9.81,10.2,-0.39,-0.048,-9.4,True,3.0
+MEL0098,MEL0100,uhi_degc,Urban heat island,°C,9.93,8.71,1.22,0.66,-9.4,True,1.0
+MEL0098,MEL0100,open_space_pct,Public open space,%,7.71,6.21,1.5,0.175,-9.4,True,2.0
+MEL0099,MEL0093,vegetation_pct,Tree canopy,%,9.87,11.58,-1.71,-0.212,-1.4,False,2.0
+MEL0099,MEL0093,uhi_degc,Urban heat island,°C,8.53,8.75,-0.21,-0.115,-1.4,False,3.0
+MEL0099,MEL0093,open_space_pct,Public open space,%,13.82,4.45,9.37,1.093,-1.4,False,1.0
+MEL0100,MEL0102,vegetation_pct,Tree canopy,%,10.2,11.96,-1.77,-0.219,15.5,True,2.0
+MEL0100,MEL0102,uhi_degc,Urban heat island,°C,8.71,8.79,-0.08,-0.043,15.5,True,3.0
+MEL0100,MEL0102,open_space_pct,Public open space,%,6.21,13.68,-7.47,-0.871,15.5,True,1.0
+MEL0101,MEL0093,vegetation_pct,Tree canopy,%,8.31,11.58,-3.27,-0.405,-1.8,False,1.0
+MEL0101,MEL0093,uhi_degc,Urban heat island,°C,8.82,8.75,0.07,0.04,-1.8,False,3.0
+MEL0101,MEL0093,open_space_pct,Public open space,%,6.02,4.45,1.57,0.184,-1.8,False,2.0
+MEL0102,MEL0093,vegetation_pct,Tree canopy,%,11.96,11.58,0.38,0.047,-3.2,False,2.0
+MEL0102,MEL0093,uhi_degc,Urban heat island,°C,8.79,8.75,0.05,0.026,-3.2,False,3.0
+MEL0102,MEL0093,open_space_pct,Public open space,%,13.68,4.45,9.23,1.076,-3.2,False,1.0
+MEL0103,MEL0104,vegetation_pct,Tree canopy,%,19.09,18.28,0.81,0.101,-7.5,True,1.0
+MEL0103,MEL0104,uhi_degc,Urban heat island,°C,7.63,7.79,-0.16,-0.086,-7.5,True,2.0
+MEL0103,MEL0104,open_space_pct,Public open space,%,7.3,7.1,0.2,0.024,-7.5,True,3.0
+MEL0104,MEL0103,vegetation_pct,Tree canopy,%,18.28,19.09,-0.81,-0.101,7.5,True,1.0
+MEL0104,MEL0103,uhi_degc,Urban heat island,°C,7.79,7.63,0.16,0.086,7.5,True,2.0
+MEL0104,MEL0103,open_space_pct,Public open space,%,7.1,7.3,-0.2,-0.024,7.5,True,3.0
+MEL0105,MEL0131,vegetation_pct,Tree canopy,%,10.95,10.8,0.15,0.019,-5.1,False,3.0
+MEL0105,MEL0131,uhi_degc,Urban heat island,°C,9.12,8.87,0.26,0.141,-5.1,False,2.0
+MEL0105,MEL0131,open_space_pct,Public open space,%,8.56,18.03,-9.47,-1.104,-5.1,False,1.0
+MEL0106,MEL0112,vegetation_pct,Tree canopy,%,21.0,20.9,0.1,0.012,-0.1,False,2.0
+MEL0106,MEL0112,uhi_degc,Urban heat island,°C,8.18,8.18,-0.0,-0.002,-0.1,False,3.0
+MEL0106,MEL0112,open_space_pct,Public open space,%,12.4,20.86,-8.45,-0.986,-0.1,False,1.0
+MEL0107,MEL0106,vegetation_pct,Tree canopy,%,18.74,21.0,-2.26,-0.28,-4.1,False,1.0
+MEL0107,MEL0106,uhi_degc,Urban heat island,°C,8.07,8.18,-0.1,-0.056,-4.1,False,3.0
+MEL0107,MEL0106,open_space_pct,Public open space,%,14.66,12.4,2.26,0.264,-4.1,False,2.0
+MEL0109,MEL0107,vegetation_pct,Tree canopy,%,24.1,18.74,5.37,0.664,-6.9,False,1.0
+MEL0109,MEL0107,uhi_degc,Urban heat island,°C,6.97,8.07,-1.1,-0.596,-6.9,False,2.0
+MEL0109,MEL0107,open_space_pct,Public open space,%,13.8,14.66,-0.86,-0.1,-6.9,False,3.0
+MEL0111,MEL0112,vegetation_pct,Tree canopy,%,26.83,20.9,5.93,0.734,5.9,False,2.0
+MEL0111,MEL0112,uhi_degc,Urban heat island,°C,7.25,8.18,-0.93,-0.507,5.9,False,3.0
+MEL0111,MEL0112,open_space_pct,Public open space,%,12.33,20.86,-8.53,-0.994,5.9,False,1.0
+MEL0112,MEL0106,vegetation_pct,Tree canopy,%,20.9,21.0,-0.1,-0.012,0.1,False,2.0
+MEL0112,MEL0106,uhi_degc,Urban heat island,°C,8.18,8.18,0.0,0.002,0.1,False,3.0
+MEL0112,MEL0106,open_space_pct,Public open space,%,20.86,12.4,8.45,0.986,0.1,False,1.0
+MEL0113,MEL0112,vegetation_pct,Tree canopy,%,14.56,20.9,-6.34,-0.784,3.2,False,2.0
+MEL0113,MEL0112,uhi_degc,Urban heat island,°C,8.96,8.18,0.78,0.424,3.2,False,3.0
+MEL0113,MEL0112,open_space_pct,Public open space,%,9.48,20.86,-11.38,-1.327,3.2,False,1.0
+MEL0114,MEL0128,vegetation_pct,Tree canopy,%,22.5,16.7,5.8,0.718,-4.7,False,1.0
+MEL0114,MEL0128,uhi_degc,Urban heat island,°C,7.84,8.57,-0.73,-0.398,-4.7,False,3.0
+MEL0114,MEL0128,open_space_pct,Public open space,%,29.17,32.8,-3.63,-0.424,-4.7,False,2.0
+MEL0115,MEL0117,vegetation_pct,Tree canopy,%,7.9,8.71,-0.82,-0.101,0.5,False,3.0
+MEL0115,MEL0117,uhi_degc,Urban heat island,°C,8.63,8.91,-0.27,-0.147,0.5,False,2.0
+MEL0115,MEL0117,open_space_pct,Public open space,%,4.55,11.82,-7.27,-0.848,0.5,False,1.0
+MEL0116,MEL0112,vegetation_pct,Tree canopy,%,10.48,20.9,-10.42,-1.289,-6.9,False,2.0
+MEL0116,MEL0112,uhi_degc,Urban heat island,°C,8.59,8.18,0.41,0.221,-6.9,False,3.0
+MEL0116,MEL0112,open_space_pct,Public open space,%,4.7,20.86,-16.15,-1.884,-6.9,False,1.0
+MEL0117,MEL0120,vegetation_pct,Tree canopy,%,8.71,9.29,-0.58,-0.071,-0.9,False,2.0
+MEL0117,MEL0120,uhi_degc,Urban heat island,°C,8.91,8.87,0.04,0.021,-0.9,False,3.0
+MEL0117,MEL0120,open_space_pct,Public open space,%,11.82,9.53,2.29,0.268,-0.9,False,1.0
+MEL0120,MEL0117,vegetation_pct,Tree canopy,%,9.29,8.71,0.58,0.071,0.9,False,2.0
+MEL0120,MEL0117,uhi_degc,Urban heat island,°C,8.87,8.91,-0.04,-0.021,0.9,False,3.0
+MEL0120,MEL0117,open_space_pct,Public open space,%,9.53,11.82,-2.29,-0.268,0.9,False,1.0
+MEL0121,MEL0109,vegetation_pct,Tree canopy,%,33.5,24.1,9.39,1.162,7.1,True,1.0
+MEL0121,MEL0109,uhi_degc,Urban heat island,°C,6.4,6.97,-0.57,-0.312,7.1,True,2.0
+MEL0121,MEL0109,open_space_pct,Public open space,%,16.46,13.8,2.65,0.31,7.1,True,3.0
+MEL0122,MEL0112,vegetation_pct,Tree canopy,%,35.27,20.9,14.37,1.778,-4.0,False,2.0
+MEL0122,MEL0112,uhi_degc,Urban heat island,°C,5.42,8.18,-2.76,-1.5,-4.0,False,3.0
+MEL0122,MEL0112,open_space_pct,Public open space,%,4.85,20.86,-16.01,-1.867,-4.0,False,1.0
+MEL0124,MEL0125,vegetation_pct,Tree canopy,%,30.69,26.1,4.59,0.567,-3.2,False,3.0
+MEL0124,MEL0125,uhi_degc,Urban heat island,°C,4.14,6.91,-2.77,-1.501,-3.2,False,1.0
+MEL0124,MEL0125,open_space_pct,Public open space,%,24.98,16.3,8.68,1.012,-3.2,False,2.0
+MEL0125,MEL0124,vegetation_pct,Tree canopy,%,26.1,30.69,-4.59,-0.567,3.2,False,3.0
+MEL0125,MEL0124,uhi_degc,Urban heat island,°C,6.91,4.14,2.77,1.501,3.2,False,1.0
+MEL0125,MEL0124,open_space_pct,Public open space,%,16.3,24.98,-8.68,-1.012,3.2,False,2.0
+MEL0128,MEL0130,vegetation_pct,Tree canopy,%,16.7,11.56,5.14,0.636,10.2,False,2.0
+MEL0128,MEL0130,uhi_degc,Urban heat island,°C,8.57,8.78,-0.21,-0.115,10.2,False,3.0
+MEL0128,MEL0130,open_space_pct,Public open space,%,32.8,17.55,15.25,1.778,10.2,False,1.0
+MEL0129,MEL0132,vegetation_pct,Tree canopy,%,11.25,4.82,6.43,0.796,0.7,False,1.0
+MEL0129,MEL0132,uhi_degc,Urban heat island,°C,8.91,8.95,-0.04,-0.021,0.7,False,3.0
+MEL0129,MEL0132,open_space_pct,Public open space,%,13.87,11.88,1.99,0.232,0.7,False,2.0
+MEL0130,MEL0105,vegetation_pct,Tree canopy,%,11.56,10.95,0.6,0.075,-3.1,False,3.0
+MEL0130,MEL0105,uhi_degc,Urban heat island,°C,8.78,9.12,-0.34,-0.185,-3.1,False,2.0
+MEL0130,MEL0105,open_space_pct,Public open space,%,17.55,8.56,8.99,1.048,-3.1,False,1.0
+MEL0131,MEL0105,vegetation_pct,Tree canopy,%,10.8,10.95,-0.15,-0.019,5.1,False,3.0
+MEL0131,MEL0105,uhi_degc,Urban heat island,°C,8.87,9.12,-0.26,-0.141,5.1,False,2.0
+MEL0131,MEL0105,open_space_pct,Public open space,%,18.03,8.56,9.47,1.104,5.1,False,1.0
+MEL0132,MEL0142,vegetation_pct,Tree canopy,%,4.82,5.74,-0.92,-0.113,-3.7,False,3.0
+MEL0132,MEL0142,uhi_degc,Urban heat island,°C,8.95,9.3,-0.35,-0.189,-3.7,False,2.0
+MEL0132,MEL0142,open_space_pct,Public open space,%,11.88,7.3,4.57,0.533,-3.7,False,1.0
+MEL0138,MEL0140,vegetation_pct,Tree canopy,%,9.02,9.68,-0.67,-0.082,2.8,False,3.0
+MEL0138,MEL0140,uhi_degc,Urban heat island,°C,8.85,9.16,-0.31,-0.167,2.8,False,2.0
+MEL0138,MEL0140,open_space_pct,Public open space,%,39.89,11.46,28.43,3.316,2.8,False,1.0
+MEL0139,MEL0105,vegetation_pct,Tree canopy,%,10.76,10.95,-0.19,-0.024,-0.2,False,3.0
+MEL0139,MEL0105,uhi_degc,Urban heat island,°C,8.62,9.12,-0.5,-0.271,-0.2,False,2.0
+MEL0139,MEL0105,open_space_pct,Public open space,%,24.45,8.56,15.89,1.853,-0.2,False,1.0
+MEL0140,MEL0138,vegetation_pct,Tree canopy,%,9.68,9.02,0.67,0.082,-2.8,False,3.0
+MEL0140,MEL0138,uhi_degc,Urban heat island,°C,9.16,8.85,0.31,0.167,-2.8,False,2.0
+MEL0140,MEL0138,open_space_pct,Public open space,%,11.46,39.89,-28.43,-3.316,-2.8,False,1.0
+MEL0141,MEL0144,vegetation_pct,Tree canopy,%,8.35,7.11,1.24,0.154,-9.8,True,3.0
+MEL0141,MEL0144,uhi_degc,Urban heat island,°C,9.27,8.94,0.33,0.178,-9.8,True,2.0
+MEL0141,MEL0144,open_space_pct,Public open space,%,25.8,10.45,15.36,1.791,-9.8,True,1.0
+MEL0142,MEL0132,vegetation_pct,Tree canopy,%,5.74,4.82,0.92,0.113,3.7,False,3.0
+MEL0142,MEL0132,uhi_degc,Urban heat island,°C,9.3,8.95,0.35,0.189,3.7,False,2.0
+MEL0142,MEL0132,open_space_pct,Public open space,%,7.3,11.88,-4.57,-0.533,3.7,False,1.0
+MEL0143,MEL0142,vegetation_pct,Tree canopy,%,3.62,5.74,-2.11,-0.261,10.9,False,1.0
+MEL0143,MEL0142,uhi_degc,Urban heat island,°C,9.41,9.3,0.11,0.06,10.9,False,3.0
+MEL0143,MEL0142,open_space_pct,Public open space,%,9.28,7.3,1.97,0.23,10.9,False,2.0
+MEL0144,MEL0141,vegetation_pct,Tree canopy,%,7.11,8.35,-1.24,-0.154,9.8,True,3.0
+MEL0144,MEL0141,uhi_degc,Urban heat island,°C,8.94,9.27,-0.33,-0.178,9.8,True,2.0
+MEL0144,MEL0141,open_space_pct,Public open space,%,10.45,25.8,-15.36,-1.791,9.8,True,1.0
+MEL0146,MEL0149,vegetation_pct,Tree canopy,%,9.4,10.38,-0.98,-0.121,-12.0,True,2.0
+MEL0146,MEL0149,uhi_degc,Urban heat island,°C,9.63,9.69,-0.06,-0.031,-12.0,True,3.0
+MEL0146,MEL0149,open_space_pct,Public open space,%,26.48,28.96,-2.48,-0.289,-12.0,True,1.0
+MEL0147,MEL0155,vegetation_pct,Tree canopy,%,9.98,11.96,-1.98,-0.245,-4.9,False,2.0
+MEL0147,MEL0155,uhi_degc,Urban heat island,°C,9.58,8.95,0.63,0.34,-4.9,False,1.0
+MEL0147,MEL0155,open_space_pct,Public open space,%,17.99,19.51,-1.52,-0.177,-4.9,False,3.0
+MEL0148,MEL0162,vegetation_pct,Tree canopy,%,12.87,4.5,8.36,1.034,-9.0,False,2.0
+MEL0148,MEL0162,uhi_degc,Urban heat island,°C,10.01,9.2,0.81,0.441,-9.0,False,3.0
+MEL0148,MEL0162,open_space_pct,Public open space,%,15.33,2.07,13.26,1.547,-9.0,False,1.0
+MEL0149,MEL0146,vegetation_pct,Tree canopy,%,10.38,9.4,0.98,0.121,12.0,True,2.0
+MEL0149,MEL0146,uhi_degc,Urban heat island,°C,9.69,9.63,0.06,0.031,12.0,True,3.0
+MEL0149,MEL0146,open_space_pct,Public open space,%,28.96,26.48,2.48,0.289,12.0,True,1.0
+MEL0150,MEL0146,vegetation_pct,Tree canopy,%,8.01,9.4,-1.4,-0.173,9.7,False,3.0
+MEL0150,MEL0146,uhi_degc,Urban heat island,°C,10.19,9.63,0.56,0.302,9.7,False,2.0
+MEL0150,MEL0146,open_space_pct,Public open space,%,11.19,26.48,-15.3,-1.784,9.7,False,1.0
+MEL0155,MEL0160,vegetation_pct,Tree canopy,%,11.96,11.65,0.31,0.038,-1.4,False,3.0
+MEL0155,MEL0160,uhi_degc,Urban heat island,°C,8.95,9.45,-0.5,-0.273,-1.4,False,2.0
+MEL0155,MEL0160,open_space_pct,Public open space,%,19.51,12.76,6.75,0.787,-1.4,False,1.0
+MEL0157,MEL0158,vegetation_pct,Tree canopy,%,12.59,10.36,2.24,0.277,-22.3,True,2.0
+MEL0157,MEL0158,uhi_degc,Urban heat island,°C,9.02,9.25,-0.23,-0.124,-22.3,True,3.0
+MEL0157,MEL0158,open_space_pct,Public open space,%,2.63,7.0,-4.36,-0.509,-22.3,True,1.0
+MEL0158,MEL0157,vegetation_pct,Tree canopy,%,10.36,12.59,-2.24,-0.277,22.3,True,2.0
+MEL0158,MEL0157,uhi_degc,Urban heat island,°C,9.25,9.02,0.23,0.124,22.3,True,3.0
+MEL0158,MEL0157,open_space_pct,Public open space,%,7.0,2.63,4.36,0.509,22.3,True,1.0
+MEL0160,MEL0161,vegetation_pct,Tree canopy,%,11.65,9.59,2.06,0.255,-5.8,False,2.0
+MEL0160,MEL0161,uhi_degc,Urban heat island,°C,9.45,9.29,0.17,0.091,-5.8,False,3.0
+MEL0160,MEL0161,open_space_pct,Public open space,%,12.76,6.54,6.23,0.726,-5.8,False,1.0
+MEL0161,MEL0160,vegetation_pct,Tree canopy,%,9.59,11.65,-2.06,-0.255,5.8,False,2.0
+MEL0161,MEL0160,uhi_degc,Urban heat island,°C,9.29,9.45,-0.17,-0.091,5.8,False,3.0
+MEL0161,MEL0160,open_space_pct,Public open space,%,6.54,12.76,-6.23,-0.726,5.8,False,1.0
+MEL0162,MEL0165,vegetation_pct,Tree canopy,%,4.5,3.94,0.57,0.07,4.7,False,3.0
+MEL0162,MEL0165,uhi_degc,Urban heat island,°C,9.2,9.39,-0.2,-0.107,4.7,False,1.0
+MEL0162,MEL0165,open_space_pct,Public open space,%,2.07,2.88,-0.81,-0.094,4.7,False,2.0
+MEL0164,MEL0165,vegetation_pct,Tree canopy,%,5.38,3.94,1.44,0.178,-1.3,False,3.0
+MEL0164,MEL0165,uhi_degc,Urban heat island,°C,9.73,9.39,0.33,0.182,-1.3,False,2.0
+MEL0164,MEL0165,open_space_pct,Public open space,%,5.65,2.88,2.77,0.323,-1.3,False,1.0
+MEL0165,MEL0164,vegetation_pct,Tree canopy,%,3.94,5.38,-1.44,-0.178,1.3,False,3.0
+MEL0165,MEL0164,uhi_degc,Urban heat island,°C,9.39,9.73,-0.33,-0.182,1.3,False,2.0
+MEL0165,MEL0164,open_space_pct,Public open space,%,2.88,5.65,-2.77,-0.323,1.3,False,1.0
+MEL0167,MEL0170,vegetation_pct,Tree canopy,%,4.26,7.25,-2.99,-0.37,11.3,True,2.0
+MEL0167,MEL0170,uhi_degc,Urban heat island,°C,9.01,9.57,-0.56,-0.302,11.3,True,3.0
+MEL0167,MEL0170,open_space_pct,Public open space,%,9.31,17.61,-8.3,-0.969,11.3,True,1.0
+MEL0168,MEL0150,vegetation_pct,Tree canopy,%,7.39,8.01,-0.62,-0.076,7.9,False,2.0
+MEL0168,MEL0150,uhi_degc,Urban heat island,°C,10.13,10.19,-0.06,-0.03,7.9,False,3.0
+MEL0168,MEL0150,open_space_pct,Public open space,%,23.41,11.19,12.22,1.425,7.9,False,1.0
+MEL0170,MEL0167,vegetation_pct,Tree canopy,%,7.25,4.26,2.99,0.37,-11.3,True,2.0
+MEL0170,MEL0167,uhi_degc,Urban heat island,°C,9.57,9.01,0.56,0.302,-11.3,True,3.0
+MEL0170,MEL0167,open_space_pct,Public open space,%,17.61,9.31,8.3,0.969,-11.3,True,1.0
+MEL0171,MEL0157,vegetation_pct,Tree canopy,%,5.33,12.59,-7.27,-0.899,13.4,False,1.0
+MEL0171,MEL0157,uhi_degc,Urban heat island,°C,9.96,9.02,0.93,0.506,13.4,False,2.0
+MEL0171,MEL0157,open_space_pct,Public open space,%,3.97,2.63,1.34,0.157,13.4,False,3.0
+MEL0173,MEL0174,vegetation_pct,Tree canopy,%,3.73,5.92,-2.19,-0.271,-8.1,True,1.0
+MEL0173,MEL0174,uhi_degc,Urban heat island,°C,8.65,8.34,0.3,0.163,-8.1,True,2.0
+MEL0173,MEL0174,open_space_pct,Public open space,%,7.24,7.61,-0.37,-0.043,-8.1,True,3.0
+MEL0174,MEL0173,vegetation_pct,Tree canopy,%,5.92,3.73,2.19,0.271,8.1,True,1.0
+MEL0174,MEL0173,uhi_degc,Urban heat island,°C,8.34,8.65,-0.3,-0.163,8.1,True,2.0
+MEL0174,MEL0173,open_space_pct,Public open space,%,7.61,7.24,0.37,0.043,8.1,True,3.0
+MEL0176,MEL0173,vegetation_pct,Tree canopy,%,2.27,3.73,-1.46,-0.18,-0.6,False,1.0
+MEL0176,MEL0173,uhi_degc,Urban heat island,°C,8.71,8.65,0.07,0.037,-0.6,False,3.0
+MEL0176,MEL0173,open_space_pct,Public open space,%,8.41,7.24,1.17,0.136,-0.6,False,2.0
+MEL0179,MEL0187,vegetation_pct,Tree canopy,%,10.74,20.56,-9.82,-1.215,-0.1,False,1.0
+MEL0179,MEL0187,uhi_degc,Urban heat island,°C,7.71,6.71,1.0,0.544,-0.1,False,2.0
+MEL0179,MEL0187,open_space_pct,Public open space,%,4.7,8.01,-3.3,-0.385,-0.1,False,3.0
+MEL0180,MEL0204,vegetation_pct,Tree canopy,%,10.37,20.95,-10.58,-1.309,5.8,False,1.0
+MEL0180,MEL0204,uhi_degc,Urban heat island,°C,6.31,7.39,-1.08,-0.588,5.8,False,2.0
+MEL0180,MEL0204,open_space_pct,Public open space,%,10.66,9.83,0.82,0.096,5.8,False,3.0
+MEL0182,MEL0204,vegetation_pct,Tree canopy,%,11.85,20.95,-9.1,-1.126,9.3,True,1.0
+MEL0182,MEL0204,uhi_degc,Urban heat island,°C,7.3,7.39,-0.1,-0.053,9.3,True,3.0
+MEL0182,MEL0204,open_space_pct,Public open space,%,8.66,9.83,-1.17,-0.136,9.3,True,2.0
+MEL0183,MEL0184,vegetation_pct,Tree canopy,%,10.18,15.77,-5.59,-0.691,2.4,False,1.0
+MEL0183,MEL0184,uhi_degc,Urban heat island,°C,7.23,6.41,0.83,0.448,2.4,False,2.0
+MEL0183,MEL0184,open_space_pct,Public open space,%,13.41,12.95,0.46,0.053,2.4,False,3.0
+MEL0184,MEL0183,vegetation_pct,Tree canopy,%,15.77,10.18,5.59,0.691,-2.4,False,1.0
+MEL0184,MEL0183,uhi_degc,Urban heat island,°C,6.41,7.23,-0.83,-0.448,-2.4,False,2.0
+MEL0184,MEL0183,open_space_pct,Public open space,%,12.95,13.41,-0.46,-0.053,-2.4,False,3.0
+MEL0185,MEL0182,vegetation_pct,Tree canopy,%,16.98,11.85,5.13,0.635,-6.7,False,2.0
+MEL0185,MEL0182,uhi_degc,Urban heat island,°C,7.31,7.3,0.02,0.01,-6.7,False,3.0
+MEL0185,MEL0182,open_space_pct,Public open space,%,17.12,8.66,8.45,0.986,-6.7,False,1.0
+MEL0186,MEL0214,vegetation_pct,Tree canopy,%,15.83,47.51,-31.68,-3.92,-9.4,False,1.0
+MEL0186,MEL0214,uhi_degc,Urban heat island,°C,6.82,0.4,6.43,3.486,-9.4,False,2.0
+MEL0186,MEL0214,open_space_pct,Public open space,%,30.56,52.65,-22.09,-2.576,-9.4,False,3.0
+MEL0187,MEL0179,vegetation_pct,Tree canopy,%,20.56,10.74,9.82,1.215,0.1,False,1.0
+MEL0187,MEL0179,uhi_degc,Urban heat island,°C,6.71,7.71,-1.0,-0.544,0.1,False,2.0
+MEL0187,MEL0179,open_space_pct,Public open space,%,8.01,4.7,3.3,0.385,0.1,False,3.0
+MEL0188,MEL0198,vegetation_pct,Tree canopy,%,19.93,20.06,-0.13,-0.016,2.0,False,3.0
+MEL0188,MEL0198,uhi_degc,Urban heat island,°C,6.42,6.84,-0.42,-0.228,2.0,False,2.0
+MEL0188,MEL0198,open_space_pct,Public open space,%,7.66,17.01,-9.35,-1.091,2.0,False,1.0
+MEL0189,MEL0190,vegetation_pct,Tree canopy,%,17.69,38.44,-20.75,-2.567,-16.3,False,1.0
+MEL0189,MEL0190,uhi_degc,Urban heat island,°C,6.46,2.44,4.02,2.182,-16.3,False,2.0
+MEL0189,MEL0190,open_space_pct,Public open space,%,10.82,4.73,6.09,0.71,-16.3,False,3.0
+MEL0190,MEL0189,vegetation_pct,Tree canopy,%,38.44,17.69,20.75,2.567,16.3,False,1.0
+MEL0190,MEL0189,uhi_degc,Urban heat island,°C,2.44,6.46,-4.02,-2.182,16.3,False,2.0
+MEL0190,MEL0189,open_space_pct,Public open space,%,4.73,10.82,-6.09,-0.71,16.3,False,3.0
+MEL0191,MEL0184,vegetation_pct,Tree canopy,%,33.97,15.77,18.2,2.251,-0.3,False,1.0
+MEL0191,MEL0184,uhi_degc,Urban heat island,°C,5.43,6.41,-0.97,-0.528,-0.3,False,2.0
+MEL0191,MEL0184,open_space_pct,Public open space,%,10.42,12.95,-2.54,-0.296,-0.3,False,3.0
+MEL0193,MEL0210,vegetation_pct,Tree canopy,%,17.93,11.13,6.8,0.841,1.9,False,1.0
+MEL0193,MEL0210,uhi_degc,Urban heat island,°C,6.51,5.26,1.26,0.682,1.9,False,2.0
+MEL0193,MEL0210,open_space_pct,Public open space,%,6.5,3.82,2.68,0.313,1.9,False,3.0
+MEL0194,MEL0206,vegetation_pct,Tree canopy,%,27.06,37.75,-10.69,-1.323,-23.3,True,1.0
+MEL0194,MEL0206,uhi_degc,Urban heat island,°C,6.53,4.55,1.97,1.071,-23.3,True,3.0
+MEL0194,MEL0206,open_space_pct,Public open space,%,11.11,20.98,-9.87,-1.151,-23.3,True,2.0
+MEL0195,MEL0199,vegetation_pct,Tree canopy,%,15.43,21.0,-5.57,-0.689,7.5,True,2.0
+MEL0195,MEL0199,uhi_degc,Urban heat island,°C,7.37,6.94,0.44,0.237,7.5,True,3.0
+MEL0195,MEL0199,open_space_pct,Public open space,%,13.49,7.42,6.07,0.708,7.5,True,1.0
+MEL0196,MEL0189,vegetation_pct,Tree canopy,%,23.78,17.69,6.09,0.753,6.9,False,1.0
+MEL0196,MEL0189,uhi_degc,Urban heat island,°C,6.55,6.46,0.09,0.049,6.9,False,3.0
+MEL0196,MEL0189,open_space_pct,Public open space,%,8.38,10.82,-2.44,-0.284,6.9,False,2.0
+MEL0197,MEL0182,vegetation_pct,Tree canopy,%,24.43,11.85,12.58,1.557,-8.1,False,1.0
+MEL0197,MEL0182,uhi_degc,Urban heat island,°C,6.4,7.3,-0.89,-0.485,-8.1,False,2.0
+MEL0197,MEL0182,open_space_pct,Public open space,%,12.55,8.66,3.88,0.453,-8.1,False,3.0
+MEL0198,MEL0209,vegetation_pct,Tree canopy,%,20.06,18.17,1.9,0.235,3.1,False,3.0
+MEL0198,MEL0209,uhi_degc,Urban heat island,°C,6.84,5.71,1.13,0.611,3.1,False,2.0
+MEL0198,MEL0209,open_space_pct,Public open space,%,17.01,4.36,12.65,1.475,3.1,False,1.0
+MEL0199,MEL0195,vegetation_pct,Tree canopy,%,21.0,15.43,5.57,0.689,-7.5,True,2.0
+MEL0199,MEL0195,uhi_degc,Urban heat island,°C,6.94,7.37,-0.44,-0.237,-7.5,True,3.0
+MEL0199,MEL0195,open_space_pct,Public open space,%,7.42,13.49,-6.07,-0.708,-7.5,True,1.0
+MEL0200,MEL0209,vegetation_pct,Tree canopy,%,17.71,18.17,-0.46,-0.057,3.9,False,3.0
+MEL0200,MEL0209,uhi_degc,Urban heat island,°C,6.43,5.71,0.71,0.387,3.9,False,1.0
+MEL0200,MEL0209,open_space_pct,Public open space,%,3.42,4.36,-0.94,-0.109,3.9,False,2.0
+MEL0201,MEL0199,vegetation_pct,Tree canopy,%,16.85,21.0,-4.14,-0.513,9.6,True,2.0
+MEL0201,MEL0199,uhi_degc,Urban heat island,°C,7.97,6.94,1.04,0.562,9.6,True,1.0
+MEL0201,MEL0199,open_space_pct,Public open space,%,7.5,7.42,0.08,0.009,9.6,True,3.0
+MEL0202,MEL0196,vegetation_pct,Tree canopy,%,20.98,23.78,-2.8,-0.347,-4.3,False,2.0
+MEL0202,MEL0196,uhi_degc,Urban heat island,°C,7.48,6.55,0.93,0.504,-4.3,False,1.0
+MEL0202,MEL0196,open_space_pct,Public open space,%,9.5,8.38,1.12,0.131,-4.3,False,3.0
+MEL0203,MEL0212,vegetation_pct,Tree canopy,%,15.48,41.09,-25.61,-3.169,18.1,True,1.0
+MEL0203,MEL0212,uhi_degc,Urban heat island,°C,7.91,3.65,4.27,2.315,18.1,True,2.0
+MEL0203,MEL0212,open_space_pct,Public open space,%,8.05,14.32,-6.27,-0.731,18.1,True,3.0
+MEL0204,MEL0180,vegetation_pct,Tree canopy,%,20.95,10.37,10.58,1.309,-5.8,False,1.0
+MEL0204,MEL0180,uhi_degc,Urban heat island,°C,7.39,6.31,1.08,0.588,-5.8,False,2.0
+MEL0204,MEL0180,open_space_pct,Public open space,%,9.83,10.66,-0.82,-0.096,-5.8,False,3.0
+MEL0205,MEL0191,vegetation_pct,Tree canopy,%,18.84,33.97,-15.12,-1.871,-1.3,False,1.0
+MEL0205,MEL0191,uhi_degc,Urban heat island,°C,7.56,5.43,2.13,1.156,-1.3,False,2.0
+MEL0205,MEL0191,open_space_pct,Public open space,%,11.73,10.42,1.31,0.153,-1.3,False,3.0
+MEL0206,MEL0194,vegetation_pct,Tree canopy,%,37.75,27.06,10.69,1.323,23.3,True,1.0
+MEL0206,MEL0194,uhi_degc,Urban heat island,°C,4.55,6.53,-1.97,-1.071,23.3,True,3.0
+MEL0206,MEL0194,open_space_pct,Public open space,%,20.98,11.1,9.87,1.151,23.3,True,2.0
+MEL0207,MEL0190,vegetation_pct,Tree canopy,%,8.27,38.44,-30.18,-3.734,-16.3,False,1.0
+MEL0207,MEL0190,uhi_degc,Urban heat island,°C,5.28,2.44,2.84,1.54,-16.3,False,2.0
+MEL0207,MEL0190,open_space_pct,Public open space,%,1.81,4.73,-2.92,-0.341,-16.3,False,3.0
+MEL0209,MEL0200,vegetation_pct,Tree canopy,%,18.17,17.71,0.46,0.057,-3.9,False,3.0
+MEL0209,MEL0200,uhi_degc,Urban heat island,°C,5.71,6.43,-0.71,-0.387,-3.9,False,1.0
+MEL0209,MEL0200,open_space_pct,Public open space,%,4.36,3.42,0.94,0.109,-3.9,False,2.0
+MEL0210,MEL0193,vegetation_pct,Tree canopy,%,11.13,17.93,-6.8,-0.841,-1.9,False,1.0
+MEL0210,MEL0193,uhi_degc,Urban heat island,°C,5.26,6.51,-1.26,-0.682,-1.9,False,2.0
+MEL0210,MEL0193,open_space_pct,Public open space,%,3.82,6.5,-2.68,-0.313,-1.9,False,3.0
+MEL0211,MEL0185,vegetation_pct,Tree canopy,%,33.81,16.98,16.83,2.082,14.6,True,1.0
+MEL0211,MEL0185,uhi_degc,Urban heat island,°C,4.38,7.31,-2.93,-1.59,14.6,True,2.0
+MEL0211,MEL0185,open_space_pct,Public open space,%,5.8,17.12,-11.32,-1.32,14.6,True,3.0
+MEL0212,MEL0203,vegetation_pct,Tree canopy,%,41.09,15.48,25.61,3.169,-18.1,True,1.0
+MEL0212,MEL0203,uhi_degc,Urban heat island,°C,3.65,7.91,-4.27,-2.315,-18.1,True,2.0
+MEL0212,MEL0203,open_space_pct,Public open space,%,14.32,8.06,6.27,0.731,-18.1,True,3.0
+MEL0213,MEL0190,vegetation_pct,Tree canopy,%,21.88,38.44,-16.56,-2.049,-9.2,False,2.0
+MEL0213,MEL0190,uhi_degc,Urban heat island,°C,6.36,2.44,3.92,2.128,-9.2,False,1.0
+MEL0213,MEL0190,open_space_pct,Public open space,%,7.49,4.73,2.76,0.322,-9.2,False,3.0
+MEL0214,MEL0186,vegetation_pct,Tree canopy,%,47.51,15.83,31.68,3.92,9.4,False,1.0
+MEL0214,MEL0186,uhi_degc,Urban heat island,°C,0.4,6.82,-6.43,-3.486,9.4,False,2.0
+MEL0214,MEL0186,open_space_pct,Public open space,%,52.65,30.56,22.09,2.576,9.4,False,3.0
+MEL0215,MEL0196,vegetation_pct,Tree canopy,%,37.24,23.78,13.46,1.665,-5.8,False,1.0
+MEL0215,MEL0196,uhi_degc,Urban heat island,°C,4.45,6.55,-2.1,-1.141,-5.8,False,2.0
+MEL0215,MEL0196,open_space_pct,Public open space,%,11.95,8.38,3.57,0.416,-5.8,False,3.0
+MEL0216,MEL0189,vegetation_pct,Tree canopy,%,47.03,17.69,29.34,3.629,-1.8,False,1.0
+MEL0216,MEL0189,uhi_degc,Urban heat island,°C,3.89,6.46,-2.57,-1.395,-1.8,False,2.0
+MEL0216,MEL0189,open_space_pct,Public open space,%,12.81,10.82,1.99,0.232,-1.8,False,3.0
+MEL0217,MEL0211,vegetation_pct,Tree canopy,%,20.73,33.81,-13.08,-1.619,-8.8,False,1.0
+MEL0217,MEL0211,uhi_degc,Urban heat island,°C,5.0,4.38,0.62,0.334,-8.8,False,2.0
+MEL0217,MEL0211,open_space_pct,Public open space,%,5.84,5.8,0.04,0.005,-8.8,False,3.0
+MEL0219,MEL0241,vegetation_pct,Tree canopy,%,37.72,9.48,28.24,3.494,-0.9,False,2.0
+MEL0219,MEL0241,uhi_degc,Urban heat island,°C,3.1,7.44,-4.34,-2.352,-0.9,False,3.0
+MEL0219,MEL0241,open_space_pct,Public open space,%,39.18,8.21,30.97,3.612,-0.9,False,1.0
+MEL0220,MEL0239,vegetation_pct,Tree canopy,%,24.48,4.21,20.26,2.507,-1.1,False,1.0
+MEL0220,MEL0239,uhi_degc,Urban heat island,°C,7.66,9.16,-1.5,-0.816,-1.1,False,2.0
+MEL0220,MEL0239,open_space_pct,Public open space,%,12.12,5.18,6.94,0.81,-1.1,False,3.0
+MEL0224,MEL0239,vegetation_pct,Tree canopy,%,16.76,4.21,12.55,1.553,4.7,False,1.0
+MEL0224,MEL0239,uhi_degc,Urban heat island,°C,7.44,9.16,-1.72,-0.935,4.7,False,2.0
+MEL0224,MEL0239,open_space_pct,Public open space,%,5.69,5.18,0.52,0.06,4.7,False,3.0
+MEL0225,MEL0255,vegetation_pct,Tree canopy,%,4.29,11.38,-7.09,-0.877,3.3,False,1.0
+MEL0225,MEL0255,uhi_degc,Urban heat island,°C,7.78,8.73,-0.94,-0.512,3.3,False,3.0
+MEL0225,MEL0255,open_space_pct,Public open space,%,2.36,7.46,-5.1,-0.595,3.3,False,2.0
+MEL0226,MEL0233,vegetation_pct,Tree canopy,%,4.01,9.29,-5.28,-0.653,-0.3,False,3.0
+MEL0226,MEL0233,uhi_degc,Urban heat island,°C,10.06,11.32,-1.25,-0.68,-0.3,False,2.0
+MEL0226,MEL0233,open_space_pct,Public open space,%,6.85,13.0,-6.14,-0.716,-0.3,False,1.0
+MEL0227,MEL0251,vegetation_pct,Tree canopy,%,16.04,10.98,5.06,0.626,6.0,False,2.0
+MEL0227,MEL0251,uhi_degc,Urban heat island,°C,9.5,9.29,0.21,0.112,6.0,False,3.0
+MEL0227,MEL0251,open_space_pct,Public open space,%,19.63,4.97,14.66,1.709,6.0,False,1.0
+MEL0228,MEL0257,vegetation_pct,Tree canopy,%,10.29,9.17,1.12,0.138,11.0,True,3.0
+MEL0228,MEL0257,uhi_degc,Urban heat island,°C,7.98,8.96,-0.98,-0.533,11.0,True,1.0
+MEL0228,MEL0257,open_space_pct,Public open space,%,18.06,15.82,2.25,0.262,11.0,True,2.0
+MEL0229,MEL0250,vegetation_pct,Tree canopy,%,6.93,9.56,-2.63,-0.325,20.6,True,2.0
+MEL0229,MEL0250,uhi_degc,Urban heat island,°C,8.57,8.11,0.46,0.25,20.6,True,3.0
+MEL0229,MEL0250,open_space_pct,Public open space,%,7.14,18.53,-11.39,-1.328,20.6,True,1.0
+MEL0231,MEL0266,vegetation_pct,Tree canopy,%,22.69,10.82,11.88,1.469,7.0,False,3.0
+MEL0231,MEL0266,uhi_degc,Urban heat island,°C,5.53,8.65,-3.11,-1.688,7.0,False,2.0
+MEL0231,MEL0266,open_space_pct,Public open space,%,54.12,6.66,47.46,5.535,7.0,False,1.0
+MEL0232,MEL0266,vegetation_pct,Tree canopy,%,10.46,10.82,-0.36,-0.044,12.4,True,2.0
+MEL0232,MEL0266,uhi_degc,Urban heat island,°C,8.61,8.65,-0.03,-0.019,12.4,True,3.0
+MEL0232,MEL0266,open_space_pct,Public open space,%,8.2,6.66,1.55,0.18,12.4,True,1.0
+MEL0233,MEL0226,vegetation_pct,Tree canopy,%,9.29,4.01,5.28,0.653,0.3,False,3.0
+MEL0233,MEL0226,uhi_degc,Urban heat island,°C,11.32,10.06,1.25,0.68,0.3,False,2.0
+MEL0233,MEL0226,open_space_pct,Public open space,%,12.99,6.85,6.14,0.716,0.3,False,1.0
+MEL0234,MEL0247,vegetation_pct,Tree canopy,%,9.03,9.16,-0.13,-0.016,3.9,False,3.0
+MEL0234,MEL0247,uhi_degc,Urban heat island,°C,10.53,9.0,1.53,0.829,3.9,False,1.0
+MEL0234,MEL0247,open_space_pct,Public open space,%,15.62,17.67,-2.05,-0.239,3.9,False,2.0
+MEL0235,MEL0242,vegetation_pct,Tree canopy,%,8.89,11.2,-2.32,-0.287,-6.5,False,3.0
+MEL0235,MEL0242,uhi_degc,Urban heat island,°C,10.83,11.94,-1.11,-0.602,-6.5,False,2.0
+MEL0235,MEL0242,open_space_pct,Public open space,%,8.82,17.68,-8.86,-1.033,-6.5,False,1.0
+MEL0236,MEL0220,vegetation_pct,Tree canopy,%,5.97,24.48,-18.5,-2.289,3.1,False,2.0
+MEL0236,MEL0220,uhi_degc,Urban heat island,°C,11.97,7.66,4.31,2.339,3.1,False,1.0
+MEL0236,MEL0220,open_space_pct,Public open space,%,17.59,12.12,5.47,0.637,3.1,False,3.0
+MEL0237,MEL0225,vegetation_pct,Tree canopy,%,11.13,4.29,6.84,0.847,1.4,False,3.0
+MEL0237,MEL0225,uhi_degc,Urban heat island,°C,10.97,7.78,3.19,1.729,1.4,False,1.0
+MEL0237,MEL0225,open_space_pct,Public open space,%,12.52,2.36,10.16,1.185,1.4,False,2.0
+MEL0239,MEL0244,vegetation_pct,Tree canopy,%,4.21,5.52,-1.3,-0.161,-0.9,False,3.0
+MEL0239,MEL0244,uhi_degc,Urban heat island,°C,9.16,12.73,-3.57,-1.935,-0.9,False,1.0
+MEL0239,MEL0244,open_space_pct,Public open space,%,5.17,7.39,-2.22,-0.259,-0.9,False,2.0
+MEL0241,MEL0219,vegetation_pct,Tree canopy,%,9.48,37.72,-28.24,-3.494,0.9,False,2.0
+MEL0241,MEL0219,uhi_degc,Urban heat island,°C,7.44,3.1,4.34,2.352,0.9,False,3.0
+MEL0241,MEL0219,open_space_pct,Public open space,%,8.21,39.18,-30.97,-3.612,0.9,False,1.0
+MEL0242,MEL0235,vegetation_pct,Tree canopy,%,11.2,8.89,2.32,0.287,6.5,False,3.0
+MEL0242,MEL0235,uhi_degc,Urban heat island,°C,11.94,10.83,1.11,0.602,6.5,False,2.0
+MEL0242,MEL0235,open_space_pct,Public open space,%,17.68,8.82,8.86,1.033,6.5,False,1.0
+MEL0243,MEL0235,vegetation_pct,Tree canopy,%,10.12,8.89,1.24,0.153,6.5,False,3.0
+MEL0243,MEL0235,uhi_degc,Urban heat island,°C,11.99,10.83,1.16,0.629,6.5,False,1.0
+MEL0243,MEL0235,open_space_pct,Public open space,%,10.81,8.82,1.99,0.232,6.5,False,2.0
+MEL0244,MEL0245,vegetation_pct,Tree canopy,%,5.52,7.55,-2.04,-0.252,0.2,False,3.0
+MEL0244,MEL0245,uhi_degc,Urban heat island,°C,12.73,11.51,1.22,0.66,0.2,False,1.0
+MEL0244,MEL0245,open_space_pct,Public open space,%,7.39,4.46,2.93,0.342,0.2,False,2.0
+MEL0245,MEL0244,vegetation_pct,Tree canopy,%,7.55,5.52,2.04,0.252,-0.2,False,3.0
+MEL0245,MEL0244,uhi_degc,Urban heat island,°C,11.51,12.73,-1.22,-0.66,-0.2,False,1.0
+MEL0245,MEL0244,open_space_pct,Public open space,%,4.46,7.39,-2.93,-0.342,-0.2,False,2.0
+MEL0246,MEL0247,vegetation_pct,Tree canopy,%,6.08,9.16,-3.08,-0.381,5.8,False,2.0
+MEL0246,MEL0247,uhi_degc,Urban heat island,°C,8.19,9.0,-0.81,-0.442,5.8,False,1.0
+MEL0246,MEL0247,open_space_pct,Public open space,%,18.35,17.67,0.68,0.08,5.8,False,3.0
+MEL0247,MEL0253,vegetation_pct,Tree canopy,%,9.16,9.96,-0.8,-0.099,-4.8,False,3.0
+MEL0247,MEL0253,uhi_degc,Urban heat island,°C,9.0,8.55,0.46,0.248,-4.8,False,2.0
+MEL0247,MEL0253,open_space_pct,Public open space,%,17.67,2.42,15.25,1.779,-4.8,False,1.0
+MEL0248,MEL0227,vegetation_pct,Tree canopy,%,8.47,16.04,-7.57,-0.936,5.9,False,2.0
+MEL0248,MEL0227,uhi_degc,Urban heat island,°C,9.39,9.5,-0.1,-0.056,5.9,False,3.0
+MEL0248,MEL0227,open_space_pct,Public open space,%,5.79,19.63,-13.84,-1.614,5.9,False,1.0
+MEL0249,MEL0267,vegetation_pct,Tree canopy,%,7.53,11.87,-4.34,-0.537,16.2,True,2.0
+MEL0249,MEL0267,uhi_degc,Urban heat island,°C,9.58,8.39,1.19,0.643,16.2,True,1.0
+MEL0249,MEL0267,open_space_pct,Public open space,%,7.41,5.3,2.12,0.247,16.2,True,3.0
+MEL0250,MEL0253,vegetation_pct,Tree canopy,%,9.56,9.96,-0.4,-0.049,-3.7,False,3.0
+MEL0250,MEL0253,uhi_degc,Urban heat island,°C,8.11,8.55,-0.43,-0.234,-3.7,False,2.0
+MEL0250,MEL0253,open_space_pct,Public open space,%,18.53,2.42,16.12,1.879,-3.7,False,1.0
+MEL0251,MEL0227,vegetation_pct,Tree canopy,%,10.98,16.04,-5.06,-0.626,-6.0,False,2.0
+MEL0251,MEL0227,uhi_degc,Urban heat island,°C,9.29,9.5,-0.21,-0.112,-6.0,False,3.0
+MEL0251,MEL0227,open_space_pct,Public open space,%,4.97,19.63,-14.66,-1.709,-6.0,False,1.0
+MEL0252,MEL0250,vegetation_pct,Tree canopy,%,8.37,9.56,-1.19,-0.148,9.2,False,3.0
+MEL0252,MEL0250,uhi_degc,Urban heat island,°C,8.54,8.11,0.43,0.231,9.2,False,2.0
+MEL0252,MEL0250,open_space_pct,Public open space,%,6.01,18.53,-12.52,-1.46,9.2,False,1.0
+MEL0253,MEL0250,vegetation_pct,Tree canopy,%,9.96,9.56,0.4,0.049,3.7,False,3.0
+MEL0253,MEL0250,uhi_degc,Urban heat island,°C,8.55,8.11,0.43,0.234,3.7,False,2.0
+MEL0253,MEL0250,open_space_pct,Public open space,%,2.42,18.53,-16.12,-1.879,3.7,False,1.0
+MEL0255,MEL0234,vegetation_pct,Tree canopy,%,11.38,9.02,2.35,0.291,0.4,False,3.0
+MEL0255,MEL0234,uhi_degc,Urban heat island,°C,8.73,10.53,-1.8,-0.977,0.4,False,1.0
+MEL0255,MEL0234,open_space_pct,Public open space,%,7.46,15.62,-8.16,-0.952,0.4,False,2.0
+MEL0256,MEL0253,vegetation_pct,Tree canopy,%,7.92,9.96,-2.04,-0.253,2.6,False,2.0
+MEL0256,MEL0253,uhi_degc,Urban heat island,°C,9.41,8.55,0.87,0.47,2.6,False,1.0
+MEL0256,MEL0253,open_space_pct,Public open space,%,2.74,2.42,0.33,0.038,2.6,False,3.0
+MEL0257,MEL0228,vegetation_pct,Tree canopy,%,9.17,10.29,-1.12,-0.138,-11.0,True,3.0
+MEL0257,MEL0228,uhi_degc,Urban heat island,°C,8.96,7.98,0.98,0.533,-11.0,True,1.0
+MEL0257,MEL0228,open_space_pct,Public open space,%,15.82,18.06,-2.25,-0.262,-11.0,True,2.0
+MEL0259,MEL0252,vegetation_pct,Tree canopy,%,7.16,8.37,-1.21,-0.149,-0.9,False,2.0
+MEL0259,MEL0252,uhi_degc,Urban heat island,°C,9.62,8.54,1.08,0.585,-0.9,False,1.0
+MEL0259,MEL0252,open_space_pct,Public open space,%,7.24,6.01,1.22,0.143,-0.9,False,3.0
+MEL0260,MEL0235,vegetation_pct,Tree canopy,%,6.37,8.89,-2.51,-0.311,-3.0,False,2.0
+MEL0260,MEL0235,uhi_degc,Urban heat island,°C,9.63,10.83,-1.2,-0.649,-3.0,False,1.0
+MEL0260,MEL0235,open_space_pct,Public open space,%,6.61,8.82,-2.21,-0.258,-3.0,False,3.0
+MEL0261,MEL0267,vegetation_pct,Tree canopy,%,13.86,11.87,1.99,0.246,3.1,False,2.0
+MEL0261,MEL0267,uhi_degc,Urban heat island,°C,8.26,8.39,-0.13,-0.071,3.1,False,3.0
+MEL0261,MEL0267,open_space_pct,Public open space,%,8.86,5.3,3.56,0.415,3.1,False,1.0
+MEL0262,MEL0264,vegetation_pct,Tree canopy,%,17.23,17.32,-0.09,-0.011,-0.6,False,3.0
+MEL0262,MEL0264,uhi_degc,Urban heat island,°C,7.71,7.81,-0.1,-0.053,-0.6,False,2.0
+MEL0262,MEL0264,open_space_pct,Public open space,%,12.57,6.39,6.18,0.72,-0.6,False,1.0
+MEL0263,MEL0264,vegetation_pct,Tree canopy,%,14.46,17.32,-2.85,-0.353,3.5,False,1.0
+MEL0263,MEL0264,uhi_degc,Urban heat island,°C,8.17,7.81,0.36,0.196,3.5,False,2.0
+MEL0263,MEL0264,open_space_pct,Public open space,%,7.0,6.39,0.61,0.071,3.5,False,3.0
+MEL0264,MEL0263,vegetation_pct,Tree canopy,%,17.32,14.46,2.85,0.353,-3.5,False,1.0
+MEL0264,MEL0263,uhi_degc,Urban heat island,°C,7.81,8.17,-0.36,-0.196,-3.5,False,2.0
+MEL0264,MEL0263,open_space_pct,Public open space,%,6.39,7.0,-0.61,-0.071,-3.5,False,3.0
+MEL0265,MEL0266,vegetation_pct,Tree canopy,%,15.04,10.82,4.22,0.522,-3.9,False,1.0
+MEL0265,MEL0266,uhi_degc,Urban heat island,°C,8.0,8.65,-0.64,-0.349,-3.9,False,2.0
+MEL0265,MEL0266,open_space_pct,Public open space,%,9.31,6.66,2.66,0.31,-3.9,False,3.0
+MEL0266,MEL0265,vegetation_pct,Tree canopy,%,10.82,15.04,-4.22,-0.522,3.9,False,1.0
+MEL0266,MEL0265,uhi_degc,Urban heat island,°C,8.65,8.0,0.64,0.349,3.9,False,2.0
+MEL0266,MEL0265,open_space_pct,Public open space,%,6.66,9.31,-2.66,-0.31,3.9,False,3.0
+MEL0267,MEL0261,vegetation_pct,Tree canopy,%,11.87,13.86,-1.99,-0.246,-3.1,False,2.0
+MEL0267,MEL0261,uhi_degc,Urban heat island,°C,8.39,8.26,0.13,0.071,-3.1,False,3.0
+MEL0267,MEL0261,open_space_pct,Public open space,%,5.29,8.86,-3.56,-0.415,-3.1,False,1.0
+MEL0271,MEL0316,vegetation_pct,Tree canopy,%,7.31,8.76,-1.45,-0.179,-22.8,True,3.0
+MEL0271,MEL0316,uhi_degc,Urban heat island,°C,10.86,7.53,3.33,1.808,-22.8,True,1.0
+MEL0271,MEL0316,open_space_pct,Public open space,%,23.63,15.31,8.32,0.971,-22.8,True,2.0
+MEL0272,MEL0306,vegetation_pct,Tree canopy,%,6.06,5.81,0.24,0.03,8.1,False,3.0
+MEL0272,MEL0306,uhi_degc,Urban heat island,°C,11.61,10.09,1.52,0.823,8.1,False,2.0
+MEL0272,MEL0306,open_space_pct,Public open space,%,25.62,8.89,16.72,1.95,8.1,False,1.0
+MEL0273,MEL0311,vegetation_pct,Tree canopy,%,4.35,7.25,-2.9,-0.359,4.4,False,3.0
+MEL0273,MEL0311,uhi_degc,Urban heat island,°C,11.44,8.26,3.18,1.727,4.4,False,1.0
+MEL0273,MEL0311,open_space_pct,Public open space,%,5.26,8.5,-3.24,-0.378,4.4,False,2.0
+MEL0274,MEL0311,vegetation_pct,Tree canopy,%,8.23,7.25,0.98,0.121,-8.4,False,3.0
+MEL0274,MEL0311,uhi_degc,Urban heat island,°C,10.75,8.26,2.5,1.354,-8.4,False,2.0
+MEL0274,MEL0311,open_space_pct,Public open space,%,24.41,8.5,15.91,1.855,-8.4,False,1.0
+MEL0275,MEL0280,vegetation_pct,Tree canopy,%,5.48,4.64,0.84,0.104,-12.1,True,3.0
+MEL0275,MEL0280,uhi_degc,Urban heat island,°C,10.98,9.99,0.99,0.538,-12.1,True,1.0
+MEL0275,MEL0280,open_space_pct,Public open space,%,11.3,6.98,4.33,0.505,-12.1,True,2.0
+MEL0278,MEL0316,vegetation_pct,Tree canopy,%,8.43,8.76,-0.33,-0.041,-18.2,True,3.0
+MEL0278,MEL0316,uhi_degc,Urban heat island,°C,10.12,7.53,2.58,1.402,-18.2,True,1.0
+MEL0278,MEL0316,open_space_pct,Public open space,%,9.9,15.31,-5.41,-0.631,-18.2,True,2.0
+MEL0279,MEL0280,vegetation_pct,Tree canopy,%,5.31,4.64,0.67,0.082,10.5,False,3.0
+MEL0279,MEL0280,uhi_degc,Urban heat island,°C,10.73,9.99,0.74,0.402,10.5,False,1.0
+MEL0279,MEL0280,open_space_pct,Public open space,%,10.21,6.98,3.23,0.377,10.5,False,2.0
+MEL0280,MEL0275,vegetation_pct,Tree canopy,%,4.64,5.48,-0.84,-0.104,12.1,True,3.0
+MEL0280,MEL0275,uhi_degc,Urban heat island,°C,9.99,10.98,-0.99,-0.538,12.1,True,1.0
+MEL0280,MEL0275,open_space_pct,Public open space,%,6.98,11.3,-4.33,-0.505,12.1,True,2.0
+MEL0281,MEL0291,vegetation_pct,Tree canopy,%,5.5,7.73,-2.23,-0.276,10.3,False,2.0
+MEL0281,MEL0291,uhi_degc,Urban heat island,°C,11.6,9.81,1.8,0.974,10.3,False,1.0
+MEL0281,MEL0291,open_space_pct,Public open space,%,7.65,7.51,0.14,0.017,10.3,False,3.0
+MEL0283,MEL0280,vegetation_pct,Tree canopy,%,6.7,4.64,2.05,0.254,0.3,False,3.0
+MEL0283,MEL0280,uhi_degc,Urban heat island,°C,11.41,9.99,1.42,0.768,0.3,False,1.0
+MEL0283,MEL0280,open_space_pct,Public open space,%,9.68,6.98,2.7,0.315,0.3,False,2.0
+MEL0285,MEL0286,vegetation_pct,Tree canopy,%,4.92,4.32,0.6,0.074,-1.7,False,3.0
+MEL0285,MEL0286,uhi_degc,Urban heat island,°C,7.02,7.8,-0.78,-0.421,-1.7,False,2.0
+MEL0285,MEL0286,open_space_pct,Public open space,%,29.19,45.32,-16.12,-1.88,-1.7,False,1.0
+MEL0286,MEL0274,vegetation_pct,Tree canopy,%,4.32,8.23,-3.91,-0.484,4.3,False,3.0
+MEL0286,MEL0274,uhi_degc,Urban heat island,°C,7.8,10.75,-2.95,-1.603,4.3,False,2.0
+MEL0286,MEL0274,open_space_pct,Public open space,%,45.32,24.41,20.91,2.438,4.3,False,1.0
+MEL0287,MEL0295,vegetation_pct,Tree canopy,%,5.17,5.77,-0.59,-0.073,5.2,False,3.0
+MEL0287,MEL0295,uhi_degc,Urban heat island,°C,9.21,10.55,-1.34,-0.73,5.2,False,1.0
+MEL0287,MEL0295,open_space_pct,Public open space,%,10.24,4.23,6.01,0.701,5.2,False,2.0
+MEL0288,MEL0296,vegetation_pct,Tree canopy,%,8.77,9.11,-0.34,-0.042,3.5,False,3.0
+MEL0288,MEL0296,uhi_degc,Urban heat island,°C,7.61,8.72,-1.11,-0.603,3.5,False,1.0
+MEL0288,MEL0296,open_space_pct,Public open space,%,17.97,13.32,4.65,0.543,3.5,False,2.0
+MEL0289,MEL0310,vegetation_pct,Tree canopy,%,7.58,6.51,1.06,0.132,-15.6,True,3.0
+MEL0289,MEL0310,uhi_degc,Urban heat island,°C,9.97,9.25,0.72,0.39,-15.6,True,2.0
+MEL0289,MEL0310,open_space_pct,Public open space,%,13.47,7.37,6.11,0.712,-15.6,True,1.0
+MEL0291,MEL0281,vegetation_pct,Tree canopy,%,7.73,5.5,2.23,0.276,-10.3,False,2.0
+MEL0291,MEL0281,uhi_degc,Urban heat island,°C,9.81,11.6,-1.8,-0.974,-10.3,False,1.0
+MEL0291,MEL0281,open_space_pct,Public open space,%,7.51,7.65,-0.14,-0.017,-10.3,False,3.0
+MEL0294,MEL0296,vegetation_pct,Tree canopy,%,9.77,9.11,0.65,0.081,-0.0,False,3.0
+MEL0294,MEL0296,uhi_degc,Urban heat island,°C,8.18,8.72,-0.54,-0.293,-0.0,False,2.0
+MEL0294,MEL0296,open_space_pct,Public open space,%,1.26,13.32,-12.05,-1.406,-0.0,False,1.0
+MEL0295,MEL0287,vegetation_pct,Tree canopy,%,5.77,5.17,0.59,0.073,-5.2,False,3.0
+MEL0295,MEL0287,uhi_degc,Urban heat island,°C,10.55,9.21,1.34,0.73,-5.2,False,1.0
+MEL0295,MEL0287,open_space_pct,Public open space,%,4.23,10.24,-6.01,-0.701,-5.2,False,2.0
+MEL0296,MEL0294,vegetation_pct,Tree canopy,%,9.11,9.77,-0.65,-0.081,0.0,False,3.0
+MEL0296,MEL0294,uhi_degc,Urban heat island,°C,8.72,8.18,0.54,0.293,0.0,False,2.0
+MEL0296,MEL0294,open_space_pct,Public open space,%,13.32,1.26,12.05,1.406,0.0,False,1.0
+MEL0298,MEL0329,vegetation_pct,Tree canopy,%,4.01,5.93,-1.92,-0.238,2.3,False,3.0
+MEL0298,MEL0329,uhi_degc,Urban heat island,°C,11.93,8.7,3.23,1.755,2.3,False,1.0
+MEL0298,MEL0329,open_space_pct,Public open space,%,6.71,12.15,-5.44,-0.635,2.3,False,2.0
+MEL0299,MEL0325,vegetation_pct,Tree canopy,%,2.08,0.84,1.24,0.153,-3.0,False,3.0
+MEL0299,MEL0325,uhi_degc,Urban heat island,°C,10.62,9.49,1.13,0.612,-3.0,False,1.0
+MEL0299,MEL0325,open_space_pct,Public open space,%,4.53,2.88,1.65,0.192,-3.0,False,2.0
+MEL0300,MEL0302,vegetation_pct,Tree canopy,%,4.67,4.08,0.59,0.073,3.4,False,3.0
+MEL0300,MEL0302,uhi_degc,Urban heat island,°C,10.89,11.5,-0.61,-0.329,3.4,False,2.0
+MEL0300,MEL0302,open_space_pct,Public open space,%,9.3,24.45,-15.14,-1.766,3.4,False,1.0
+MEL0302,MEL0300,vegetation_pct,Tree canopy,%,4.08,4.67,-0.59,-0.073,-3.4,False,3.0
+MEL0302,MEL0300,uhi_degc,Urban heat island,°C,11.5,10.89,0.61,0.329,-3.4,False,2.0
+MEL0302,MEL0300,open_space_pct,Public open space,%,24.45,9.3,15.14,1.766,-3.4,False,1.0
+MEL0303,MEL0319,vegetation_pct,Tree canopy,%,6.7,5.42,1.28,0.159,5.5,False,3.0
+MEL0303,MEL0319,uhi_degc,Urban heat island,°C,9.36,10.36,-1.0,-0.544,5.5,False,2.0
+MEL0303,MEL0319,open_space_pct,Public open space,%,19.57,10.89,8.68,1.012,5.5,False,1.0
+MEL0304,MEL0307,vegetation_pct,Tree canopy,%,3.93,4.55,-0.62,-0.077,-0.2,False,2.0
+MEL0304,MEL0307,uhi_degc,Urban heat island,°C,10.67,10.64,0.03,0.018,-0.2,False,3.0
+MEL0304,MEL0307,open_space_pct,Public open space,%,10.88,5.01,5.87,0.685,-0.2,False,1.0
+MEL0306,MEL0303,vegetation_pct,Tree canopy,%,5.81,6.7,-0.89,-0.11,4.4,False,3.0
+MEL0306,MEL0303,uhi_degc,Urban heat island,°C,10.09,9.36,0.74,0.4,4.4,False,2.0
+MEL0306,MEL0303,open_space_pct,Public open space,%,8.89,19.57,-10.68,-1.245,4.4,False,1.0
+MEL0307,MEL0329,vegetation_pct,Tree canopy,%,4.55,5.93,-1.38,-0.171,0.8,False,3.0
+MEL0307,MEL0329,uhi_degc,Urban heat island,°C,10.64,8.7,1.95,1.056,0.8,False,1.0
+MEL0307,MEL0329,open_space_pct,Public open space,%,5.01,12.15,-7.15,-0.833,0.8,False,2.0
+MEL0310,MEL0311,vegetation_pct,Tree canopy,%,6.51,7.25,-0.74,-0.092,0.1,False,3.0
+MEL0310,MEL0311,uhi_degc,Urban heat island,°C,9.25,8.26,0.99,0.539,0.1,False,1.0
+MEL0310,MEL0311,open_space_pct,Public open space,%,7.37,8.5,-1.13,-0.132,0.1,False,2.0
+MEL0311,MEL0310,vegetation_pct,Tree canopy,%,7.25,6.51,0.74,0.092,-0.1,False,3.0
+MEL0311,MEL0310,uhi_degc,Urban heat island,°C,8.26,9.25,-0.99,-0.539,-0.1,False,1.0
+MEL0311,MEL0310,open_space_pct,Public open space,%,8.5,7.37,1.13,0.132,-0.1,False,2.0
+MEL0312,MEL0314,vegetation_pct,Tree canopy,%,3.15,2.76,0.39,0.049,2.8,False,3.0
+MEL0312,MEL0314,uhi_degc,Urban heat island,°C,10.12,8.08,2.04,1.105,2.8,False,2.0
+MEL0312,MEL0314,open_space_pct,Public open space,%,12.36,44.11,-31.75,-3.703,2.8,False,1.0
+MEL0313,MEL0295,vegetation_pct,Tree canopy,%,3.05,5.77,-2.71,-0.336,2.3,False,2.0
+MEL0313,MEL0295,uhi_degc,Urban heat island,°C,3.54,10.55,-7.01,-3.804,2.3,False,1.0
+MEL0313,MEL0295,open_space_pct,Public open space,%,4.46,4.23,0.23,0.027,2.3,False,3.0
+MEL0314,MEL0320,vegetation_pct,Tree canopy,%,2.76,3.68,-0.92,-0.114,-4.3,False,3.0
+MEL0314,MEL0320,uhi_degc,Urban heat island,°C,8.08,11.18,-3.11,-1.685,-4.3,False,2.0
+MEL0314,MEL0320,open_space_pct,Public open space,%,44.11,11.49,32.62,3.804,-4.3,False,1.0
+MEL0316,MEL0278,vegetation_pct,Tree canopy,%,8.76,8.43,0.33,0.041,18.2,True,3.0
+MEL0316,MEL0278,uhi_degc,Urban heat island,°C,7.53,10.12,-2.58,-1.402,18.2,True,1.0
+MEL0316,MEL0278,open_space_pct,Public open space,%,15.31,9.9,5.41,0.631,18.2,True,2.0
+MEL0319,MEL0303,vegetation_pct,Tree canopy,%,5.42,6.7,-1.28,-0.159,-5.5,False,3.0
+MEL0319,MEL0303,uhi_degc,Urban heat island,°C,10.36,9.36,1.0,0.544,-5.5,False,2.0
+MEL0319,MEL0303,open_space_pct,Public open space,%,10.89,19.57,-8.68,-1.012,-5.5,False,1.0
+MEL0320,MEL0314,vegetation_pct,Tree canopy,%,3.68,2.76,0.92,0.114,4.3,False,3.0
+MEL0320,MEL0314,uhi_degc,Urban heat island,°C,11.18,8.08,3.11,1.685,4.3,False,2.0
+MEL0320,MEL0314,open_space_pct,Public open space,%,11.49,44.11,-32.62,-3.804,4.3,False,1.0
+MEL0321,MEL0323,vegetation_pct,Tree canopy,%,1.79,1.58,0.21,0.026,-5.4,False,3.0
+MEL0321,MEL0323,uhi_degc,Urban heat island,°C,8.21,8.29,-0.08,-0.042,-5.4,False,2.0
+MEL0321,MEL0323,open_space_pct,Public open space,%,0.75,0.02,0.72,0.084,-5.4,False,1.0
+MEL0322,MEL0327,vegetation_pct,Tree canopy,%,3.0,2.59,0.41,0.051,-11.6,True,3.0
+MEL0322,MEL0327,uhi_degc,Urban heat island,°C,8.87,11.37,-2.5,-1.357,-11.6,True,1.0
+MEL0322,MEL0327,open_space_pct,Public open space,%,10.14,12.51,-2.37,-0.277,-11.6,True,2.0
+MEL0323,MEL0321,vegetation_pct,Tree canopy,%,1.58,1.79,-0.21,-0.026,5.4,False,3.0
+MEL0323,MEL0321,uhi_degc,Urban heat island,°C,8.29,8.21,0.08,0.042,5.4,False,2.0
+MEL0323,MEL0321,open_space_pct,Public open space,%,0.02,0.75,-0.72,-0.084,5.4,False,1.0
+MEL0324,MEL0322,vegetation_pct,Tree canopy,%,3.7,3.0,0.7,0.086,-1.1,False,2.0
+MEL0324,MEL0322,uhi_degc,Urban heat island,°C,8.45,8.87,-0.43,-0.231,-1.1,False,1.0
+MEL0324,MEL0322,open_space_pct,Public open space,%,9.8,10.14,-0.34,-0.04,-1.1,False,3.0
+MEL0325,MEL0299,vegetation_pct,Tree canopy,%,0.84,2.08,-1.24,-0.153,3.0,False,3.0
+MEL0325,MEL0299,uhi_degc,Urban heat island,°C,9.49,10.62,-1.13,-0.612,3.0,False,1.0
+MEL0325,MEL0299,open_space_pct,Public open space,%,2.88,4.53,-1.65,-0.192,3.0,False,2.0
+MEL0327,MEL0322,vegetation_pct,Tree canopy,%,2.59,3.0,-0.41,-0.051,11.6,True,3.0
+MEL0327,MEL0322,uhi_degc,Urban heat island,°C,11.37,8.87,2.5,1.357,11.6,True,1.0
+MEL0327,MEL0322,open_space_pct,Public open space,%,12.51,10.14,2.37,0.277,11.6,True,2.0
+MEL0329,MEL0307,vegetation_pct,Tree canopy,%,5.93,4.55,1.38,0.171,-0.8,False,3.0
+MEL0329,MEL0307,uhi_degc,Urban heat island,°C,8.7,10.64,-1.95,-1.056,-0.8,False,1.0
+MEL0329,MEL0307,open_space_pct,Public open space,%,12.15,5.01,7.15,0.833,-0.8,False,2.0
+MEL0330,MEL0331,vegetation_pct,Tree canopy,%,6.99,17.06,-10.07,-1.246,-0.8,False,1.0
+MEL0330,MEL0331,uhi_degc,Urban heat island,°C,8.44,7.8,0.65,0.35,-0.8,False,3.0
+MEL0330,MEL0331,open_space_pct,Public open space,%,8.39,13.11,-4.72,-0.551,-0.8,False,2.0
+MEL0331,MEL0330,vegetation_pct,Tree canopy,%,17.06,6.99,10.07,1.246,0.8,False,1.0
+MEL0331,MEL0330,uhi_degc,Urban heat island,°C,7.8,8.44,-0.65,-0.35,0.8,False,3.0
+MEL0331,MEL0330,open_space_pct,Public open space,%,13.11,8.39,4.72,0.551,0.8,False,2.0
+MEL0333,MEL0341,vegetation_pct,Tree canopy,%,24.88,21.91,2.96,0.367,3.8,False,3.0
+MEL0333,MEL0341,uhi_degc,Urban heat island,°C,6.04,4.47,1.57,0.853,3.8,False,2.0
+MEL0333,MEL0341,open_space_pct,Public open space,%,16.87,9.51,7.36,0.858,3.8,False,1.0
+MEL0334,MEL0344,vegetation_pct,Tree canopy,%,26.03,15.11,10.92,1.351,12.7,True,1.0
+MEL0334,MEL0344,uhi_degc,Urban heat island,°C,6.02,4.24,1.78,0.967,12.7,True,2.0
+MEL0334,MEL0344,open_space_pct,Public open space,%,10.26,3.14,7.12,0.83,12.7,True,3.0
+MEL0336,MEL0334,vegetation_pct,Tree canopy,%,8.35,26.03,-17.68,-2.187,-2.1,False,1.0
+MEL0336,MEL0334,uhi_degc,Urban heat island,°C,8.6,6.02,2.58,1.398,-2.1,False,2.0
+MEL0336,MEL0334,open_space_pct,Public open space,%,1.06,10.26,-9.2,-1.073,-2.1,False,3.0
+MEL0337,MEL0343,vegetation_pct,Tree canopy,%,22.63,22.99,-0.37,-0.045,-12.2,True,3.0
+MEL0337,MEL0343,uhi_degc,Urban heat island,°C,3.1,4.41,-1.31,-0.709,-12.2,True,1.0
+MEL0337,MEL0343,open_space_pct,Public open space,%,9.05,12.03,-2.98,-0.347,-12.2,True,2.0
+MEL0339,MEL0344,vegetation_pct,Tree canopy,%,21.28,15.11,6.18,0.764,12.2,True,1.0
+MEL0339,MEL0344,uhi_degc,Urban heat island,°C,3.18,4.24,-1.06,-0.577,12.2,True,2.0
+MEL0339,MEL0344,open_space_pct,Public open space,%,6.88,3.14,3.74,0.436,12.2,True,3.0
+MEL0341,MEL0333,vegetation_pct,Tree canopy,%,21.91,24.88,-2.96,-0.367,-3.8,False,3.0
+MEL0341,MEL0333,uhi_degc,Urban heat island,°C,4.47,6.04,-1.57,-0.853,-3.8,False,2.0
+MEL0341,MEL0333,open_space_pct,Public open space,%,9.51,16.87,-7.36,-0.858,-3.8,False,1.0
+MEL0342,MEL0337,vegetation_pct,Tree canopy,%,19.57,22.63,-3.05,-0.377,4.9,False,2.0
+MEL0342,MEL0337,uhi_degc,Urban heat island,°C,3.56,3.1,0.46,0.249,4.9,False,3.0
+MEL0342,MEL0337,open_space_pct,Public open space,%,20.16,9.05,11.1,1.295,4.9,False,1.0
+MEL0343,MEL0337,vegetation_pct,Tree canopy,%,22.99,22.63,0.37,0.045,12.2,True,3.0
+MEL0343,MEL0337,uhi_degc,Urban heat island,°C,4.41,3.1,1.31,0.709,12.2,True,1.0
+MEL0343,MEL0337,open_space_pct,Public open space,%,12.03,9.05,2.98,0.347,12.2,True,2.0
+MEL0344,MEL0334,vegetation_pct,Tree canopy,%,15.11,26.03,-10.92,-1.351,-12.7,True,1.0
+MEL0344,MEL0334,uhi_degc,Urban heat island,°C,4.24,6.02,-1.78,-0.967,-12.7,True,2.0
+MEL0344,MEL0334,open_space_pct,Public open space,%,3.14,10.26,-7.12,-0.83,-12.7,True,3.0
