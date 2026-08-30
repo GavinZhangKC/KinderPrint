@@ -1,6 +1,8 @@
-# KinderPrint data handover v2 : Iteration 1
+# KinderPrint data handover v2 — Iteration 1
 
 **Date:** 2026-08-30 · **Scope:** Greater Melbourne · **Status:** verified against `validation.py`, all endpoints returning live data
+
+Supersedes handover v1 (which was CSV + SQL — wrong format, my error).
 
 ---
 
@@ -58,7 +60,15 @@ The four CSVs are the same data in tabular form, for the database layer. The bac
 
 ---
 
-## 3. Geographic unit
+## 3. Two things I need from you
+
+**`neighbourhood_id` format.** The 9-digit SA2 code, e.g. `206071141` (Collingwood). For the 13 communities where AEDC merges SA2s, component codes are joined with **underscores**, e.g. `206041127_206041507`. Underscores rather than slashes because a slash breaks the `/api/neighbourhoods/{id}/profile` route.
+
+**Notice strings.** `responses.py` has `TBC_NOTICE_MESSAGE = "TBC"` for five notices. Approved wording is in `NOTICES.md` — please use it verbatim. That text is the product's scientific framing and it needs to be exact.
+
+---
+
+## 4. Geographic unit
 
 **SA2, ASGS Edition 3 (2021).** Pin Edition 3. ABS released Edition 4 in July 2026 and it is now their default download; Edition 4 SA2 codes partially match Edition 3 codes and will fail silently rather than erroring.
 
@@ -66,9 +76,9 @@ The four CSVs are the same data in tabular form, for the database layer. The bac
 
 ---
 
-## 4. What's in each file
+## 5. What's in each file
 
-**`profiles.json`** — three domains per community, always. Child Development (4 AEDC indicators, 2024) and Social (7 SEIFA/Census indicators, 2021) carry values. Environment carries 3 indicators at `status: "unavailable"` pending handover.
+**`profiles.json`** — three domains per community, always. Child Development (4 AEDC indicators, 2024) and Social (7 SEIFA/Census indicators, 2021) carry values. Environment carries 3 indicators at `status: "unavailable"` pending handover v3.
 
 **`priorities.json`** — Investigation priority band from model V1. `Higher` 20, `Moderate` 67, `Lower` 255, unavailable 4. Bands only, never a score.
 
@@ -78,7 +88,7 @@ The four CSVs are the same data in tabular form, for the database layer. The bac
 
 ---
 
-## 5. Things the UI must surface
+## 6. Things the UI must surface
 
 **`no_match` is a real answer, not an error.** 73 communities have no peer similar enough to compare fairly. Returning a poor match would be worse than returning none. Please render this as a legitimate state.
 
@@ -88,7 +98,7 @@ The four CSVs are the same data in tabular form, for the database layer. The bac
 
 ---
 
-## 6. Method summary
+## 7. Method summary
 
 **Priority (V1).** AEDC vulnerability regressed on socioeconomic position, weighted by children assessed; communities ranked by residual. A first version using percentile overlap correlated 0.795 with disadvantage — it was reproducing a disadvantage map, which the product exists not to be. V1 correlates 0.014. Top-20 overlap between the two is 2/20.
 
@@ -98,6 +108,6 @@ The four CSVs are the same data in tabular form, for the database layer. The bac
 
 ---
 
-## 7. Coming in next updates 
+## 8. Coming in v3
 
 Environmental indicators — urban vegetation cover, urban heat island, public open space — from the Victorian Cooling & Greening Melbourne datasets. Same `neighbourhood_id` key. `profiles.json` and `comparisons.json` will be regenerated; **no code changes needed**, the fields already exist with `unavailable` status.
