@@ -345,18 +345,22 @@ Only neighbourhoods with compatible confirmed geographic units and approved soci
 
 Prepares a side-by-side comparison of any two supported neighbourhoods. Provisional query parameters are `neighbourhood_id_a` and `neighbourhood_id_b`; final naming is TBC.
 
+Both identifiers are validated against the approved profile dataset. The pair does not need to exist in the approved matching output. The backend compares source-supplied profile indicators with matching indicator identifiers and must not calculate a new similarity result, force a match, or invoke a new matching rule.
+
 The response uses the standard envelope and supports:
 
 - both neighbourhood identifiers, names, and confirmed geographic units;
 - side-by-side comparison fields (final fields TBC);
-- approved similarity variables or basis;
-- match strength, including `limited` for weak comparisons;
+- an empty `similarity_basis` list, because manual comparison does not run matching logic;
+- a `null` `match_strength`, because manual comparison does not calculate similarity;
 - source, reference year, geographic unit, and data quality;
 - limitations and incomplete comparison inputs;
 - an area-level comparison notice; and
 - a comparable-not-identical notice.
 
 No final matching variable, threshold, strength category, or comparison field is defined by this contract.
+
+Missing indicators remain `null` with their explicit non-available status. If either identifier has no supported profile, the endpoint returns a `missing` or `unavailable` state and an explanatory limitation. Profiles using incompatible geographic units return `incompatible`; the backend must not transform or estimate values to make them comparable.
 
 ## Error handling
 

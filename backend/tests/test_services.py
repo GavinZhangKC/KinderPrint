@@ -1,6 +1,11 @@
 import json
 
-from data_loader import COMPARISON_DATA_PATH_ENV, EXPLANATION_DATA_PATH_ENV, PRIORITY_DATA_PATH_ENV
+from data_loader import (
+    COMPARISON_DATA_PATH_ENV,
+    EXPLANATION_DATA_PATH_ENV,
+    PRIORITY_DATA_PATH_ENV,
+    PROFILE_DATA_PATH_ENV,
+)
 
 METADATA = {
     "source": "approved",
@@ -140,6 +145,46 @@ def comparison_source() -> dict:
     }
 
 
+def profile(identifier: str, value: int, *, geographic_unit: str = "TBC",
+            social_status: str = "available") -> dict:
+    def indicator(indicator_id: str, indicator_value, status: str = "available") -> dict:
+        return {
+            "id": indicator_id,
+            "name": indicator_id.replace("_", " ").title(),
+            "value": indicator_value,
+            "status": status,
+            "source": "approved",
+            "geographic_unit": geographic_unit,
+            "reference_year": "TBC",
+        }
+
+    social_value = value + 1 if social_status == "available" else None
+    return {
+        "neighbourhood": {
+            "id": identifier,
+            "name": identifier.upper(),
+            "geographic_unit": geographic_unit,
+        },
+        "domains": [
+            {
+                "id": "development",
+                "name": "Child Development",
+                "indicators": [indicator("development", value)],
+            },
+            {
+                "id": "social",
+                "name": "Social",
+                "indicators": [indicator("social", social_value, social_status)],
+            },
+            {
+                "id": "environment",
+                "name": "Environment",
+                "indicators": [indicator("environment", value + 2)],
+            },
+        ],
+    }
+
+
 def test_limited_match_is_returned_without_forcing_strength(client, monkeypatch, write_json) -> None:
     path = write_json("comparisons.json", json.dumps(comparison_source()))
     monkeypatch.setenv(COMPARISON_DATA_PATH_ENV, str(path))
@@ -157,16 +202,77 @@ def test_no_match_is_explicit(client, monkeypatch, write_json) -> None:
     assert body["limitations"][0]["code"] == "no_approved_match"
 
 
-def test_manual_comparison_can_reverse_approved_pair(client, monkeypatch, write_json) -> None:
-    path = write_json("comparisons.json", json.dumps(comparison_source()))
-    monkeypatch.setenv(COMPARISON_DATA_PATH_ENV, str(path))
+def test_manual_comparison_supports_any_two_profiles(client, monkeypatch, write_json) -> None:
+    path = write_json("profiles.json", json.dumps({
+        "profiles": [profile("a", 0), profile("b", 2)],
+    }))
+    monkeypatch.setenv(PROFILE_DATA_PATH_ENV, str(path))
     body = client.get("/api/compare", params={"neighbourhood_id_a": "b", "neighbourhood_id_b": "a"}).json()
     assert body["status"] == "available"
     assert body["data"]["source_neighbourhood"]["id"] == "b"
     assert body["data"]["side_by_side"][0]["source_value"] == 2
+    assert body["data"]["side_by_side"][0]["comparison_value"] == 0
+    assert body["data"]["similarity_basis"] == []
+    assert body["data"]["match_strength"] is None
 
 
-def test_manual_comparison_rejects_same_neighbourhood(client) -> None:
+def test_manual_comparison_preserves_missing_null(client, monkeypatch, write_json) -> None:
+    path = write_json("profiles.json", json.dumps({
+        "profiles": [profile("a", 1, social_status="missing"), profile("b", 2)],
+    }))
+    monkeypatch.setenv(PROFILE_DATA_PATH_ENV, str(path))
+    body = client.get("/api/compare", params={"neighbourhood_id_a": "a", "neighbourhood_id_b": "b"}).json()
+    social = next(field for field in body["data"]["side_by_side"] if field["id"] == "social")
+    assert body["status"] == "limited"
+    assert social["source_value"] is None
+    assert social["source_status"] == "missing"
+
+
+def test_manual_comparison_marks_absent_indicator_unavailable(client, monkeypatch, write_json) -> None:
+    source = profile("a", 1)
+    source["domains"][2]["indicators"] = []
+    path = write_json("profiles.json", json.dumps({
+        "profiles": [source, profile("b", 2)],
+    }))
+    monkeypatch.setenv(PROFILE_DATA_PATH_ENV, str(path))
+    body = client.get("/api/compare", params={"neighbourhood_id_a": "a", "neighbourhood_id_b": "b"}).json()
+    environment = next(field for field in body["data"]["side_by_side"] if field["id"] == "environment")
+    assert body["status"] == "limited"
+    assert environment["source_value"] is None
+    assert environment["source_status"] == "unavailable"
+    assert "indicator_unavailable_for_comparison" in {
+        item["code"] for item in body["limitations"]
+    }
+
+
+def test_manual_comparison_reports_unconfigured_profiles(client) -> None:
+    body = client.get("/api/compare", params={"neighbourhood_id_a": "a", "neighbourhood_id_b": "b"}).json()
+    assert body["status"] == "unavailable"
+    assert body["limitations"][0]["code"] == "profile_dataset_not_configured"
+
+
+def test_manual_comparison_rejects_unknown_profile(client, monkeypatch, write_json) -> None:
+    path = write_json("profiles.json", json.dumps({"profiles": [profile("a", 1)]}))
+    monkeypatch.setenv(PROFILE_DATA_PATH_ENV, str(path))
+    body = client.get("/api/compare", params={"neighbourhood_id_a": "a", "neighbourhood_id_b": "unknown"}).json()
+    assert body["status"] == "missing"
+    assert body["limitations"][0]["code"] == "unsupported_neighbourhood"
+    assert body["limitations"][0]["affected_fields"] == ["neighbourhood_id_b"]
+
+
+def test_manual_comparison_rejects_incompatible_geography(client, monkeypatch, write_json) -> None:
+    path = write_json("profiles.json", json.dumps({
+        "profiles": [profile("a", 1), profile("b", 2, geographic_unit="other")],
+    }))
+    monkeypatch.setenv(PROFILE_DATA_PATH_ENV, str(path))
+    body = client.get("/api/compare", params={"neighbourhood_id_a": "a", "neighbourhood_id_b": "b"}).json()
+    assert body["status"] == "incompatible"
+    assert body["limitations"][0]["code"] == "incompatible_geographic_unit"
+
+
+def test_manual_comparison_rejects_same_neighbourhood(client, monkeypatch, write_json) -> None:
+    path = write_json("profiles.json", json.dumps({"profiles": [profile("a", 1)]}))
+    monkeypatch.setenv(PROFILE_DATA_PATH_ENV, str(path))
     body = client.get("/api/compare", params={"neighbourhood_id_a": "a", "neighbourhood_id_b": "a"}).json()
     assert body["status"] == "no_match"
     assert body["limitations"][0]["code"] == "same_neighbourhood_selected"

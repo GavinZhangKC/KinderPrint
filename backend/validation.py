@@ -159,6 +159,86 @@ def profile_collection_metadata(profiles: list[dict[str, Any]]) -> dict[str, Any
     }
 
 
+def profile_comparison_data(
+    source_profile: dict[str, Any], comparison_profile: dict[str, Any]
+) -> dict[str, Any]:
+    """Build a side-by-side projection without calculating similarity or filling gaps."""
+    source_indicators = {
+        indicator["id"]: indicator
+        for domain in source_profile["domains"]
+        for indicator in domain["indicators"]
+    }
+    comparison_indicators = {
+        indicator["id"]: indicator
+        for domain in comparison_profile["domains"]
+        for indicator in domain["indicators"]
+    }
+    indicator_ids = list(source_indicators)
+    indicator_ids.extend(
+        identifier for identifier in comparison_indicators if identifier not in source_indicators)
+
+    side_by_side = []
+    for identifier in indicator_ids:
+        source = source_indicators.get(identifier)
+        compared = comparison_indicators.get(identifier)
+        exemplar = source or compared
+        side_by_side.append({
+            "id": identifier,
+            "name": exemplar["name"],
+            "source_value": source["value"] if source else None,
+            "comparison_value": compared["value"] if compared else None,
+            "source_status": source["status"] if source else "unavailable",
+            "comparison_status": compared["status"] if compared else "unavailable",
+        })
+
+    return {
+        "source_neighbourhood": source_profile["neighbourhood"],
+        "comparison_neighbourhood": comparison_profile["neighbourhood"],
+        "side_by_side": side_by_side,
+        "similarity_basis": [],
+        "match_strength": None,
+    }
+
+
+def profile_comparison_limitations(
+    source_profile: dict[str, Any], comparison_profile: dict[str, Any]
+) -> list[dict[str, Any]]:
+    """Expose profile gaps for both selected neighbourhoods without imputing values."""
+    limitations: list[dict[str, Any]] = []
+    for profile in (source_profile, comparison_profile):
+        identifier = profile["neighbourhood"]["id"]
+        limitations.extend({
+            **item,
+            "affected_fields": list(dict.fromkeys([
+                *item.get("affected_fields", []), identifier,
+            ])),
+        } for item in profile_limitations(profile))
+
+    source_ids = {
+        indicator["id"]
+        for domain in source_profile["domains"]
+        for indicator in domain["indicators"]
+    }
+    comparison_ids = {
+        indicator["id"]
+        for domain in comparison_profile["domains"]
+        for indicator in domain["indicators"]
+    }
+    for identifier in sorted(source_ids ^ comparison_ids):
+        missing_from = (
+            comparison_profile["neighbourhood"]["id"]
+            if identifier in source_ids
+            else source_profile["neighbourhood"]["id"]
+        )
+        limitations.append(limitation(
+            "indicator_unavailable_for_comparison",
+            "This indicator is not present for both selected neighbourhoods.",
+            identifier,
+            missing_from,
+        ))
+    return limitations
+
+
 def profile_boundary_limitations(
     profiles: list[dict[str, Any]], features: list[dict[str, Any]]
 ) -> list[dict[str, Any]]:
