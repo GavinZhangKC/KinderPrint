@@ -8,6 +8,7 @@ from fastapi import FastAPI, Query, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 
+from data_loader import boundary_data_path
 from geography import (
     feature_metadata,
     intersects_bbox,
@@ -24,7 +25,8 @@ from validation import (
     aggregate_status, explanation_data, load_comparison_data, load_explanations,
     load_priority_results, load_profiles, manual_comparison_data,
     map_indicator_data, match_data, priority_data, profile_collection_metadata,
-    profile_limitations, profile_metadata, profile_status,
+    profile_boundary_limitations, profile_limitations, profile_metadata,
+    profile_status,
 )
 
 app = FastAPI(title="KinderPrint API", version="0.1.0")
@@ -179,7 +181,15 @@ def neighbourhood_indicators() -> dict[str, Any]:
         for profile in profiles
         for item in profile_limitations(profile)
     ]
+    if boundary_data_path() is not None:
+        features, boundary_limitations = load_boundary_features()
+        if features is None:
+            collection_limitations.extend(boundary_limitations)
+        else:
+            collection_limitations.extend(profile_boundary_limitations(profiles, features))
     status = aggregate_status([profile_status(profile) for profile in profiles])
+    if collection_limitations and status == "available":
+        status = "limited"
     return envelope(
         status,
         {"neighbourhoods": [map_indicator_data(profile) for profile in profiles]},
