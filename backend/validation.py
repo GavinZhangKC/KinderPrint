@@ -118,6 +118,47 @@ def profile_metadata(profile: dict[str, Any]) -> dict[str, Any]:
     }
 
 
+def map_indicator_data(profile: dict[str, Any]) -> dict[str, Any]:
+    """Project a validated profile to the lightweight map-indicator shape."""
+    return {
+        "id": profile["neighbourhood"]["id"],
+        "geographic_unit": profile["neighbourhood"]["geographic_unit"],
+        "indicators": {
+            indicator["id"]: {
+                "value": indicator["value"],
+                "status": indicator["status"],
+            }
+            for domain in profile["domains"]
+            for indicator in domain["indicators"]
+        },
+    }
+
+
+def profile_collection_metadata(profiles: list[dict[str, Any]]) -> dict[str, Any]:
+    """Summarise provenance supplied by a validated profile collection."""
+    indicators = [
+        indicator
+        for profile in profiles
+        for domain in profile["domains"]
+        for indicator in domain["indicators"]
+    ]
+    geographic_units = sorted({
+        profile["neighbourhood"]["geographic_unit"] for profile in profiles
+    })
+    quality_values = sorted({
+        str(profile.get("metadata", {}).get(
+            "data_quality", "Provided by the approved profile dataset"))
+        for profile in profiles
+    })
+    return {
+        "sources": sorted({str(indicator["source"]) for indicator in indicators}),
+        "reference_years": sorted({str(indicator["reference_year"]) for indicator in indicators}),
+        "geographic_unit": geographic_units[0] if len(geographic_units) == 1 else None,
+        "data_quality": quality_values[0] if len(quality_values) == 1 else quality_values,
+        "result_count": len(profiles),
+    }
+
+
 def valid_priority_metadata(metadata: Any) -> bool:
     return isinstance(metadata, dict) and all(
         isinstance(metadata.get(field), (str, int)) and str(metadata[field]).strip()
