@@ -21,8 +21,9 @@ from responses import (
     HUMAN_DECISION_NOTICE, INVESTIGATION_LEADS_NOTICE, envelope, limitation,
 )
 from validation import (
-    explanation_data, load_comparison_data, load_explanations, load_priority_results,
-    load_profiles, manual_comparison_data, match_data, priority_data,
+    aggregate_status, explanation_data, load_comparison_data, load_explanations,
+    load_priority_results, load_profiles, manual_comparison_data,
+    map_indicator_data, match_data, priority_data, profile_collection_metadata,
     profile_limitations, profile_metadata, profile_status,
 )
 
@@ -151,6 +152,41 @@ def neighbourhood_profile(neighbourhood_id: str) -> dict[str, Any]:
         "neighbourhood": profile["neighbourhood"],
         "domains": profile["domains"],
     }, metadata=profile_metadata(profile), limitations=profile_limitations(profile), notices=[AREA_LEVEL_NOTICE])
+
+
+@app.get("/api/neighbourhoods/indicators")
+def neighbourhood_indicators() -> dict[str, Any]:
+    """Return lightweight approved indicator values for all supported map areas."""
+    profiles, limitations = load_profiles()
+    empty = {"neighbourhoods": []}
+    if profiles is None:
+        return envelope(
+            "unavailable", empty, limitations=limitations, notices=[AREA_LEVEL_NOTICE])
+    if not profiles:
+        return envelope("unavailable", empty, limitations=[limitation(
+            "profile_inputs_unavailable",
+            "The approved profile dataset contains no neighbourhood indicators.",
+            "indicators")], notices=[AREA_LEVEL_NOTICE])
+
+    collection_limitations = [
+        {
+            **item,
+            "affected_fields": list(dict.fromkeys([
+                *item.get("affected_fields", []),
+                profile["neighbourhood"]["id"],
+            ])),
+        }
+        for profile in profiles
+        for item in profile_limitations(profile)
+    ]
+    status = aggregate_status([profile_status(profile) for profile in profiles])
+    return envelope(
+        status,
+        {"neighbourhoods": [map_indicator_data(profile) for profile in profiles]},
+        metadata=profile_collection_metadata(profiles),
+        limitations=collection_limitations,
+        notices=[AREA_LEVEL_NOTICE],
+    )
 
 
 @app.get("/api/neighbourhoods/{neighbourhood_id}/priority")
