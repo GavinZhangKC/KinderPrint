@@ -11,15 +11,11 @@ import NeighbourhoodMap from './components/NeighbourhoodMap'
 import PreferencePanel from './components/PreferencePanel'
 import ProfileModal from './components/ProfileModal'
 
-import {
-  getNeighbourhood,
-  similarNeighbourhoods,
-} from './data/mockData'
-
 import { api } from './services/api'
 import { toNeighbourhood } from './services/profileAdapter'
 
 import type {
+  NeighbourhoodComparison,
   NeighbourhoodSearchResult,
 } from './services/api'
 
@@ -43,6 +39,16 @@ const [view, setView] =
 
   const [comparison, setComparison] =
     useState<Neighbourhood | null>(null)
+  const [comparisonResult, setComparisonResult] =
+    useState<NeighbourhoodComparison | null>(null)
+  const [compareLoading, setCompareLoading] = useState(false)
+  const [compareError, setCompareError] = useState<string | null>(null)
+  const [comparisonLimitations, setComparisonLimitations] =
+    useState<string[]>([])
+
+  const [mapComparisonEnabled, setMapComparisonEnabled] =
+    useState(false)
+
 
   const [preference, setPreference] =
     useState<PreferenceId | null>(null)
@@ -127,6 +133,7 @@ function resetExplore() {
 
     setSelected(null)
     setComparison(null)
+    setMapComparisonEnabled(false)
 
     setMapSelectedId(null)
     setMapFocusId(null)
@@ -218,29 +225,16 @@ async function handleMapSelect(
     name?: string,
     focusMap = true,
   ) {
-    const prototypeNeighbourhood = getNeighbourhood(id)
-
-    if (prototypeNeighbourhood) {
-      if (view === 'compare-select' && selected) {
-        if (prototypeNeighbourhood.id !== selected.id) {
-          setComparison(prototypeNeighbourhood)
-        }
-        return
-      }
-
-      choosePrimary(prototypeNeighbourhood)
-      return
-    }
-
     setMapSelectedId(id)
     setMapFocusId(focusMap ? id : null)
     setSearch(name ?? id)
     setShowSearchResults(false)
 
     try {
-      const [profileResponse, priorityResponse] = await Promise.all([
+      const [profileResponse, priorityResponse, explanationResponse] = await Promise.all([
         api.getProfile(id),
         api.getPriority(id),
+        api.getExplanation(id),
       ])
 
       if (
@@ -258,6 +252,18 @@ async function handleMapSelect(
         priorityResponse.status === 'available' || priorityResponse.status === 'limited'
           ? priorityResponse.data
           : null,
+        explanationResponse.status === 'available' || explanationResponse.status === 'limited'
+          ? explanationResponse.data : null,
+        {
+          metadata: profileResponse.metadata,
+          limitations: [profileResponse, priorityResponse, explanationResponse]
+            .flatMap((response) => response.limitations)
+            .map((item) => item.message),
+          notices: [profileResponse, priorityResponse, explanationResponse]
+            .flatMap((response) => response.notices)
+            .map((item) => item.message)
+            .filter((message) => message && message !== 'TBC'),
+        },
         id,
         name,
       )
@@ -282,6 +288,7 @@ function startComparison() {
       return
     }
 
+    setMapComparisonEnabled(false)
     setComparison(null)
 
     setShowDataDrawer(false)
@@ -289,7 +296,7 @@ function startComparison() {
     setView('compare-select')
   }
 
-  function openComparisonResult() {
+  async function openComparisonResult() {
     if (
       !selected ||
       !comparison
@@ -297,29 +304,31 @@ function startComparison() {
       return
     }
 
-    setView('comparison')
-
-    window.scrollTo({
-      top: 0,
-      behavior: 'smooth',
-    })
+    try {
+      setCompareLoading(true)
+      setCompareError(null)
+      const response = await api.compare(selected.id, comparison.id)
+      if (response.status !== 'available' && response.status !== 'limited') {
+        throw new Error(response.limitations[0]?.message ?? 'No approved comparison is available for these neighbourhoods.')
+      }
+      setComparisonResult(response.data)
+      setComparisonLimitations(response.limitations.map((item) => item.message))
+      setView('comparison')
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+    } catch (error) {
+      console.error('Failed to compare neighbourhoods:', error)
+      setComparisonResult(null)
+      setComparisonLimitations([])
+      setCompareError(error instanceof Error ? error.message : 'Could not load this comparison.')
+    } finally {
+      setCompareLoading(false)
+    }
   }
-const similarity =
-    selected && comparison
-      ? (
-          similarNeighbourhoods[
-            selected.id
-          ] ?? []
-        ).find(
-          (item) =>
-            item.neighbourhoodId ===
-            comparison.id,
-        )?.similarity ?? 70
-      : 0
 if (
     view === 'comparison' &&
     selected &&
-    comparison
+    comparison &&
+    comparisonResult
   ) {
     return (
       <div className="app-background detailed-background">
@@ -331,9 +340,8 @@ if (
         />
 
         <DetailedComparison
-          a={selected}
-          b={comparison}
-          similarity={similarity}
+          comparisonResult={comparisonResult}
+          limitations={comparisonLimitations}
           onBack={() =>
             setView('compare-select')
           }
@@ -482,12 +490,19 @@ setMapSelectedId(null)
 
             compareMode={
               view ===
-              'compare-select'
+              'compare-select' && mapComparisonEnabled
             }
 
-            onSelect={
-              handleMapSelect
+            selectionEnabled={
+              view !== 'compare-select' || mapComparisonEnabled
             }
+
+            onSelect={(id, name) => {
+              if (view === 'compare-select') {
+                setMapComparisonEnabled(false)
+              }
+              void handleMapSelect(id, name)
+            }}
           />
 
           {
@@ -499,16 +514,18 @@ setMapSelectedId(null)
               onChange={setPreference}
             />
 
-            <Legend
-              preference={preference}
-            />
+            {preference ? (
+              <Legend
+                preference={preference}
+              />
+            ) : null}
           </div>
 
           {
 }
 
           {view === 'profile' && selected && (
-            <div className="profile-interaction-lock" aria-modal="true" role="dialog">
+            <div className={`profile-interaction-lock ${showDataDrawer ? 'has-data-drawer' : ''}`} aria-modal="true" role="dialog">
               <ProfileModal
                 neighbourhood={
                   selected
@@ -536,7 +553,8 @@ setMapSelectedId(null)
 
           {view ===
             'compare-select' &&
-            selected && (
+            selected &&
+            !mapComparisonEnabled && (
               <ComparePanel
                 source={selected}
 
@@ -544,22 +562,48 @@ setMapSelectedId(null)
                   comparison
                 }
 
-                onSelectComparison={
-                  setComparison
-                }
+                onSelectResult={async (item) => {
+                  await handleMapSelect(item.id, item.name, false)
+                }}
 
-                onBack={() =>
+                onClearComparison={() => {
+                  setMapComparisonEnabled(false)
+                  setComparison(null)
+                  setCompareError(null)
+                }}
+
+                onBack={() => {
+                  setMapComparisonEnabled(false)
                   setView('profile')
-                }
+                }}
 
-                onCompare={
-                  openComparisonResult
-                }
+                onCompare={openComparisonResult}
+
+                compareLoading={compareLoading}
+
+                compareError={compareError}
+
+                mapSelectionEnabled={mapComparisonEnabled}
+
+                onToggleMapSelection={() => {
+                  setMapComparisonEnabled((enabled) => !enabled)
+                  setCompareError(null)
+                }}
               />
             )}
 
-          {
-}
+          {view === 'compare-select' && mapComparisonEnabled && (
+            <div className="glass map-selection-banner" role="status">
+              <div>
+                <strong>Choose neighbourhood 2</strong>
+                <span>Click a neighbourhood boundary on the map.</span>
+              </div>
+              <button type="button" onClick={() => setMapComparisonEnabled(false)}>
+                Cancel
+              </button>
+            </div>
+          )}
+
 
           {showDataDrawer &&
             selected && (

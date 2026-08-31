@@ -1,9 +1,16 @@
 import type {
+  NeighbourhoodExplanation,
   NeighbourhoodPriority,
   NeighbourhoodProfile,
   ProfileIndicator,
 } from './api'
-import type { Neighbourhood, RiskBand } from '../types/neighbourhood'
+import type { Neighbourhood } from '../types/neighbourhood'
+
+interface ProfileContext {
+  metadata: Record<string, unknown>
+  limitations: string[]
+  notices: string[]
+}
 
 function indicator(profile: NeighbourhoodProfile, id: string): ProfileIndicator | undefined {
   return profile.domains
@@ -11,65 +18,62 @@ function indicator(profile: NeighbourhoodProfile, id: string): ProfileIndicator 
     .find((item) => item.id === id)
 }
 
-function numberValue(profile: NeighbourhoodProfile, id: string): number {
-  const value = indicator(profile, id)?.value
-  return typeof value === 'number' && Number.isFinite(value) ? value : 0
-}
-
-function heatBand(value: number): RiskBand {
-  if (value >= 8) return 'High'
-  if (value >= 6) return 'Moderate'
-  return 'Low'
+function numberValue(profile: NeighbourhoodProfile, id: string): number | null {
+  const item = indicator(profile, id)
+  const value = item?.value
+  const available = item?.status === 'available' || item?.status === 'limited'
+  return available && typeof value === 'number' && Number.isFinite(value) ? value : null
 }
 
 export function toNeighbourhood(
   profile: NeighbourhoodProfile,
   priority: NeighbourhoodPriority | null,
+  explanation: NeighbourhoodExplanation | null,
+  context: ProfileContext,
   fallbackId: string,
   fallbackName?: string,
 ): Neighbourhood {
-  const indicators = profile.domains?.flatMap((domain) => domain.indicators) ?? []
-  const referenceYears = Array.from(
-    new Set(
-      indicators
-        .map((item) => item.reference_year)
-        .filter((year): year is string | number => year !== null && year !== undefined)
-        .map(String),
-    ),
-  ).sort()
-  const sources = Array.from(
-    new Set(
-      indicators
-        .map((item) => item.source)
-        .filter((source): source is string => Boolean(source)),
-    ),
-  )
-  const irsdDecile = numberValue(profile, 'seifa_irsd_decile')
-  const priorityBand = priority?.priority_band ?? priority?.priority_level ?? priority?.level
+  const referenceYears = Array.isArray(context.metadata.reference_years)
+    ? context.metadata.reference_years
+      .filter((year): year is string | number => typeof year === 'string' || typeof year === 'number')
+      .map(String)
+    : []
+  const sources = Array.isArray(context.metadata.sources)
+    ? context.metadata.sources.filter((source): source is string => typeof source === 'string')
+    : []
+  const highlightedIds = new Set(explanation?.highlighted_factor_ids ?? [])
+  const highlightedFactors = explanation?.factor_domains
+    .flatMap((domain) => domain.factors)
+    .filter((factor) => highlightedIds.has(factor.id))
+    .map((factor) => factor.name) ?? []
+  const childDevelopmentScore = numberValue(profile, 'aedc_on_track_five')
+  const developmentalVulnerability = numberValue(profile, 'aedc_vulnerable_one_or_more')
+  const socialDisadvantageDecile = numberValue(profile, 'seifa_irsd_decile')
+  const heatExposure = numberValue(profile, 'env_urban_heat')
+  const treeCanopy = numberValue(profile, 'env_vegetation_cover')
+  const greenSpaceAccess = numberValue(profile, 'env_open_space_access')
+  const dataQuality = typeof context.metadata.data_quality === 'string'
+    ? context.metadata.data_quality
+    : null
+  const round = (value: number | null) => value === null ? null : Math.round(value * 10) / 10
 
   return {
-    id: profile.neighbourhood?.id ?? fallbackId,
-    name: profile.neighbourhood?.name ?? fallbackName ?? fallbackId,
+    id: profile.neighbourhood.id || fallbackId,
+    name: profile.neighbourhood.name || fallbackName || fallbackId,
     geographicUnit:
-      profile.neighbourhood?.geographic_unit ?? 'SA2 (ASGS Edition 3, 2021)',
+      profile.neighbourhood.geographic_unit ?? 'Not available',
     referencePeriod: referenceYears.join('–') || 'Not available',
-    childDevelopmentScore: Math.round(numberValue(profile, 'aedc_on_track_five')),
-    developmentalVulnerability: Math.round(
-      numberValue(profile, 'aedc_vulnerable_one_or_more'),
-    ),
-    socialDisadvantage:
-      irsdDecile >= 8 ? 'Low' : irsdDecile >= 4 ? 'Moderate' : 'High',
-    heatExposure: heatBand(numberValue(profile, 'env_urban_heat')),
-    treeCanopy: Math.round(numberValue(profile, 'env_vegetation_cover')),
-    greenSpaceAccess: Math.round(numberValue(profile, 'env_open_space_access')),
-    priority:
-      priorityBand === 'Higher'
-        ? 'High'
-        : priorityBand === 'Moderate'
-          ? 'Moderate'
-          : 'Low',
-    keyInsight:
-      'This profile uses the approved child-development, social and environmental indicators for the selected Greater Melbourne neighbourhood.',
+    childDevelopmentScore: round(childDevelopmentScore),
+    developmentalVulnerability: round(developmentalVulnerability),
+    socialDisadvantageDecile: round(socialDisadvantageDecile),
+    heatExposure: round(heatExposure),
+    treeCanopy: round(treeCanopy),
+    greenSpaceAccess: round(greenSpaceAccess),
+    priority: priority?.priority_band ?? null,
+    highlightedFactors,
     sources,
+    dataQuality,
+    limitations: context.limitations,
+    notices: context.notices,
   }
 }

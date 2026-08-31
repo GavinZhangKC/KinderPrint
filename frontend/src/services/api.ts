@@ -81,24 +81,31 @@ export interface BoundaryDetail {
   geometry: BoundaryGeometry | null
 }
 
+export interface MapIndicatorValue {
+  value: number | null
+  status: ApiStatus | string
+}
+
+export interface NeighbourhoodMapIndicators {
+  id: string
+  geographic_unit: string
+  indicators: Record<string, MapIndicatorValue>
+}
+
+export interface NeighbourhoodIndicatorsCollection {
+  neighbourhoods: NeighbourhoodMapIndicators[]
+}
+
 
 export interface ProfileIndicator {
-  id?: string
-  name?: string
-  label?: string
-
-  value?: number | string | null
-  unit?: string | null
-
-  status?: ApiStatus | string
-
-  reference_value?: number | string | null
-  reference_label?: string | null
-
-  source?: string | null
-  reference_year?: string | number | null
-
-  [key: string]: unknown
+  id: string
+  name: string
+  value: number | string | null
+  unit: string | null
+  status: ApiStatus | string
+  source: string | null
+  reference_year: string | number | null
+  geographic_unit: string | null
 }
 
 export interface ProfileDomain {
@@ -108,106 +115,73 @@ export interface ProfileDomain {
 }
 
 export interface NeighbourhoodProfile {
-  neighbourhood?: {
+  neighbourhood: {
     id: string
     name: string | null
     geographic_unit: string | null
   }
-
-  child_development?: Record<
-    string,
-    ProfileIndicator | unknown
-  >
-
-  social?: Record<
-    string,
-    ProfileIndicator | unknown
-  >
-
-  environment?: Record<
-    string,
-    ProfileIndicator | unknown
-  >
-
-  domains?: ProfileDomain[]
-
-  [key: string]: unknown
+  domains: ProfileDomain[]
 }
 
-
 export interface NeighbourhoodPriority {
-  neighbourhood?: {
+  neighbourhood: {
     id: string
     name?: string | null
     geographic_unit?: string | null
   }
 
-  priority_level?: string | null
-  priority_band?: string | null
-  level?: string | null
+  priority_band: string | null
+  contributing_domains: string[]
 
-  label?: string | null
-
-  [key: string]: unknown
 }
 
 export interface ExplanationFactor {
-  id?: string
-  name?: string
-  label?: string
-
-  prominence?: string | number | null
-  value?: number | string | null
-
-  [key: string]: unknown
+  id: string
+  name: string
+  value: number | string | null
+  status: ApiStatus | string
+  source: string
+  geographic_unit: string
+  reference_year: string | number
 }
 
 export interface NeighbourhoodExplanation {
-  neighbourhood?: {
+  neighbourhood: {
     id: string
-    name?: string | null
+    name: string | null
   }
-
-  factors?: ExplanationFactor[]
-  contributing_factors?: ExplanationFactor[]
-  highlighted_factors?: ExplanationFactor[]
-
-  [key: string]: unknown
+  factor_domains: Array<{
+    domain: string
+    factors: ExplanationFactor[]
+  }>
+  highlighted_factor_ids: string[]
+  incomplete_inputs: string[]
 }
 
-
-export interface MatchNeighbourhood {
-  id: string
-  name?: string
-  geographic_unit?: string
-
-  similarity?: number | null
-  similarity_score?: number | null
-
-  [key: string]: unknown
-}
 
 export interface NeighbourhoodMatch {
-  neighbourhood?: {
-    id: string
-    name?: string | null
-  }
+  source_neighbourhood: NeighbourhoodSearchResult
+  matched_neighbourhood: NeighbourhoodSearchResult | null
+  similarity_basis: string[]
+  match_strength: string | null
+}
 
-  matches?: MatchNeighbourhood[]
-
-  match?: MatchNeighbourhood | null
-
-  [key: string]: unknown
+export interface ComparisonField {
+  id: string
+  name: string
+  source_value: number | string | null
+  comparison_value: number | string | null
+  source_status: ApiStatus | string
+  comparison_status: ApiStatus | string
 }
 
 
 export interface NeighbourhoodComparison {
-  neighbourhood_a?: Record<string, unknown>
-  neighbourhood_b?: Record<string, unknown>
-
-  comparison?: Record<string, unknown>
-
-  [key: string]: unknown
+  source_neighbourhood: NeighbourhoodSearchResult
+  comparison_neighbourhood: NeighbourhoodSearchResult
+  side_by_side: ComparisonField[]
+  similarity_basis: string[]
+  match_strength: string | null
 }
 
 
@@ -267,6 +241,11 @@ export const api = {
       `/api/neighbourhoods/${encodeURIComponent(
         id,
       )}/boundary`,
+    ),
+
+  getNeighbourhoodIndicators: () =>
+    request<NeighbourhoodIndicatorsCollection>(
+      '/api/neighbourhoods/indicators',
     ),
 
   getProfile: (

@@ -20,7 +20,7 @@ import { api } from '../services/api'
 import type {
   BoundaryFeatureCollection,
   BoundaryGeometry,
-  NeighbourhoodProfile,
+  NeighbourhoodMapIndicators,
 } from '../services/api'
 
 import type {
@@ -28,6 +28,8 @@ import type {
 } from '../types/neighbourhood'
 
 setWorkerUrl(workerUrl)
+const CURSOR_ORB_EASING = 0.12
+
 interface NeighbourhoodMapProps {
   preference: PreferenceId | null
 
@@ -38,6 +40,8 @@ interface NeighbourhoodMapProps {
   comparisonId?: string | null
 
   compareMode?: boolean
+  selectionEnabled?: boolean
+
 
   onSelect: (
     id: string,
@@ -115,65 +119,74 @@ type HeatmapMetrics = {
   green_space?: number | null
 }
 
-const heatmapMetricsCache = new Map<string, HeatmapMetrics>()
+let heatmapMetricsPromise: Promise<Map<string, HeatmapMetrics>> | null = null
 
-function metricValue(profile: NeighbourhoodProfile, indicatorId: string) {
-  const value = profile.domains
-    ?.flatMap((domain) => domain.indicators)
-    .find((indicator) => indicator.id === indicatorId)?.value
+function metricValue(
+  neighbourhood: NeighbourhoodMapIndicators,
+  indicatorId: string,
+) {
+  const indicator = neighbourhood.indicators[indicatorId]
+  const value = indicator?.value
+
+  if (
+    indicator?.status !== 'available' &&
+    indicator?.status !== 'limited'
+  ) {
+    return null
+  }
+
   return typeof value === 'number' && Number.isFinite(value) ? value : null
 }
 
-function metricsFromProfile(profile: NeighbourhoodProfile): HeatmapMetrics {
-  const socialDecile = metricValue(profile, 'seifa_irsd_decile')
+function metricsFromIndicators(
+  neighbourhood: NeighbourhoodMapIndicators,
+): HeatmapMetrics {
+  const socialDecile = metricValue(neighbourhood, 'seifa_irsd_decile')
   return {
-    development: metricValue(profile, 'aedc_on_track_five'),
-    heat: metricValue(profile, 'env_urban_heat'),
+    development: metricValue(neighbourhood, 'aedc_on_track_five'),
+    heat: metricValue(neighbourhood, 'env_urban_heat'),
     social: socialDecile === null ? null : 11 - socialDecile,
-    vegetation: metricValue(profile, 'env_vegetation_cover'),
-    green_space: metricValue(profile, 'env_open_space_access'),
+    vegetation: metricValue(neighbourhood, 'env_vegetation_cover'),
+    green_space: metricValue(neighbourhood, 'env_open_space_access'),
   }
 }
 
-async function addHeatmapMetrics(
-  collection: BoundaryFeatureCollection,
-): Promise<BoundaryFeatureCollection> {
-  const missingIds = Array.from(
-    new Set(
-      collection.features
-        .map((feature) => feature.properties.id)
-        .filter((id) => !heatmapMetricsCache.has(id)),
-    ),
-  )
-  let nextIndex = 0
-
-  async function worker() {
-    while (nextIndex < missingIds.length) {
-      const id = missingIds[nextIndex]
-      nextIndex += 1
-
-      try {
-        const response = await api.getProfile(id)
-        if (response.status === 'available' || response.status === 'limited') {
-          heatmapMetricsCache.set(id, metricsFromProfile(response.data))
-        }
-      } catch (error) {
-        console.warn(`Could not load heatmap metrics for ${id}:`, error)
+async function getHeatmapMetrics() {
+  if (!heatmapMetricsPromise) {
+    heatmapMetricsPromise = api.getNeighbourhoodIndicators().then((response) => {
+      if (response.status !== 'available' && response.status !== 'limited') {
+        throw new Error(
+          response.limitations[0]?.message ??
+            'Neighbourhood indicators are unavailable.',
+        )
       }
-    }
+
+      return new Map(
+        response.data.neighbourhoods.map((neighbourhood) => [
+          neighbourhood.id,
+          metricsFromIndicators(neighbourhood),
+        ]),
+      )
+    }).catch((error) => {
+      heatmapMetricsPromise = null
+      throw error
+    })
   }
 
-  await Promise.all(
-    Array.from({ length: Math.min(6, missingIds.length) }, () => worker()),
-  )
+  return heatmapMetricsPromise
+}
 
+function addHeatmapMetrics(
+  collection: BoundaryFeatureCollection,
+  metricsById: Map<string, HeatmapMetrics>,
+): BoundaryFeatureCollection {
   return {
     ...collection,
     features: collection.features.map((feature) => ({
       ...feature,
       properties: {
         ...feature.properties,
-        ...heatmapMetricsCache.get(feature.properties.id),
+        ...metricsById.get(feature.properties.id),
       },
     })),
   }
@@ -249,6 +262,7 @@ export default function NeighbourhoodMap({
   comparisonId,
   compareMode = false,
   onSelect,
+  selectionEnabled = true,
 }: NeighbourhoodMapProps) {
   const mapContainerRef =
     useRef<HTMLDivElement | null>(
@@ -259,6 +273,11 @@ export default function NeighbourhoodMap({
     useRef<MapLibreMap | null>(
       null,
     )
+  const cursorOrbRef =
+    useRef<HTMLDivElement | null>(
+      null,
+    )
+
 
   const preferenceRef = useRef<PreferenceId | null>(preference)
 const selectedIdRef =
@@ -279,6 +298,8 @@ const hoveredIdRef =
     >(null)
 const requestNumberRef =
     useRef(0)
+  const selectionEnabledRef = useRef(selectionEnabled)
+
 
   const [
     loading,
@@ -309,6 +330,7 @@ const requestNumberRef =
     onSelect
 
   preferenceRef.current = preference
+  selectionEnabledRef.current = selectionEnabled
 useEffect(() => {
     if (
       !mapContainerRef.current ||
@@ -394,10 +416,13 @@ async function loadVisibleBoundaries() {
       try {
         setLoading(true)
 
-        const response =
-          await api.getBoundaries(
-            bbox,
-          )
+        const [response, metricsResult] = await Promise.all([
+          api.getBoundaries(bbox),
+          getHeatmapMetrics().catch((error) => {
+            console.warn('Could not load heatmap indicators:', error)
+            return null
+          }),
+        ])
 if (
           currentRequest !==
           requestNumberRef.current
@@ -431,13 +456,10 @@ clearHover()
           )
 
         if (source) {
-          ;(source as GeoJSONSource).setData(response.data as any)
-
-          const enrichedData = await addHeatmapMetrics(response.data)
-          if (currentRequest !== requestNumberRef.current) {
-            return
-          }
-          ;(source as GeoJSONSource).setData(enrichedData as any)
+          const mapData = metricsResult
+            ? addHeatmapMetrics(response.data, metricsResult)
+            : response.data
+          ;(source as GeoJSONSource).setData(mapData as any)
         }
 
         setMapError(
@@ -721,9 +743,8 @@ map.on(
           'mouseenter',
           FILL_LAYER_ID,
           () => {
-            map.getCanvas()
-              .style.cursor =
-              'pointer'
+            map.getCanvas().style.cursor =
+              selectionEnabledRef.current ? 'pointer' : ''
           },
         )
 map.on(
@@ -829,6 +850,10 @@ map.on(
           'click',
           FILL_LAYER_ID,
           (event) => {
+            if (!selectionEnabledRef.current) {
+              return
+            }
+
             const feature =
               event.features?.[0]
 
@@ -880,6 +905,96 @@ return () => {
         null
     }
   }, [])
+  useEffect(() => {
+    const container = mapContainerRef.current
+    const orb = cursorOrbRef.current
+
+    if (!container || !orb) {
+      return
+    }
+
+    let targetX = 0
+    let targetY = 0
+    let currentX = 0
+    let currentY = 0
+    let lastClientX = 0
+    let lastClientY = 0
+    let animationFrame: number | null = null
+    let active = false
+
+    const updateTarget = (clientX: number, clientY: number) => {
+      const rect = container.getBoundingClientRect()
+      targetX = clientX - rect.left
+      targetY = clientY - rect.top
+    }
+
+    const animate = () => {
+      currentX += (targetX - currentX) * CURSOR_ORB_EASING
+      currentY += (targetY - currentY) * CURSOR_ORB_EASING
+      orb.style.transform = `translate3d(${currentX}px, ${currentY}px, 0) translate(-50%, -50%)`
+
+      if (active) {
+        animationFrame = window.requestAnimationFrame(animate)
+      }
+    }
+
+    const handleMouseEnter = (event: MouseEvent) => {
+      lastClientX = event.clientX
+      lastClientY = event.clientY
+      updateTarget(lastClientX, lastClientY)
+      currentX = targetX
+      currentY = targetY
+      orb.style.transform = `translate3d(${currentX}px, ${currentY}px, 0) translate(-50%, -50%)`
+      active = true
+      orb.classList.add('is-visible')
+
+      if (animationFrame === null) {
+        animationFrame = window.requestAnimationFrame(animate)
+      }
+    }
+
+    const handleMouseMove = (event: MouseEvent) => {
+      lastClientX = event.clientX
+      lastClientY = event.clientY
+      updateTarget(lastClientX, lastClientY)
+    }
+
+    const handleMouseLeave = () => {
+      active = false
+      orb.classList.remove('is-visible')
+
+      if (animationFrame !== null) {
+        window.cancelAnimationFrame(animationFrame)
+        animationFrame = null
+      }
+    }
+
+    const handleViewportChange = () => {
+      if (active) {
+        updateTarget(lastClientX, lastClientY)
+      }
+    }
+
+    container.addEventListener('mouseenter', handleMouseEnter)
+    container.addEventListener('mousemove', handleMouseMove)
+    container.addEventListener('mouseleave', handleMouseLeave)
+    window.addEventListener('resize', handleViewportChange)
+    window.addEventListener('scroll', handleViewportChange, { passive: true })
+
+    return () => {
+      active = false
+      container.removeEventListener('mouseenter', handleMouseEnter)
+      container.removeEventListener('mousemove', handleMouseMove)
+      container.removeEventListener('mouseleave', handleMouseLeave)
+      window.removeEventListener('resize', handleViewportChange)
+      window.removeEventListener('scroll', handleViewportChange)
+
+      if (animationFrame !== null) {
+        window.cancelAnimationFrame(animationFrame)
+      }
+    }
+  }, [])
+
 useEffect(() => {
     const map = mapRef.current
 
@@ -1028,6 +1143,12 @@ useEffect(() => {
           mapContainerRef
         }
         className="real-map"
+      />
+
+      <div
+        ref={cursorOrbRef}
+        className="map-cursor-orb"
+        aria-hidden="true"
       />
 
       {hoveredName && (
