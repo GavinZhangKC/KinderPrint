@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 
 import './styles.css'
 
@@ -11,12 +11,13 @@ import NeighbourhoodMap from './components/NeighbourhoodMap'
 import PreferencePanel from './components/PreferencePanel'
 import ProfileModal from './components/ProfileModal'
 
+import { useNeighbourhoodSearch } from './hooks/useNeighbourhoodSearch'
+
 import { api } from './services/api'
 import { toNeighbourhood } from './services/profileAdapter'
 
 import type {
   NeighbourhoodComparison,
-  NeighbourhoodSearchResult,
 } from './services/api'
 
 import type {
@@ -53,13 +54,6 @@ const [view, setView] =
   const [preference, setPreference] =
     useState<PreferenceId | null>(null)
 
-  const [search, setSearch] =
-    useState('')
-
-  const [
-    showSearchResults,
-    setShowSearchResults,
-  ] = useState(false)
 
   const [
     showDataDrawer,
@@ -73,61 +67,21 @@ const [
     mapFocusId,
     setMapFocusId,
   ] = useState<string | null>(null)
-const [
+  const {
+    search,
+    setSearch,
+    showSearchResults,
+    setShowSearchResults,
     searchResults,
     setSearchResults,
-  ] = useState<NeighbourhoodSearchResult[]>([])
-
-  const [
     searchLoading,
-    setSearchLoading,
-  ] = useState(false)
-useEffect(() => {
-    if (!showSearchResults) {
-      return
-    }
-
-    const timer = window.setTimeout(
-      async () => {
-        try {
-          setSearchLoading(true)
-
-          const response =
-            await api.searchNeighbourhoods(
-              search.trim(),
-            )
-
-          if (
-            response.status === 'available' ||
-            response.status === 'limited'
-          ) {
-            setSearchResults(
-              response.data.slice(0, 8),
-            )
-          } else {
-            setSearchResults([])
-          }
-        } catch (error) {
-          console.error(
-            'Failed to search neighbourhoods:',
-            error,
-          )
-
-          setSearchResults([])
-        } finally {
-          setSearchLoading(false)
-        }
-      },
-      250,
-    )
-
-    return () => {
-      window.clearTimeout(timer)
-    }
-  }, [
-    search,
-    showSearchResults,
-  ])
+    handleSearchResultSelect,
+    submitSearch,
+  } = useNeighbourhoodSearch({
+    onSelectResult: async (item) => {
+      await handleMapSelect(item.id, item.name, true)
+    },
+  })
 function resetExplore() {
     setView('map')
 
@@ -156,69 +110,6 @@ function choosePrimary(
     setShowSearchResults(false)
 
     setView('profile')
-  }
-async function handleSearchResultSelect(
-    item: NeighbourhoodSearchResult,
-  ) {
-    setSearch(item.name)
-    setShowSearchResults(false)
-    await handleMapSelect(item.id, item.name, true)
-  }
-async function submitSearch() {
-    const query = search.trim()
-
-    if (!query) {
-      setShowSearchResults(true)
-      return
-    }
-
-    try {
-      setSearchLoading(true)
-const response =
-        await api.searchNeighbourhoods(query)
-
-      if (
-        response.status !== 'available' &&
-        response.status !== 'limited'
-      ) {
-        setSearchResults([])
-        setShowSearchResults(true)
-        return
-      }
-
-      const results =
-        response.data.slice(0, 8)
-
-      setSearchResults(results)
-
-      if (results.length === 0) {
-        setShowSearchResults(true)
-        return
-      }
-const normalizedQuery =
-        query.toLowerCase()
-
-      const exactMatch =
-        results.find(
-          (item) =>
-            item.name.toLowerCase() ===
-            normalizedQuery,
-        )
-
-      await handleSearchResultSelect(
-        exactMatch ?? results[0],
-      )
-    } catch (error) {
-      console.error(
-        'Failed to submit neighbourhood search:',
-        error,
-      )
-
-      setSearchResults([])
-      setShowSearchResults(true)
-    } finally {
-      setSearchLoading(false)
-    }
   }
 async function handleMapSelect(
     id: string,

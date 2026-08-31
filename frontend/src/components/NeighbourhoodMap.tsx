@@ -17,6 +17,20 @@ import 'maplibre-gl/dist/maplibre-gl.css'
 
 import { api } from '../services/api'
 
+import {
+  choroplethFill,
+  COMPARISON_LAYER_ID,
+  EMPTY_COLLECTION,
+  FILL_LAYER_ID,
+  HOVER_BORDER_LAYER_ID,
+  HOVER_FILL_LAYER_ID,
+  HOVER_SHADOW_LAYER_ID,
+  OUTLINE_LAYER_ID,
+  SELECTED_LAYER_ID,
+  selectionFilter,
+  SOURCE_ID,
+} from './mapStyles'
+
 import type {
   BoundaryFeatureCollection,
   BoundaryGeometry,
@@ -47,69 +61,6 @@ interface NeighbourhoodMapProps {
     id: string,
     name?: string,
   ) => void
-}
-const SOURCE_ID =
-  'kinderprint-neighbourhoods'
-
-const FILL_LAYER_ID =
-  'kinderprint-neighbourhood-fill'
-
-const HOVER_SHADOW_LAYER_ID =
-  'kinderprint-neighbourhood-hover-shadow'
-
-const HOVER_FILL_LAYER_ID =
-  'kinderprint-neighbourhood-hover-fill'
-
-const OUTLINE_LAYER_ID =
-  'kinderprint-neighbourhood-outline'
-
-const HOVER_BORDER_LAYER_ID =
-  'kinderprint-neighbourhood-hover-border'
-
-const SELECTED_LAYER_ID =
-  'kinderprint-neighbourhood-selected'
-
-const COMPARISON_LAYER_ID =
-  'kinderprint-neighbourhood-comparison'
-const EMPTY_COLLECTION: BoundaryFeatureCollection = {
-  type: 'FeatureCollection',
-  features: [],
-}
-const HEATMAP_STYLE: Record<
-  PreferenceId,
-  { property: string; stops: [number, number, number] }
-> = {
-  development: { property: 'development', stops: [45, 65, 80] },
-  heat: { property: 'heat', stops: [5, 7, 9] },
-  social: { property: 'social', stops: [2, 5, 8] },
-  vegetation: { property: 'vegetation', stops: [10, 20, 35] },
-  'green-space': { property: 'green_space', stops: [10, 20, 35] },
-}
-
-function heatmapFill(preference: PreferenceId | null) {
-  if (!preference) return '#FFFFFF'
-
-  const { property, stops } = HEATMAP_STYLE[preference]
-  const positive =
-    preference === 'development' ||
-    preference === 'vegetation' ||
-    preference === 'green-space'
-  const low = positive ? '#F5B6A8' : '#9ADBB8'
-  const high = positive ? '#9ADBB8' : '#F5B6A8'
-
-  return [
-    'interpolate',
-    ['linear'],
-    ['coalesce', ['get', property], -999],
-    -999,
-    'rgba(255,255,255,0.08)',
-    stops[0],
-    low,
-    stops[1],
-    '#F6E7A8',
-    stops[2],
-    high,
-  ] as any
 }
 type HeatmapMetrics = {
   development?: number | null
@@ -190,16 +141,6 @@ function addHeatmapMetrics(
       },
     })),
   }
-}
-function selectionFilter(
-  id: string | null | undefined,
-) {
-  return [
-    '==',
-    ['get', 'id'],
-    id ??
-      '__no_neighbourhood_selected__',
-  ] as any
 }
 // Calculate bounds for map focus
 function getGeometryBounds(
@@ -517,7 +458,7 @@ map.addSource(
             SOURCE_ID,
 
           paint: {
-'fill-color': heatmapFill(preferenceRef.current),
+'fill-color': choroplethFill(preferenceRef.current),
             'fill-opacity': preferenceRef.current ? 0.62 : 0.01,
           },
         })
@@ -1002,7 +943,7 @@ useEffect(() => {
       return
     }
 
-    map.setPaintProperty(FILL_LAYER_ID, 'fill-color', heatmapFill(preference))
+    map.setPaintProperty(FILL_LAYER_ID, 'fill-color', choroplethFill(preference))
     map.setPaintProperty(FILL_LAYER_ID, 'fill-opacity', preference ? 0.62 : 0.01)
   }, [preference])
 useEffect(() => {

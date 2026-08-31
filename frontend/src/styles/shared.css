@@ -1,0 +1,22 @@
+.status-badge { min-width: 86px; display: inline-flex; align-items: center; justify-content: center; min-height: 30px; border-radius: 999px; padding: 5px 14px; font-size: 11px; font-weight: 800; border: 1px solid rgba(255,255,255,.72); }
+.status-badge.compact { min-width: 72px; min-height: 28px; padding: 4px 9px; font-size: 10px; }
+.status-strong { background: var(--positive-bg); color: var(--positive-text); }
+.status-moderate { background: var(--moderate-bg); color: var(--moderate-text); }
+.status-concern { background: var(--concern-bg); color: var(--concern-text); }
+
+.metric-ring { margin: 4px auto 10px; border-radius: 50%; display: grid; place-items: center; position: relative; background: conic-gradient(var(--ring-color) 0 var(--ring-value), rgba(127,148,184,.18) var(--ring-value) 360deg); }
+.metric-ring::before { content: ''; position: absolute; inset: 8px; border-radius: 50%; background: rgba(248,250,255,.92); }
+.metric-ring-small { width: 76px; height: 76px; }
+.metric-ring-large { width: 148px; height: 148px; }
+.metric-ring-large::before { inset: 16px; }
+.metric-ring-inner { position: relative; z-index: 1; display: grid; place-items: center; }
+.metric-ring-inner strong { color: var(--text); font-size: 18px; }
+.metric-ring-large .metric-ring-inner strong { font-size: 32px; }
+.ring-primary { --ring-color: #6d78e8; }.ring-positive { --ring-color: #73c6a0; }.ring-concern { --ring-color: #e99889; }
+
+.button { min-height: 44px; min-width: 158px; border-radius: 999px; padding: 0 20px; cursor: pointer; font-weight: 700; border: 1px solid rgba(255,255,255,.78); transition: transform .2s ease, box-shadow .2s ease, opacity .2s ease; }
+.button:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 10px 24px rgba(57,76,137,.14); }
+.button.primary { background: linear-gradient(135deg, #6d78e8, #728ee9); color: white; }
+.button.secondary { background: rgba(255,255,255,.62); color: #5367b8; }
+.button:disabled { opacity: .38; cursor: not-allowed; }
+

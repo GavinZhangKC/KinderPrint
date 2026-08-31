@@ -1,0 +1,36 @@
+.profile-interaction-lock {
+  position: fixed;
+  inset: 0;
+  z-index: 19;
+  background: rgba(231, 239, 252, .38);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  pointer-events: auto;
+}
+.profile-interaction-lock .profile-modal {
+  z-index: 1;
+  margin-left: 0;
+  transition: margin-left .58s cubic-bezier(.22, 1, .36, 1);
+}
+.profile-interaction-lock.has-data-drawer .profile-modal { margin-left: clamp(-220px, -14vw, -150px); }
+.profile-modal { position: absolute; width: min(860px, calc(100% - 70px)); min-height: 620px; left: 50%; top: 50%; transform: translate(-50%, -48%); z-index: 20; border-radius: 28px; background: rgba(255,255,255,.76); padding: 24px 28px 22px; }
+.profile-modal h1 { margin: 0; font-size: 30px; color: var(--brand); }
+.profile-subtitle { margin: 4px 0 12px; color: var(--muted); font-size: 13px; }
+.icon-close { position: absolute; right: 18px; top: 16px; width: 36px; height: 36px; border: 0; border-radius: 50%; background: rgba(255,255,255,.62); cursor: pointer; font-size: 22px; color: #617494; }
+.profile-meta { height: 48px; border-radius: 14px; padding: 0 18px; display: flex; align-items: center; justify-content: space-between; color: #637697; font-size: 12px; }
+.priority-inline { display: flex; align-items: center; gap: 10px; font-weight: 700; color: #536987; }
+.profile-domain-grid { display: grid; grid-template-columns: 1fr 1fr 1.4fr; gap: 18px; margin-top: 18px; }
+.profile-domain-card { min-height: 222px; border-radius: 18px; padding: 15px 16px; text-align: center; }
+.profile-domain-card h2 { margin: 0 0 12px; font-size: 12px; letter-spacing: .04em; color: var(--brand); }
+.profile-domain-card p { font-size: 11px; color: var(--muted); line-height: 1.5; margin: 10px 0 0; }
+.metric-label { text-align: left; margin: 16px 0 2px !important; }
+.metric-large { display: block; font-size: 32px; color: var(--text); margin: 2px 0 12px; text-align: left; }
+.environment-card { text-align: left; }
+.environment-row { display: grid; grid-template-columns: 1.2fr .6fr .8fr; align-items: center; gap: 8px; min-height: 50px; border-top: 1px solid rgba(125,145,180,.16); font-size: 11px; }
+.environment-row:first-of-type { border-top: 0; }
+.environment-row strong { color: #3d567d; }
+.key-insight-card { border-radius: 18px; margin-top: 18px; min-height: 90px; padding: 14px 18px; }
+.key-insight-card h2 { margin: 0 0 5px; font-size: 17px; color: var(--brand); }
+.key-insight-card p { margin: 0; font-size: 12px; line-height: 1.55; color: #596e8f; }
+.profile-actions { display: flex; justify-content: center; gap: 164px; margin-top: 26px; }
+
