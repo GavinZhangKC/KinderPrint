@@ -2,7 +2,7 @@
 
 **Version:** 0.1  
 **Status:** Working Iteration 1 contract  
-**Last updated:** 28 August 2026
+**Last updated:** 31 August 2026
 
 This document describes the agreed API shape for Iteration 1. It is a design contract only. It does not define implementation logic, connect datasets, or approve Data Science methods. Every unresolved decision is marked `TBC`.
 
@@ -107,6 +107,49 @@ Returns an aggregate neighbourhood profile. The final geographic identifier form
 ```
 
 An indicator with missing or incompatible input must carry its own non-available status, a `null` value, and the relevant limitation. The backend must not generate, infer, or estimate a replacement value.
+
+### `GET /api/neighbourhoods/indicators`
+
+Returns a lightweight collection of neighbourhood-level indicator values for rendering the visible map without making a separate profile request for every neighbourhood. This endpoint supplements, and does not replace, `GET /api/neighbourhoods/{neighbourhood_id}/profile`.
+
+The final map indicator list and any query parameters for selecting indicators or limiting the result to the visible map area are TBC. Only source indicators approved for Iteration 1 may be exposed; this endpoint must not create new composite values or scores.
+
+```json
+{
+  "status": "available",
+  "data": {
+    "neighbourhoods": [
+      {
+        "id": "TBC",
+        "geographic_unit": "TBC",
+        "indicators": {
+          "TBC-indicator-id": {
+            "value": null,
+            "status": "available | missing | incompatible | unavailable | limited"
+          }
+        }
+      }
+    ]
+  },
+  "metadata": {
+    "sources": ["TBC"],
+    "reference_years": ["TBC"],
+    "geographic_unit": "TBC",
+    "data_quality": "TBC"
+  },
+  "limitations": [],
+  "notices": [
+    {
+      "code": "area_level_information",
+      "message": "TBC"
+    }
+  ]
+}
+```
+
+Every requested indicator is represented by its concrete indicator identifier and its own availability status. A missing, incompatible, unavailable, or otherwise unsupported value must be `null`, never `0` or an estimated replacement. Relevant reasons must be recorded in `limitations`.
+
+Indicator data and boundary geometry remain separate resources. The collection does not include GeoJSON geometry. The frontend joins each result to `GET /api/neighbourhoods/boundaries` using the neighbourhood `id`. The identifier and confirmed geographic unit must be consistent across the indicator collection, individual profiles, neighbourhood search results, and boundary endpoints. The backend must return a clear non-available state or limitation when that consistency cannot be established.
 
 ## BE-2 — Geography and Boundary Service
 
@@ -364,6 +407,7 @@ It confirms that the FastAPI service is running and makes no statement about bus
 - Final comparison fields
 - Final approved disclaimer and notice wording where not already confirmed
 - Final bounding-box query format
+- Final map-indicator query parameters and indicator selection
 - Final HTTP status and machine-readable error-code mappings
 
 ## Change policy and version roadmap
