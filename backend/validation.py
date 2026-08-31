@@ -159,6 +159,42 @@ def profile_collection_metadata(profiles: list[dict[str, Any]]) -> dict[str, Any
     }
 
 
+def profile_boundary_limitations(
+    profiles: list[dict[str, Any]], features: list[dict[str, Any]]
+) -> list[dict[str, Any]]:
+    """Report identities or geographic units that cannot be joined safely."""
+    profile_units = {
+        profile["neighbourhood"]["id"]: profile["neighbourhood"]["geographic_unit"]
+        for profile in profiles
+    }
+    boundary_units = {
+        feature["properties"]["id"]: feature["properties"]["geographic_unit"]
+        for feature in features
+    }
+    limitations: list[dict[str, Any]] = []
+    for identifier in sorted(profile_units.keys() - boundary_units.keys()):
+        limitations.append(limitation(
+            "boundary_missing_for_profile",
+            "No boundary uses this profile neighbourhood identifier.",
+            identifier,
+        ))
+    for identifier in sorted(boundary_units.keys() - profile_units.keys()):
+        limitations.append(limitation(
+            "profile_missing_for_boundary",
+            "No profile uses this boundary neighbourhood identifier.",
+            identifier,
+        ))
+    for identifier in sorted(profile_units.keys() & boundary_units.keys()):
+        if profile_units[identifier] != boundary_units[identifier]:
+            limitations.append(limitation(
+                "incompatible_geographic_unit",
+                "The profile and boundary geographic units differ for this neighbourhood.",
+                identifier,
+                "geographic_unit",
+            ))
+    return limitations
+
+
 def valid_priority_metadata(metadata: Any) -> bool:
     return isinstance(metadata, dict) and all(
         isinstance(metadata.get(field), (str, int)) and str(metadata[field]).strip()
