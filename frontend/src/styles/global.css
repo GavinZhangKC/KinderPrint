@@ -1,0 +1,56 @@
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap');
+
+:root {
+  font-family: 'Manrope', 'Segoe UI', sans-serif;
+  color: #233a63;
+  background: #edf4ff;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  --brand: #2c5eaf;
+  --primary: #6d78e8;
+  --text: #233a63;
+  --muted: #6b7b9d;
+  --glass: rgba(255, 255, 255, .50);
+  --glass-strong: rgba(255, 255, 255, .74);
+  --glass-subtle: rgba(255, 255, 255, .48);
+  --border: rgba(255, 255, 255, .76);
+  --positive-bg: #9adbb8;
+  --positive-text: #246b57;
+  --moderate-bg: #f6e7a8;
+  --moderate-text: #8b6b16;
+  --concern-bg: #f5b6a8;
+  --concern-text: #9a4638;
+  --shadow: 0 18px 42px rgba(51, 82, 140, .16);
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { margin: 0; min-width: 320px; min-height: 100vh; background: #edf4ff; }
+button, input { font: inherit; }
+button { color: inherit; }
+a { color: inherit; text-decoration: none; }
+
+.app-background {
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+  padding: 20px 24px 56px;
+  background:
+    radial-gradient(circle at 18% 25%, rgba(184,178,255,.32), transparent 33%),
+    radial-gradient(circle at 82% 55%, rgba(131,214,255,.28), transparent 34%),
+    linear-gradient(135deg, #eff2ff 0%, #e8f5ff 52%, #e8efff 100%);
+}
+
+.ambient { position: fixed; border-radius: 999px; pointer-events: none; filter: blur(90px); opacity: .6; z-index: 0; }
+.ambient-one { width: 520px; height: 520px; left: -150px; top: 160px; background: rgba(184,178,255,.34); }
+.ambient-two { width: 500px; height: 500px; right: -90px; top: 380px; background: rgba(131,214,255,.28); }
+
+.glass {
+  background: var(--glass);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(22px);
+  -webkit-backdrop-filter: blur(22px);
+}
+.glass-subtle { background: var(--glass-subtle); border: 1px solid rgba(255,255,255,.78); box-shadow: 0 12px 30px rgba(51,82,140,.10); }
+

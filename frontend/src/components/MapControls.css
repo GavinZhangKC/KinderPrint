@@ -1,0 +1,17 @@
+.map-controls-row { position: absolute; left: 30px; bottom: 36px; display: flex; align-items: stretch; gap: 10px; z-index: 8; }
+.map-control { border-radius: 24px; padding: 18px 20px; background: rgba(255,255,255,.53); }
+.map-control h2 { margin: 0 0 14px; color: var(--brand); font-size: 20px; }
+.preference-card { width: 198px; min-height: 238px; }
+.preference-options { display: grid; gap: 10px; }
+.preference-option { display: flex; align-items: center; gap: 10px; font-size: 13px; cursor: pointer; color: #445a80; }
+.preference-option input { position: absolute; opacity: 0; pointer-events: none; }
+.custom-radio { width: 18px; height: 18px; border: 1.5px solid #8da0c4; border-radius: 50%; background: rgba(255,255,255,.72); position: relative; }
+.custom-radio.is-selected { border-color: var(--primary); }
+.custom-radio.is-selected::after { content: ''; width: 9px; height: 9px; border-radius: 50%; background: var(--primary); position: absolute; inset: 3px; }
+.legend-card { width: 180px; min-height: 238px; }
+.legend-card p { margin: 0 0 14px; font-size: 11px; letter-spacing: .06em; color: #7687a5; font-weight: 700; }
+.legend-row { display: flex; align-items: center; gap: 10px; margin: 12px 0; font-size: 13px; color: #526987; }
+.legend-swatch { width: 16px; height: 16px; border-radius: 4px; background: #f6e7a8; }
+.legend-swatch.risk-low { background: #9adbb8; }.legend-swatch.risk-high { background: #f5b6a8; }
+.legend-swatch.positive-low { background: #f5b6a8; }.legend-swatch.positive-high { background: #9adbb8; }.legend-swatch.mid { background: #f6e7a8; }
+
