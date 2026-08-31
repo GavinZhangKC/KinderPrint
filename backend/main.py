@@ -8,6 +8,7 @@ from fastapi import FastAPI, Query, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 
+from data_loader import boundary_data_path
 from geography import (
     feature_metadata,
     intersects_bbox,
@@ -21,9 +22,11 @@ from responses import (
     HUMAN_DECISION_NOTICE, INVESTIGATION_LEADS_NOTICE, envelope, limitation,
 )
 from validation import (
-    explanation_data, load_comparison_data, load_explanations, load_priority_results,
-    load_profiles, manual_comparison_data, match_data, priority_data,
-    profile_limitations, profile_metadata, profile_status,
+    aggregate_status, explanation_data, load_comparison_data, load_explanations,
+    load_priority_results, load_profiles, map_indicator_data, match_data,
+    priority_data, profile_boundary_limitations, profile_collection_metadata,
+    profile_comparison_data, profile_comparison_limitations, profile_limitations,
+    profile_metadata, profile_status,
 )
 
 app = FastAPI(title="KinderPrint API", version="0.1.0")
@@ -153,6 +156,49 @@ def neighbourhood_profile(neighbourhood_id: str) -> dict[str, Any]:
     }, metadata=profile_metadata(profile), limitations=profile_limitations(profile), notices=[AREA_LEVEL_NOTICE])
 
 
+@app.get("/api/neighbourhoods/indicators")
+def neighbourhood_indicators() -> dict[str, Any]:
+    """Return lightweight approved indicator values for all supported map areas."""
+    profiles, limitations = load_profiles()
+    empty = {"neighbourhoods": []}
+    if profiles is None:
+        return envelope(
+            "unavailable", empty, limitations=limitations, notices=[AREA_LEVEL_NOTICE])
+    if not profiles:
+        return envelope("unavailable", empty, limitations=[limitation(
+            "profile_inputs_unavailable",
+            "The approved profile dataset contains no neighbourhood indicators.",
+            "indicators")], notices=[AREA_LEVEL_NOTICE])
+
+    collection_limitations = [
+        {
+            **item,
+            "affected_fields": list(dict.fromkeys([
+                *item.get("affected_fields", []),
+                profile["neighbourhood"]["id"],
+            ])),
+        }
+        for profile in profiles
+        for item in profile_limitations(profile)
+    ]
+    if boundary_data_path() is not None:
+        features, boundary_limitations = load_boundary_features()
+        if features is None:
+            collection_limitations.extend(boundary_limitations)
+        else:
+            collection_limitations.extend(profile_boundary_limitations(profiles, features))
+    status = aggregate_status([profile_status(profile) for profile in profiles])
+    if collection_limitations and status == "available":
+        status = "limited"
+    return envelope(
+        status,
+        {"neighbourhoods": [map_indicator_data(profile) for profile in profiles]},
+        metadata=profile_collection_metadata(profiles),
+        limitations=collection_limitations,
+        notices=[AREA_LEVEL_NOTICE],
+    )
+
+
 @app.get("/api/neighbourhoods/{neighbourhood_id}/priority")
 def neighbourhood_priority(neighbourhood_id: str) -> dict[str, Any]:
     """Return the approved relative priority band or withhold an unsupported result."""
@@ -223,39 +269,59 @@ def manual_compare(
     neighbourhood_id_a: str = Query(..., min_length=1, max_length=100),
     neighbourhood_id_b: str = Query(..., min_length=1, max_length=100),
 ) -> dict[str, Any]:
-    """Return an approved side-by-side comparison in the selected order."""
+    """Compare profile indicators for any two supported neighbourhoods."""
     notices = [COMPARABLE_NOTICE, COMPARISON_AREA_NOTICE]
-    if neighbourhood_id_a == neighbourhood_id_b:
-        return envelope("no_match", {
-            "source_neighbourhood": {"id": neighbourhood_id_a, "name": None, "geographic_unit": None},
-            "comparison_neighbourhood": {"id": neighbourhood_id_b, "name": None, "geographic_unit": None},
-            "side_by_side": [], "similarity_basis": [], "match_strength": None,
-        }, limitations=[limitation(
-            "same_neighbourhood_selected", "Choose two different neighbourhoods for a comparison.",
-            "neighbourhood_id_a", "neighbourhood_id_b")], notices=notices)
-    comparison_data, metadata, limitations = load_comparison_data()
     empty = {
         "source_neighbourhood": {"id": neighbourhood_id_a, "name": None, "geographic_unit": None},
         "comparison_neighbourhood": {"id": neighbourhood_id_b, "name": None, "geographic_unit": None},
         "side_by_side": [], "similarity_basis": [], "match_strength": None,
     }
-    if comparison_data is None:
+    profiles, limitations = load_profiles()
+    if profiles is None:
         return envelope("unavailable", empty, limitations=limitations, notices=notices)
-    comparison = next((item for item in comparison_data["comparisons"]
-                       if item["source_neighbourhood"]["id"] == neighbourhood_id_a
-                       and item["comparison_neighbourhood"]["id"] == neighbourhood_id_b), None)
-    reverse = False
-    if comparison is None:
-        comparison = next((item for item in comparison_data["comparisons"]
-                           if item["source_neighbourhood"]["id"] == neighbourhood_id_b
-                           and item["comparison_neighbourhood"]["id"] == neighbourhood_id_a), None)
-        reverse = comparison is not None
-    if comparison is None:
-        return envelope("no_match", empty, metadata=metadata, limitations=[limitation(
-            "no_approved_comparison", "No approved side-by-side comparison is available for these neighbourhoods.",
+    source_profile = next((profile for profile in profiles
+                           if profile["neighbourhood"]["id"] == neighbourhood_id_a), None)
+    comparison_profile = next((profile for profile in profiles
+                               if profile["neighbourhood"]["id"] == neighbourhood_id_b), None)
+    if source_profile is None or comparison_profile is None:
+        missing_parameters = [
+            parameter
+            for profile, parameter in (
+                (source_profile, "neighbourhood_id_a"),
+                (comparison_profile, "neighbourhood_id_b"),
+            )
+            if profile is None
+        ]
+        return envelope("missing", empty, limitations=[limitation(
+            "unsupported_neighbourhood",
+            "One or both neighbourhood identifiers do not have a supported profile.",
+            *missing_parameters,
+        )], notices=notices)
+    if neighbourhood_id_a == neighbourhood_id_b:
+        return envelope("no_match", empty, limitations=[limitation(
+            "same_neighbourhood_selected", "Choose two different neighbourhoods for a comparison.",
             "neighbourhood_id_a", "neighbourhood_id_b")], notices=notices)
-    return envelope(comparison["status"], manual_comparison_data(comparison, reverse), metadata=metadata,
-                    limitations=comparison.get("limitations", []), notices=notices)
+    if (source_profile["neighbourhood"]["geographic_unit"]
+            != comparison_profile["neighbourhood"]["geographic_unit"]):
+        return envelope("incompatible", empty, limitations=[limitation(
+            "incompatible_geographic_unit",
+            "The selected neighbourhood profiles use incompatible geographic units.",
+            "neighbourhood_id_a", "neighbourhood_id_b", "geographic_unit",
+        )], notices=notices)
+
+    data = profile_comparison_data(source_profile, comparison_profile)
+    comparison_limitations = profile_comparison_limitations(source_profile, comparison_profile)
+    statuses = [
+        field[status_key]
+        for field in data["side_by_side"]
+        for status_key in ("source_status", "comparison_status")
+    ]
+    return envelope(
+        aggregate_status(statuses), data,
+        metadata=profile_collection_metadata([source_profile, comparison_profile]),
+        limitations=comparison_limitations,
+        notices=notices,
+    )
 
 
 @app.get("/api/neighbourhoods/{neighbourhood_id}/boundary")

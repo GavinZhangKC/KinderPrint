@@ -1,5 +1,12 @@
-import { preferenceOptions } from '../data/mockData'
 import type { PreferenceId } from '../types/neighbourhood'
+const preferenceOptions: Array<{ id: PreferenceId; label: string }> = [
+  { id: 'development', label: 'Development' },
+  { id: 'heat', label: 'Heat' },
+  { id: 'social', label: 'Social Disadvantage' },
+  { id: 'vegetation', label: 'Vegetation' },
+  { id: 'green-space', label: 'Green Space' },
+]
+
 
 interface PreferencePanelProps {
   value: PreferenceId | null

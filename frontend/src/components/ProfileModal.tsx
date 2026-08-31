@@ -1,5 +1,4 @@
 import MetricRing from './MetricRing'
-import StatusBadge from './StatusBadge'
 import type { Neighbourhood } from '../types/neighbourhood'
 
 interface ProfileModalProps {
@@ -7,6 +6,10 @@ interface ProfileModalProps {
   onCompare: () => void
   onExploreData: () => void
   onClose: () => void
+}
+
+function display(value: number | null, suffix = '') {
+  return value === null ? 'Not available' : `${value}${suffix}`
 }
 
 export default function ProfileModal({ neighbourhood, onCompare, onExploreData, onClose }: ProfileModalProps) {
@@ -18,36 +21,40 @@ export default function ProfileModal({ neighbourhood, onCompare, onExploreData, 
 
       <div className="profile-meta glass-subtle">
         <span>{neighbourhood.geographicUnit} · Reference period {neighbourhood.referencePeriod}</span>
-        <span className="priority-inline">Priority for Investigation <StatusBadge status={neighbourhood.priority === 'High' ? 'Concern' : neighbourhood.priority === 'Low' ? 'Strong' : 'Moderate'} compact /></span>
+        <span className="priority-inline">Priority for Investigation <strong>{neighbourhood.priority ?? 'Not available'}</strong></span>
       </div>
 
       <div className="profile-domain-grid">
         <article className="glass-subtle profile-domain-card child-card">
           <h2>CHILD DEVELOPMENT</h2>
           <MetricRing value={neighbourhood.childDevelopmentScore} label="Child development score" />
-          <StatusBadge status={neighbourhood.childDevelopmentScore >= 72 ? 'Strong' : neighbourhood.childDevelopmentScore >= 62 ? 'Moderate' : 'Concern'} />
-          <p>Developmental outcomes relative to the prototype reference level</p>
+          <p>On track on all five AEDC domains</p>
         </article>
 
         <article className="glass-subtle profile-domain-card social-card">
           <h2>SOCIAL CONTEXT</h2>
           <p className="metric-label">Socioeconomic<br />disadvantage</p>
-          <strong className="metric-large">{neighbourhood.socialDisadvantage}</strong>
-          <StatusBadge status={neighbourhood.socialDisadvantage === 'High' ? 'Concern' : neighbourhood.socialDisadvantage === 'Low' ? 'Strong' : 'Moderate'} />
-          <p>Relative disadvantage within the selected area</p>
+          <strong className="metric-large">{display(neighbourhood.socialDisadvantageDecile)}</strong>
+          <p>National SEIFA IRSD decile</p>
         </article>
 
         <article className="glass-subtle profile-domain-card environment-card">
           <h2>ENVIRONMENT</h2>
-          <div className="environment-row"><span>Heat exposure</span><strong>{neighbourhood.heatExposure}</strong><StatusBadge compact status={neighbourhood.heatExposure === 'High' ? 'Concern' : neighbourhood.heatExposure === 'Low' ? 'Strong' : 'Moderate'} /></div>
-          <div className="environment-row"><span>Tree canopy</span><strong>{neighbourhood.treeCanopy}%</strong><StatusBadge compact status={neighbourhood.treeCanopy >= 50 ? 'Strong' : neighbourhood.treeCanopy >= 30 ? 'Moderate' : 'Concern'} /></div>
-          <div className="environment-row"><span>Green-space access</span><strong>{neighbourhood.greenSpaceAccess}%</strong><StatusBadge compact status={neighbourhood.greenSpaceAccess >= 70 ? 'Strong' : neighbourhood.greenSpaceAccess >= 50 ? 'Moderate' : 'Concern'} /></div>
+          <div className="environment-row"><span>Urban heat island effect</span><strong>{display(neighbourhood.heatExposure, '°C')}</strong></div>
+          <div className="environment-row"><span>Tree canopy</span><strong>{display(neighbourhood.treeCanopy, '%')}</strong></div>
+          <div className="environment-row"><span>Public open space</span><strong>{display(neighbourhood.greenSpaceAccess, '%')}</strong></div>
         </article>
       </div>
 
       <article className="glass-subtle key-insight-card">
-        <h2>Key Insight</h2>
-        <p>{neighbourhood.keyInsight}</p>
+        <h2>Highlighted Factors</h2>
+        {neighbourhood.highlightedFactors.length > 0 ? (
+          <ul>
+            {neighbourhood.highlightedFactors.map((factor) => <li key={factor}>{factor}</li>)}
+          </ul>
+        ) : (
+          <p>No approved highlighted factors are available.</p>
+        )}
       </article>
 
       <div className="profile-actions">

@@ -1,0 +1,263 @@
+# KinderPrint — Data Source Register
+#
+# PURPOSE
+#   Single machine-readable record of provenance for every dataset.
+#   The ingestion pipeline reads this file; it is NOT documentation that
+#   sits beside the code, it IS the config the code runs on.
+#   It loads into the `data_sources` table verbatim.
+#
+# RULES
+#   1. Nothing enters data/raw/ without a matching entry here.
+#   2. `verified: false` fields are ASSUMPTIONS. They must be confirmed by
+#      inspecting the downloaded file and then flipped to true, with the
+#      evidence noted in `verification_note`.
+#   3. Never edit an entry retrospectively. Add a new entry with a new
+#      source_id and mark the old one `superseded_by`.
+#   4. `sha256` is filled by scripts/01_download.py after download. If a
+#      re-download produces a different hash, that is an incident, not a
+#      convenience — log it in docs/decisions/.
+#
+# TEMPLATE — copy this block for each new source
+# --------------------------------------------------------------------
+# - source_id:              # short stable key, snake_case, e.g. aedc_sa2_2024
+#   dataset_name:           # official title as published
+#   publisher:              # organisation
+#   url_landing:            # human-readable page
+#   url_file:               # direct download URL
+#   licence:                # e.g. CC-BY-4.0
+#   licence_url:
+#   attribution_required:   # true/false — what string must appear in the UI
+#   attribution_text:
+#   release_year:           # when the publisher issued this product
+#   reference_period:       # what period the DATA describes (not release date)
+#   collection_date:        # when observations were made, if distinct
+#   geography_level:        # SA2 / SA1 / grid / raster / point
+#   asgs_edition:           # Edition 3 (2021) / Edition 4 (2026) / n-a
+#   geographic_id_field:    # exact column name in the file
+#   format:                 # xlsx / csv / gpkg / netcdf / geotiff
+#   size_mb:
+#   missing_value_repr:     # how missing is encoded in THIS file
+#   suppression_rule:       # publisher's small-cell rule, verbatim
+#   update_frequency:
+#   accessed_date:
+#   sha256:
+#   raw_path:               # data/raw/<source>/<accessed_date>/<filename>
+#   transformations_required:
+#     - ...
+#   known_limitations:
+#     - ...
+#   verified: false
+#   verification_note:
+#   superseded_by:
+# --------------------------------------------------------------------
+
+sources:
+
+  # ============================================================
+  # 1. GEOGRAPHIC BACKBONE
+  # ============================================================
+  - source_id: asgs_ed3_sa2_2021
+    dataset_name: "ASGS Edition 3 — Statistical Areas Level 2, digital boundary files"
+    publisher: "Australian Bureau of Statistics"
+    url_landing: "https://www.abs.gov.au/statistics/standards/australian-statistical-geography-standard-asgs/edition-3-july-2021-june-2026/access-and-downloads/digital-boundary-files"
+    url_file: "TO_FILL_from_landing_page"
+    licence: "CC-BY-4.0"
+    licence_url: "https://creativecommons.org/licenses/by/4.0/"
+    attribution_required: true
+    attribution_text: "Source: Australian Bureau of Statistics"
+    release_year: 2021
+    reference_period: "July 2021 – June 2026"
+    geography_level: "SA2"
+    asgs_edition: "Edition 3 (2021)"
+    geographic_id_field: "SA2_CODE21"
+    format: "gpkg (preferred) or shp"
+    missing_value_repr: "n-a"
+    suppression_rule: "n-a"
+    update_frequency: "Every 5 years"
+    accessed_date: "TO_FILL"
+    sha256: "TO_FILL"
+    raw_path: "data/raw/asgs/TO_FILL/"
+    transformations_required:
+      - "Take the GDA2020 variant, not GDA94. Store as EPSG:7844."
+      - "Reproject to EPSG:3577 (Australian Albers) for ALL area and zonal-stat calculations."
+      - "Validate geometries (shapely make_valid); log any repaired features."
+      - "Exclude non-physical SA2s (special-purpose codes: migratory/offshore/shipping, no usual address). Do not silently drop — flag them."
+    known_limitations:
+      - "CRITICAL: ASGS Edition 4 (July 2026) is now the ABS 'latest release' and SA2 boundaries HAVE CHANGED. The /latest-release URL will serve Edition 4. Iteration 1 must pin Edition 3 explicitly."
+    verified: true
+    verification_note: "ABS confirms Ed 3 covers Jul 2021 – Jun 2026; Ed 4 released progressively from July 2026. Verified 2026-08-28."
+
+  - source_id: asgs_ed3_allocation_mb_2021
+    dataset_name: "ASGS Edition 3 — Mesh Block to SA1/SA2 allocation file"
+    publisher: "Australian Bureau of Statistics"
+    url_landing: "https://www.abs.gov.au/statistics/standards/australian-statistical-geography-standard-asgs/edition-3-july-2021-june-2026/access-and-downloads/allocation-files"
+    url_file: "TO_FILL"
+    licence: "CC-BY-4.0"
+    release_year: 2021
+    reference_period: "2021"
+    geography_level: "Mesh Block"
+    asgs_edition: "Edition 3 (2021)"
+    geographic_id_field: "MB_CODE_2021"
+    format: "xlsx"
+    update_frequency: "Every 5 years"
+    accessed_date: "TO_FILL"
+    raw_path: "data/raw/asgs/TO_FILL/"
+    transformations_required:
+      - "Needed as the weighting layer for POPULATION-WEIGHTED zonal statistics. Without it, heat and vegetation indicators are area-weighted and therefore wrong (see docs/methodology/zonal_stats.md)."
+    verified: false
+    verification_note: "Confirm MB population counts are in this file or must come from the Census MB counts product."
+
+  # ============================================================
+  # 2. CHILD DEVELOPMENT OUTCOME LAYER
+  # ============================================================
+  - source_id: aedc_sa2_2009_2024
+    dataset_name: "AEDC Data by Statistical Areas Level 2 (SA2), 2009–2024"
+    publisher: "Australian Early Development Census / Department of Education"
+    url_landing: "https://www.aedc.gov.au/data-hub/public-data/additional-data"
+    url_file: "https://www.aedc.gov.au/docs/default-source/default-document-library/sa2-2009-24.xlsx"
+    licence: "CHECK — AEDC Data Guidelines impose reporting conditions distinct from a plain CC licence"
+    licence_url: "https://www.aedc.gov.au/copyright"
+    attribution_required: true
+    attribution_text: "TO_FILL from AEDC Data Guidelines"
+    release_year: 2025
+    reference_period: "Collection cycles 2009, 2012, 2015, 2018, 2021, 2024"
+    collection_date: "2024 cycle: 1 May – 31 July 2024"
+    geography_level: "SA2"
+    asgs_edition: "Edition 3 (2021) — ASSUMED, verify against the file's notes sheet"
+    geographic_id_field: "TO_FILL — inspect file"
+    format: "xlsx"
+    size_mb: 5.9
+    missing_value_repr: "TO_FILL — inspect"
+    suppression_rule: "TO_FILL — AEDC does not publish results for areas with small child counts. Read the file's notes/caveats sheet for the exact rule. DO NOT ASSUME A NUMBER."
+    update_frequency: "Every 3 years"
+    accessed_date: "TO_FILL"
+    sha256: "TO_FILL"
+    raw_path: "data/raw/aedc/TO_FILL/sa2-2009-24.xlsx"
+    transformations_required:
+      - "Unpivot from wide (year × domain columns) to long."
+      - "Separate percentage columns from count/denominator columns."
+      - "Preserve the suppression flag as a distinct quality_flag value — never coerce to NaN and never impute."
+    known_limitations:
+      - "OPEN QUESTION, blocks Epic 4: does this file publish the NUMBER OF CHILDREN per SA2? If not, confidence intervals and AEDC 'critical difference' cannot be computed, and community-vs-community comparison has no uncertainty measure."
+      - "OPEN QUESTION: is a child assigned to the SA2 of RESIDENCE or of SCHOOL? This changes the meaning of every environmental join. Confirm in the AEDC Data Dictionary before any join."
+      - "2024 cohort was mostly born 2018–2019, so the relevant environmental exposure window is roughly 2019–2024, not 2024 alone."
+    verified: false
+    verification_note: "URL and SA2 availability verified from AEDC Additional Data page 2026-08-28. File contents NOT yet inspected."
+
+  # ============================================================
+  # 3. SOCIOECONOMIC CONTEXT (matching backbone)
+  # ============================================================
+  - source_id: seifa_2021_sa2
+    dataset_name: "Socio-Economic Indexes for Areas (SEIFA), Australia, 2021 — SA2 indexes"
+    publisher: "Australian Bureau of Statistics"
+    url_landing: "https://www.abs.gov.au/statistics/people/people-and-communities/socio-economic-indexes-areas-seifa-australia/latest-release"
+    url_file: "TO_FILL — data cube from Data downloads"
+    licence: "CC-BY-4.0"
+    attribution_required: true
+    attribution_text: "Source: Australian Bureau of Statistics"
+    release_year: 2023
+    reference_period: "2021 (based on 2021 Census)"
+    geography_level: "SA2"
+    asgs_edition: "Edition 3 (2021)"
+    geographic_id_field: "TO_FILL — inspect"
+    format: "xlsx"
+    missing_value_repr: "TO_FILL"
+    suppression_rule: "ABS excludes SA1s with very low population from index calculation; SA2 scores are population-weighted averages of SA1 scores."
+    update_frequency: "Every 5 years"
+    accessed_date: "TO_FILL"
+    raw_path: "data/raw/seifa/TO_FILL/"
+    transformations_required:
+      - "Use IRSD score, decile and percentile. Retain the score for matching, the decile for display."
+      - "Do NOT combine IRSD with raw Census income/unemployment in the same composite — IRSD is built FROM those variables (double counting)."
+    known_limitations:
+      - "SEIFA 2026 will not exist until early 2028, so 2021 is the only option and is 3 years older than AEDC 2024."
+      - "SEIFA measures AREA disadvantage, not the disadvantage of any individual child (ecological fallacy)."
+    verified: true
+    verification_note: "ABS confirms SEIFA 2021 uses ASGS Ed 3, SA2 available, SA2 scores are population-weighted SA1 averages. Verified 2026-08-28."
+
+  - source_id: census_2021_gcp_sa2
+    dataset_name: "2021 Census General Community Profile DataPack, SA2"
+    publisher: "Australian Bureau of Statistics"
+    url_landing: "https://www.abs.gov.au/census/find-census-data/datapacks"
+    url_file: "TO_FILL"
+    licence: "CC-BY-4.0"
+    release_year: 2022
+    reference_period: "Census night 10 August 2021"
+    geography_level: "SA2"
+    asgs_edition: "Edition 3 (2021)"
+    geographic_id_field: "SA2_CODE_2021"
+    format: "csv (many files) + metadata xlsx"
+    update_frequency: "Every 5 years"
+    accessed_date: "TO_FILL"
+    raw_path: "data/raw/census/TO_FILL/"
+    transformations_required:
+      - "Select ONLY the ~8–12 matching variables named in config/indicators.yaml. Do not ingest the whole DataPack."
+      - "Convert counts to proportions using the correct denominator from the DataPack metadata — denominators differ per table."
+      - "ABS applies random perturbation to small Census cells; small proportions are unstable."
+    known_limitations:
+      - "2026 Census first release is June 2027; 2021 remains the only usable Census for Iteration 1."
+      - "Fast-growth SA2s (e.g. Melbourne's western growth corridor) changed materially between 2021 and the AEDC 2024 collection."
+    verified: true
+    verification_note: "2026 Census held 11 Aug 2026, first release June 2027, SEIFA-equivalent early 2028. Verified 2026-08-28."
+
+  # ============================================================
+  # 4. ENVIRONMENT — HEAT
+  # ============================================================
+  - source_id: silo_gridded_max_temp
+    dataset_name: "SILO gridded daily maximum temperature"
+    publisher: "Queensland Government (Dept of Environment, Tourism, Science and Innovation)"
+    url_landing: "https://www.longpaddock.qld.gov.au/silo/gridded-data/"
+    url_file: "s3://silo-open-data/Official/annual/max_temp/<year>.max_temp.nc"
+    licence: "CC-BY-4.0"
+    attribution_required: true
+    attribution_text: "SILO climate data, Queensland Government, CC BY 4.0"
+    release_year: 2026
+    reference_period: "1889 – yesterday; KinderPrint window TBD (proposed 2019–2024)"
+    geography_level: "Grid, 0.05° (~5 km)"
+    asgs_edition: "n-a"
+    geographic_id_field: "n-a (lat/lon)"
+    format: "netcdf (annual stacks) or geotiff (daily)"
+    missing_value_repr: "NetCDF _FillValue — read from file attrs, do not assume"
+    suppression_rule: "n-a"
+    update_frequency: "Daily"
+    accessed_date: "TO_FILL"
+    raw_path: "data/raw/silo/TO_FILL/"
+    transformations_required:
+      - "Compute per-cell annual counts of days above threshold, THEN population-weighted zonal mean to SA2. Do not average temperature first and count later."
+      - "Threshold must come from a cited standard (e.g. ETCCDI TX90p percentile index, or BoM Excess Heat Factor). Record the citation in docs/methodology/heat_indicator.md."
+      - "Reproject grid to EPSG:3577 before zonal statistics."
+    known_limitations:
+      - "BINDING RESOLUTION CONSTRAINT: a ~5 km interpolated grid cannot distinguish adjacent urban SA2s. Differences between neighbouring metropolitan SA2s are largely interpolation artefact, not measured urban heat island. This must be stated in the UI and limits Epic 4 claims about heat."
+      - "SILO is explicitly not intended for climate-change detection studies."
+    verified: true
+    verification_note: "SILO confirmed CC-BY-4.0, 0.05° grid, daily max_temp on AWS open data, no auth for gridded files. Chosen over BoM AGCD, which is CC-BY-NC (non-commercial) and gated behind NCI registration. Verified 2026-08-28."
+
+  # ============================================================
+  # 5. ENVIRONMENT — LAND COVER / VEGETATION
+  # ============================================================
+  - source_id: dea_landcover_v2
+    dataset_name: "DEA Land Cover (Landsat), version 2.0.0 — ga_ls_landcover_class_cyear_3"
+    publisher: "Geoscience Australia / Digital Earth Australia"
+    url_landing: "https://knowledge.dea.ga.gov.au/data/product/dea-land-cover-landsat/"
+    url_file: "via DEA Open Data Cube / STAC / Digital Atlas of Australia"
+    licence: "CC-BY-4.0"
+    attribution_required: true
+    attribution_text: "Digital Earth Australia, Geoscience Australia"
+    release_year: 2026
+    reference_period: "Annual, 1988–2025 (last update April 2026)"
+    geography_level: "Raster, 30 m"
+    asgs_edition: "n-a"
+    format: "geotiff / COG"
+    missing_value_repr: "255 (v2.0.0 changed no-data from 0 to 255)"
+    update_frequency: "Annual"
+    accessed_date: "TO_FILL"
+    raw_path: "data/raw/dea/TO_FILL/"
+    transformations_required:
+      - "Level 3 gives 6 base classes; Level 4 subdivides. Decide and document which classes count as 'vegetated' BEFORE computing anything."
+      - "Population-weight or urban-mask the zonal statistic (see limitation below)."
+    known_limitations:
+      - "CRITICAL: a naive area-share of vegetation per SA2 measures FARMLAND AND BUSH, not green space near where children live. Fringe SA2s will score high on vegetation while having no accessible park. Mask to the populated portion of the SA2 or the indicator is misleading."
+      - "v2.0.0 is 30 m, not the 25 m quoted in older documentation and in the project brief."
+      - "Land Cover is a thematic classification. If a continuous vegetation FRACTION is wanted, DEA Fractional Cover (v4.0.0, 2026) is the more appropriate product. Decide, document, do not use both interchangeably."
+    verified: true
+    verification_note: "DEA Land Cover v2.0.0 confirmed: 30 m, product ID ga_ls_landcover_class_cyear_3, no-data 255, coverage 1988–2025, updated April 2026. Verified 2026-08-28."

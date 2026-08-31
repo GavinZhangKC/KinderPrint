@@ -1,7 +1,7 @@
 import type { PreferenceId } from '../types/neighbourhood'
 
 interface LegendProps {
-  preference: PreferenceId | null
+  preference: PreferenceId
 }
 
 const labels: Record<PreferenceId, { title: string; low: string; middle: string; high: string }> = {
@@ -13,7 +13,7 @@ const labels: Record<PreferenceId, { title: string; low: string; middle: string;
 }
 
 export default function Legend({ preference }: LegendProps) {
-  const active = preference ? labels[preference] : labels.heat
+  const active = labels[preference]
   const positive = preference === 'development' || preference === 'vegetation' || preference === 'green-space'
   return (
     <section className="glass map-control legend-card" aria-labelledby="legend-title">

@@ -118,6 +118,163 @@ def profile_metadata(profile: dict[str, Any]) -> dict[str, Any]:
     }
 
 
+def map_indicator_data(profile: dict[str, Any]) -> dict[str, Any]:
+    """Project a validated profile to the lightweight map-indicator shape."""
+    return {
+        "id": profile["neighbourhood"]["id"],
+        "geographic_unit": profile["neighbourhood"]["geographic_unit"],
+        "indicators": {
+            indicator["id"]: {
+                "value": indicator["value"],
+                "status": indicator["status"],
+            }
+            for domain in profile["domains"]
+            for indicator in domain["indicators"]
+        },
+    }
+
+
+def profile_collection_metadata(profiles: list[dict[str, Any]]) -> dict[str, Any]:
+    """Summarise provenance supplied by a validated profile collection."""
+    indicators = [
+        indicator
+        for profile in profiles
+        for domain in profile["domains"]
+        for indicator in domain["indicators"]
+    ]
+    geographic_units = sorted({
+        profile["neighbourhood"]["geographic_unit"] for profile in profiles
+    })
+    quality_values = sorted({
+        str(profile.get("metadata", {}).get(
+            "data_quality", "Provided by the approved profile dataset"))
+        for profile in profiles
+    })
+    return {
+        "sources": sorted({str(indicator["source"]) for indicator in indicators}),
+        "reference_years": sorted({str(indicator["reference_year"]) for indicator in indicators}),
+        "geographic_unit": geographic_units[0] if len(geographic_units) == 1 else None,
+        "data_quality": quality_values[0] if len(quality_values) == 1 else quality_values,
+        "result_count": len(profiles),
+    }
+
+
+def profile_comparison_data(
+    source_profile: dict[str, Any], comparison_profile: dict[str, Any]
+) -> dict[str, Any]:
+    """Build a side-by-side projection without calculating similarity or filling gaps."""
+    source_indicators = {
+        indicator["id"]: indicator
+        for domain in source_profile["domains"]
+        for indicator in domain["indicators"]
+    }
+    comparison_indicators = {
+        indicator["id"]: indicator
+        for domain in comparison_profile["domains"]
+        for indicator in domain["indicators"]
+    }
+    indicator_ids = list(source_indicators)
+    indicator_ids.extend(
+        identifier for identifier in comparison_indicators if identifier not in source_indicators)
+
+    side_by_side = []
+    for identifier in indicator_ids:
+        source = source_indicators.get(identifier)
+        compared = comparison_indicators.get(identifier)
+        exemplar = source or compared
+        side_by_side.append({
+            "id": identifier,
+            "name": exemplar["name"],
+            "source_value": source["value"] if source else None,
+            "comparison_value": compared["value"] if compared else None,
+            "source_status": source["status"] if source else "unavailable",
+            "comparison_status": compared["status"] if compared else "unavailable",
+        })
+
+    return {
+        "source_neighbourhood": source_profile["neighbourhood"],
+        "comparison_neighbourhood": comparison_profile["neighbourhood"],
+        "side_by_side": side_by_side,
+        "similarity_basis": [],
+        "match_strength": None,
+    }
+
+
+def profile_comparison_limitations(
+    source_profile: dict[str, Any], comparison_profile: dict[str, Any]
+) -> list[dict[str, Any]]:
+    """Expose profile gaps for both selected neighbourhoods without imputing values."""
+    limitations: list[dict[str, Any]] = []
+    for profile in (source_profile, comparison_profile):
+        identifier = profile["neighbourhood"]["id"]
+        limitations.extend({
+            **item,
+            "affected_fields": list(dict.fromkeys([
+                *item.get("affected_fields", []), identifier,
+            ])),
+        } for item in profile_limitations(profile))
+
+    source_ids = {
+        indicator["id"]
+        for domain in source_profile["domains"]
+        for indicator in domain["indicators"]
+    }
+    comparison_ids = {
+        indicator["id"]
+        for domain in comparison_profile["domains"]
+        for indicator in domain["indicators"]
+    }
+    for identifier in sorted(source_ids ^ comparison_ids):
+        missing_from = (
+            comparison_profile["neighbourhood"]["id"]
+            if identifier in source_ids
+            else source_profile["neighbourhood"]["id"]
+        )
+        limitations.append(limitation(
+            "indicator_unavailable_for_comparison",
+            "This indicator is not present for both selected neighbourhoods.",
+            identifier,
+            missing_from,
+        ))
+    return limitations
+
+
+def profile_boundary_limitations(
+    profiles: list[dict[str, Any]], features: list[dict[str, Any]]
+) -> list[dict[str, Any]]:
+    """Report identities or geographic units that cannot be joined safely."""
+    profile_units = {
+        profile["neighbourhood"]["id"]: profile["neighbourhood"]["geographic_unit"]
+        for profile in profiles
+    }
+    boundary_units = {
+        feature["properties"]["id"]: feature["properties"]["geographic_unit"]
+        for feature in features
+    }
+    limitations: list[dict[str, Any]] = []
+    for identifier in sorted(profile_units.keys() - boundary_units.keys()):
+        limitations.append(limitation(
+            "boundary_missing_for_profile",
+            "No boundary uses this profile neighbourhood identifier.",
+            identifier,
+        ))
+    for identifier in sorted(boundary_units.keys() - profile_units.keys()):
+        limitations.append(limitation(
+            "profile_missing_for_boundary",
+            "No profile uses this boundary neighbourhood identifier.",
+            identifier,
+        ))
+    for identifier in sorted(profile_units.keys() & boundary_units.keys()):
+        if profile_units[identifier] != boundary_units[identifier]:
+            limitations.append(limitation(
+                "incompatible_geographic_unit",
+                "The profile and boundary geographic units differ for this neighbourhood.",
+                identifier,
+                "geographic_unit",
+            ))
+    return limitations
+
+
 def valid_priority_metadata(metadata: Any) -> bool:
     return isinstance(metadata, dict) and all(
         isinstance(metadata.get(field), (str, int)) and str(metadata[field]).strip()
