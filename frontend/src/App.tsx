@@ -2,11 +2,14 @@ import { useState } from 'react'
 
 import './styles.css'
 
+import AboutUsPage from './components/AboutUsPage'
 import BrandHeader from './components/BrandHeader'
 import ComparePanel from './components/ComparePanel'
 import DetailedComparison from './components/DetailedComparison'
 import DetailedDataDrawer from './components/DetailedDataDrawer'
 import Legend from './components/Legend'
+import LandingPage from './components/LandingPage'
+import MenuPage from './components/MenuPage'
 import NeighbourhoodMap from './components/NeighbourhoodMap'
 import PreferencePanel from './components/PreferencePanel'
 import ProfileModal from './components/ProfileModal'
@@ -31,7 +34,17 @@ type View =
   | 'compare-select'
   | 'comparison'
 
+type AppPage =
+  | 'landing'
+  | 'menu'
+  | 'insight'
+  | 'map'
+  | 'about'
+
 export default function App() {
+const [appPage, setAppPage] =
+    useState<AppPage>('landing')
+
 const [view, setView] =
     useState<View>('map')
 
@@ -97,6 +110,14 @@ function resetExplore() {
     setShowSearchResults(false)
 
     setShowDataDrawer(false)
+  }
+function backToMenu() {
+    resetExplore()
+    setAppPage('menu')
+  }
+function backToLanding() {
+    resetExplore()
+    setAppPage('landing')
   }
 function choosePrimary(
     neighbourhood: Neighbourhood,
@@ -215,6 +236,24 @@ function startComparison() {
       setCompareLoading(false)
     }
   }
+if (appPage === 'landing') {
+    return <LandingPage onExplore={() => setAppPage('menu')} />
+  }
+
+  if (appPage === 'menu') {
+    return (
+      <MenuPage
+        onInsight={() => setAppPage('insight')}
+        onMap={() => setAppPage('map')}
+        onAboutUs={() => setAppPage('about')}
+      />
+    )
+  }
+
+  if (appPage === 'about') {
+    return <AboutUsPage onBack={backToMenu} />
+  }
+
 if (
     view === 'comparison' &&
     selected &&
@@ -227,7 +266,9 @@ if (
         <div className="ambient ambient-two" />
 
         <BrandHeader
+          onLogoClick={backToLanding}
           onExplore={resetExplore}
+          onBackToMenu={backToMenu}
         />
 
         <DetailedComparison
@@ -249,14 +290,13 @@ return (
       <div className="ambient ambient-two" />
 
       <BrandHeader
-        onExplore={resetExplore}
-      />
+          onLogoClick={backToLanding}
+          onExplore={resetExplore}
+          onBackToMenu={backToMenu}
+        />
 
       <main className="map-shell">
         <section className="glass map-surface">
-
-          {
-}
 
           <div className="neighbourhood-search-block">
             <label htmlFor="neighbourhood-search">
@@ -311,9 +351,6 @@ setMapSelectedId(null)
               </button>
             </form>
 
-            {
-}
-
             {showSearchResults &&
               !selected && (
                 <div className="glass search-results">
@@ -361,8 +398,6 @@ setMapSelectedId(null)
 
           </div>
 
-          {
-}
 
           <NeighbourhoodMap
             preference={preference}
@@ -396,8 +431,6 @@ setMapSelectedId(null)
             }}
           />
 
-          {
-}
 
           <div className="map-controls-row">
             <PreferencePanel
@@ -412,8 +445,6 @@ setMapSelectedId(null)
             ) : null}
           </div>
 
-          {
-}
 
           {view === 'profile' && selected && (
             <div className={`profile-interaction-lock ${showDataDrawer ? 'has-data-drawer' : ''}`} aria-modal="true" role="dialog">
@@ -439,8 +470,6 @@ setMapSelectedId(null)
             </div>
           )}
 
-          {
-}
 
           {view ===
             'compare-select' &&
