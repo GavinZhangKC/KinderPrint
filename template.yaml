@@ -3,9 +3,18 @@ Transform: AWS::Serverless-2016-10-31
 Description: KinderPrint Iteration 1 FastAPI backend
 
 Parameters:
-  FrontendOrigin:
+  VercelOrigin:
     Type: String
-    Description: Exact HTTPS origin of the deployed KinderPrint frontend
+    Default: https://kinderprint.vercel.app
+    Description: Exact HTTPS origin of the deployed Vercel frontend
+  CustomDomainOrigin:
+    Type: String
+    Default: https://kinderprint.me
+    Description: Exact HTTPS origin of the KinderPrint root domain
+  CustomWwwOrigin:
+    Type: String
+    Default: https://www.kinderprint.me
+    Description: Exact HTTPS origin of the KinderPrint www domain
 
 Globals:
   Function:
@@ -22,7 +31,9 @@ Resources:
       StageName: $default
       CorsConfiguration:
         AllowOrigins:
-          - !Ref FrontendOrigin
+          - !Ref VercelOrigin
+          - !Ref CustomDomainOrigin
+          - !Ref CustomWwwOrigin
         AllowHeaders:
           - Accept
           - Content-Type
