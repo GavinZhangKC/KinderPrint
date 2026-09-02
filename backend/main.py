@@ -6,7 +6,9 @@ from typing import Any
 
 from fastapi import FastAPI, Query, Request
 from fastapi.exceptions import RequestValidationError
+from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.responses import JSONResponse
+from mangum import Mangum
 
 from data_loader import boundary_data_path
 from geography import (
@@ -30,6 +32,7 @@ from validation import (
 )
 
 app = FastAPI(title="KinderPrint API", version="0.1.0")
+app.add_middleware(GZipMiddleware, minimum_size=1000)
 logger = logging.getLogger("kinderprint.api")
 
 
@@ -338,3 +341,6 @@ def neighbourhood_boundary(neighbourhood_id: str) -> dict[str, Any]:
             "neighbourhood_id", "geometry")])
     return envelope("available", {"neighbourhood": neighbourhood(feature), "geometry": feature["geometry"]},
                     metadata=feature_metadata(feature))
+
+
+handler = Mangum(app, lifespan="off")
