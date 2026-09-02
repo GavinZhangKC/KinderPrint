@@ -42,3 +42,22 @@ source .venv/bin/activate
 python -m pip install -r requirements-dev.txt
 python -m pytest
 ```
+
+### AWS Lambda deployment
+
+The backend is deployed as a zip-based Python 3.13 Lambda behind an API
+Gateway HTTP API. The preparation script installs Linux x86_64 wheels into the
+generated package, so Docker is not required.
+
+Prepare only the five approved Iteration 1 runtime datasets, then build and
+deploy with AWS SAM:
+
+```bash
+./backend/prepare_lambda_package.sh
+sam build
+sam deploy --guided --parameter-overrides FrontendOrigin=https://YOUR-PROJECT.vercel.app
+```
+
+Use the `ApiUrl` stack output as the Vercel `VITE_API_BASE_URL`, then redeploy
+the frontend. The generated `backend/lambda_package/` and `.aws-sam/`
+directories are local build artifacts and are not committed.

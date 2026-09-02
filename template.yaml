@@ -1,0 +1,63 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: KinderPrint Iteration 1 FastAPI backend
+
+Parameters:
+  FrontendOrigin:
+    Type: String
+    Description: Exact HTTPS origin of the deployed KinderPrint frontend
+
+Globals:
+  Function:
+    Runtime: python3.13
+    Architectures:
+      - x86_64
+    MemorySize: 1024
+    Timeout: 30
+
+Resources:
+  KinderPrintHttpApi:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      StageName: $default
+      CorsConfiguration:
+        AllowOrigins:
+          - !Ref FrontendOrigin
+        AllowHeaders:
+          - Accept
+          - Content-Type
+        AllowMethods:
+          - GET
+        MaxAge: 600
+
+  KinderPrintApiFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: backend/lambda_package/
+      Handler: main.handler
+      Description: KinderPrint Iteration 1 API
+      Environment:
+        Variables:
+          KINDERPRINT_PROFILE_DATA_PATH: /var/task/data/profiles.json
+          KINDERPRINT_BOUNDARY_DATA_PATH: /var/task/data/boundaries.geojson
+          KINDERPRINT_PRIORITY_DATA_PATH: /var/task/data/priorities.json
+          KINDERPRINT_EXPLANATION_DATA_PATH: /var/task/data/explanations.json
+          KINDERPRINT_COMPARISON_DATA_PATH: /var/task/data/comparisons.json
+      Events:
+        ApiProxy:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref KinderPrintHttpApi
+            Path: /{proxy+}
+            Method: ANY
+        ApiRoot:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref KinderPrintHttpApi
+            Path: /
+            Method: ANY
+
+Outputs:
+  ApiUrl:
+    Description: Base URL for VITE_API_BASE_URL
+    Value: !Sub "https://${KinderPrintHttpApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}"
