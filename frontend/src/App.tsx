@@ -7,6 +7,7 @@ import BrandHeader from './components/BrandHeader'
 import ComparePanel from './components/ComparePanel'
 import DetailedComparison from './components/DetailedComparison'
 import DetailedDataDrawer from './components/DetailedDataDrawer'
+import InsightPage from './components/InsightPage'
 import Legend from './components/Legend'
 import LandingPage from './components/LandingPage'
 import MenuPage from './components/MenuPage'
@@ -252,6 +253,10 @@ if (appPage === 'landing') {
 
   if (appPage === 'about') {
     return <AboutUsPage onBack={backToMenu} />
+  }
+
+  if (appPage === 'insight') {
+    return <InsightPage onBack={backToMenu} />
   }
 
 if (
