@@ -15,7 +15,9 @@ npm.cmd install
 npm.cmd run dev
 ```
 
-The Vite dev server proxies `/api` to `http://localhost:8000` for later backend integration.
+The Vite dev and preview servers listen on `0.0.0.0` and proxy `/api` to
+`http://localhost:8000`. Other devices on the same LAN can open
+`http://<this-computer-LAN-IP>:5173` without a separate API configuration.
 
 ## Data note
 

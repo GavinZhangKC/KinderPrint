@@ -6,15 +6,16 @@ interface ProfileModalProps {
   onCompare: () => void
   onExploreData: () => void
   onClose: () => void
+  onActivate: () => void
 }
 
 function display(value: number | null, suffix = '') {
   return value === null ? 'Not available' : `${value}${suffix}`
 }
 
-export default function ProfileModal({ neighbourhood, onCompare, onExploreData, onClose }: ProfileModalProps) {
+export default function ProfileModal({ neighbourhood, onCompare, onExploreData, onClose, onActivate }: ProfileModalProps) {
   return (
-    <section className="glass profile-modal page-enter" aria-labelledby="profile-title">
+    <section className="glass profile-modal page-enter" aria-labelledby="profile-title" onPointerDown={onActivate}>
       <button className="icon-close" type="button" onClick={onClose} aria-label="Close profile">×</button>
       <h1 id="profile-title">{neighbourhood.name} Profile</h1>
       <p className="profile-subtitle">A snapshot of child development, social and environmental conditions in this neighbourhood.</p>

@@ -1,35 +1,65 @@
-import logo from '../assets/LogoMark.png'
-import '../styles/about-us.css'
+import BrandHeader from './BrandHeader'
+import './InsightPage.css'
 
 interface InsightPageProps {
-  onBack: () => void
+  onLogoClick: () => void
+  onBackToMenu: () => void
+  onExploreMap: () => void
 }
 
-export default function InsightPage({ onBack }: InsightPageProps) {
+const insightAreas = [
+  {
+    title: 'Child Development',
+    description: 'Explore indicators related to children’s development and wellbeing.',
+  },
+  {
+    title: 'Social Context',
+    description: 'Understand the social and socioeconomic conditions of each neighbourhood.',
+  },
+  {
+    title: 'Environment',
+    description: 'Review environmental factors including heat, vegetation and public open space.',
+  },
+]
+
+export default function InsightPage({ onLogoClick, onBackToMenu, onExploreMap }: InsightPageProps) {
   return (
-    <section className="about-us-page" aria-labelledby="insight-title">
-      <button className="back-to-menu-button" type="button" onClick={onBack}>
-        ← Back to Menu
-      </button>
+    <div className="app-background insight-page">
+      <div className="ambient ambient-one" />
+      <div className="ambient ambient-two" />
 
-      <article className="glass about-us-panel">
-        <div className="about-us-logo" aria-hidden="true">
-          <img src={logo} alt="" />
-        </div>
+      <BrandHeader
+        onLogoClick={onLogoClick}
+        onExplore={onExploreMap}
+        onBackToMenu={onBackToMenu}
+      />
 
-        <div className="about-us-content">
-          <p className="about-us-kicker">KinderPrint Insight</p>
-          <h2 id="insight-title">Understand neighbourhood evidence at a glance.</h2>
-          <p>
-            Explore the child development, social and environmental factors available for
-            each neighbourhood.
-          </p>
-          <p className="about-us-note">
-            These insights support local exploration and further investigation using
-            area-level information.
-          </p>
-        </div>
-      </article>
-    </section>
+      <main className="insight-page__main">
+        <article className="glass insight-panel" aria-labelledby="insight-title">
+          <header className="insight-panel__heading">
+            <p className="insight-panel__kicker">INSIGHT</p>
+            <h1 id="insight-title">Understand the factors shaping each neighbourhood.</h1>
+            <p>
+              KinderPrint brings together child development, social context and environmental
+              indicators to help users understand neighbourhood conditions more clearly.
+            </p>
+          </header>
+
+          <div className="insight-grid">
+            {insightAreas.map((area, index) => (
+              <section className="glass-subtle insight-card" key={area.title}>
+                <span aria-hidden="true">{String(index + 1).padStart(2, '0')}</span>
+                <h2>{area.title}</h2>
+                <p>{area.description}</p>
+              </section>
+            ))}
+          </div>
+
+          <button className="button primary insight-map-button" type="button" onClick={onExploreMap}>
+            Explore the Map
+          </button>
+        </article>
+      </main>
+    </div>
   )
 }

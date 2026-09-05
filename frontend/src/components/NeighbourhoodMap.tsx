@@ -4,16 +4,11 @@ import {
   useState,
 } from 'react'
 
-import {
-  GeoJSONSource,
-  Map as MapLibreMap,
-  NavigationControl,
-  setWorkerUrl,
-} from 'maplibre-gl'
+import mapboxgl, {
+  type MapLayerMouseEvent,
+} from 'mapbox-gl'
 
-import workerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url'
-
-import 'maplibre-gl/dist/maplibre-gl.css'
+import 'mapbox-gl/dist/mapbox-gl.css'
 
 import { api } from '../services/api'
 
@@ -32,6 +27,7 @@ import {
 } from './mapStyles'
 
 import type {
+  ApiEnvelope,
   BoundaryFeatureCollection,
   BoundaryGeometry,
   NeighbourhoodMapIndicators,
@@ -41,8 +37,8 @@ import type {
   PreferenceId,
 } from '../types/neighbourhood'
 
-setWorkerUrl(workerUrl)
 const CURSOR_ORB_EASING = 0.12
+const MAPBOX_ACCESS_TOKEN = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN
 
 interface NeighbourhoodMapProps {
   preference: PreferenceId | null
@@ -62,6 +58,26 @@ interface NeighbourhoodMapProps {
     name?: string,
   ) => void
 }
+
+interface NeighbourhoodFeatureProperties {
+  id?: string | number
+  neighbourhood_id?: string | number
+  name?: string
+  [key: string]: unknown
+}
+
+type NeighbourhoodMapFeature =
+  NonNullable<MapLayerMouseEvent['features']>[number] & {
+    id?: string | number
+    properties: NeighbourhoodFeatureProperties | null
+  }
+
+function getFirstNeighbourhoodFeature(
+  event: MapLayerMouseEvent,
+): NeighbourhoodMapFeature | undefined {
+  return event.features?.[0] as NeighbourhoodMapFeature | undefined
+}
+
 type HeatmapMetrics = {
   development?: number | null
   heat?: number | null
@@ -211,7 +227,7 @@ export default function NeighbourhoodMap({
     )
 
   const mapRef =
-    useRef<MapLibreMap | null>(
+    useRef<mapboxgl.Map | null>(
       null,
     )
   const cursorOrbRef =
@@ -239,7 +255,11 @@ const hoveredIdRef =
     >(null)
 const requestNumberRef =
     useRef(0)
+  const boundaryAbortControllerRef = useRef<AbortController | null>(null)
+  const lastBoundaryBboxRef = useRef<string | null>(null)
+  const moveendTimerRef = useRef<number | null>(null)
   const selectionEnabledRef = useRef(selectionEnabled)
+  const clearHoverRef = useRef<() => void>(() => {})
 
 
   const [
@@ -280,13 +300,40 @@ useEffect(() => {
       return
     }
 
+    if (!MAPBOX_ACCESS_TOKEN) {
+      const message =
+        'Mapbox access token is missing. Add VITE_MAPBOX_ACCESS_TOKEN to frontend/.env.local.'
+      console.error(message)
+      setMapError(message)
+      setLoading(false)
+      return
+    }
+
+    mapboxgl.accessToken = MAPBOX_ACCESS_TOKEN
+
     const map =
-      new MapLibreMap({
+      new mapboxgl.Map({
         container:
           mapContainerRef.current,
 
         style:
-          'https://tiles.openfreemap.org/styles/liberty',
+          'mapbox://styles/mapbox/standard',
+
+        config: {
+          basemap: {
+            theme: 'monochrome',
+            lightPreset: 'day',
+            show3dObjects: false,
+            showPointOfInterestLabels: false,
+            showTransitLabels: false,
+            showRoadLabels: true,
+            showPlaceLabels: true,
+          },
+        },
+
+        projection: 'mercator',
+        pitch: 0,
+        bearing: 0,
 center: [
           144.9631,
           -37.8136,
@@ -301,13 +348,20 @@ center: [
 
     mapRef.current = map
 
+    const resizeObserver = new ResizeObserver(() => {
+      map.resize()
+    })
+    resizeObserver.observe(mapContainerRef.current)
+    map.resize()
+
     map.addControl(
-      new NavigationControl({
+      new mapboxgl.NavigationControl({
         showCompass: true,
         showZoom: true,
       }),
       'bottom-right',
     )
+    let layerEventsBound = false
 function clearHover() {
       const hoveredId =
         hoveredIdRef.current
@@ -340,25 +394,51 @@ function clearHover() {
         null,
       )
     }
+    clearHoverRef.current = clearHover
 async function loadVisibleBoundaries() {
-      const currentRequest =
-        ++requestNumberRef.current
-
       const bounds =
         map.getBounds()
+
+      if (!bounds) {
+        return
+      }
 
       const bbox = [
         bounds.getWest(),
         bounds.getSouth(),
         bounds.getEast(),
         bounds.getNorth(),
-      ].join(',')
+      ].map((value) => value.toFixed(4)).join(',')
+
+      if (bbox === lastBoundaryBboxRef.current) {
+        return
+      }
+
+      lastBoundaryBboxRef.current = bbox
+      boundaryAbortControllerRef.current?.abort()
+
+      const abortController = new AbortController()
+      boundaryAbortControllerRef.current = abortController
+
+      const currentRequest =
+        ++requestNumberRef.current
 
       try {
         setLoading(true)
 
         const [response, metricsResult] = await Promise.all([
-          api.getBoundaries(bbox),
+          fetch(
+            `${import.meta.env.VITE_API_BASE_URL ?? ''}/api/neighbourhoods/boundaries?bbox=${encodeURIComponent(bbox)}`,
+            {
+              headers: { Accept: 'application/json' },
+              signal: abortController.signal,
+            },
+          ).then(async (boundaryResponse) => {
+            if (!boundaryResponse.ok) {
+              throw new Error(`Request failed with status ${boundaryResponse.status}`)
+            }
+            return boundaryResponse.json() as Promise<ApiEnvelope<BoundaryFeatureCollection>>
+          }),
           getHeatmapMetrics().catch((error) => {
             console.warn('Could not load heatmap indicators:', error)
             return null
@@ -400,13 +480,17 @@ clearHover()
           const mapData = metricsResult
             ? addHeatmapMetrics(response.data, metricsResult)
             : response.data
-          ;(source as GeoJSONSource).setData(mapData as any)
+          ;(source as mapboxgl.GeoJSONSource).setData(mapData as any)
         }
 
         setMapError(
           null,
         )
       } catch (error) {
+        if (error instanceof DOMException && error.name === 'AbortError') {
+          return
+        }
+
         console.error(
           'Failed to load neighbourhood boundaries:',
           error,
@@ -432,7 +516,7 @@ clearHover()
       }
     }
 map.on(
-      'load',
+      'style.load',
       () => {
 map.addSource(
           SOURCE_ID,
@@ -454,6 +538,9 @@ map.addSource(
           type:
             'fill',
 
+          slot:
+            'middle',
+
           source:
             SOURCE_ID,
 
@@ -469,6 +556,9 @@ map.addSource(
 
           type:
             'line',
+
+          slot:
+            'top',
 
           source:
             SOURCE_ID,
@@ -527,6 +617,9 @@ map.addSource(
           type:
             'fill',
 
+          slot:
+            'middle',
+
           source:
             SOURCE_ID,
 
@@ -559,6 +652,9 @@ map.addSource(
           type:
             'line',
 
+          slot:
+            'middle',
+
           source:
             SOURCE_ID,
 
@@ -575,6 +671,9 @@ map.addSource(
 
           type:
             'line',
+
+          slot:
+            'top',
 
           source:
             SOURCE_ID,
@@ -628,6 +727,9 @@ map.addSource(
           type:
             'line',
 
+          slot:
+            'top',
+
           source:
             SOURCE_ID,
 
@@ -657,6 +759,9 @@ map.addSource(
           type:
             'line',
 
+          slot:
+            'top',
+
           source:
             SOURCE_ID,
 
@@ -680,7 +785,10 @@ map.addSource(
             ],
           },
         })
-map.on(
+        if (!layerEventsBound) {
+          layerEventsBound = true
+
+          map.on(
           'mouseenter',
           FILL_LAYER_ID,
           () => {
@@ -688,12 +796,17 @@ map.on(
               selectionEnabledRef.current ? 'pointer' : ''
           },
         )
-map.on(
+        map.on(
           'mousemove',
           FILL_LAYER_ID,
-          (event) => {
-            const feature =
-              event.features?.[0]
+          (event: MapLayerMouseEvent) => {
+            if (!selectionEnabledRef.current) {
+              clearHover()
+              map.getCanvas().style.cursor = ''
+              return
+            }
+
+            const feature = getFirstNeighbourhoodFeature(event)
 
             if (!feature) {
               return
@@ -787,28 +900,28 @@ map.on(
             clearHover()
           },
         )
-map.on(
+        map.on(
           'click',
           FILL_LAYER_ID,
-          (event) => {
+          (event: MapLayerMouseEvent) => {
             if (!selectionEnabledRef.current) {
               return
             }
 
-            const feature =
-              event.features?.[0]
+            const feature = getFirstNeighbourhoodFeature(event)
 
             if (!feature) {
               return
             }
 
-            const id =
+            const properties =
               feature.properties
-                ?.id
+
+            const id =
+              properties?.id
 
             const name =
-              feature.properties
-                ?.name
+              properties?.name
 
             if (
               typeof id !==
@@ -827,16 +940,31 @@ map.on(
             )
           },
         )
+        }
 void loadVisibleBoundaries()
       },
     )
 map.on(
       'moveend',
       () => {
-        void loadVisibleBoundaries()
+        if (moveendTimerRef.current !== null) {
+          window.clearTimeout(moveendTimerRef.current)
+        }
+
+        moveendTimerRef.current = window.setTimeout(() => {
+          moveendTimerRef.current = null
+          void loadVisibleBoundaries()
+        }, 200)
       },
     )
 return () => {
+      resizeObserver.disconnect()
+
+      if (moveendTimerRef.current !== null) {
+        window.clearTimeout(moveendTimerRef.current)
+      }
+
+      boundaryAbortControllerRef.current?.abort()
       requestNumberRef.current +=
         1
 
@@ -844,8 +972,18 @@ return () => {
 
       mapRef.current =
         null
+      clearHoverRef.current = () => {}
     }
   }, [])
+  useEffect(() => {
+    if (!selectionEnabled) {
+      clearHoverRef.current()
+      const map = mapRef.current
+      if (map) {
+        map.getCanvas().style.cursor = ''
+      }
+    }
+  }, [selectionEnabled])
   useEffect(() => {
     const container = mapContainerRef.current
     const orb = cursorOrbRef.current
@@ -1010,7 +1148,7 @@ useEffect(() => {
     }
 
     const focusNeighbourhood = async (
-      activeMap: MapLibreMap,
+      activeMap: mapboxgl.Map,
       neighbourhoodId: string,
     ) => {
       try {

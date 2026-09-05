@@ -1,0 +1,28 @@
+.entry-pages {
+  position: relative;
+  isolation: isolate;
+  min-height: 100vh;
+  overflow: hidden;
+}
+
+.water-ripple-background {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+  background-color: #edf4ff;
+  background-image: url('/water-ripple-background.svg');
+  background-position: center;
+  background-size: cover;
+}
+
+.entry-pages > .landing-page,
+.entry-pages > .menu-page {
+  position: relative;
+  z-index: 1;
+}
+
+@media (prefers-reduced-motion: reduce), (pointer: coarse) {
+  .water-ripple-background { background-image: url('/water-ripple-background.svg'); }
+}

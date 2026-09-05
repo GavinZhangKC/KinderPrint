@@ -16,13 +16,13 @@ export default function LandingPage({ onExplore }: LandingPageProps) {
   }
 
   return (
-    <section className="landing-page" aria-labelledby="landing-title">
-      <div className="landing-brand" aria-label="KinderPrint">
+    <section className="landing-page" aria-labelledby="landing-title" data-ripple-surface>
+      <div className="landing-brand" aria-label="KinderPrint" data-no-ripple>
         <img src={logo} alt="" />
         <span>KinderPrint</span>
       </div>
 
-      <div className="glass landing-panel">
+      <div className="glass landing-panel" data-no-ripple>
         <p className="landing-kicker">Neighbourhood evidence, brought together</p>
         <h1 id="landing-title">See the bigger picture of where children grow.</h1>
         <p className="landing-copy">

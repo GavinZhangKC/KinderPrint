@@ -55,11 +55,14 @@
   color: var(--brand);
   font-size: 26px;
   font-weight: 800;
+  z-index: 1;
 }
 
 .landing-brand img { width: 56px; height: 56px; object-fit: contain; }
 
 .landing-panel {
+  position: relative;
+  z-index: 1;
   width: min(900px, 100%);
   padding: clamp(38px, 7vw, 78px);
   border-radius: 42px;

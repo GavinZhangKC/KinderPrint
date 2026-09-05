@@ -7,16 +7,16 @@ interface ComparePanelProps {
   source: Neighbourhood
   comparison: Neighbourhood | null
   onSelectResult: (result: NeighbourhoodSearchResult) => Promise<void>
+  mapSelectionEnabled: boolean
+  onToggleMapSelection: () => void
   onClearComparison: () => void
   onBack: () => void
   onCompare: () => Promise<void>
   compareLoading: boolean
   compareError: string | null
-  mapSelectionEnabled: boolean
-  onToggleMapSelection: () => void
 }
 
-export default function ComparePanel({ source, comparison, onSelectResult, onClearComparison, onBack, onCompare, compareLoading, compareError, mapSelectionEnabled, onToggleMapSelection }: ComparePanelProps) {
+export default function ComparePanel({ source, comparison, onSelectResult, mapSelectionEnabled, onToggleMapSelection, onClearComparison, onBack, onCompare, compareLoading, compareError }: ComparePanelProps) {
   const [query, setQuery] = useState('')
   const [searchResults, setSearchResults] = useState<NeighbourhoodSearchResult[]>([])
   const [searchLoading, setSearchLoading] = useState(false)
@@ -68,6 +68,10 @@ export default function ComparePanel({ source, comparison, onSelectResult, onCle
   }, [source.id])
 
   async function choose(result: NeighbourhoodSearchResult) {
+    if (result.id === source.id) {
+      return
+    }
+
     setQuery('')
     setSearchResults([])
     await onSelectResult(result)
@@ -75,11 +79,12 @@ export default function ComparePanel({ source, comparison, onSelectResult, onCle
 
   return (
     <aside className="glass compare-panel page-enter" aria-labelledby="compare-panel-title">
-      <div className="compare-panel-scroll">
-      <div className="compare-panel-scroll">      
+      <header className="compare-panel__header">
         <h1 id="compare-panel-title">Compare Neighbourhoods</h1>
-        <p className="compare-intro">Keep {source.name} as your starting point, then search for or select a second neighbourhood on the map.</p>
+        <p className="compare-intro">Keep {source.name} as your starting point, then search for or choose a recommended second neighbourhood.</p>
+      </header>
 
+      <div className="compare-panel-scroll compare-panel__body">
         <label className="panel-label">NEIGHBOURHOOD 1</label>
         <div className="glass-subtle selected-neighbourhood-row">
           <strong>{source.name}</strong>
@@ -108,6 +113,26 @@ export default function ComparePanel({ source, comparison, onSelectResult, onCle
           </div>
         )}
 
+        <div className="or-divider" aria-hidden="true">
+          <i />
+          <span>OR</span>
+          <i />
+        </div>
+
+        <button
+          className={`glass-subtle select-map-card ${mapSelectionEnabled ? 'is-active' : ''}`}
+          type="button"
+          aria-pressed={mapSelectionEnabled}
+          onClick={onToggleMapSelection}
+        >
+          <strong>{mapSelectionEnabled ? 'Selecting on the map…' : 'Select directly on the map'}</strong>
+          <p>
+            {mapSelectionEnabled
+              ? 'Click a neighbourhood on the map, or click here to cancel.'
+              : 'Click here first to enable neighbourhood selection on the map.'}
+          </p>
+        </button>
+
         <section className="similar-section" aria-labelledby="similar-heading">
           <h2 id="similar-heading">Similar Neighbourhoods</h2>
           {recommended ? (
@@ -124,26 +149,16 @@ export default function ComparePanel({ source, comparison, onSelectResult, onCle
             <div className="glass-subtle no-similar-state">No similar neighbourhoods were found for the selected area.</div>
           )}
         </section>
+      </div>
 
-        <div className="or-divider"><span>OR</span><i /></div>
-        <button
-          className={`glass-subtle select-map-card ${mapSelectionEnabled ? 'is-active' : ''}`}
-          type="button"
-          aria-pressed={mapSelectionEnabled}
-          onClick={onToggleMapSelection}
-        >
-          <strong>{mapSelectionEnabled ? 'Map selection enabled' : 'Select directly on the map'}</strong>
-          <p>{mapSelectionEnabled ? 'Now click a neighbourhood boundary on the map.' : 'Click here first to enable neighbourhood selection on the map.'}</p>
-        </button>
-
+      <footer className="compare-panel__footer">
         <div className="compare-actions">
           <button className="button secondary" type="button" onClick={onBack}>Back to Profile</button>
           <button className="button primary" type="button" disabled={!comparison || compareLoading} onClick={() => { void onCompare() }}>{compareLoading ? 'Comparing...' : 'Compare'}</button>
         </div>
         {compareError && <div className="selection-hint" role="alert">{compareError}</div>}
         {!comparison && <div className="selection-hint">Select a second neighbourhood to continue.</div>}
-      </div>
-      </div>
+      </footer>
     </aside>
   )
 }

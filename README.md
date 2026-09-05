@@ -10,7 +10,9 @@ npm install
 npm run dev
 ```
 
-The frontend is available at `http://localhost:5173` by default.
+Vite listens on all network interfaces. The frontend is available locally at
+`http://localhost:5173`, or from another device at
+`http://<this-computer-LAN-IP>:5173`.
 
 ## Backend
 
@@ -19,10 +21,17 @@ cd backend
 python3 -m venv .venv
 source .venv/bin/activate
 python -m pip install -r requirements.txt
-uvicorn main:app --reload
+uvicorn main:app --reload --host 0.0.0.0 --port 8000
 ```
 
-The backend is available at `http://127.0.0.1:8000` by default.
+The backend listens on all network interfaces. It is available locally at
+`http://127.0.0.1:8000`, or from another device at
+`http://<this-computer-LAN-IP>:8000`.
+
+The frontend calls `/api` on its own origin and Vite proxies those requests to
+the backend, so LAN clients do not need a separate API URL or permissive CORS
+configuration. If Windows Firewall prompts for Python or Node.js access, allow
+it only on Private networks.
 
 ### Approved data configuration
 

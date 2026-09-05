@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 import './styles.css'
 
@@ -14,6 +14,7 @@ import MenuPage from './components/MenuPage'
 import NeighbourhoodMap from './components/NeighbourhoodMap'
 import PreferencePanel from './components/PreferencePanel'
 import ProfileModal from './components/ProfileModal'
+import WaterRippleBackground from './components/WaterRippleBackground'
 
 import { useNeighbourhoodSearch } from './hooks/useNeighbourhoodSearch'
 
@@ -60,10 +61,8 @@ const [view, setView] =
   const [compareError, setCompareError] = useState<string | null>(null)
   const [comparisonLimitations, setComparisonLimitations] =
     useState<string[]>([])
-
-  const [mapComparisonEnabled, setMapComparisonEnabled] =
-    useState(false)
-
+  const [isMapSelectionMode, setIsMapSelectionMode] = useState(false)
+  const compareRequestNumberRef = useRef(0)
 
   const [preference, setPreference] =
     useState<PreferenceId | null>(null)
@@ -73,6 +72,8 @@ const [view, setView] =
     showDataDrawer,
     setShowDataDrawer,
   ] = useState(false)
+  const [activeProfilePanel, setActiveProfilePanel] =
+    useState<'profile' | 'drawer'>('profile')
 const [
     mapSelectedId,
     setMapSelectedId,
@@ -96,12 +97,26 @@ const [
       await handleMapSelect(item.id, item.name, true)
     },
   })
+function resetComparisonState() {
+    compareRequestNumberRef.current += 1
+    setIsMapSelectionMode(false)
+    setComparison(null)
+    setComparisonResult(null)
+    setCompareError(null)
+    setCompareLoading(false)
+    setComparisonLimitations([])
+  }
+function handleCloseCompare(targetView: 'profile' | 'map' = 'profile') {
+    resetComparisonState()
+    setMapSelectedId(selected?.id ?? null)
+    setMapFocusId(null)
+    setView(targetView === 'profile' && selected ? 'profile' : 'map')
+  }
 function resetExplore() {
     setView('map')
 
     setSelected(null)
-    setComparison(null)
-    setMapComparisonEnabled(false)
+    resetComparisonState()
 
     setMapSelectedId(null)
     setMapFocusId(null)
@@ -119,6 +134,10 @@ function backToMenu() {
 function backToLanding() {
     resetExplore()
     setAppPage('landing')
+  }
+function openMapPage() {
+    resetExplore()
+    setAppPage('map')
   }
 function choosePrimary(
     neighbourhood: Neighbourhood,
@@ -201,13 +220,27 @@ function startComparison() {
       return
     }
 
-    setMapComparisonEnabled(false)
-    setComparison(null)
+    resetComparisonState()
 
     setShowDataDrawer(false)
 
     setView('compare-select')
   }
+
+  useEffect(() => {
+    if (view !== 'compare-select' || !isMapSelectionMode) {
+      return
+    }
+
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setIsMapSelectionMode(false)
+      }
+    }
+
+    window.addEventListener('keydown', handleEscape)
+    return () => window.removeEventListener('keydown', handleEscape)
+  }, [isMapSelectionMode, view])
 
   async function openComparisonResult() {
     if (
@@ -217,10 +250,15 @@ function startComparison() {
       return
     }
 
+    const requestNumber = ++compareRequestNumberRef.current
+
     try {
       setCompareLoading(true)
       setCompareError(null)
       const response = await api.compare(selected.id, comparison.id)
+      if (requestNumber !== compareRequestNumberRef.current) {
+        return
+      }
       if (response.status !== 'available' && response.status !== 'limited') {
         throw new Error(response.limitations[0]?.message ?? 'No approved comparison is available for these neighbourhoods.')
       }
@@ -229,25 +267,33 @@ function startComparison() {
       setView('comparison')
       window.scrollTo({ top: 0, behavior: 'smooth' })
     } catch (error) {
+      if (requestNumber !== compareRequestNumberRef.current) {
+        return
+      }
       console.error('Failed to compare neighbourhoods:', error)
       setComparisonResult(null)
       setComparisonLimitations([])
       setCompareError(error instanceof Error ? error.message : 'Could not load this comparison.')
     } finally {
-      setCompareLoading(false)
+      if (requestNumber === compareRequestNumberRef.current) {
+        setCompareLoading(false)
+      }
     }
   }
-if (appPage === 'landing') {
-    return <LandingPage onExplore={() => setAppPage('menu')} />
-  }
-
-  if (appPage === 'menu') {
+if (appPage === 'landing' || appPage === 'menu') {
     return (
-      <MenuPage
-        onInsight={() => setAppPage('insight')}
-        onMap={() => setAppPage('map')}
-        onAboutUs={() => setAppPage('about')}
-      />
+      <div className="entry-pages">
+        <WaterRippleBackground />
+        {appPage === 'landing' ? (
+          <LandingPage onExplore={() => setAppPage('menu')} />
+        ) : (
+          <MenuPage
+            onInsight={() => setAppPage('insight')}
+            onMap={() => setAppPage('map')}
+            onAboutUs={() => setAppPage('about')}
+          />
+        )}
+      </div>
     )
   }
 
@@ -256,7 +302,13 @@ if (appPage === 'landing') {
   }
 
   if (appPage === 'insight') {
-    return <InsightPage onBack={backToMenu} />
+    return (
+      <InsightPage
+        onLogoClick={backToLanding}
+        onBackToMenu={backToMenu}
+        onExploreMap={openMapPage}
+      />
+    )
   }
 
 if (
@@ -279,16 +331,14 @@ if (
         <DetailedComparison
           comparisonResult={comparisonResult}
           limitations={comparisonLimitations}
-          onBack={() =>
-            setView('compare-select')
-          }
+          onBack={() => handleCloseCompare('profile')}
         />
       </div>
     )
   }
 return (
     <div
-      className="app-background"
+      className="app-background map-page"
       id="explore"
     >
       <div className="ambient ambient-one" />
@@ -419,20 +469,20 @@ setMapSelectedId(null)
               null
             }
 
-            compareMode={
-              view ===
-              'compare-select' && mapComparisonEnabled
-            }
+            compareMode={view === 'compare-select'}
 
-            selectionEnabled={
-              view !== 'compare-select' || mapComparisonEnabled
-            }
+            selectionEnabled={view !== 'compare-select' || isMapSelectionMode}
 
             onSelect={(id, name) => {
-              if (view === 'compare-select') {
-                setMapComparisonEnabled(false)
+              if (view === 'compare-select' && id === selected?.id) {
+                return
               }
-              void handleMapSelect(id, name)
+
+              void handleMapSelect(id, name).then(() => {
+                if (view === 'compare-select') {
+                  setIsMapSelectionMode(false)
+                }
+              })
             }}
           />
 
@@ -452,34 +502,48 @@ setMapSelectedId(null)
 
 
           {view === 'profile' && selected && (
-            <div className={`profile-interaction-lock ${showDataDrawer ? 'has-data-drawer' : ''}`} aria-modal="true" role="dialog">
-              <ProfileModal
-                neighbourhood={
-                  selected
-                }
+            <div className={`profile-interaction-lock profile-stage ${showDataDrawer ? 'has-data-drawer' : ''}`} aria-modal="true" role="dialog">
+              <div className={`profile-motion-wrapper ${activeProfilePanel === 'profile' ? 'is-active' : ''}`}>
+                <ProfileModal
+                  neighbourhood={
+                    selected
+                  }
 
-                onCompare={
-                  startComparison
-                }
+                  onCompare={
+                    startComparison
+                  }
 
-                onExploreData={() =>
-                  setShowDataDrawer(
-                    true,
-                  )
-                }
+                  onExploreData={() => {
+                    setActiveProfilePanel('drawer')
+                    setShowDataDrawer(true)
+                  }}
 
-                onClose={() =>
-                  setView('map')
-                }
-              />
+                  onActivate={() => setActiveProfilePanel('profile')}
+
+                  onClose={() =>
+                    setView('map')
+                  }
+                />
+              </div>
+
+              {showDataDrawer && (
+                <DetailedDataDrawer
+                  neighbourhood={selected}
+                  isActive={activeProfilePanel === 'drawer'}
+                  onActivate={() => setActiveProfilePanel('drawer')}
+                  onClose={() => {
+                    setShowDataDrawer(false)
+                    setActiveProfilePanel('profile')
+                  }}
+                />
+              )}
             </div>
           )}
 
 
           {view ===
             'compare-select' &&
-            selected &&
-            !mapComparisonEnabled && (
+            selected && (
               <ComparePanel
                 source={selected}
 
@@ -489,17 +553,22 @@ setMapSelectedId(null)
 
                 onSelectResult={async (item) => {
                   await handleMapSelect(item.id, item.name, false)
+                  setIsMapSelectionMode(false)
+                }}
+
+                mapSelectionEnabled={isMapSelectionMode}
+
+                onToggleMapSelection={() => {
+                  setIsMapSelectionMode((enabled) => !enabled)
                 }}
 
                 onClearComparison={() => {
-                  setMapComparisonEnabled(false)
                   setComparison(null)
                   setCompareError(null)
                 }}
 
                 onBack={() => {
-                  setMapComparisonEnabled(false)
-                  setView('profile')
+                  handleCloseCompare('profile')
                 }}
 
                 onCompare={openComparisonResult}
@@ -508,42 +577,9 @@ setMapSelectedId(null)
 
                 compareError={compareError}
 
-                mapSelectionEnabled={mapComparisonEnabled}
-
-                onToggleMapSelection={() => {
-                  setMapComparisonEnabled((enabled) => !enabled)
-                  setCompareError(null)
-                }}
               />
             )}
 
-          {view === 'compare-select' && mapComparisonEnabled && (
-            <div className="glass map-selection-banner" role="status">
-              <div>
-                <strong>Choose neighbourhood 2</strong>
-                <span>Click a neighbourhood boundary on the map.</span>
-              </div>
-              <button type="button" onClick={() => setMapComparisonEnabled(false)}>
-                Cancel
-              </button>
-            </div>
-          )}
-
-
-          {showDataDrawer &&
-            selected && (
-              <DetailedDataDrawer
-                neighbourhood={
-                  selected
-                }
-
-                onClose={() =>
-                  setShowDataDrawer(
-                    false,
-                  )
-                }
-              />
-            )}
 
         </section>
       </main>

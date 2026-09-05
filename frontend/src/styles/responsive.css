@@ -3,15 +3,14 @@
 @keyframes pageEnter { from { opacity: 0; transform: translateY(12px) scale(.988); } to { opacity: 1; transform: translateY(0) scale(1); } }
 @keyframes reveal { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: translateY(0); } }
 .profile-modal.page-enter { animation-name: profileEnter; }
-@keyframes profileEnter { from { opacity: 0; transform: translate(-50%,-46%) scale(.96); } to { opacity: 1; transform: translate(-50%,-48%) scale(1); } }
-
+@keyframes profileEnter { from { opacity: 0; transform: translateY(12px) scale(.96); } to { opacity: 1; transform: translateY(0) scale(1); } }
 @media (max-width: 1180px) {
   .profile-interaction-lock.has-data-drawer .profile-modal { margin-left: 0; }
 }
 
 @media (max-width: 1050px) {
   .map-shell { width: calc(100vw - 40px); }
-  .compare-panel { right: 24px; }
+  .compare-panel { right: clamp(16px, 2.4vw, 24px); }
   .profile-domain-grid, .summary-grid, .environment-comparison-grid, .next-step-grid { grid-template-columns: 1fr; }
   .profile-modal { max-height: calc(100vh - 170px); overflow-y: auto; }
   .profile-actions { gap: 20px; }
@@ -25,8 +24,60 @@
   .map-shell { width: calc(100vw - 20px); margin-top: 14px; }.map-surface { min-height: 820px; height: auto; padding-bottom: 320px; }
   .neighbourhood-search-block { left: 18px; top: 18px; width: calc(100% - 36px); }
   .map-controls-row { left: 18px; right: 18px; bottom: 18px; display: grid; grid-template-columns: 1fr 1fr; }.preference-card,.legend-card { width: auto; }
-  .profile-modal { position: absolute; left: 18px; right: 18px; width: auto; top: 100px; transform: none; max-height: 650px; }.profile-modal.page-enter { animation: pageEnter .42s both; }.profile-domain-grid { grid-template-columns: 1fr; }.profile-actions { flex-direction: column; gap: 10px; }
-  .compare-panel { position: absolute; left: 18px; right: 18px; top: 100px; width: auto; height: 650px; }.data-drawer { left: 18px; right: 18px; width: auto; }
+  .profile-modal { position: relative; left: auto; right: auto; top: auto; width: 100%; transform: none; max-height: 650px; }.profile-modal.page-enter { animation: pageEnter .42s both; }.profile-domain-grid { grid-template-columns: 1fr; }.profile-actions { flex-direction: column; gap: 10px; }
+  .compare-panel { position: absolute; left: 18px; right: 18px; top: 18px; bottom: 18px; width: auto; height: auto; max-height: none; }.data-drawer { left: 18px; right: 18px; width: auto; }
   .comparison-page { width: calc(100vw - 20px); margin-top: 24px; }.comparison-heading-row { flex-direction: column; }.similarity-chip { margin-top: 0; }.hero-ring-content { flex-direction: column; align-items: flex-start; }.comparison-section { padding: 20px 16px; }.comparison-heading-row h1 { font-size: 30px; }
 }
 
+@media (max-height: 800px) {
+  .map-page { padding-block: 9px; }
+  .map-page > .nav-shell { height: 64px; }
+  .map-page .map-shell { margin-top: 8px; }
+  .map-page .search-input-shell { height: 46px; }
+  .map-page .neighbourhood-search-block { top: 14px; }
+  .map-page .map-controls-row { bottom: 12px; }
+  .map-page .map-control { padding: 11px 14px; }
+  .map-page .map-control h2 { margin-bottom: 8px; font-size: 17px; }
+  .map-page .preference-options { gap: 6px; }
+  .map-page .legend-card p { margin-bottom: 8px; }
+  .map-page .legend-row { margin: 7px 0; }
+  .map-page .compare-panel { top: 16px; bottom: 16px; }
+  .map-page .compare-panel-scroll { padding: 20px 24px 18px; }
+}
+
+@media (max-height: 700px) {
+  .map-page { padding-block: 6px; }
+  .map-page > .nav-shell { height: 58px; min-height: 58px; }
+  .map-page .brand-logo { width: 42px; height: 42px; }
+  .map-page .map-shell { margin-top: 6px; }
+  .map-page .neighbourhood-search-block { top: 10px; }
+  .map-page .search-input-shell { height: 42px; }
+  .map-page .map-controls-row { bottom: 8px; }
+  .map-page .map-control { padding: 8px 12px; }
+  .map-page .map-control h2 { margin-bottom: 5px; font-size: 15px; }
+  .map-page .preference-options { gap: 4px; }
+  .map-page .preference-option { font-size: 11px; }
+  .map-page .legend-card p { margin-bottom: 5px; }
+  .map-page .legend-row { margin: 4px 0; font-size: 11px; }
+  .map-page .compare-panel { top: 12px; bottom: 12px; }
+  .map-page .compare-panel-scroll { padding: 16px 20px 14px; }
+}
+
+@media (max-width: 760px) {
+  .map-page { padding: 8px 10px; }
+  .map-page > .nav-shell { width: 100%; top: auto; padding-inline: 12px; }
+  .map-page .map-shell { width: 100%; }
+  .map-page .map-surface { height: 100%; min-height: 0; padding-bottom: 0; }
+  .map-page .neighbourhood-search-block { left: 16px; width: clamp(260px, 72vw, 420px); max-width: calc(100% - 32px); }
+  .map-page .map-controls-row { left: 16px; right: auto; display: flex; grid-template-columns: none; }
+  .map-page .preference-card { width: clamp(210px, 42vw, 260px); }
+  .map-page .legend-card { width: clamp(150px, 34vw, 190px); }
+}
+
+@media (max-width: 520px) {
+  .map-page .brand-button span { display: none; }
+  .map-page .nav-links { gap: 7px; font-size: 11px; }
+  .map-page .map-controls-row { right: 12px; left: 12px; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, .8fr); }
+  .map-page .preference-card,
+  .map-page .legend-card { width: auto; }
+}
