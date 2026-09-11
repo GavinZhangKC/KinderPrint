@@ -20,3 +20,6 @@ __pycache__/
 .vscode/
 
 .Rhistory
+
+# Local run logs and screenshots
+/.run-logs/

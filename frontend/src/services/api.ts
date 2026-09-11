@@ -190,11 +190,13 @@ const API_BASE =
 
 async function request<T>(
   path: string,
+  signal?: AbortSignal,
 ): Promise<ApiEnvelope<T>> {
   const response = await fetch(
     `${API_BASE}${path}`,
     {
       method: 'GET',
+      signal,
 
       headers: {
         Accept: 'application/json',
@@ -211,6 +213,23 @@ async function request<T>(
   return response.json() as Promise<
     ApiEnvelope<T>
   >
+}
+
+// The map and Insight share this small collection, including in-flight requests.
+let indicatorsCache: Promise<ApiEnvelope<NeighbourhoodIndicatorsCollection>> | null = null
+let indicatorsCachedAt = 0
+function getNeighbourhoodIndicators(refresh = false) {
+  if (!refresh && indicatorsCache && Date.now() - indicatorsCachedAt < 300_000) return indicatorsCache
+  indicatorsCachedAt = Date.now()
+  const controller = new AbortController()
+  const timeout = setTimeout(() => controller.abort(), 15_000)
+  indicatorsCache = request<NeighbourhoodIndicatorsCollection>('/api/neighbourhoods/indicators', controller.signal)
+    .then(response => {
+      if (response.status !== 'available' && response.status !== 'limited') indicatorsCache = null
+      return response
+    }).catch(error => { indicatorsCache = null; throw error })
+    .finally(() => clearTimeout(timeout))
+  return indicatorsCache
 }
 
 export const api = {
@@ -243,28 +262,27 @@ export const api = {
       )}/boundary`,
     ),
 
-  getNeighbourhoodIndicators: () =>
-    request<NeighbourhoodIndicatorsCollection>(
-      '/api/neighbourhoods/indicators',
-    ),
+  getNeighbourhoodIndicators,
 
   getProfile: (
     id: string,
+    signal?: AbortSignal,
   ) =>
     request<NeighbourhoodProfile>(
       `/api/neighbourhoods/${encodeURIComponent(
         id,
-      )}/profile`,
+      )}/profile`, signal,
     ),
 
 
   getPriority: (
     id: string,
+    signal?: AbortSignal,
   ) =>
     request<NeighbourhoodPriority>(
       `/api/neighbourhoods/${encodeURIComponent(
         id,
-      )}/priority`,
+      )}/priority`, signal,
     ),
 
   getExplanation: (

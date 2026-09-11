@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 1000" preserveAspectRatio="xMidYMax slice">
+  <defs>
+    <linearGradient id="hill" x2="0" y2="1"><stop stop-color="#99b9cd"/><stop offset="1" stop-color="#619da9"/></linearGradient>
+    <linearGradient id="valley" x2="0" y2="1"><stop stop-color="#c6dfe7"/><stop offset="1" stop-color="#8cbfc5"/></linearGradient>
+    <filter id="glow"><feGaussianBlur stdDeviation="5"/></filter>
+  </defs>
+  <path fill="#a4c3d6" d="M0 320 Q160 170 330 410 Q550 280 730 470 Q1000 250 1170 340 L1440 210 V1000 H0Z"/>
+  <path fill="url(#valley)" d="M0 550 Q540 400 920 525 Q1130 390 1440 480 V1000 H0Z"/>
+  <path fill="url(#hill)" d="M0 390 Q180 310 400 630 Q600 740 580 1000 H0Z M1440 350 Q1300 420 1240 650 Q1130 810 1180 1000 H1440Z"/>
+  <path d="M800 1000 C760 920 1040 840 980 760 S825 690 900 635 S1020 580 945 520" fill="none" stroke="#bcf8ff" stroke-width="12" filter="url(#glow)"/>
+  <path d="M800 1000 C760 920 1040 840 980 760 S825 690 900 635 S1020 580 945 520" fill="none" stroke="#eaffff" stroke-width="2"/>
+  <g fill="#e9ffff" stroke="#7dc9df" stroke-width="2"><circle cx="800" cy="1000" r="5"/><circle cx="939" cy="866" r="5"/><circle cx="966" cy="742" r="5"/><circle cx="901" cy="634" r="5"/><circle cx="945" cy="520" r="5"/></g>
+</svg>
