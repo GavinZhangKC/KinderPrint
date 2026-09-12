@@ -1,10 +1,12 @@
 # KinderPrint API Contract
 
-**Version:** 0.1  
-**Status:** Working Iteration 1 contract  
-**Last updated:** 31 August 2026
+**Version:** 0.2
 
-This document describes the agreed API shape for Iteration 1. It is a design contract only. It does not define implementation logic, connect datasets, or approve Data Science methods. Every unresolved decision is marked `TBC`.
+**Status:** Working Iteration 1 contract with provisional Iteration 2 extensions
+
+**Last updated:** 12 September 2026
+
+This document describes the agreed API shape for Iteration 1 and provisional Backend + Integration contracts for Iteration 2. It is a design contract only. It does not define implementation logic, connect datasets, or approve Data Science or AI methods. Every unresolved decision is marked `TBC`.
 
 ## Contract conventions
 
@@ -362,6 +364,82 @@ No final matching variable, threshold, strength category, or comparison field is
 
 Missing indicators remain `null` with their explicit non-available status. If either identifier has no supported profile, the endpoint returns a `missing` or `unavailable` state and an explanatory limitation. Profiles using incompatible geographic units return `incompatible`; the backend must not transform or estimate values to make them comparable.
 
+## Iteration 2 provisional extensions
+
+Iteration 2 services consume only explicitly approved Data Science or AI outputs. The backend may load, validate, select, order, and expose those outputs, but it must not recreate analytical methods or generate conclusions. Endpoint names and analytical payload fields in this section remain provisional until the corresponding output contracts are confirmed.
+
+## BE-7 — Outcome Comparison Service (supports E5)
+
+### `GET /api/outcome-comparison` (provisional)
+
+Returns approved child-development outcome comparison results for two selected or previously matched neighbourhoods. Provisional query parameters are `neighbourhood_id_a` and `neighbourhood_id_b`.
+
+This service is distinct from `GET /api/compare`: the existing endpoint prepares a general side-by-side projection from Iteration 1 neighbourhood profiles, while this endpoint exposes only approved Iteration 2 outcome-comparison results and approved differences supplied by Data Science.
+
+```json
+{
+  "status": "available | limited | missing | incompatible | unavailable",
+  "data": {
+    "neighbourhood_a": {
+      "id": "TBC",
+      "name": "TBC",
+      "geographic_unit": "TBC"
+    },
+    "neighbourhood_b": {
+      "id": "TBC",
+      "name": "TBC",
+      "geographic_unit": "TBC"
+    },
+    "outcome_indicators": [
+      {
+        "id": "TBC",
+        "name": "TBC",
+        "unit": "TBC",
+        "neighbourhood_a": {
+          "value": null,
+          "status": "available | missing | incompatible | unavailable | limited"
+        },
+        "neighbourhood_b": {
+          "value": null,
+          "status": "available | missing | incompatible | unavailable | limited"
+        },
+        "approved_difference": {
+          "value": null,
+          "status": "available | missing | incompatible | unavailable | limited"
+        },
+        "source": "TBC",
+        "reference_year": "TBC",
+        "geographic_unit": "TBC"
+      }
+    ]
+  },
+  "metadata": {
+    "source": "TBC",
+    "reference_year": "TBC",
+    "geographic_unit": "TBC",
+    "data_quality": "TBC",
+    "output_schema_version": "TBC"
+  },
+  "limitations": [],
+  "notices": [
+    {
+      "code": "area_level_comparison",
+      "message": "TBC"
+    },
+    {
+      "code": "association_not_causation",
+      "message": "TBC"
+    }
+  ]
+}
+```
+
+Both identifiers must be validated as supported neighbourhoods. The two neighbourhoods must use compatible confirmed geographic units, and the response must preserve the order selected by the requester. Whether approved results are stored as ordered or unordered pairs is TBC.
+
+The service must preserve source-provided missing, suppressed, unavailable, limited, and incompatible states. A non-available numeric value or difference is `null`, never zero, an average, a neighbouring-area value, or an inferred value. If no approved outcome-comparison result exists for the pair, the service returns `unavailable` or `missing` with a clear limitation and does not derive a result from profile data.
+
+The backend must not calculate outcome differences, statistical significance, confidence, rankings, or similarity. The final child-development outcome list, units, difference direction, significance or uncertainty representation, dataset location, schema, and approved notice wording are TBC pending the Data Science output contract.
+
 ## Error handling
 
 Errors use the same envelope shape:
@@ -409,6 +487,11 @@ It confirms that the FastAPI service is running and makes no statement about bus
 - Final data-quality representation
 - Final matching variables and match-strength thresholds/categories
 - Final comparison fields
+- Final Iteration 2 outcome-comparison endpoint name and query parameter names
+- Final Iteration 2 outcome indicator list, units, and difference direction
+- Final Iteration 2 outcome-comparison dataset location and schema version
+- Final significance, confidence, uncertainty, and suppression representations
+- Whether Iteration 2 neighbourhood pairs are stored as ordered or unordered pairs
 - Final approved disclaimer and notice wording where not already confirmed
 - Final bounding-box query format
 - Final map-indicator query parameters and indicator selection
@@ -416,9 +499,9 @@ It confirms that the FastAPI service is running and makes no statement about bus
 
 ## Change policy and version roadmap
 
-This is a working Iteration 1 API contract. It may be revised when geographic decisions are confirmed, Data Science processed datasets become available, frontend requirements become more specific, or acceptance criteria are refined.
+This is a working Iteration 1 contract with provisional Iteration 2 extensions. It may be revised when geographic decisions are confirmed, approved Data Science or AI outputs become available, frontend requirements become more specific, or acceptance criteria are refined.
 
-- **v0.1 — Initial draft** (this document)
-- **v0.2 — Updated from Iteration 1 LeanKit cards and acceptance criteria**
+- **v0.1 — Initial Iteration 1 draft**
+- **v0.2 — Added provisional Iteration 2 Backend + Integration contracts** (this document)
 - **v0.3 — Updated after geographic unit / Data Science structures are confirmed**
 - **v1.0 — Stabilised Iteration 1 API contract**
