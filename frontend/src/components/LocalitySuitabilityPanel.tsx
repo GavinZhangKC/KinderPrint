@@ -12,6 +12,7 @@ interface LocalitySuitabilityPanelProps {
   loading: boolean
   error: string | null
   notice: string | null
+  onSelectLocality: (id: string, name: string) => void
 }
 
 const optionMeta: Record<string, { label: string; description: string }> = {
@@ -28,6 +29,7 @@ export default function LocalitySuitabilityPanel({
   loading,
   error,
   notice,
+  onSelectLocality,
 }: LocalitySuitabilityPanelProps) {
   const activeCriteria = new Set(criteria)
 
@@ -70,12 +72,19 @@ export default function LocalitySuitabilityPanel({
             <ol>
               {localities.map((locality, index) => (
                 <li key={locality.id}>
-                  <span className="rank">#{index + 1}</span>
-                  <div>
-                    <strong>{locality.name}</strong>
-                    <small>{locality.geographic_unit}</small>
-                  </div>
-                  <span className="score">{locality.score === null ? 'N/A' : locality.score.toFixed(1)}</span>
+                  <button
+                    type="button"
+                    className="suitability-result-button"
+                    onClick={() => onSelectLocality(locality.id, locality.name)}
+                    aria-label={`View ${locality.name}`}
+                  >
+                    <span className="rank">#{index + 1}</span>
+                    <span className="suitability-result-name">
+                      <strong>{locality.name}</strong>
+                      <small>{locality.geographic_unit}</small>
+                    </span>
+                    <span className="score">{locality.score === null ? 'N/A' : locality.score.toFixed(1)}</span>
+                  </button>
                 </li>
               ))}
             </ol>

@@ -2,52 +2,6 @@
 .map-control { max-height: 100%; overflow-y: auto; border-radius: clamp(16px, 2vw, 24px); padding: clamp(12px, 1.4vw, 18px) clamp(14px, 1.6vw, 20px); background: rgba(255,255,255,.53); }
 .map-control h2 { margin: 0 0 14px; color: var(--brand); font-size: 20px; }
 .preference-card { width: clamp(220px, 20vw, 300px); min-height: 0; }
-
-.preference-header { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
-.preference-header h2 { margin: 0 0 0; }
-.preference-help {
-  padding: 0;
-  border: 0;
-  position: relative;
-  z-index: 12;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  background: rgba(83, 103, 255, 0.12);
-  color: var(--brand);
-  font-size: 12px;
-  font-weight: 700;
-  cursor: help;
-  user-select: none;
-}
-.preference-help::after {
-  content: attr(data-tooltip);
-  position: absolute;
-  left: 50%;
-  bottom: calc(100% + 8px);
-  transform: translateX(-50%);
-  width: 220px;
-  padding: 8px 10px;
-  border-radius: 10px;
-  background: rgba(17, 27, 50, 0.96);
-  color: #edf3ff;
-  font-size: 11px;
-  line-height: 1.4;
-  font-weight: 500;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.15s ease;
-  white-space: normal;
-  box-shadow: 0 10px 25px rgba(17, 27, 50, 0.18);
-  z-index: 40;
-}
-.preference-help:hover::after,
-.preference-help:focus-visible::after {
-  opacity: 1;
-}
 .preference-options { display: grid; gap: 10px; }
 .preference-option { display: flex; align-items: center; gap: 10px; font-size: 13px; cursor: pointer; color: #445a80; }
 .preference-option input { position: absolute; opacity: 0; pointer-events: none; }

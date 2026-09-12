@@ -78,6 +78,9 @@ const [view, setView] =
   const [suitabilityLoading, setSuitabilityLoading] = useState(false)
   const [suitabilityError, setSuitabilityError] = useState<string | null>(null)
   const [suitabilityNotice, setSuitabilityNotice] = useState<string | null>(null)
+  const [isSuitabilityModalOpen, setIsSuitabilityModalOpen] = useState(false)
+  const suitabilityModalRef = useRef<HTMLDivElement>(null)
+  const suitabilityCloseButtonRef = useRef<HTMLButtonElement>(null)
 
   useEffect(() => {
     if (suitabilityCriteria.length === 0) {
@@ -129,6 +132,57 @@ const [view, setView] =
       isActive = false
     }
   }, [suitabilityCriteria])
+
+  useEffect(() => {
+    if (!isSuitabilityModalOpen) {
+      return
+    }
+
+    const previouslyFocused = document.activeElement instanceof HTMLElement
+      ? document.activeElement
+      : null
+
+    suitabilityCloseButtonRef.current?.focus()
+
+    const handleModalKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setIsSuitabilityModalOpen(false)
+        return
+      }
+
+      if (event.key !== 'Tab' || !suitabilityModalRef.current) {
+        return
+      }
+
+      const focusableElements = Array.from(
+        suitabilityModalRef.current.querySelectorAll<HTMLElement>(
+          'button:not([disabled]), input:not([disabled]), [href], [tabindex]:not([tabindex="-1"])',
+        ),
+      )
+
+      const firstElement = focusableElements[0]
+      const lastElement = focusableElements[focusableElements.length - 1]
+
+      if (!firstElement || !lastElement) {
+        event.preventDefault()
+        return
+      }
+
+      if (event.shiftKey && document.activeElement === firstElement) {
+        event.preventDefault()
+        lastElement.focus()
+      } else if (!event.shiftKey && document.activeElement === lastElement) {
+        event.preventDefault()
+        firstElement.focus()
+      }
+    }
+
+    window.addEventListener('keydown', handleModalKeyDown)
+    return () => {
+      window.removeEventListener('keydown', handleModalKeyDown)
+      previouslyFocused?.focus()
+    }
+  }, [isSuitabilityModalOpen])
 
   const [
     showDataDrawer,
@@ -570,6 +624,17 @@ setMapSelectedId(null)
 
           </div>
 
+          <button
+            type="button"
+            className="glass suitability-launch-button"
+            aria-haspopup="dialog"
+            aria-expanded={isSuitabilityModalOpen}
+            aria-controls="suitability-modal"
+            onClick={() => setIsSuitabilityModalOpen(true)}
+          >
+            Find suitable areas
+          </button>
+
 
           <NeighbourhoodMap
             preference={preference}
@@ -608,23 +673,6 @@ setMapSelectedId(null)
             <PreferencePanel
               value={preference}
               onChange={setPreference}
-            />
-
-            <LocalitySuitabilityPanel
-              criteria={suitabilityCriteria}
-              onToggle={(criterion) => {
-                setSuitabilityCriteria((current) => {
-                  if (current.includes(criterion)) {
-                    return current.filter((item) => item !== criterion)
-                  }
-
-                  return [...current, criterion]
-                })
-              }}
-              localities={suitabilityResults}
-              loading={suitabilityLoading}
-              error={suitabilityError}
-              notice={suitabilityNotice}
             />
 
             {preference ? (
@@ -717,6 +765,50 @@ setMapSelectedId(null)
 
         </section>
       </main>
+
+      {isSuitabilityModalOpen && (
+        <div className="suitability-modal-backdrop">
+          <div
+            id="suitability-modal"
+            ref={suitabilityModalRef}
+            className="suitability-modal-shell page-enter"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="suitability-title"
+          >
+            <button
+              ref={suitabilityCloseButtonRef}
+              className="icon-close suitability-modal-close"
+              type="button"
+              onClick={() => setIsSuitabilityModalOpen(false)}
+              aria-label="Close locality suitability"
+            >
+              ×
+            </button>
+
+            <LocalitySuitabilityPanel
+              criteria={suitabilityCriteria}
+              onToggle={(criterion) => {
+                setSuitabilityCriteria((current) => {
+                  if (current.includes(criterion)) {
+                    return current.filter((item) => item !== criterion)
+                  }
+
+                  return [...current, criterion]
+                })
+              }}
+              localities={suitabilityResults}
+              loading={suitabilityLoading}
+              error={suitabilityError}
+              notice={suitabilityNotice}
+              onSelectLocality={(id, name) => {
+                setIsSuitabilityModalOpen(false)
+                void handleMapSelect(id, name, true)
+              }}
+            />
+          </div>
+        </div>
+      )}
     </div>
   )
 }
