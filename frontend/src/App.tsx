@@ -84,7 +84,7 @@ const [view, setView] =
         setSuitabilityLoading(true)
         setSuitabilityError(null)
 
-        const response = await api.getSuitableLocalities(suitabilityCriteria, 6)
+        const response = await api.getSuitableLocalities(suitabilityCriteria, 5)
         if (!isActive) {
           return
         }
