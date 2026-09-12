@@ -5,11 +5,13 @@ from typing import Any
 from data_loader import (
     COMPARISON_DATA_PATH_ENV,
     EXPLANATION_DATA_PATH_ENV,
+    OUTCOME_COMPARISON_DATA_PATH_ENV,
     PRIORITY_DATA_PATH_ENV,
     PROFILE_DATA_PATH_ENV,
     comparison_data_path,
     explanation_data_path,
     load_json_source,
+    outcome_comparison_data_path,
     priority_data_path,
     profile_data_path,
 )
@@ -567,4 +569,98 @@ def manual_comparison_data(comparison: dict[str, Any], reverse: bool = False) ->
         "side_by_side": fields,
         "similarity_basis": comparison["similarity_basis"],
         "match_strength": comparison["match_strength"],
+    }
+
+
+def valid_outcome_value(value: Any) -> bool:
+    """Require explicit availability and preserve null for every unavailable value."""
+    if not isinstance(value, dict) or value.get("status") not in INDICATOR_STATUSES:
+        return False
+    return ((value.get("value") is not None) if value["status"] == "available"
+            else value.get("value") is None)
+
+
+def valid_outcome_indicator(indicator: Any, geographic_unit: str) -> bool:
+    if not isinstance(indicator, dict):
+        return False
+    required_text = ("id", "name", "unit", "source", "reference_year", "geographic_unit")
+    if not all(isinstance(indicator.get(field), (str, int)) and str(indicator[field]).strip()
+               for field in required_text):
+        return False
+    if indicator["geographic_unit"] != geographic_unit:
+        return False
+    return all(valid_outcome_value(indicator.get(field)) for field in (
+        "neighbourhood_a", "neighbourhood_b", "approved_difference"))
+
+
+def valid_outcome_comparison(comparison: Any) -> bool:
+    """Validate a supplied E5 result without deriving differences or significance."""
+    if not isinstance(comparison, dict) or comparison.get("status") not in INDICATOR_STATUSES:
+        return False
+    area_a, area_b = comparison.get("neighbourhood_a"), comparison.get("neighbourhood_b")
+    if not valid_comparison_area(area_a) or not valid_comparison_area(area_b):
+        return False
+    if area_a["id"] == area_b["id"] or area_a["geographic_unit"] != area_b["geographic_unit"]:
+        return False
+    indicators = comparison.get("outcome_indicators")
+    if not isinstance(indicators, list) or not all(
+            valid_outcome_indicator(indicator, area_a["geographic_unit"])
+            for indicator in indicators):
+        return False
+    indicator_ids = [indicator["id"] for indicator in indicators]
+    if len(indicator_ids) != len(set(indicator_ids)):
+        return False
+    limitations = comparison.get("limitations", [])
+    if not isinstance(limitations, list) or not all(valid_priority_limitation(item) for item in limitations):
+        return False
+    if comparison["status"] == "available":
+        return bool(indicators) and all(
+            value["status"] == "available"
+            for indicator in indicators
+            for value in (
+                indicator["neighbourhood_a"],
+                indicator["neighbourhood_b"],
+                indicator["approved_difference"],
+            )
+        )
+    return bool(limitations)
+
+
+def load_outcome_comparisons() -> tuple[list[dict[str, Any]] | None, dict[str, Any] | None, list[dict[str, Any]]]:
+    """Load only explicitly approved E5 outcome-comparison outputs."""
+    source, limitations = load_json_source(
+        outcome_comparison_data_path(), OUTCOME_COMPARISON_DATA_PATH_ENV,
+        "outcome_comparison")
+    if source is None:
+        return None, None, limitations
+    comparisons, metadata = source.get("comparisons"), source.get("metadata")
+    if (source.get("approved") is not True or not isinstance(comparisons, list)
+            or not valid_priority_metadata(metadata)):
+        return None, None, [limitation(
+            "outcome_comparison_dataset_invalid",
+            "The outcome-comparison dataset must be explicitly approved and contain comparisons with complete provenance metadata.",
+            "outcome_comparison")]
+    if not all(valid_outcome_comparison(comparison) for comparison in comparisons):
+        return None, None, [limitation(
+            "outcome_comparison_dataset_invalid",
+            "The outcome-comparison dataset contains an invalid result, value status, or non-null unavailable value.",
+            "comparisons")]
+    pair_ids = [
+        (comparison["neighbourhood_a"]["id"], comparison["neighbourhood_b"]["id"])
+        for comparison in comparisons
+    ]
+    if len(pair_ids) != len(set(pair_ids)):
+        return None, None, [limitation(
+            "outcome_comparison_dataset_invalid",
+            "The outcome-comparison dataset contains duplicate ordered neighbourhood pairs.",
+            "comparisons")]
+    return comparisons, metadata, []
+
+
+def outcome_comparison_data(comparison: dict[str, Any]) -> dict[str, Any]:
+    """Whitelist public E5 fields from the approved output."""
+    return {
+        "neighbourhood_a": comparison["neighbourhood_a"],
+        "neighbourhood_b": comparison["neighbourhood_b"],
+        "outcome_indicators": comparison["outcome_indicators"],
     }

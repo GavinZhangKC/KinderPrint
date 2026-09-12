@@ -3,6 +3,7 @@ import json
 from data_loader import (
     COMPARISON_DATA_PATH_ENV,
     EXPLANATION_DATA_PATH_ENV,
+    OUTCOME_COMPARISON_DATA_PATH_ENV,
     PRIORITY_DATA_PATH_ENV,
     PROFILE_DATA_PATH_ENV,
 )
@@ -276,3 +277,114 @@ def test_manual_comparison_rejects_same_neighbourhood(client, monkeypatch, write
     body = client.get("/api/compare", params={"neighbourhood_id_a": "a", "neighbourhood_id_b": "a"}).json()
     assert body["status"] == "no_match"
     assert body["limitations"][0]["code"] == "same_neighbourhood_selected"
+
+
+def outcome_comparison_source(*, missing: bool = False) -> dict:
+    status = "missing" if missing else "available"
+    comparison_status = "limited" if missing else "available"
+    comparison = {
+        "status": comparison_status,
+        "neighbourhood_a": {"id": "a", "name": "A", "geographic_unit": "TBC"},
+        "neighbourhood_b": {"id": "b", "name": "B", "geographic_unit": "TBC"},
+        "outcome_indicators": [{
+            "id": "outcome",
+            "name": "Outcome",
+            "unit": "TBC",
+            "neighbourhood_a": {"value": 0, "status": "available"},
+            "neighbourhood_b": {"value": None if missing else 2, "status": status},
+            "approved_difference": {"value": None if missing else 0,
+                                    "status": status},
+            "source": "approved",
+            "reference_year": "TBC",
+            "geographic_unit": "TBC",
+        }],
+    }
+    if comparison_status != "available":
+        comparison["limitations"] = [{
+            "code": "outcome_missing",
+            "message": "The approved output identifies a missing outcome.",
+            "affected_fields": ["outcome"],
+        }]
+    return {
+        "approved": True,
+        "metadata": METADATA,
+        "comparisons": [comparison],
+    }
+
+
+def configure_outcome_sources(monkeypatch, write_json, source: dict) -> None:
+    profile_path = write_json("profiles.json", json.dumps({
+        "profiles": [profile("a", 1), profile("b", 2)],
+    }))
+    outcome_path = write_json("outcome_comparisons.json", json.dumps(source))
+    monkeypatch.setenv(PROFILE_DATA_PATH_ENV, str(profile_path))
+    monkeypatch.setenv(OUTCOME_COMPARISON_DATA_PATH_ENV, str(outcome_path))
+
+
+def test_outcome_comparison_returns_only_approved_values(client, monkeypatch, write_json) -> None:
+    configure_outcome_sources(monkeypatch, write_json, outcome_comparison_source())
+
+    body = client.get("/api/outcome-comparison", params={
+        "neighbourhood_id_a": "a", "neighbourhood_id_b": "b",
+    }).json()
+
+    assert body["status"] == "available"
+    indicator = body["data"]["outcome_indicators"][0]
+    assert indicator["neighbourhood_a"]["value"] == 0
+    assert indicator["approved_difference"]["value"] == 0
+    assert {notice["code"] for notice in body["notices"]} == {
+        "area_level_comparison", "association_not_causation",
+    }
+
+
+def test_outcome_comparison_preserves_missing_null(client, monkeypatch, write_json) -> None:
+    configure_outcome_sources(
+        monkeypatch, write_json, outcome_comparison_source(missing=True))
+
+    body = client.get("/api/outcome-comparison", params={
+        "neighbourhood_id_a": "a", "neighbourhood_id_b": "b",
+    }).json()
+
+    assert body["status"] == "limited"
+    indicator = body["data"]["outcome_indicators"][0]
+    assert indicator["neighbourhood_b"]["value"] is None
+    assert indicator["approved_difference"]["value"] is None
+    assert body["limitations"][0]["code"] == "outcome_missing"
+
+
+def test_outcome_comparison_reports_unconfigured_output(client, monkeypatch, write_json) -> None:
+    profile_path = write_json("profiles.json", json.dumps({
+        "profiles": [profile("a", 1), profile("b", 2)],
+    }))
+    monkeypatch.setenv(PROFILE_DATA_PATH_ENV, str(profile_path))
+
+    body = client.get("/api/outcome-comparison", params={
+        "neighbourhood_id_a": "a", "neighbourhood_id_b": "b",
+    }).json()
+
+    assert body["status"] == "unavailable"
+    assert body["limitations"][0]["code"] == "outcome_comparison_dataset_not_configured"
+
+
+def test_outcome_comparison_rejects_unknown_neighbourhood(client, monkeypatch, write_json) -> None:
+    profile_path = write_json("profiles.json", json.dumps({"profiles": [profile("a", 1)]}))
+    monkeypatch.setenv(PROFILE_DATA_PATH_ENV, str(profile_path))
+
+    body = client.get("/api/outcome-comparison", params={
+        "neighbourhood_id_a": "a", "neighbourhood_id_b": "unknown",
+    }).json()
+
+    assert body["status"] == "missing"
+    assert body["limitations"][0]["affected_fields"] == ["neighbourhood_id_b"]
+
+
+def test_outcome_comparison_does_not_reverse_an_unapproved_direction(client, monkeypatch, write_json) -> None:
+    configure_outcome_sources(monkeypatch, write_json, outcome_comparison_source())
+
+    body = client.get("/api/outcome-comparison", params={
+        "neighbourhood_id_a": "b", "neighbourhood_id_b": "a",
+    }).json()
+
+    assert body["status"] == "unavailable"
+    assert body["data"]["outcome_indicators"] == []
+    assert body["limitations"][0]["code"] == "outcome_comparison_unavailable"
