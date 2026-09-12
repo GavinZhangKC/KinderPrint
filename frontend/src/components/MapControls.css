@@ -1,7 +1,55 @@
 .map-controls-row { position: absolute; left: 30px; bottom: 36px; display: flex; align-items: stretch; gap: 10px; z-index: 8; }
 .map-control { border-radius: 24px; padding: 18px 20px; background: rgba(255,255,255,.53); }
 .map-control h2 { margin: 0 0 14px; color: var(--brand); font-size: 20px; }
-.preference-card { width: 198px; min-height: 238px; }
+.preference-header { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.preference-header h2 { margin: 0 0 0; }
+.preference-help {
+  position: relative;
+  z-index: 12;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: rgba(83, 103, 255, 0.12);
+  color: var(--brand);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: help;
+  user-select: none;
+}
+.preference-help::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 8px);
+  transform: translateX(-50%);
+  width: 220px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: rgba(17, 27, 50, 0.96);
+  color: #edf3ff;
+  font-size: 11px;
+  line-height: 1.4;
+  font-weight: 500;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s ease;
+  white-space: normal;
+  box-shadow: 0 10px 25px rgba(17, 27, 50, 0.18);
+  z-index: 40;
+}
+.preference-help:hover::after,
+.preference-help:focus-visible::after {
+  opacity: 1;
+}
+.preference-card {
+  position: relative;
+  z-index: 12;
+  width: 238px;
+  min-height: 238px;
+}
 .preference-options { display: grid; gap: 10px; }
 .preference-option { display: flex; align-items: center; gap: 10px; font-size: 13px; cursor: pointer; color: #445a80; }
 .preference-option input { position: absolute; opacity: 0; pointer-events: none; }

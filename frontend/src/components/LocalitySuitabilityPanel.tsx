@@ -30,7 +30,16 @@ export default function LocalitySuitabilityPanel({
 
   return (
     <section className="glass map-control suitability-card" aria-labelledby="suitability-title">
-      <h2 id="suitability-title">Locality suitability</h2>
+      <div className="suitability-header">
+        <h2 id="suitability-title">Locality suitability</h2>
+        <span
+          className="suitability-help"
+          aria-label="How the suitability score is calculated"
+          data-tooltip="This score is a weighted average across the selected criteria. It compares areas using approved local indicators for child development, green space, disadvantage, heat and childcare access. Higher scores indicate stronger overall conditions for raising children, but it remains a relative neighbourhood indicator, not a prediction."
+        >
+          ?
+        </span>
+      </div>
 
       <div className="suitability-options" role="group" aria-label="Suitability filters">
         {Object.entries(optionMeta).map(([id, meta]) => (
