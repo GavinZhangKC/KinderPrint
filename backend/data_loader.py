@@ -5,7 +5,21 @@ import os
 from pathlib import Path
 from typing import Any
 
+from dotenv import load_dotenv
+
 from responses import limitation
+
+
+def _load_runtime_environment() -> None:
+    """Load the repo-level .env or backend .env when present so local runs pick up approved dataset paths."""
+    backend_dir = Path(__file__).resolve().parent
+    repo_root = backend_dir.parent
+    for candidate in (backend_dir / ".env", repo_root / ".env"):
+        if candidate.is_file():
+            load_dotenv(candidate, override=False)
+
+
+_load_runtime_environment()
 
 BOUNDARY_DATA_PATH_ENV = "KINDERPRINT_BOUNDARY_DATA_PATH"
 PROFILE_DATA_PATH_ENV = "KINDERPRINT_PROFILE_DATA_PATH"

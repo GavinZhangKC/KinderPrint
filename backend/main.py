@@ -343,4 +343,105 @@ def neighbourhood_boundary(neighbourhood_id: str) -> dict[str, Any]:
                     metadata=feature_metadata(feature))
 
 
+@app.get("/api/localities/suitable")
+def locality_suitability(
+    criteria: str = Query("child_development,green_space,low_disadvantage", description="comma-separated priority factors"),
+    limit: int = Query(10, ge=1, le=20),
+) -> dict[str, Any]:
+    """Rank localities using the approved indicators already available in the profile dataset."""
+    profiles, limitations = load_profiles()
+    if profiles is None:
+        return envelope("unavailable", {"localities": [], "criteria": [], "limit": limit}, limitations=limitations)
+
+    valid_criteria = {
+        "child_development",
+        "green_space",
+        "low_disadvantage",
+        "low_heat",
+    }
+    selected_criteria = [
+        item.strip()
+        for item in criteria.split(",")
+        if item and item.strip() in valid_criteria
+    ]
+    if not selected_criteria:
+        selected_criteria = ["child_development", "green_space", "low_disadvantage"]
+
+    def value_for(profile: dict[str, Any], indicator_id: str) -> float | None:
+        for domain in profile["domains"]:
+            for indicator in domain["indicators"]:
+                if indicator["id"] == indicator_id and indicator["status"] == "available":
+                    value = indicator.get("value")
+                    if isinstance(value, (int, float)) and not isinstance(value, bool):
+                        return float(value)
+        return None
+
+    ranked: list[dict[str, Any]] = []
+    for profile in profiles:
+        subtotal = 0.0
+        weight_total = 0.0
+        matched_criteria: list[str] = []
+        for criterion in selected_criteria:
+            if criterion == "child_development":
+                on_track = value_for(profile, "aedc_on_track_five")
+                vulnerability = value_for(profile, "aedc_vulnerable_one_or_more")
+                if on_track is not None:
+                    subtotal += on_track * 0.6
+                    weight_total += 0.6
+                    matched_criteria.append("child_development")
+                if vulnerability is not None:
+                    subtotal += (100.0 - vulnerability) * 0.4
+                    weight_total += 0.4
+                    matched_criteria.append("child_development")
+            elif criterion == "green_space":
+                vegetation = value_for(profile, "env_vegetation_cover")
+                open_space = value_for(profile, "env_open_space_access")
+                if vegetation is not None or open_space is not None:
+                    green_score = 0.0
+                    green_count = 0
+                    for value in (vegetation, open_space):
+                        if value is not None:
+                            green_score += value
+                            green_count += 1
+                    if green_count:
+                        score = green_score / green_count
+                        subtotal += score
+                        weight_total += 1.0
+                        matched_criteria.append("green_space")
+            elif criterion == "low_disadvantage":
+                social_decile = value_for(profile, "seifa_irsd_decile")
+                if social_decile is not None:
+                    subtotal += social_decile
+                    weight_total += 1.0
+                    matched_criteria.append("low_disadvantage")
+            elif criterion == "low_heat":
+                heat = value_for(profile, "env_urban_heat")
+                if heat is not None:
+                    subtotal += max(0.0, 100.0 - heat * 3.0)
+                    weight_total += 1.0
+                    matched_criteria.append("low_heat")
+
+        if weight_total == 0:
+            score = 0.0
+        else:
+            score = max(0.0, min(100.0, (subtotal / weight_total) * 1.0))
+
+        ranked.append({
+            "id": profile["neighbourhood"]["id"],
+            "name": profile["neighbourhood"]["name"],
+            "geographic_unit": profile["neighbourhood"]["geographic_unit"],
+            "score": round(score, 2),
+            "criteria": sorted(set(matched_criteria)) if matched_criteria else selected_criteria,
+        })
+
+    ranked.sort(key=lambda item: item["score"], reverse=True)
+    ranked = ranked[:limit]
+    return envelope(
+        "available",
+        {"localities": ranked, "criteria": selected_criteria, "limit": limit},
+        metadata={"result_count": len(ranked), "source": "Approved profile dataset"},
+        notices=[AREA_LEVEL_NOTICE],
+    )
+
+
 handler = Mangum(app, lifespan="off")

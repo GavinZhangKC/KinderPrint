@@ -2,6 +2,7 @@
 @import './components/BrandHeader.css';
 @import './components/NeighbourhoodMap.css';
 @import './components/MapControls.css';
+@import './components/LocalitySuitabilityPanel.css';
 @import './components/ProfileModal.css';
 @import './styles/shared.css';
 @import './components/ComparePanel.css';
