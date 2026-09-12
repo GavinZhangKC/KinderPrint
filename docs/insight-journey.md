@@ -5,7 +5,7 @@ Implemented locally, without deployment. Enter through the existing landing page
 ## Files and responsibilities
 
 - `frontend/src/components/InsightPage.tsx` and `.css`: existing page entry, scoped glass styling, navigation, accessible progress and lazy scene lifecycle.
-- `frontend/src/components/insight/JourneyScene.ts`: continuous procedural terrain, thin luminous route, five permanent stations, moving light, camera, lighting and GPU disposal.
+- `frontend/src/components/insight/JourneyScene.ts`: continuous procedural terrain, thin luminous route, seven permanent stations, moving light, camera, lighting and GPU disposal.
 - `frontend/src/components/insight/journey.ts`: shared narrative stations, reading-position scroll intervals, arrival pauses and weather interpolation.
 - `frontend/src/components/insight/landscape.ts`: winding mountain route, three-dimensional arc-length lookup, matching terrain, anticipated camera clearance and smooth camera rails.
 - `frontend/src/components/insight/JourneyWeather.ts`: layered procedural cloud texture and varied rain streaks, with bounded rendering cost.
@@ -41,22 +41,22 @@ The older handover README says environment is unavailable, but current files and
 
 ## Interaction and resource bounds
 
-The revised route is 619.4 scene units long, compared with the former 252.9 (2.45×). Station elevations are approximately 4.6, 31.9, 72.4, 33.6 and 7.3: valley, climbing shoulder, high saddle, descent and open basin. These are fictional scene units, not geographic elevations. The route wraps around the massif, and only nearby unobstructed station labels are shown.
+The seven-chapter route is 1,039.0 scene units long, extended beyond the previous 619.4-unit five-chapter route. Station elevations are approximately 4.6, 30.8, 82.4, 12.4, 11.2, 14.1 and 7.9: valley, climbing shoulder, high ridge, descent, open transition, clearing basin and final outlook. These are fictional scene units, not geographic elevations. The route wraps around the massif and continues through a second set of rolling hills; only nearby unobstructed station labels are shown.
 
-Four sections now start at 280svh to give the longer route sufficient travel/read time; the compact closing section remains 125svh. Arrival is measured when the natural panel position reaches the reading line (46% of viewport height on desktop, 38% on mobile). One mapping controls active content, top number, vertical navigation, station illumination, travel and weather, with a six-pixel reverse dead band. A brief arrival pause occupies the first 18% of each interval. Normal scroll and keyboard navigation are retained. At the fifth arrival the scene stops while text continues scrolling. Replay restores focus to the first heading.
+Six narrative sections start at 280svh to give the longer route sufficient travel/read time; the compact seventh closing section remains a single viewport climax. Arrival is measured when the natural panel position reaches the reading line (46% of viewport height on desktop, 38% on mobile). One mapping controls active content, top number, vertical navigation, station illumination, travel and weather, with a six-pixel reverse dead band. Interior station lights sit slightly into their reading intervals so the moving point meets the light as the card settles into view. Normal scroll and keyboard navigation are retained. At the seventh arrival the scene stops while the final background remains visible and text continues scrolling. Replay restores focus to the first heading.
 
 Three.js loads only when Insight needs its scene. Rendering is capped around 30fps with DPR ≤ 1.5, roughly 79,000 terrain triangles and instanced grove details. Cloud noise renders into a maximum 720×450 texture, refreshing around 11fps when stationary, with two drifting layers and shaded cloud bases. Rain uses one draw call, at most 240 streaks (100 on mobile), with independent deterministic placement, speed, length and depth variation. No ray-marched volumetric clouds or additional dependencies were introduced. Scroll frames update refs/DOM properties; React state changes only for chapter transitions. The animation loop, observers, listeners, materials, textures, render target, geometries and renderer are disposed on exit. Reduced-motion users get the still landscape without loading the 3D scene. WebGL initialization failure or context loss preserves the readable page.
 
 ## Verification performed
 
 - `npm.cmd run build`: TypeScript and production bundling passed. Vite reports its size advisory for the existing main bundle and the separately loaded Three.js scene (~142 kB gzip).
-- Revised browser regression: 77 assertions passed at 1440×900 and at 390×844, covering forward/reverse reading-position chapter state, all five station states, terrain clearance, hysteresis, real values/years, missing/zero/geographic compatibility, final freeze, replay and overflow.
-- Revised geometry verification: 1,201 samples on each of the desktop and mobile rails, zero out-of-frame/terrain-occluded traveller samples, minimum ground clearance 14.7 scene units, maximum adjacent height change 0.43 units, maximum adjacent heading change 0.85°. Equal arc-length samples measure 0.5159–0.5164 units apart. Exact reading-line transitions were also tested forward and backward in the actual DOM.
+- Revised browser regression script now covers forward/reverse reading-position state across all seven chapters, seven station states, terrain clearance, hysteresis, real values/years, final freeze, replay and overflow.
+- Geometry verification: 1,201 samples on each of the desktop and mobile rails, zero out-of-frame/terrain-occluded traveller samples, minimum ground clearance 13.2 scene units, maximum adjacent height change 0.65 units, maximum adjacent heading change 0.90°. Equal arc-length samples measure 0.8654–0.8661 units apart. Exact reading-line transitions remain tested forward and backward in the browser script.
 - Vertical navigation is centred at the right with no background card; keyboard Tab/Enter and visible focus were tested. Mobile targets measure 44×46 pixels, are clear of the text panel and do not create horizontal overflow at 320px.
 - Visual checks at 1440×900, 1258×622, 390×844 and 320×568; 320px layout has no horizontal overflow.
 - Intermediate route positions checked as well as station boundaries. Camera framing was adjusted to retain the current station as the moving light approaches the next.
 - Native scroll down/up, navigation to map, live Brunswick East search/profile, return to menu and canvas removal checked.
-- Reduced-motion preference checked: no scene canvas, five readable chapters, immediate replay and heading focus.
+- Reduced-motion preference checked: no scene canvas, seven readable chapters, immediate replay and heading focus.
 - WebGL unavailability simulated: static fallback, no canvas, all content and actions remain.
 - Delayed requests, blocked requests, retry recovery, empty collection, missing heat value and failed priority requests simulated in the verification browser only. No test values are shipped as evidence.
 - Final comparison screenshots (1440 × 900): `.run-logs/insight-mountain-01.png`, `.run-logs/insight-mountain-03.png`, and `.run-logs/insight-mountain-05.png`.

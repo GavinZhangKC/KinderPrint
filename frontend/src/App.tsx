@@ -145,10 +145,6 @@ function resetExplore() {
 
     setShowDataDrawer(false)
   }
-function backToMenu() {
-    resetExplore()
-    setAppPage('menu')
-  }
 function backToLanding() {
     resetExplore()
     setAppPage('landing')
@@ -156,6 +152,17 @@ function backToLanding() {
 function openMapPage() {
     resetExplore()
     setAppPage('map')
+  }
+function openInsightPage() {
+    resetExplore()
+    setAppPage('insight')
+  }
+function openAboutUsSection() {
+    resetExplore()
+    setAppPage('landing')
+    window.setTimeout(() => {
+      document.getElementById('home-about')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }, 0)
   }
 function choosePrimary(
     neighbourhood: Neighbourhood,
@@ -303,32 +310,40 @@ function startComparison() {
       }
     }
   }
-if (appPage === 'landing' || appPage === 'menu') {
+if (appPage === 'landing') {
     return (
       <div className="entry-pages">
         <WaterRippleBackground />
-        {appPage === 'landing' ? (
-          <LandingPage onExplore={() => setAppPage('menu')} />
-        ) : (
-          <MenuPage
-            onInsight={() => setAppPage('insight')}
-            onMap={() => setAppPage('map')}
-            onAboutUs={() => setAppPage('about')}
-          />
-        )}
+        <LandingPage
+          onInsight={openInsightPage}
+          onMap={openMapPage}
+        />
+      </div>
+    )
+  }
+
+  if (appPage === 'menu') {
+    return (
+      <div className="entry-pages">
+        <WaterRippleBackground />
+        <MenuPage
+          onInsight={openInsightPage}
+          onMap={openMapPage}
+          onAboutUs={() => setAppPage('about')}
+        />
       </div>
     )
   }
 
   if (appPage === 'about') {
-    return <AboutUsPage onBack={backToMenu} />
+    return <AboutUsPage onHome={backToLanding} onInsight={openInsightPage} onMap={openMapPage} />
   }
 
   if (appPage === 'insight') {
     return (
       <InsightPage
         onLogoClick={backToLanding}
-        onBackToMenu={backToMenu}
+        onAboutUs={openAboutUsSection}
         onExploreMap={openMapPage}
       />
     )
@@ -346,9 +361,11 @@ if (
         <div className="ambient ambient-two" />
 
         <BrandHeader
-          onLogoClick={backToLanding}
-          onExplore={resetExplore}
-          onBackToMenu={backToMenu}
+          activePage="map"
+          onHome={backToLanding}
+          onInsight={openInsightPage}
+          onMap={resetExplore}
+          onAboutUs={openAboutUsSection}
         />
 
         <DetailedComparison
@@ -368,9 +385,11 @@ return (
       <div className="ambient ambient-two" />
 
       <BrandHeader
-          onLogoClick={backToLanding}
-          onExplore={resetExplore}
-          onBackToMenu={backToMenu}
+          activePage="map"
+          onHome={backToLanding}
+          onInsight={openInsightPage}
+          onMap={resetExplore}
+          onAboutUs={openAboutUsSection}
         />
 
       <main className="map-shell">

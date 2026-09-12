@@ -17,13 +17,13 @@ html.insight-scrollbar-hidden body::-webkit-scrollbar { display: none; }
 .insight-page .insight-clouds { position: absolute; inset: 0 0 40%; opacity: calc(.15 + var(--storm) * .82 - var(--sun) * .15); background: url('/insight-clouds.svg') center / cover; animation: insight-cloud-drift 32s ease-in-out infinite alternate; }
 .insight-page[data-scene='ready'] .insight-clouds { display: none; }
 .insight-page .insight-atmosphere { position: absolute; inset: 0; background: linear-gradient(0deg, #bcd5df15, transparent 15%); }
-.insight-page .nav-shell { position: fixed; top: 16px; left: 50%; transform: translateX(-50%); width: calc(100% - 48px); max-width: 1440px; height: 68px; background: rgba(241, 248, 255, .42); border: 1px solid rgba(255, 255, 255, .38); box-shadow: 0 8px 32px rgba(53, 90, 138, .07); backdrop-filter: blur(18px) saturate(115%); -webkit-backdrop-filter: blur(18px) saturate(115%); }
-.insight-page .nav-links .active::after { display: none; }
-.insight-page .insight-journey-status { position: fixed; z-index: 3; top: 108px; right: 5.2%; display: flex; align-items: center; gap: 12px; color: #315a80; background: rgba(241, 249, 255, .4); border: 1px solid rgba(255, 255, 255, .42); box-shadow: 0 8px 28px rgba(40, 78, 115, .06); backdrop-filter: blur(16px) saturate(115%); -webkit-backdrop-filter: blur(16px) saturate(115%); border-radius: 17px; padding: 9px 13px; }
-.insight-page .insight-journey-status > div > span { letter-spacing: .18em; font-size: 10px; font-weight: 800; }
-.insight-page .insight-journey-status p { font-size: 12px; margin: 6px 0 0; font-weight: 600; }
-.insight-page .insight-journey-status i { display: inline-block; width: 3px; height: 3px; border-radius: 50%; background: currentColor; margin: 0 8px 3px; }
-.insight-page .insight-weather-icon { font-size: 32px; font-family: 'Segoe UI Symbol', sans-serif; }
+.insight-page .nav-shell { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); width: min(1440px, calc(100% - 48px)); height: 76px; background: rgba(255, 255, 255, .42); border: 1px solid var(--border); box-shadow: 0 12px 36px rgba(51, 82, 140, .11); backdrop-filter: blur(22px); -webkit-backdrop-filter: blur(22px); }
+.insight-page .insight-audio-control { position: fixed; z-index: 4; top: 104px; left: auto; right: max(54px, calc((100vw - 1440px) / 2 + 30px)); width: 48px; height: 48px; display: grid; place-items: center; padding: 0; color: #315a80; background: rgba(241, 248, 255, .42); border: 1px solid rgba(255, 255, 255, .38); border-radius: 50%; box-shadow: 0 8px 32px rgba(53, 90, 138, .07), inset 0 1px 0 rgba(255, 255, 255, .18); backdrop-filter: blur(18px) saturate(115%); -webkit-backdrop-filter: blur(18px) saturate(115%); cursor: pointer; transition: background .2s, transform .2s, box-shadow .2s; }
+.insight-page .insight-audio-control:hover { background: rgba(241, 248, 255, .62); transform: translateY(-1px); box-shadow: 0 10px 30px rgba(53, 90, 138, .12), inset 0 1px 0 rgba(255, 255, 255, .24); }
+.insight-page .insight-audio-control:active { transform: translateY(0); }
+.insight-page .insight-audio-control svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 1.8; }
+.insight-page .insight-audio-control svg path:first-child { fill: currentColor; stroke: none; }
+.insight-page .insight-audio { display: none; }
 .insight-page .insight-chapter { position: relative; min-height: 280svh; padding: clamp(146px, 22svh, 230px) 0 24svh 7%; display: flow-root; }
 .insight-page .insight-panel { box-sizing: border-box; position: sticky; top: 120px; width: min(460px, 42vw); padding: 28px 30px; border: 1px solid rgba(255, 255, 255, .44); border-radius: 26px; background: linear-gradient(132deg, rgba(250, 253, 255, calc(.48 + var(--storm) * .12)), rgba(232, 245, 255, calc(.32 + var(--storm) * .14))); box-shadow: 0 16px 48px rgba(43, 78, 111, .09); backdrop-filter: blur(24px) saturate(118%); -webkit-backdrop-filter: blur(24px) saturate(118%); }
 @media (min-width: 761px) {
@@ -44,6 +44,7 @@ html.insight-scrollbar-hidden body::-webkit-scrollbar { display: none; }
 .insight-page .insight-evidence > p:not(.insight-example) { font-size: 12px; line-height: 1.7; }
 .insight-page .insight-metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 17px; }
 .insight-page .insight-metrics .insight-metric:first-child { grid-column: 1 / -1; }
+.insight-page .insight-metrics--paired .insight-metric:first-child { grid-column: auto; }
 .insight-page .insight-metrics .insight-metric > strong { font-size: 27px; }
 .insight-page .insight-metric--missing > strong { font-size: 17px !important; }
 .insight-page .insight-priority { display: flex; justify-content: space-between; align-items: center; gap: 12px; font-size: 11px; }
@@ -85,14 +86,11 @@ html.insight-scrollbar-hidden body::-webkit-scrollbar { display: none; }
   .insight-page .insight-evidence { margin-top: 15px; padding-top: 12px; }
 }
 @media (max-width: 760px) {
-  .insight-page .nav-shell { top: 10px; width: calc(100% - 24px); height: 60px; padding: 0 14px 0 8px; border-radius: 20px; }
+  .insight-page .nav-shell { top: 10px; width: calc(100% - 20px); height: 62px; padding: 0 12px 0 8px; border-radius: 20px; }
   .insight-page .brand-button { font-size: 19px; gap: 2px; }
   .insight-page .brand-logo { width: 42px; height: 42px; }
   .insight-page .nav-links { gap: 10px; font-size: 10px; }
-  .insight-page .insight-journey-status { top: 87px; right: 21px; gap: 8px; }
-  .insight-page .insight-weather-icon { font-size: 24px; }
-  .insight-page .insight-journey-status > div > span { font-size: 8px; }
-  .insight-page .insight-journey-status p { font-size: 10px; margin-top: 4px; }
+  .insight-page .insight-audio-control { top: 82px; left: auto; right: 22px; width: 44px; height: 44px; }
   .insight-page .insight-chapter { padding: 29svh 52px 30svh 14px; min-height: 280svh; }
   .insight-page .insight-panel { position: relative; width: min(100%, 480px); padding: 24px; border-radius: 24px; top: auto; background: linear-gradient(132deg, rgba(246, 251, 255, .58), rgba(232, 244, 255, .4)); }
   .insight-page .insight-progress { right: 2px; gap: 1px; }

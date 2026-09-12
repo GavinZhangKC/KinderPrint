@@ -13,7 +13,7 @@ function Metric({ profile, id, unit, note }: { profile: NeighbourhoodProfile; id
 }
 
 export default function ChapterEvidence({ chapter, state, retry }: { chapter: number; state: EvidenceState; retry: () => void }) {
-  if (chapter === 4) return null
+  if (chapter >= 5) return null
   if (state.status !== 'ready') return <div className="insight-data-state" role="status">
     <span className={state.status === 'loading' ? 'insight-loading-dot' : ''} />
     <p>{state.message}</p>
@@ -31,33 +31,37 @@ export default function ChapterEvidence({ chapter, state, retry }: { chapter: nu
       <Metric profile={profile} id="census_children_0_4_pct" unit="percent" note="Share of the area's usual resident population aged 0–4." />
     </>}
     {chapter === 1 && <>
-      <Metric profile={profile} id="aedc_vulnerable_one_or_more" unit="percent" />
+      <Metric profile={profile} id="env_urban_heat" unit="degrees Celsius" note="Heat island effect; not air temperature or a weather forecast." />
     </>}
     {chapter === 2 && <>
-      <div className="insight-metrics">
-        <Metric profile={profile} id="seifa_irsd_decile" unit="decile" note="Lower deciles indicate greater relative disadvantage." />
-        <Metric profile={profile} id="env_urban_heat" unit="degrees Celsius" note="Heat island effect; not air temperature or a weather forecast." />
+      <div className="insight-metrics insight-metrics--paired">
         <Metric profile={profile} id="env_vegetation_cover" unit="percent" />
+        <Metric profile={profile} id="env_open_space_access" unit="percent" />
       </div>
     </>}
     {chapter === 3 && <>
+      <Metric profile={profile} id="aedc_vulnerable_one_or_more" unit="percent" />
+    </>}
+    {chapter === 4 && <>
       {validPriority ? <>
         <div className="insight-priority"><span>Priority for Investigation</span><strong>{priority!.data.priority_band}</strong></div>
-        <p>This example carries the model's <strong>{priority!.data.priority_band?.toLowerCase()}</strong> investigation band. Review the local evidence and speak with communities before deciding where closer investigation or preventive work is warranted.</p>
+        <p>The combined indicators place this neighbourhood in the model's <strong>{priority!.data.priority_band?.toLowerCase()}</strong> investigation band.</p>
         <cite>{String(prioritySource)} · {String(priorityYear)} · {area.geographic_unit}</cite>
       </> : <p className="insight-data-state">{state.priorityError ?? 'The priority label lacks compatible source metadata and cannot be displayed.'}</p>}
     </>}
-    {(state.profile.limitations.length > 0 || (chapter === 3 && priority?.limitations.length)) ? <details className="insight-limitations">
+    {(state.profile.limitations.length > 0 || (chapter === 4 && priority?.limitations.length)) ? <details className="insight-limitations">
       <summary>Data limitations</summary>
-      {[...state.profile.limitations, ...(chapter === 3 ? priority?.limitations ?? [] : [])].map((limitation, index) => <p key={`${limitation.code}-${index}`}>{limitation.message}</p>)}
+      {[...state.profile.limitations, ...(chapter === 4 ? priority?.limitations ?? [] : [])].map((limitation, index) => <p key={`${limitation.code}-${index}`}>{limitation.message}</p>)}
     </details> : null}
   </div>
 }
 
 export const chapterCopy = [
-  'Every child begins with possibility. The places where children grow offer different surroundings, resources and everyday experiences. Follow the light to explore the evidence behind those differences.',
-  'Understanding begins with listening to the evidence. KinderPrint brings together child development, social context and environmental indicators to help us see neighbourhood conditions more clearly.',
-  'The path is not always clear. Social conditions, heat and tree cover add different pieces to the picture. Looking across them raises questions about pressures that may overlap, without assuming every area or child faces the same challenges.',
-  'As the clouds lift, better questions come into view. Results are starting points for investigation, not conclusions. They indicate where a closer look may be warranted.',
-  'A clearer picture is a beginning. Bring local evidence into conversations with communities, explore the questions it raises, and help shape more supportive places for children to grow.',
+  'Every neighbourhood creates a different setting for childhood. Begin with the selected place, its community and the everyday environment surrounding young children.',
+  'Urban heat can add environmental pressure to daily life. Follow the local heat island indicator to see how strongly the built environment retains heat.',
+  'Tree canopy and accessible public open space help shape how a neighbourhood feels. Here, the journey turns to the amount of green cover available locally.',
+  'Environmental context sits alongside child development evidence. AEDC data shows the share of children developmentally vulnerable on one or more domains in this neighbourhood.',
+  'Across neighbourhood-level indicators, a pattern can emerge: lower vegetation and higher heat exposure can coincide with higher child development vulnerability. This is a signal for investigation, not a claim about individual children.',
+  'Environmental conditions are not fixed. More tree canopy, more accessible open space and lower heat exposure can become practical directions for local improvement.',
+  'A better future begins with informed local choices. Clearer evidence can support conversations and action toward healthier, more supportive places for children to grow.',
 ]

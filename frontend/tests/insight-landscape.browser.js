@@ -5,7 +5,7 @@
   const T = await import('/node_modules/three/build/three.module.js')
   const assert = (condition, message) => { if (!condition) throw new Error(message) }
   const report = { length: L.routeLength, minimumClearance: Infinity, maximumCameraStep: 0, maximumHeadingStep: 0, hidden: 0, occluded: 0, routeStepRange: [Infinity, 0], elevations: [] }
-  assert(L.routeLength > 252.94 * 1.5, 'Path must physically exceed 1.5× the former path')
+  assert(L.routeLength > 800, 'Path must extend well beyond the former five-chapter route')
   for (const mobile of [false, true]) {
     const camera = new T.PerspectiveCamera(52, mobile ? 390 / 844 : 1440 / 900, .2, 600)
     let previous
@@ -28,7 +28,7 @@
       previous = { y: pose.y, heading, point }
     }
   }
-  report.elevations = [0, .25, .5, .75, 1].map(p => L.routePosition(p).y)
+  report.elevations = [0, 1 / 6, 2 / 6, 3 / 6, 4 / 6, 5 / 6, 1].map(p => L.routePosition(p).y)
   assert(report.minimumClearance >= 13, 'Camera must clear the terrain throughout both rails')
   assert(report.hidden === 0 && report.occluded === 0, 'Moving light must stay in frame and clear of terrain')
   assert(report.maximumCameraStep < .7 && report.maximumHeadingStep < 1.2, 'No abrupt rail height or heading changes')
@@ -37,14 +37,14 @@
   const root = document.querySelector('.insight-page')
   const sections = [...root.querySelectorAll('.insight-chapter')]
   const wait = ms => new Promise(resolve => setTimeout(resolve, ms))
-  for (const i of [1, 2, 3, 4, 3, 2, 1]) {
+  for (const i of [1, 2, 3, 4, 5, 6, 5, 4, 3, 2, 1]) {
     const anchor = Number(sections[i].dataset.arrival)
     window.scrollTo({ top: anchor - 20, behavior: 'instant' }); await wait(100)
     assert(root.dataset.chapter === String(i), 'Previous chapter remains active before the reading line')
     window.scrollTo({ top: anchor + 1, behavior: 'instant' }); await wait(100)
     assert(root.dataset.chapter === String(i + 1), 'Chapter changes as its panel enters the reading line')
     assert(Math.abs(sections[i].querySelector('article').getBoundingClientRect().top - Number(root.dataset.readingLine)) < 3, 'Measured boundary must match actual content position')
-    assert(root.dataset.progress === (i / 4).toFixed(5), 'Moving light arrives at the same chapter station')
+    assert(root.dataset.progress === (i / 6).toFixed(5), 'Moving light arrives at the same chapter station')
   }
   return report
 })()
