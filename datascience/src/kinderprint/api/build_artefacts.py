@@ -1,5 +1,5 @@
 """
-Build the five approved JSON artefacts the KinderPrint backend reads.
+Build the approved JSON artefacts the KinderPrint backend reads.
 
 The backend validates strictly and rejects a whole file on one bad record, so
 this module targets validation.py exactly:
@@ -16,6 +16,8 @@ import json
 from pathlib import Path
 import pandas as pd
 import numpy as np
+
+from kinderprint.analytics.suitability import build_rankings
 
 DOMAINS = ["Child Development", "Social", "Environment"]
 GEO_UNIT = "SA2 (ASGS Edition 3, 2021)"
@@ -110,6 +112,19 @@ def build_profiles(d: pd.DataFrame) -> dict:
             "limitations": [],
         })
     return {"profiles": profiles}
+
+
+def build_suitability(profiles: list[dict]) -> dict:
+    """Build the provisional locality-suitability output outside the backend."""
+    return {
+        "rankings": build_rankings(profiles),
+        "metadata": {
+            "source": "Approved profile dataset",
+            "reference_year": "2024",
+            "geographic_unit": GEO_UNIT,
+            "data_quality": "Provisional Iteration 2 locality-suitability prototype.",
+        },
+    }
 
 
 def build_priorities(d: pd.DataFrame) -> dict:

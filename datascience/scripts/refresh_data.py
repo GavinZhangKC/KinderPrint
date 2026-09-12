@@ -35,6 +35,7 @@ REF = ROOT / "data/reference"
 INTERIM = ROOT / "data/interim"
 PROC = ROOT / "data/processed"
 OUT = ROOT / "outputs" / "iteration_1"
+ITERATION_2_OUT = ROOT / "outputs" / "iteration_2"
 
 PIPELINE_VERSION = "2.0.0"
 SCHEMA_VERSION = "2"
@@ -118,6 +119,7 @@ def main() -> int:
 
     PROC.mkdir(parents=True, exist_ok=True)
     OUT.mkdir(parents=True, exist_ok=True)
+    ITERATION_2_OUT.mkdir(parents=True, exist_ok=True)
 
     # ---------------------------------------------------------------- 01
     with Stage("01 verify raw inputs", manifest):
@@ -355,13 +357,19 @@ def main() -> int:
     # ---------------------------------------------------------------- 11
     with Stage("11 build artefacts", manifest):
         geo = json.loads((REF / "sa2_melbourne.geojson").read_text())
-        for name, obj in {"profiles.json": B.build_profiles(final),
+        profiles = B.build_profiles(final)
+        for name, obj in {"profiles.json": profiles,
                           "priorities.json": B.build_priorities(final),
                           "explanations.json": B.build_explanations(final),
                           "comparisons.json": B.build_comparisons(final),
                           "boundaries.geojson": B.build_boundaries(geo, final)}.items():
             (OUT / name).write_text(json.dumps(obj, separators=(",", ":")))
             log.info("  %-20s %6.2f MB", name, (OUT / name).stat().st_size / 1e6)
+        suitability_path = ITERATION_2_OUT / "suitability.json"
+        suitability_path.write_text(json.dumps(
+            B.build_suitability(profiles["profiles"]), separators=(",", ":")))
+        log.info("  %-20s %6.2f MB", suitability_path.name,
+                 suitability_path.stat().st_size / 1e6)
 
     manifest["finished_utc"] = datetime.now(timezone.utc).isoformat()
     manifest["duration_seconds"] = round((datetime.now(timezone.utc) - started).total_seconds(), 2)

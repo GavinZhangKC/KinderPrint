@@ -68,6 +68,7 @@ Resources:
           KINDERPRINT_ENVIRONMENTAL_DIFFERENCE_DATA_PATH: /var/task/data/environmental_differences.json
           KINDERPRINT_PATTERN_INSIGHT_DATA_PATH: /var/task/data/pattern_insights.json
           KINDERPRINT_PREVENTION_OPPORTUNITY_DATA_PATH: /var/task/data/prevention_opportunities.json
+          KINDERPRINT_SUITABILITY_DATA_PATH: /var/task/data/suitability.json
       Events:
         ApiProxy:
           Type: HttpApi

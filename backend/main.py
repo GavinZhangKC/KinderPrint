@@ -28,7 +28,7 @@ from validation import (
     aggregate_status, environmental_difference_data, explanation_data,
     load_comparison_data, load_environmental_differences, load_explanations,
     load_outcome_comparisons, load_pattern_insights, load_prevention_opportunities,
-    load_priority_results, load_profiles,
+    load_priority_results, load_profiles, load_suitability_rankings,
     map_indicator_data, match_data,
     outcome_comparison_data, pattern_insight_data, prevention_opportunity_data,
     priority_data, profile_boundary_limitations, profile_collection_metadata,
@@ -681,6 +681,94 @@ def neighbourhood_boundary(neighbourhood_id: str) -> dict[str, Any]:
     return envelope("available", {"neighbourhood": neighbourhood(feature),
                                   "geometry": public_boundary_geometry(feature)},
                     metadata=feature_metadata(feature))
+
+
+@app.get("/api/localities/suitable")
+def locality_suitability(
+    criteria: str = Query("child_development,green_space,low_disadvantage", description="comma-separated priority factors"),
+    limit: int = Query(10, ge=1, le=20),
+) -> dict[str, Any]:
+    """Return a locality ranking already calculated by the Data Science pipeline."""
+    rankings, metadata, limitations = load_suitability_rankings()
+    if rankings is None:
+        return envelope("unavailable", {"localities": [], "criteria": [], "limit": limit}, limitations=limitations)
+
+    valid_criteria = {
+        "child_development",
+        "green_space",
+        "low_disadvantage",
+        "low_heat",
+    }
+    selected_criteria = [
+        item.strip()
+        for item in criteria.split(",")
+        if item.strip()
+    ]
+    invalid_criteria = [
+        item for item in selected_criteria if item not in valid_criteria
+    ]
+    selected_criteria = list(dict.fromkeys(selected_criteria))
+    if invalid_criteria:
+        return envelope(
+            "unavailable",
+            {"localities": [], "criteria": selected_criteria, "limit": limit,
+             "withheld_count": 0},
+            limitations=[limitation(
+                "unsupported_suitability_criteria",
+                "One or more suitability criteria are unsupported.",
+                "criteria",
+            )],
+        )
+    if not selected_criteria:
+        return envelope(
+            "unavailable",
+            {"localities": [], "criteria": [], "limit": limit,
+             "withheld_count": 0},
+            limitations=[limitation(
+                "suitability_criteria_required",
+                "Select at least one suitability criterion.",
+                "criteria",
+            )],
+        )
+
+    selected_set = set(selected_criteria)
+    ranking = next((
+        item for item in rankings if set(item["criteria"]) == selected_set
+    ), None)
+    if ranking is None:
+        return envelope(
+            "unavailable",
+            {"localities": [], "criteria": selected_criteria, "limit": limit},
+            limitations=[limitation(
+                "suitability_result_unavailable",
+                "No precomputed suitability result exists for the selected criteria.",
+                "criteria",
+            )],
+        )
+
+    available = [
+        item for item in ranking["localities"] if item["status"] == "available"
+    ]
+    withheld_count = len(ranking["localities"]) - len(available)
+    ranked = available[:limit]
+    response_limitations = []
+    if withheld_count:
+        response_limitations.append(limitation(
+            "suitability_results_withheld",
+            f"{withheld_count} localities were excluded because selected inputs were unavailable.",
+            "localities",
+        ))
+    response_status = "limited" if withheld_count else "available"
+    if not ranked:
+        response_status = "unavailable"
+    return envelope(
+        response_status,
+        {"localities": ranked, "criteria": selected_criteria, "limit": limit,
+         "withheld_count": withheld_count},
+        metadata={**(metadata or {}), "result_count": len(ranked)},
+        limitations=response_limitations,
+        notices=[AREA_LEVEL_NOTICE],
+    )
 
 
 handler = Mangum(app, lifespan="off")

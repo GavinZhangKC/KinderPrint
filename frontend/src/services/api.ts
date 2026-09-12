@@ -184,6 +184,23 @@ export interface NeighbourhoodComparison {
   match_strength: string | null
 }
 
+export interface SuitableLocality {
+  id: string
+  name: string
+  geographic_unit: string
+  score: number | null
+  status: ApiStatus | string
+  criteria: string[]
+  limitations: ApiLimitation[]
+}
+
+export interface SuitableLocalitiesResponse {
+  localities: SuitableLocality[]
+  criteria: string[]
+  limit: number
+  withheld_count: number
+}
+
 
 const API_BASE =
   import.meta.env.VITE_API_BASE_URL ?? ''
@@ -314,5 +331,12 @@ export const api = {
       )}&neighbourhood_id_b=${encodeURIComponent(
         b,
       )}`,
+    ),
+  getSuitableLocalities: (
+    criteria: string[],
+    limit = 5,
+  ) =>
+    request<SuitableLocalitiesResponse>(
+      `/api/localities/suitable?criteria=${encodeURIComponent(criteria.join(','))}&limit=${limit}`,
     ),
 }

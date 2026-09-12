@@ -11,6 +11,7 @@ from data_loader import (
     PREVENTION_OPPORTUNITY_DATA_PATH_ENV,
     PRIORITY_DATA_PATH_ENV,
     PROFILE_DATA_PATH_ENV,
+    SUITABILITY_DATA_PATH_ENV,
     comparison_data_path,
     environmental_difference_data_path,
     explanation_data_path,
@@ -20,6 +21,7 @@ from data_loader import (
     prevention_opportunity_data_path,
     priority_data_path,
     profile_data_path,
+    suitability_data_path,
 )
 from responses import INDICATOR_STATUSES, PRIORITY_DOMAINS, limitation
 
@@ -80,6 +82,91 @@ def load_profiles() -> tuple[list[dict[str, Any]] | None, list[dict[str, Any]]]:
     if len(identifiers) != len(set(identifiers)):
         return None, [limitation("profile_dataset_invalid", "The profile dataset contains duplicate neighbourhood identifiers.", "profiles")]
     return profiles, []
+
+
+SUITABILITY_CRITERIA = {
+    "child_development",
+    "green_space",
+    "low_disadvantage",
+    "low_heat",
+}
+
+
+def _valid_suitability_locality(locality: Any) -> bool:
+    if not isinstance(locality, dict):
+        return False
+    if not all(
+        isinstance(locality.get(field), str) and locality[field].strip()
+        for field in ("id", "name", "geographic_unit")
+    ):
+        return False
+    score = locality.get("score")
+    status = locality.get("status")
+    criteria = locality.get("criteria")
+    limitations = locality.get("limitations")
+    return (
+        status in {"available", "limited", "unavailable"}
+        and (
+            (isinstance(score, (int, float)) and not isinstance(score, bool))
+            if status == "available"
+            else score is None
+        )
+        and isinstance(criteria, list)
+        and all(item in SUITABILITY_CRITERIA for item in criteria)
+        and isinstance(limitations, list)
+        and (status == "available" or bool(limitations))
+    )
+
+
+def load_suitability_rankings() -> tuple[
+    list[dict[str, Any]] | None,
+    dict[str, Any] | None,
+    list[dict[str, Any]],
+]:
+    """Load locality rankings already calculated by the Data Science pipeline."""
+    source, limitations = load_json_source(
+        suitability_data_path(), SUITABILITY_DATA_PATH_ENV, "suitability"
+    )
+    if source is None:
+        return None, None, limitations
+    rankings, metadata = source.get("rankings"), source.get("metadata")
+    if not isinstance(rankings, list) or not isinstance(metadata, dict):
+        return None, None, [limitation(
+            "suitability_dataset_invalid",
+            "The suitability dataset must contain rankings and metadata.",
+            "suitability",
+        )]
+    for ranking in rankings:
+        if not isinstance(ranking, dict):
+            return None, None, [limitation(
+                "suitability_dataset_invalid",
+                "The suitability dataset contains an invalid ranking.",
+                "rankings",
+            )]
+        criteria, localities = ranking.get("criteria"), ranking.get("localities")
+        if (
+            not isinstance(criteria, list)
+            or not criteria
+            or len(criteria) != len(set(criteria))
+            or not all(item in SUITABILITY_CRITERIA for item in criteria)
+            or not isinstance(localities, list)
+            or not all(_valid_suitability_locality(item) for item in localities)
+        ):
+            return None, None, [limitation(
+                "suitability_dataset_invalid",
+                "The suitability dataset contains an invalid ranking.",
+                "rankings",
+            )]
+        available_scores = [
+            item["score"] for item in localities if item["status"] == "available"
+        ]
+        if available_scores != sorted(available_scores, reverse=True):
+            return None, None, [limitation(
+                "suitability_dataset_invalid",
+                "Available suitability results must be precomputed in descending order.",
+                "localities",
+            )]
+    return rankings, metadata, []
 
 
 def profile_status(profile: dict[str, Any]) -> str:

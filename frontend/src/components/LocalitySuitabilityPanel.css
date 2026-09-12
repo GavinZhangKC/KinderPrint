@@ -1,0 +1,62 @@
+.suitability-card {
+  position: relative;
+  z-index: 1;
+  width: 280px;
+  min-height: 238px;
+}
+.suitability-header { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.suitability-header h2 { margin: 0; }
+.suitability-help {
+  padding: 0;
+  border: 0;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: rgba(83, 103, 255, 0.12);
+  color: var(--brand);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: help;
+  user-select: none;
+}
+.suitability-help::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 8px);
+  transform: translateX(-50%);
+  width: 220px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: rgba(17, 27, 50, 0.96);
+  color: #edf3ff;
+  font-size: 11px;
+  line-height: 1.4;
+  font-weight: 500;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s ease;
+  white-space: normal;
+  box-shadow: 0 10px 25px rgba(17, 27, 50, 0.18);
+}
+.suitability-help:hover::after,
+.suitability-help:focus-visible::after {
+  opacity: 1;
+}
+.suitability-options { display: grid; gap: 8px; margin-bottom: 10px; }
+.suitability-option { display: flex; align-items: center; gap: 8px; color: #445a80; font-size: 12px; cursor: pointer; }
+.suitability-option input { accent-color: var(--primary); }
+.suitability-results { margin-top: 8px; border-top: 1px solid rgba(96, 120, 170, 0.18); padding-top: 10px; }
+.suitability-results p { margin: 0; font-size: 12px; color: #526987; }
+.suitability-results ol { list-style: none; padding: 0; margin: 0; display: grid; gap: 8px; }
+.suitability-results li { display: grid; grid-template-columns: 38px 1fr auto; align-items: center; gap: 8px; font-size: 12px; }
+.suitability-results strong { display: block; color: #243b63; }
+.suitability-results small { color: #7084a7; }
+.rank { font-weight: 700; color: var(--brand); }
+.score { background: rgba(79, 111, 255, 0.1); border-radius: 999px; padding: 4px 7px; font-weight: 700; color: var(--brand); }
+.suitability-error { color: #b74343; }
+.suitability-notice { margin-top: 8px !important; color: #6b5b2c !important; }

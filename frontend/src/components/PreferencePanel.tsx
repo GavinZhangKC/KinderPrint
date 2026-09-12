@@ -16,7 +16,17 @@ interface PreferencePanelProps {
 export default function PreferencePanel({ value, onChange }: PreferencePanelProps) {
   return (
     <section className="glass map-control preference-card" aria-labelledby="preference-title">
-      <h2 id="preference-title">Overall Priority</h2>
+      <div className="preference-header">
+        <h2 id="preference-title">Overall Priority</h2>
+        <button
+          type="button"
+          className="preference-help"
+          aria-label="How overall priority is interpreted"
+          data-tooltip="Overall Priority shows which broad area-level factor is currently most important for a neighbourhood: child development, heat exposure, social disadvantage, vegetation, or green space. It is a map layer for comparison, not a single definitive prediction about individual families."
+        >
+          ?
+        </button>
+      </div>
       <div className="preference-options" role="radiogroup" aria-labelledby="preference-title">
         {preferenceOptions.map((option) => (
           <label key={option.id} className="preference-option">

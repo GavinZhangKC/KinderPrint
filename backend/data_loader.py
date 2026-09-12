@@ -16,6 +16,7 @@ OUTCOME_COMPARISON_DATA_PATH_ENV = "KINDERPRINT_OUTCOME_COMPARISON_DATA_PATH"
 ENVIRONMENTAL_DIFFERENCE_DATA_PATH_ENV = "KINDERPRINT_ENVIRONMENTAL_DIFFERENCE_DATA_PATH"
 PATTERN_INSIGHT_DATA_PATH_ENV = "KINDERPRINT_PATTERN_INSIGHT_DATA_PATH"
 PREVENTION_OPPORTUNITY_DATA_PATH_ENV = "KINDERPRINT_PREVENTION_OPPORTUNITY_DATA_PATH"
+SUITABILITY_DATA_PATH_ENV = "KINDERPRINT_SUITABILITY_DATA_PATH"
 
 
 def boundary_data_path() -> Path | None:
@@ -60,6 +61,11 @@ def pattern_insight_data_path() -> Path | None:
 
 def prevention_opportunity_data_path() -> Path | None:
     value = os.getenv(PREVENTION_OPPORTUNITY_DATA_PATH_ENV)
+    return Path(value).expanduser() if value else None
+
+
+def suitability_data_path() -> Path | None:
+    value = os.getenv(SUITABILITY_DATA_PATH_ENV)
     return Path(value).expanduser() if value else None
 
 

@@ -11,6 +11,7 @@ import InsightPage from './components/InsightPage'
 import Legend from './components/Legend'
 import LandingPage from './components/LandingPage'
 import MenuPage from './components/MenuPage'
+import LocalitySuitabilityPanel from './components/LocalitySuitabilityPanel'
 import NeighbourhoodMap from './components/NeighbourhoodMap'
 import PreferencePanel from './components/PreferencePanel'
 import ProfileModal from './components/ProfileModal'
@@ -67,6 +68,64 @@ const [view, setView] =
   const [preference, setPreference] =
     useState<PreferenceId | null>(null)
 
+  const [suitabilityCriteria, setSuitabilityCriteria] =
+    useState<string[]>([])
+  const [suitabilityResults, setSuitabilityResults] =
+    useState<Array<{ id: string; name: string; geographic_unit: string; score: number | null; status: string; criteria: string[] }>>([])
+  const [suitabilityLoading, setSuitabilityLoading] = useState(false)
+  const [suitabilityError, setSuitabilityError] = useState<string | null>(null)
+  const [suitabilityNotice, setSuitabilityNotice] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (suitabilityCriteria.length === 0) {
+      setSuitabilityResults([])
+      setSuitabilityLoading(false)
+      setSuitabilityError(null)
+      setSuitabilityNotice(null)
+      return
+    }
+
+    let isActive = true
+
+    async function loadSuitableLocalities() {
+      try {
+        setSuitabilityLoading(true)
+        setSuitabilityError(null)
+        setSuitabilityNotice(null)
+
+        const response = await api.getSuitableLocalities(suitabilityCriteria, 5)
+        if (!isActive) {
+          return
+        }
+
+        if (response.status !== 'available' && response.status !== 'limited') {
+          setSuitabilityResults([])
+          setSuitabilityError(response.limitations[0]?.message ?? 'Suitable localities are unavailable.')
+          return
+        }
+
+        setSuitabilityResults(response.data.localities)
+        setSuitabilityNotice(response.limitations[0]?.message ?? null)
+      } catch (error) {
+        if (!isActive) {
+          return
+        }
+
+        setSuitabilityResults([])
+        setSuitabilityNotice(null)
+        setSuitabilityError(error instanceof Error ? error.message : 'Could not load suitability rankings.')
+      } finally {
+        if (isActive) {
+          setSuitabilityLoading(false)
+        }
+      }
+    }
+
+    void loadSuitableLocalities()
+    return () => {
+      isActive = false
+    }
+  }, [suitabilityCriteria])
 
   const [
     showDataDrawer,
@@ -355,7 +414,7 @@ return (
 
           <div className="neighbourhood-search-block">
             <label htmlFor="neighbourhood-search">
-              Neighbourhood
+              Search Neighbourhood
             </label>
 
             <form
@@ -491,6 +550,23 @@ setMapSelectedId(null)
             <PreferencePanel
               value={preference}
               onChange={setPreference}
+            />
+
+            <LocalitySuitabilityPanel
+              criteria={suitabilityCriteria}
+              onToggle={(criterion) => {
+                setSuitabilityCriteria((current) => {
+                  if (current.includes(criterion)) {
+                    return current.filter((item) => item !== criterion)
+                  }
+
+                  return [...current, criterion]
+                })
+              }}
+              localities={suitabilityResults}
+              loading={suitabilityLoading}
+              error={suitabilityError}
+              notice={suitabilityNotice}
             />
 
             {preference ? (

@@ -1,6 +1,10 @@
 import json
 
-from data_loader import BOUNDARY_DATA_PATH_ENV, PROFILE_DATA_PATH_ENV
+from data_loader import (
+    BOUNDARY_DATA_PATH_ENV,
+    PROFILE_DATA_PATH_ENV,
+    SUITABILITY_DATA_PATH_ENV,
+)
 
 
 def assert_envelope(response: dict) -> None:
@@ -58,6 +62,76 @@ def test_validation_error_uses_envelope(client) -> None:
     assert_envelope(body)
     assert body["status"] == "unavailable"
     assert body["limitations"][0]["code"] == "invalid_request"
+
+
+def test_locality_suitability_serves_precomputed_ranking(client, monkeypatch, write_json) -> None:
+    suitability_path = write_json("suitability.json", json.dumps({
+        "rankings": [{
+            "criteria": ["child_development", "green_space", "low_disadvantage"],
+            "localities": [
+                {"id": "best", "name": "Best", "geographic_unit": "SA2", "score": 80.0,
+                 "status": "available", "limitations": [],
+                 "criteria": ["child_development", "green_space", "low_disadvantage"]},
+                {"id": "worst", "name": "Worst", "geographic_unit": "SA2", "score": 20.0,
+                 "status": "available", "limitations": [],
+                 "criteria": ["child_development", "green_space", "low_disadvantage"]},
+            ],
+        }],
+        "metadata": {"source": "Approved profile dataset"},
+    }))
+    monkeypatch.setenv(SUITABILITY_DATA_PATH_ENV, str(suitability_path))
+
+    body = client.get("/api/localities/suitable?criteria=child_development,green_space,low_disadvantage&limit=5").json()
+
+    assert_envelope(body)
+    assert body["status"] == "available"
+    assert body["data"]["localities"][0]["id"] == "best"
+    assert body["data"]["localities"][0]["score"] >= body["data"]["localities"][1]["score"]
+    assert body["data"]["criteria"][0] == "child_development"
+    assert body["data"]["withheld_count"] == 0
+
+
+def test_locality_suitability_requires_supported_criteria(client, monkeypatch, write_json) -> None:
+    suitability_path = write_json("suitability.json", json.dumps({
+        "rankings": [],
+        "metadata": {"source": "Approved profile dataset"},
+    }))
+    monkeypatch.setenv(SUITABILITY_DATA_PATH_ENV, str(suitability_path))
+
+    empty = client.get("/api/localities/suitable?criteria=").json()
+    invalid = client.get("/api/localities/suitable?criteria=childcare").json()
+
+    assert empty["status"] == "unavailable"
+    assert empty["limitations"][0]["code"] == "suitability_criteria_required"
+    assert invalid["status"] == "unavailable"
+    assert invalid["limitations"][0]["code"] == "unsupported_suitability_criteria"
+
+
+def test_locality_suitability_withholds_incomplete_results(client, monkeypatch, write_json) -> None:
+    suitability_path = write_json("suitability.json", json.dumps({
+        "rankings": [{
+            "criteria": ["green_space"],
+            "localities": [
+                {"id": "complete", "name": "Complete", "geographic_unit": "SA2",
+                 "score": 75.0, "status": "available", "criteria": ["green_space"],
+                 "limitations": []},
+                {"id": "missing", "name": "Missing", "geographic_unit": "SA2",
+                 "score": None, "status": "limited", "criteria": ["green_space"],
+                 "limitations": [{"code": "suitability_inputs_incomplete",
+                                  "message": "Inputs unavailable.",
+                                  "affected_fields": ["green_space"]}]},
+            ],
+        }],
+        "metadata": {"source": "Approved profile dataset"},
+    }))
+    monkeypatch.setenv(SUITABILITY_DATA_PATH_ENV, str(suitability_path))
+
+    body = client.get("/api/localities/suitable?criteria=green_space&limit=5").json()
+
+    assert body["status"] == "limited"
+    assert [item["id"] for item in body["data"]["localities"]] == ["complete"]
+    assert body["data"]["withheld_count"] == 1
+    assert body["limitations"][0]["code"] == "suitability_results_withheld"
 
 
 def test_unconfigured_profile_is_explicit(client) -> None:

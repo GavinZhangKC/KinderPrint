@@ -668,6 +668,71 @@ When the approved output states that no supported prevention opportunity exists,
 
 Opportunities are investigation leads, not causal findings, intervention recommendations, or resource-allocation decisions. The backend must not decide which conditions are modifiable, recommend an intervention, rank opportunities, fill missing evidence, or create a new analytical conclusion. The final opportunity fields, evidence and pattern references, no-opportunity representation, pair ordering, dataset location, schema, and notice wording are TBC pending the approved Data Science or AI output contract.
 
+## Locality Suitability Service (provisional)
+
+### `GET /api/localities/suitable`
+
+Returns a precomputed locality ranking for one or more supported criteria. The
+backend reads the Data Science output and does not calculate suitability scores.
+
+Provisional query parameters:
+
+- `criteria`: comma-separated values selected from `child_development`,
+  `green_space`, `low_disadvantage`, and `low_heat`
+- `limit`: number of available results to return, from 1 to 20
+
+```json
+{
+  "status": "limited",
+  "data": {
+    "localities": [
+      {
+        "id": "TBC",
+        "name": "TBC",
+        "geographic_unit": "TBC",
+        "score": 75.0,
+        "status": "available",
+        "criteria": ["green_space"],
+        "limitations": []
+      }
+    ],
+    "criteria": ["green_space"],
+    "limit": 5,
+    "withheld_count": 12
+  },
+  "metadata": {
+    "source": "TBC",
+    "reference_year": "TBC",
+    "geographic_unit": "TBC",
+    "data_quality": "Provisional Iteration 2 locality-suitability prototype.",
+    "result_count": 5
+  },
+  "limitations": [
+    {
+      "code": "suitability_results_withheld",
+      "message": "TBC",
+      "affected_fields": ["localities"]
+    }
+  ],
+  "notices": [
+    {
+      "code": "area_level_information",
+      "message": "TBC"
+    }
+  ]
+}
+```
+
+A locality with an unavailable selected input is retained in the Data Science
+artefact with `score: null` and a non-available status, but it is withheld from
+the returned ranking. Missing values must never be represented as zero. An
+invalid or empty criteria selection returns `unavailable` with a limitation.
+
+The current scoring formula, weights, indicator transformations, ranking size,
+criteria vocabulary, and approval status remain provisional/TBC. Results are
+area-level investigation aids, not assessments of individual children or proof
+that one neighbourhood is better than another.
+
 ## Error handling
 
 Errors use the same envelope shape:
@@ -735,6 +800,8 @@ It confirms that the FastAPI service is running and makes no statement about bus
 - Final approved disclaimer and notice wording where not already confirmed
 - Final bounding-box query format
 - Final map-indicator query parameters and indicator selection
+- Final locality-suitability criteria, formula, weights, transformations, and ranking size
+- Final locality-suitability Data Science approval and output schema
 - Final HTTP status and machine-readable error-code mappings
 
 ## Change policy and version roadmap
