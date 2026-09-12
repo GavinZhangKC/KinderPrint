@@ -13,7 +13,7 @@ function Metric({ profile, id, unit, note }: { profile: NeighbourhoodProfile; id
 }
 
 export default function ChapterEvidence({ chapter, state, retry }: { chapter: number; state: EvidenceState; retry: () => void }) {
-  if (chapter === 4) return <p className="insight-footnote">The sunlight is a symbol of possibility. It does not mean these challenges have been solved.</p>
+  if (chapter === 4) return null
   if (state.status !== 'ready') return <div className="insight-data-state" role="status">
     <span className={state.status === 'loading' ? 'insight-loading-dot' : ''} />
     <p>{state.message}</p>
@@ -21,7 +21,6 @@ export default function ChapterEvidence({ chapter, state, retry }: { chapter: nu
   </div>
   const profile = state.profile.data
   const area = profile.neighbourhood
-  const dv = validMetric(profile, 'aedc_vulnerable_one_or_more', 'percent')
   const priority = state.priority
   const prioritySource = priority?.metadata.source
   const priorityYear = priority?.metadata.reference_year
@@ -30,12 +29,9 @@ export default function ChapterEvidence({ chapter, state, retry }: { chapter: nu
     <p className="insight-example">A closer look <span>{area.name || area.id}</span></p>
     {chapter === 0 && <>
       <Metric profile={profile} id="census_children_0_4_pct" unit="percent" note="Share of the area's usual resident population aged 0–4." />
-      <p className="insight-footnote">Example selection: the first neighbourhood ID with available AEDC vulnerability data, in ascending order. This is an illustration, not a ranking or a representative sample.</p>
     </>}
     {chapter === 1 && <>
       <Metric profile={profile} id="aedc_vulnerable_one_or_more" unit="percent" />
-      <p>{dv ? `In the published ${dv.reference_year} area-level AEDC data for ${area.name || area.id}, ${formatMetric(dv)} were developmentally vulnerable on at least one domain.` : 'A publishable vulnerability percentage is not available for this profile.'} The measure describes a group, not the prospects of an individual child.</p>
-      <p className="insight-footnote">AEDC looks across physical, social, emotional, language and communication development. Area estimates carry uncertainty.</p>
     </>}
     {chapter === 2 && <>
       <div className="insight-metrics">
@@ -43,16 +39,13 @@ export default function ChapterEvidence({ chapter, state, retry }: { chapter: nu
         <Metric profile={profile} id="env_urban_heat" unit="degrees Celsius" note="Heat island effect; not air temperature or a weather forecast." />
         <Metric profile={profile} id="env_vegetation_cover" unit="percent" />
       </div>
-      <p className="insight-footnote">These measures can be considered together as context. Their reference years differ; they do not describe simultaneous exposure, establish a trend, or show that one condition caused another.</p>
     </>}
     {chapter === 3 && <>
       {validPriority ? <>
         <div className="insight-priority"><span>Priority for Investigation</span><strong>{priority!.data.priority_band}</strong></div>
         <p>This example carries the model's <strong>{priority!.data.priority_band?.toLowerCase()}</strong> investigation band. Review the local evidence and speak with communities before deciding where closer investigation or preventive work is warranted.</p>
         <cite>{String(prioritySource)} · {String(priorityYear)} · {area.geographic_unit}</cite>
-        <p className="insight-footnote">The existing model considers AEDC vulnerability relative to socioeconomic position, weighted by children assessed. This label does not demonstrate an environmental cause or an intervention's effectiveness.</p>
       </> : <p className="insight-data-state">{state.priorityError ?? 'The priority label lacks compatible source metadata and cannot be displayed.'}</p>}
-      <p className="insight-footnote">The system does not make the final investigation or resource-allocation decision; people do.</p>
     </>}
     {(state.profile.limitations.length > 0 || (chapter === 3 && priority?.limitations.length)) ? <details className="insight-limitations">
       <summary>Data limitations</summary>

@@ -61,7 +61,6 @@ export default function InsightPage({ onLogoClick, onBackToMenu, onExploreMap }:
             <Heading id={`insight-heading-${index + 1}`} tabIndex={-1}>{item.title}</Heading>
             <p className="insight-intro">{chapterCopy[index]}</p>
             <ChapterEvidence chapter={index} state={state} retry={retry} />
-            {index === 0 && <button type="button" className="insight-continue" onClick={() => goToChapter(1)}>Scroll to follow the light <span aria-hidden="true">↓</span></button>}
             {index === 4 && <div className="insight-actions">
               <button type="button" className="button primary" onClick={onExploreMap}>Explore the map <span aria-hidden="true">↗</span></button>
               <button type="button" className="button secondary" onClick={() => goToChapter(0)}>Replay the journey <span aria-hidden="true">↺</span></button>
@@ -76,6 +75,9 @@ export default function InsightPage({ onLogoClick, onBackToMenu, onExploreMap }:
         <span className="insight-nav-tooltip" aria-hidden="true">{String(index + 1).padStart(2, '0')} · {item.title}</span>
       </button>)}
     </nav>
-    <div className="insight-scene-note">{sceneStatus === 'loading' ? 'Preparing the landscape…' : sceneStatus === 'static' ? reducedMotion ? 'Reduced motion · still landscape' : 'Still landscape · 3D unavailable' : 'Scroll at your own pace'}<span>Area-level evidence. Not individual outcomes.</span></div>
+    <div className="insight-scroll-hint" aria-hidden="true">
+      <span>Scroll down to explore the journey</span>
+      <span className="insight-scroll-arrow" aria-hidden="true">↓</span>
+    </div>
   </div>
 }

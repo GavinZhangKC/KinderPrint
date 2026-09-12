@@ -11,6 +11,11 @@ export const clamp = (value: number, min = 0, max = 1) => Math.min(max, Math.max
 export const smoothstep = (value: number) => { const t = clamp(value); return t * t * (3 - 2 * t) }
 export const stationProgress = chapters.map((_, i) => i / (chapters.length - 1))
 
+/** Keep the prompt readable at the start, then fade it by the midpoint from chapter 01 to 02. */
+export function scrollHintOpacity(progress: number) {
+  return 1 - smoothstep((progress - .04) / .085)
+}
+
 export function weatherAt(progress: number) {
   const storm = smoothstep(progress / .45) * (1 - smoothstep((progress - .62) / .3))
   return {
@@ -23,14 +28,12 @@ export function weatherAt(progress: number) {
 
 export interface JourneyState { progress: number; chapter: number; reducedMotion: boolean }
 
-/** Shared scroll intervals: arrival, a short reading pause, then travel by arc length. */
+/** Map every scroll interval continuously onto the landscape journey. */
 export function journeyAtScroll(scroll: number, anchors: number[], previous: number) {
   let chapter = previous
   while (chapter < 4 && scroll >= anchors[chapter + 1]) chapter++
   while (chapter > 0 && scroll < anchors[chapter] - 6) chapter--
   if (chapter === 4) return { chapter, progress: 1 }
   const local = clamp((scroll - anchors[chapter]) / Math.max(1, anchors[chapter + 1] - anchors[chapter]))
-  // Pausing at each station also gives navigation clicks a comfortable reading position.
-  const travel = clamp((local - .18) / .82)
-  return { chapter, progress: (chapter + travel) / 4 }
+  return { chapter, progress: (chapter + local) / 4 }
 }

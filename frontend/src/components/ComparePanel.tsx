@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { api } from '../services/api'
 import type { NeighbourhoodSearchResult } from '../services/api'
 import type { Neighbourhood } from '../types/neighbourhood'
@@ -20,27 +20,37 @@ export default function ComparePanel({ source, comparison, onSelectResult, mapSe
   const [query, setQuery] = useState('')
   const [searchResults, setSearchResults] = useState<NeighbourhoodSearchResult[]>([])
   const [searchLoading, setSearchLoading] = useState(false)
+  const [searchError, setSearchError] = useState<string | null>(null)
   const [recommended, setRecommended] = useState<NeighbourhoodSearchResult | null>(null)
   const [matchStrength, setMatchStrength] = useState<string | null>(null)
+  const searchRequestNumberRef = useRef(0)
 
   useEffect(() => {
+    const requestNumber = ++searchRequestNumberRef.current
     const normalized = query.trim()
     if (!normalized || comparison) {
       setSearchResults([])
+      setSearchLoading(false)
+      setSearchError(null)
       return
     }
     const timer = window.setTimeout(async () => {
+      if (requestNumber !== searchRequestNumberRef.current) return
       try {
         setSearchLoading(true)
+        setSearchError(null)
         const response = await api.searchNeighbourhoods(normalized)
+        if (requestNumber !== searchRequestNumberRef.current) return
         setSearchResults(response.status === 'available' || response.status === 'limited'
           ? response.data.filter((item) => item.id !== source.id).slice(0, 4)
           : [])
       } catch (error) {
+        if (requestNumber !== searchRequestNumberRef.current) return
         console.error('Failed to search comparison neighbourhoods:', error)
         setSearchResults([])
+        setSearchError('Could not search neighbourhoods. Please try again.')
       } finally {
-        setSearchLoading(false)
+        if (requestNumber === searchRequestNumberRef.current) setSearchLoading(false)
       }
     }, 250)
     return () => window.clearTimeout(timer)
@@ -72,8 +82,11 @@ export default function ComparePanel({ source, comparison, onSelectResult, mapSe
       return
     }
 
+    searchRequestNumberRef.current += 1
     setQuery('')
     setSearchResults([])
+    setSearchLoading(false)
+    setSearchError(null)
     await onSelectResult(result)
   }
 
@@ -99,15 +112,18 @@ export default function ComparePanel({ source, comparison, onSelectResult, mapSe
             value={comparison ? comparison.name : query}
             placeholder="Search a neighbourhood"
             onChange={(event) => {
+              searchRequestNumberRef.current += 1
               onClearComparison()
               setQuery(event.target.value)
+              setSearchLoading(false)
+              setSearchError(null)
             }}
           />
           <span className="search-glyph" aria-hidden="true">⌕</span>
         </div>
         {query && !comparison && (
           <div className="search-popover glass-subtle">
-            {searchLoading ? <span>Searching...</span> : searchResults.length ? searchResults.map((item) => (
+            {searchLoading ? <span>Searching...</span> : searchError ? <span className="search-error" role="alert">{searchError}</span> : searchResults.length ? searchResults.map((item) => (
               <button type="button" key={item.id} onClick={() => { void choose(item) }}>{item.name}</button>
             )) : <span>No neighbourhood found</span>}
           </div>

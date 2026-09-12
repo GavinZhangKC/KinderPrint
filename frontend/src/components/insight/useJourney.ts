@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { journeyAtScroll, weatherAt, type JourneyState } from './journey'
+import { journeyAtScroll, scrollHintOpacity, weatherAt, type JourneyState } from './journey'
 
 export function useJourney() {
   const rootRef = useRef<HTMLDivElement>(null)
@@ -27,6 +27,9 @@ export function useJourney() {
       root.style.setProperty('--storm', String(weather.storm))
       root.style.setProperty('--sun', String(weather.sun))
       root.style.setProperty('--rain', String(weather.rain))
+      const hintOpacity = scrollHintOpacity(mapped.progress)
+      root.style.setProperty('--scroll-hint-opacity', String(hintOpacity))
+      root.dataset.scrollHint = hintOpacity > 0 ? 'visible' : 'hidden'
       root.dataset.progress = mapped.progress.toFixed(5)
       root.dataset.chapter = String(mapped.chapter + 1)
       sections.forEach((section, index) => { section.dataset.active = String(index === mapped.chapter) })

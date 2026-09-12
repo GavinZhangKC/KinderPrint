@@ -21,6 +21,7 @@
 .search-popover { border-radius: 14px; padding: 5px; margin-top: 5px; display: grid; }
 .search-popover button { border: 0; background: transparent; padding: 9px 10px; border-radius: 10px; text-align: left; cursor: pointer; }
 .search-popover button:hover { background: rgba(109,120,232,.09); }
+.search-popover .search-error { padding: 9px 10px; color: #9b4056; font-size: 11px; line-height: 1.45; }
 .similar-section { margin-top: 18px; }
 .similar-section h2 { margin: 0; font-size: 16px; color: var(--brand); }
 .similar-section > p { margin: 3px 0 10px; font-size: 10px; color: var(--muted); }

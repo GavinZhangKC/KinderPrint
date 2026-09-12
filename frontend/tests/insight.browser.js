@@ -26,8 +26,13 @@
       assert(sections[index].dataset.active === 'true', 'Reading chapter shares the same state')
     }
   }
-  const { journeyAtScroll, weatherAt } = await import('/src/components/insight/journey.ts')
+  const { journeyAtScroll, scrollHintOpacity, weatherAt } = await import('/src/components/insight/journey.ts')
   assert(journeyAtScroll(1998, [0, 1000, 2000, 3000, 4000], 2).chapter === 2 && journeyAtScroll(1990, [0, 1000, 2000, 3000, 4000], 2).chapter === 1, 'One scroll map handles boundary hysteresis and reversal')
+  const beforeSecondChapter = journeyAtScroll(999, [0, 1000, 2000, 3000, 4000], 0).progress
+  const atSecondChapter = journeyAtScroll(1000, [0, 1000, 2000, 3000, 4000], 0).progress
+  const afterSecondChapter = journeyAtScroll(1001, [0, 1000, 2000, 3000, 4000], 1).progress
+  assert(beforeSecondChapter < atSecondChapter && atSecondChapter < afterSecondChapter, 'Journey progress stays continuous through the first chapter transition')
+  assert(scrollHintOpacity(0) === 1 && scrollHintOpacity(.125) === 0 && scrollHintOpacity(.25) === 0, 'Scroll hint is limited to the first half of chapter 01 to 02')
   assert(root.querySelectorAll('.insight-progress button').length === 5 && !root.querySelector('.insight-progress svg'), 'Vertical five-point navigation replaces the horizontal card')
   assert(weatherAt(.5).rain > .9 && weatherAt(1).rain === 0 && weatherAt(1).sun === 1, 'Weather follows journey progress')
   const data = await import('/src/components/insight/useInsightData.ts')

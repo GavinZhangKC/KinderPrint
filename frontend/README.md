@@ -19,6 +19,14 @@ The Vite dev and preview servers listen on `0.0.0.0` and proxy `/api` to
 `http://localhost:8000`. Other devices on the same LAN can open
 `http://<this-computer-LAN-IP>:5173` without a separate API configuration.
 
-## Data note
+## API integration
 
-The current UI uses local prototype values in `src/data/mockData.ts` so every Figma interaction can be demonstrated even when approved backend datasets are not configured. `src/services/api.ts` mirrors the existing backend/API contract and is ready for integration. Replace prototype values with approved backend responses before production/submission.
+The frontend uses the live API client in `src/services/api.ts` for neighbourhood
+search, boundaries, indicators, profiles, priorities, explanations, matching, and
+comparisons. It does not use local mock data for these application flows.
+
+For local development, start the FastAPI backend on `http://localhost:8000`
+before using the map or Insight pages. The backend must be configured with the
+approved dataset paths documented in the repository root README; when a source
+is missing or invalid, the API intentionally returns an unavailable or limited
+state instead of substituting prototype values.
