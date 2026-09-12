@@ -70,7 +70,7 @@ const [view, setView] =
     useState<PreferenceId | null>(null)
 
   const [suitabilityCriteria, setSuitabilityCriteria] =
-    useState<string[]>(['child_development', 'green_space', 'low_disadvantage'])
+    useState<string[]>([])
   const [suitabilityResults, setSuitabilityResults] =
     useState<Array<{ id: string; name: string; geographic_unit: string; score: number; criteria: string[] }>>([])
   const [suitabilityLoading, setSuitabilityLoading] = useState(false)
@@ -352,7 +352,7 @@ return (
 
           <div className="neighbourhood-search-block">
             <label htmlFor="neighbourhood-search">
-              Neighbourhood
+              Search Neighbourhood
             </label>
 
             <form

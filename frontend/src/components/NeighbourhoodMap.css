@@ -263,10 +263,10 @@
 
   pointer-events: none;
 }
-.neighbourhood-search-block { position: absolute; left: 42px; top: 28px; z-index: 15; width: 260px; }
+.neighbourhood-search-block { position: absolute; left: 42px; top: 28px; z-index: 15; width: 340px; }
 .neighbourhood-search-block > label { display: block; margin: 0 0 6px 6px; font-size: 12px; font-weight: 700; color: #6d83a8; }
-.search-input-shell { height: 54px; border-radius: 16px; padding: 0 15px; display: flex; align-items: center; gap: 10px; background: rgba(255,255,255,.58); }
-.search-input-shell input { border: 0; outline: 0; background: transparent; flex: 1; color: var(--text); min-width: 0; }
+.search-input-shell { height: 54px; border-radius: 16px; padding: 0 15px; display: flex; align-items: center; gap: 10px; background: rgba(255,255,255,.58); width: 100%; }
+.search-input-shell input { border: 0; outline: 0; background: transparent; flex: 1; color: var(--text); min-width: 0; font-size: 15px; }
 .search-input-shell input::placeholder { color: #8797b2; }
 .search-submit-button span { font-size: 24px; color: inherit; line-height: 1; }
 .search-submit-button {
