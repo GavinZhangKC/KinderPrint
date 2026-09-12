@@ -7,12 +7,12 @@ type TreePlacement = { x: number; z: number; scale: number; rotation: number }
 /** Scene units only. Edit these regions rather than the tree meshes. */
 export const vegetationSettings = {
   seed: 73129,
-  maxTrees: 150,
+  maxTrees: 190,
   maxSlope: .8,
   thinningHeight: 36,
   maxHeight: 69,
   minSpacing: 2.8,
-  routeClearance: 5.5,
+  routeClearance: 7,
   stationClearance: 10,
   scale: [.65, 1.12] as const,
   groves: [
@@ -24,10 +24,14 @@ export const vegetationSettings = {
     { x: -8, z: 279, rx: 30, rz: 28, count: 19 },
     { x: 5, z: 362, rx: 32, rz: 35, count: 20 },
     { x: 92, z: 416, rx: 24, rz: 32, count: 14 },
+    { x: 44, z: 485, rx: 27, rz: 34, count: 15 },
+    { x: -4, z: 570, rx: 32, rz: 36, count: 17 },
+    { x: 92, z: 655, rx: 34, rz: 38, count: 22 },
   ],
   exclusions: [
     { x: -9, z: 207, rx: 28, rz: 25 }, // Open saddle.
     { x: 43, z: 406, rx: 29, rz: 24 }, // Open arrival basin.
+    { x: 38, z: 700, rx: 24, rz: 20 }, // Keep the final station open.
   ] as Region[],
   // Add exact positions here; they still respect terrain and sight-line safety.
   overrides: [] as TreePlacement[],

@@ -63,7 +63,6 @@ function PreviewMenuLink({
           ref={videoRef}
           className="menu-link-video"
           src={videoSrc}
-          autoPlay
           muted
           loop
           playsInline

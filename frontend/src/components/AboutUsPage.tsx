@@ -1,16 +1,23 @@
 import logo from '../assets/LogoMark.png'
+import BrandHeader from './BrandHeader'
 import '../styles/about-us.css'
 
 interface AboutUsPageProps {
-  onBack: () => void
+  onHome: () => void
+  onInsight: () => void
+  onMap: () => void
 }
 
-export default function AboutUsPage({ onBack }: AboutUsPageProps) {
+export default function AboutUsPage({ onHome, onInsight, onMap }: AboutUsPageProps) {
   return (
     <section className="about-us-page" id="about-us" aria-labelledby="about-us-title">
-      <button className="back-to-menu-button" type="button" onClick={onBack}>
-        ← Back to Menu
-      </button>
+      <BrandHeader
+        activePage="about"
+        onHome={onHome}
+        onInsight={onInsight}
+        onMap={onMap}
+        onAboutUs={() => document.getElementById('about-us')?.scrollIntoView({ behavior: 'smooth' })}
+      />
       <article className="glass about-us-panel">
         <div className="about-us-logo" aria-hidden="true">
           <img src={logo} alt="" />

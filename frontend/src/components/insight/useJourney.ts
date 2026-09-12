@@ -1,10 +1,10 @@
 import { useEffect, useRef, useState } from 'react'
-import { journeyAtScroll, weatherAt, type JourneyState } from './journey'
+import { chapters, journeyAtScroll, scrollHintOpacity, weatherAt, type JourneyState } from './journey'
 
 export function useJourney() {
   const rootRef = useRef<HTMLDivElement>(null)
   const journey = useRef<JourneyState>({ progress: 0, chapter: 0, reducedMotion: false })
-  const anchorsRef = useRef([0, 1, 2, 3, 4])
+  const anchorsRef = useRef(chapters.map((_, index) => index))
   const [chapter, setChapter] = useState(0)
   const [reducedMotion, setReducedMotion] = useState(() => window.matchMedia('(prefers-reduced-motion: reduce)').matches)
 
@@ -27,6 +27,9 @@ export function useJourney() {
       root.style.setProperty('--storm', String(weather.storm))
       root.style.setProperty('--sun', String(weather.sun))
       root.style.setProperty('--rain', String(weather.rain))
+      const hintOpacity = scrollHintOpacity(mapped.progress)
+      root.style.setProperty('--scroll-hint-opacity', String(hintOpacity))
+      root.dataset.scrollHint = hintOpacity > 0 ? 'visible' : 'hidden'
       root.dataset.progress = mapped.progress.toFixed(5)
       root.dataset.chapter = String(mapped.chapter + 1)
       sections.forEach((section, index) => { section.dataset.active = String(index === mapped.chapter) })
@@ -68,8 +71,9 @@ export function useJourney() {
     if (!section) return
     const anchors = anchorsRef.current
     const readingLine = innerHeight * (innerWidth <= 760 ? .38 : .46)
-    const readingOffset = index === 0 ? 0 : Math.min(Math.max(0, readingLine - (innerWidth <= 760 ? 144 : 120)), (anchors[Math.min(4, index + 1)] - anchors[index] || innerHeight) * .17)
-    const top = index === 4 ? section.offsetTop : anchors[index] + readingOffset
+    const lastChapter = chapters.length - 1
+    const readingOffset = index === 0 ? 0 : Math.min(Math.max(0, readingLine - (innerWidth <= 760 ? 144 : 120)), (anchors[Math.min(lastChapter, index + 1)] - anchors[index] || innerHeight) * .17)
+    const top = index === lastChapter ? section.offsetTop : anchors[index] + readingOffset
     window.scrollTo({ top, behavior: reducedMotion ? 'instant' : 'smooth' })
     section.querySelector<HTMLElement>('h1, h2')?.focus({ preventScroll: true })
   }

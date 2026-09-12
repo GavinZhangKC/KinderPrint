@@ -426,3 +426,17 @@
 
   font-size: 11px;
 }
+
+.search-state--error {
+  color: #9b4056;
+}
+
+.map-request-error {
+  margin-top: 8px;
+  padding: 10px 13px;
+  border-radius: 14px;
+  color: #8b3950;
+  background: rgba(255, 245, 248, .82);
+  font-size: 11px;
+  line-height: 1.45;
+}

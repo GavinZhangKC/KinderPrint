@@ -37,7 +37,7 @@ export function useInsightData() {
         const collection = await api.getNeighbourhoodIndicators(attempt > 0)
         if (controller.signal.aborted) throw new Error('Request timed out')
         if (!usable(collection.status)) {
-          if (live) setState({ status: 'empty', message: 'Neighbourhood evidence is currently unavailable. You can still read all five chapters.' })
+          if (live) setState({ status: 'empty', message: 'Neighbourhood evidence is currently unavailable. You can still read all seven chapters.' })
           return
         }
         // Stable and non-ranking: first supported ID, with an available AEDC value.

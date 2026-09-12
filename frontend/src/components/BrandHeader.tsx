@@ -1,21 +1,25 @@
 import logo from '../assets/LogoMark.png'
 
 interface BrandHeaderProps {
-  onLogoClick: () => void
-  onExplore: () => void
-  onBackToMenu: () => void
+  activePage: 'home' | 'insight' | 'map' | 'about'
+  onHome: () => void
+  onInsight: () => void
+  onMap: () => void
+  onAboutUs: () => void
 }
 
-export default function BrandHeader({ onLogoClick, onExplore, onBackToMenu }: BrandHeaderProps) {
+export default function BrandHeader({ activePage, onHome, onInsight, onMap, onAboutUs }: BrandHeaderProps) {
   return (
     <header className="glass nav-shell">
-      <button className="brand-button" type="button" onClick={onLogoClick} aria-label="Go to KinderPrint landing page">
+      <button className="brand-button" type="button" onClick={onHome} aria-label="Go to KinderPrint home">
         <img src={logo} alt="" className="brand-logo" />
         <span>KinderPrint</span>
       </button>
       <nav className="nav-links" aria-label="Primary navigation">
-        <button className="active" type="button" onClick={onExplore}>Explore</button>
-        <button type="button" onClick={onBackToMenu}>Back to Menu</button>
+        <button className={activePage === 'home' ? 'active' : undefined} aria-current={activePage === 'home' ? 'page' : undefined} type="button" onClick={onHome}>Home</button>
+        <button className={activePage === 'insight' ? 'active' : undefined} aria-current={activePage === 'insight' ? 'page' : undefined} type="button" onClick={onInsight}>Insight Journey</button>
+        <button className={activePage === 'map' ? 'active' : undefined} aria-current={activePage === 'map' ? 'page' : undefined} type="button" onClick={onMap}>Map</button>
+        <button className={activePage === 'about' ? 'active' : undefined} aria-current={activePage === 'about' ? 'page' : undefined} type="button" onClick={onAboutUs}>About Us</button>
       </nav>
     </header>
   )

@@ -64,6 +64,9 @@ const [view, setView] =
     useState<string[]>([])
   const [isMapSelectionMode, setIsMapSelectionMode] = useState(false)
   const compareRequestNumberRef = useRef(0)
+  const profileRequestNumberRef = useRef(0)
+  const [profileError, setProfileError] = useState<string | null>(null)
+  const neighbourhoodSearchRef = useRef<HTMLDivElement>(null)
 
   const [preference, setPreference] =
     useState<PreferenceId | null>(null)
@@ -149,6 +152,7 @@ const [
     searchResults,
     setSearchResults,
     searchLoading,
+    searchError,
     handleSearchResultSelect,
     submitSearch,
   } = useNeighbourhoodSearch({
@@ -156,6 +160,17 @@ const [
       await handleMapSelect(item.id, item.name, true)
     },
   })
+  useEffect(() => {
+    if (!showSearchResults) return
+    const closeSearchOnOutsideClick = (event: PointerEvent) => {
+      const target = event.target
+      if (target instanceof Node && !neighbourhoodSearchRef.current?.contains(target)) {
+        setShowSearchResults(false)
+      }
+    }
+    document.addEventListener('pointerdown', closeSearchOnOutsideClick)
+    return () => document.removeEventListener('pointerdown', closeSearchOnOutsideClick)
+  }, [showSearchResults])
 function resetComparisonState() {
     compareRequestNumberRef.current += 1
     setIsMapSelectionMode(false)
@@ -166,12 +181,14 @@ function resetComparisonState() {
     setComparisonLimitations([])
   }
 function handleCloseCompare(targetView: 'profile' | 'map' = 'profile') {
+    profileRequestNumberRef.current += 1
     resetComparisonState()
     setMapSelectedId(selected?.id ?? null)
     setMapFocusId(null)
     setView(targetView === 'profile' && selected ? 'profile' : 'map')
   }
 function resetExplore() {
+    profileRequestNumberRef.current += 1
     setView('map')
 
     setSelected(null)
@@ -183,12 +200,9 @@ function resetExplore() {
     setSearch('')
     setSearchResults([])
     setShowSearchResults(false)
+    setProfileError(null)
 
     setShowDataDrawer(false)
-  }
-function backToMenu() {
-    resetExplore()
-    setAppPage('menu')
   }
 function backToLanding() {
     resetExplore()
@@ -197,6 +211,17 @@ function backToLanding() {
 function openMapPage() {
     resetExplore()
     setAppPage('map')
+  }
+function openInsightPage() {
+    resetExplore()
+    setAppPage('insight')
+  }
+function openAboutUsSection() {
+    resetExplore()
+    setAppPage('landing')
+    window.setTimeout(() => {
+      document.getElementById('home-about')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }, 0)
   }
 function choosePrimary(
     neighbourhood: Neighbourhood,
@@ -211,15 +236,17 @@ function choosePrimary(
 
     setView('profile')
   }
-async function handleMapSelect(
+  async function handleMapSelect(
     id: string,
     name?: string,
     focusMap = true,
   ) {
+    const requestNumber = ++profileRequestNumberRef.current
     setMapSelectedId(id)
     setMapFocusId(focusMap ? id : null)
     setSearch(name ?? id)
     setShowSearchResults(false)
+    setProfileError(null)
 
     try {
       const [profileResponse, priorityResponse, explanationResponse] = await Promise.all([
@@ -227,6 +254,7 @@ async function handleMapSelect(
         api.getPriority(id),
         api.getExplanation(id),
       ])
+      if (requestNumber !== profileRequestNumberRef.current) return
 
       if (
         profileResponse.status !== 'available' &&
@@ -268,10 +296,12 @@ async function handleMapSelect(
 
       choosePrimary(realNeighbourhood)
     } catch (error) {
+      if (requestNumber !== profileRequestNumberRef.current) return
       console.error('Failed to load location profile:', error)
       setSelected(null)
       setComparison(null)
       setView('map')
+      setProfileError(error instanceof Error ? error.message : 'Could not load this neighbourhood. Please try again.')
     }
   }
 function startComparison() {
@@ -339,32 +369,40 @@ function startComparison() {
       }
     }
   }
-if (appPage === 'landing' || appPage === 'menu') {
+if (appPage === 'landing') {
     return (
       <div className="entry-pages">
         <WaterRippleBackground />
-        {appPage === 'landing' ? (
-          <LandingPage onExplore={() => setAppPage('menu')} />
-        ) : (
-          <MenuPage
-            onInsight={() => setAppPage('insight')}
-            onMap={() => setAppPage('map')}
-            onAboutUs={() => setAppPage('about')}
-          />
-        )}
+        <LandingPage
+          onInsight={openInsightPage}
+          onMap={openMapPage}
+        />
+      </div>
+    )
+  }
+
+  if (appPage === 'menu') {
+    return (
+      <div className="entry-pages">
+        <WaterRippleBackground />
+        <MenuPage
+          onInsight={openInsightPage}
+          onMap={openMapPage}
+          onAboutUs={() => setAppPage('about')}
+        />
       </div>
     )
   }
 
   if (appPage === 'about') {
-    return <AboutUsPage onBack={backToMenu} />
+    return <AboutUsPage onHome={backToLanding} onInsight={openInsightPage} onMap={openMapPage} />
   }
 
   if (appPage === 'insight') {
     return (
       <InsightPage
         onLogoClick={backToLanding}
-        onBackToMenu={backToMenu}
+        onAboutUs={openAboutUsSection}
         onExploreMap={openMapPage}
       />
     )
@@ -382,9 +420,11 @@ if (
         <div className="ambient ambient-two" />
 
         <BrandHeader
-          onLogoClick={backToLanding}
-          onExplore={resetExplore}
-          onBackToMenu={backToMenu}
+          activePage="map"
+          onHome={backToLanding}
+          onInsight={openInsightPage}
+          onMap={resetExplore}
+          onAboutUs={openAboutUsSection}
         />
 
         <DetailedComparison
@@ -404,15 +444,17 @@ return (
       <div className="ambient ambient-two" />
 
       <BrandHeader
-          onLogoClick={backToLanding}
-          onExplore={resetExplore}
-          onBackToMenu={backToMenu}
+          activePage="map"
+          onHome={backToLanding}
+          onInsight={openInsightPage}
+          onMap={resetExplore}
+          onAboutUs={openAboutUsSection}
         />
 
       <main className="map-shell">
         <section className="glass map-surface">
 
-          <div className="neighbourhood-search-block">
+          <div className="neighbourhood-search-block" ref={neighbourhoodSearchRef}>
             <label htmlFor="neighbourhood-search">
               Search Neighbourhood
             </label>
@@ -440,6 +482,8 @@ return (
                     event.target.value
 
                   setSearch(value)
+                  profileRequestNumberRef.current += 1
+                  setProfileError(null)
 
                   setShowSearchResults(true)
 setMapSelectedId(null)
@@ -475,7 +519,14 @@ setMapSelectedId(null)
                     </div>
                   )}
 
+                  {!searchLoading && searchError && (
+                    <div className="search-state search-state--error" role="alert">
+                      {searchError}
+                    </div>
+                  )}
+
                   {!searchLoading &&
+                    !searchError &&
                     searchResults.length > 0 &&
                     searchResults.map(
                       (item) => (
@@ -500,6 +551,7 @@ setMapSelectedId(null)
                     )}
 
                   {!searchLoading &&
+                    !searchError &&
                     searchResults.length ===
                       0 && (
                       <div className="search-state">
@@ -509,6 +561,12 @@ setMapSelectedId(null)
 
                 </div>
               )}
+
+            {profileError && (
+              <div className="glass map-request-error" role="alert">
+                {profileError}
+              </div>
+            )}
 
           </div>
 
