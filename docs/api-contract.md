@@ -440,6 +440,80 @@ The service must preserve source-provided missing, suppressed, unavailable, limi
 
 The backend must not calculate outcome differences, statistical significance, confidence, rankings, or similarity. The final child-development outcome list, units, difference direction, significance or uncertainty representation, dataset location, schema, and approved notice wording are TBC pending the Data Science output contract.
 
+## BE-8 — Environmental Difference Service (supports E6)
+
+### `GET /api/environmental-difference` (provisional)
+
+Returns approved environmental-difference results for two selected neighbourhoods. Provisional query parameters are `neighbourhood_id_a` and `neighbourhood_id_b`.
+
+```json
+{
+  "status": "available | limited | missing | incompatible | unavailable",
+  "data": {
+    "neighbourhood_a": {
+      "id": "TBC",
+      "name": "TBC",
+      "geographic_unit": "TBC"
+    },
+    "neighbourhood_b": {
+      "id": "TBC",
+      "name": "TBC",
+      "geographic_unit": "TBC"
+    },
+    "environmental_indicators": [
+      {
+        "id": "TBC",
+        "name": "TBC",
+        "unit": "TBC",
+        "neighbourhood_a": {
+          "value": null,
+          "status": "available | missing | incompatible | unavailable | limited"
+        },
+        "neighbourhood_b": {
+          "value": null,
+          "status": "available | missing | incompatible | unavailable | limited"
+        },
+        "approved_difference": {
+          "value": null,
+          "status": "available | missing | incompatible | unavailable | limited"
+        },
+        "source": "TBC",
+        "reference_year": "TBC",
+        "geographic_unit": "TBC"
+      }
+    ],
+    "approved_standout_indicator_ids": []
+  },
+  "metadata": {
+    "source": "TBC",
+    "reference_year": "TBC",
+    "geographic_unit": "TBC",
+    "data_quality": "TBC",
+    "coverage": "TBC",
+    "output_schema_version": "TBC"
+  },
+  "limitations": [],
+  "notices": [
+    {
+      "code": "area_level_comparison",
+      "message": "TBC"
+    },
+    {
+      "code": "association_not_causation",
+      "message": "TBC"
+    }
+  ]
+}
+```
+
+Both identifiers must be validated as supported neighbourhoods using the confirmed geographic unit. The response preserves the selected order and exposes only environmental values, difference values, and standout identifiers supplied in an approved Data Science output.
+
+`approved_standout_indicator_ids` is provisional and must contain only identifiers present in `environmental_indicators`. An empty list means that no approved standout factor was supplied; it does not authorise the backend to select one. The final representation of standout or ranked factors is TBC.
+
+Missing, suppressed, unavailable, limited, or incompatible values and differences remain `null` with their supplied status. If the approved environmental-difference output is unavailable or does not contain the selected pair, the service returns an explicit unavailable state and does not calculate a difference from profile data.
+
+The backend must not calculate environmental differences, normalise values, assign ranks, choose standout factors, infer missing values, or make causal claims. The final environmental indicator list, units, difference direction, coverage representation, standout/ranking structure, pair ordering, dataset location, schema, and notice wording are TBC pending the Data Science output contract.
+
 ## Error handling
 
 Errors use the same envelope shape:
@@ -492,6 +566,10 @@ It confirms that the FastAPI service is running and makes no statement about bus
 - Final Iteration 2 outcome-comparison dataset location and schema version
 - Final significance, confidence, uncertainty, and suppression representations
 - Whether Iteration 2 neighbourhood pairs are stored as ordered or unordered pairs
+- Final Iteration 2 environmental-difference endpoint and query parameter names
+- Final environmental indicator list, units, and difference direction
+- Final environmental coverage and standout/ranking representations
+- Final environmental-difference dataset location and schema version
 - Final approved disclaimer and notice wording where not already confirmed
 - Final bounding-box query format
 - Final map-indicator query parameters and indicator selection
