@@ -13,6 +13,7 @@ from data_loader import (  # noqa: E402
     ENVIRONMENTAL_DIFFERENCE_DATA_PATH_ENV,
     EXPLANATION_DATA_PATH_ENV,
     OUTCOME_COMPARISON_DATA_PATH_ENV,
+    PATTERN_INSIGHT_DATA_PATH_ENV,
     PRIORITY_DATA_PATH_ENV,
     PROFILE_DATA_PATH_ENV,
 )
@@ -29,6 +30,7 @@ def clear_dataset_environment(monkeypatch: pytest.MonkeyPatch) -> None:
         COMPARISON_DATA_PATH_ENV,
         ENVIRONMENTAL_DIFFERENCE_DATA_PATH_ENV,
         OUTCOME_COMPARISON_DATA_PATH_ENV,
+        PATTERN_INSIGHT_DATA_PATH_ENV,
     ):
         monkeypatch.delenv(variable, raising=False)
 

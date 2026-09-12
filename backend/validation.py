@@ -7,6 +7,7 @@ from data_loader import (
     ENVIRONMENTAL_DIFFERENCE_DATA_PATH_ENV,
     EXPLANATION_DATA_PATH_ENV,
     OUTCOME_COMPARISON_DATA_PATH_ENV,
+    PATTERN_INSIGHT_DATA_PATH_ENV,
     PRIORITY_DATA_PATH_ENV,
     PROFILE_DATA_PATH_ENV,
     comparison_data_path,
@@ -14,6 +15,7 @@ from data_loader import (
     explanation_data_path,
     load_json_source,
     outcome_comparison_data_path,
+    pattern_insight_data_path,
     priority_data_path,
     profile_data_path,
 )
@@ -758,4 +760,116 @@ def environmental_difference_data(result: dict[str, Any]) -> dict[str, Any]:
         "neighbourhood_b": result["neighbourhood_b"],
         "environmental_indicators": result["environmental_indicators"],
         "approved_standout_indicator_ids": result["approved_standout_indicator_ids"],
+    }
+
+
+def valid_pattern(pattern: Any, outcome_ids: set[str], environmental_ids: set[str]) -> bool:
+    """Validate source-supplied pattern wording, evidence links, and assessments."""
+    if not isinstance(pattern, dict) or pattern.get("status") not in INDICATOR_STATUSES:
+        return False
+    if not all(isinstance(pattern.get(field), str) and pattern[field].strip()
+               for field in ("id", "title", "description")):
+        return False
+    outcome_references = pattern.get("supporting_outcome_indicator_ids")
+    environmental_references = pattern.get("supporting_environmental_indicator_ids")
+    if (not isinstance(outcome_references, list)
+            or not all(isinstance(identifier, str) for identifier in outcome_references)
+            or len(outcome_references) != len(set(outcome_references))
+            or not set(outcome_references).issubset(outcome_ids)):
+        return False
+    if (not isinstance(environmental_references, list)
+            or not all(isinstance(identifier, str) for identifier in environmental_references)
+            or len(environmental_references) != len(set(environmental_references))
+            or not set(environmental_references).issubset(environmental_ids)):
+        return False
+    return all(valid_comparison_value(pattern.get(field))
+               for field in ("confidence", "quality", "stability"))
+
+
+def valid_pattern_insight(insight: Any) -> bool:
+    """Validate an approved E7 result without identifying or explaining patterns."""
+    allowed_statuses = {*INDICATOR_STATUSES, "no_pattern"}
+    if not isinstance(insight, dict) or insight.get("status") not in allowed_statuses:
+        return False
+    area_a, area_b = insight.get("neighbourhood_a"), insight.get("neighbourhood_b")
+    if not valid_comparison_area(area_a) or not valid_comparison_area(area_b):
+        return False
+    if area_a["id"] == area_b["id"] or area_a["geographic_unit"] != area_b["geographic_unit"]:
+        return False
+    outcomes = insight.get("supporting_outcome_indicators")
+    environmental = insight.get("supporting_environmental_indicators")
+    if (not isinstance(outcomes, list)
+            or not all(valid_outcome_indicator(item, area_a["geographic_unit"])
+                       for item in outcomes)
+            or not isinstance(environmental, list)
+            or not all(valid_environmental_indicator(item, area_a["geographic_unit"])
+                       for item in environmental)):
+        return False
+    outcome_ids = [item["id"] for item in outcomes]
+    environmental_ids = [item["id"] for item in environmental]
+    if (len(outcome_ids) != len(set(outcome_ids))
+            or len(environmental_ids) != len(set(environmental_ids))):
+        return False
+    patterns = insight.get("patterns")
+    if not isinstance(patterns, list) or not all(
+            valid_pattern(pattern, set(outcome_ids), set(environmental_ids))
+            for pattern in patterns):
+        return False
+    pattern_ids = [pattern["id"] for pattern in patterns]
+    if len(pattern_ids) != len(set(pattern_ids)):
+        return False
+    limitations = insight.get("limitations", [])
+    if not isinstance(limitations, list) or not all(valid_priority_limitation(item) for item in limitations):
+        return False
+    if insight["status"] == "no_pattern":
+        return patterns == [] and bool(limitations)
+    if insight["status"] == "available":
+        return bool(patterns) and all(
+            pattern["status"] == "available"
+            and all(pattern[field]["status"] == "available"
+                    for field in ("confidence", "quality", "stability"))
+            for pattern in patterns
+        )
+    return bool(limitations)
+
+
+def load_pattern_insights() -> tuple[list[dict[str, Any]] | None, dict[str, Any] | None, list[dict[str, Any]]]:
+    """Load only explicitly approved E7 pattern-insight outputs."""
+    source, limitations = load_json_source(
+        pattern_insight_data_path(), PATTERN_INSIGHT_DATA_PATH_ENV,
+        "pattern_insight")
+    if source is None:
+        return None, None, limitations
+    insights, metadata = source.get("insights"), source.get("metadata")
+    if (source.get("approved") is not True or not isinstance(insights, list)
+            or not valid_priority_metadata(metadata)):
+        return None, None, [limitation(
+            "pattern_insight_dataset_invalid",
+            "The pattern-insight dataset must be explicitly approved and contain insights with complete provenance metadata.",
+            "pattern_insight")]
+    if not all(valid_pattern_insight(insight) for insight in insights):
+        return None, None, [limitation(
+            "pattern_insight_dataset_invalid",
+            "The pattern-insight dataset contains an invalid pattern, evidence reference, assessment, or non-null unavailable value.",
+            "insights")]
+    pair_ids = [
+        (insight["neighbourhood_a"]["id"], insight["neighbourhood_b"]["id"])
+        for insight in insights
+    ]
+    if len(pair_ids) != len(set(pair_ids)):
+        return None, None, [limitation(
+            "pattern_insight_dataset_invalid",
+            "The pattern-insight dataset contains duplicate ordered neighbourhood pairs.",
+            "insights")]
+    return insights, metadata, []
+
+
+def pattern_insight_data(insight: dict[str, Any]) -> dict[str, Any]:
+    """Whitelist public E7 fields from the approved output."""
+    return {
+        "neighbourhood_a": insight["neighbourhood_a"],
+        "neighbourhood_b": insight["neighbourhood_b"],
+        "patterns": insight["patterns"],
+        "supporting_outcome_indicators": insight["supporting_outcome_indicators"],
+        "supporting_environmental_indicators": insight["supporting_environmental_indicators"],
     }

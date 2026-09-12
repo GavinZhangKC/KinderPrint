@@ -27,9 +27,9 @@ from responses import (
 from validation import (
     aggregate_status, environmental_difference_data, explanation_data,
     load_comparison_data, load_environmental_differences, load_explanations,
-    load_outcome_comparisons, load_priority_results, load_profiles,
+    load_outcome_comparisons, load_pattern_insights, load_priority_results, load_profiles,
     map_indicator_data, match_data,
-    outcome_comparison_data,
+    outcome_comparison_data, pattern_insight_data,
     priority_data, profile_boundary_limitations, profile_collection_metadata,
     profile_comparison_data, profile_comparison_limitations, profile_limitations,
     profile_metadata, profile_status,
@@ -494,6 +494,90 @@ def environmental_difference(
     return envelope(
         result["status"], environmental_difference_data(result), metadata=metadata,
         limitations=result.get("limitations", []), notices=notices)
+
+
+@app.get("/api/pattern-insight")
+def pattern_insight(
+    neighbourhood_id_a: str = Query(..., min_length=1, max_length=100),
+    neighbourhood_id_b: str = Query(..., min_length=1, max_length=100),
+) -> dict[str, Any]:
+    """Return approved E7 pattern insights without detecting or explaining them."""
+    notices = [ASSOCIATION_NOTICE, INVESTIGATION_LEADS_NOTICE]
+    empty = {
+        "neighbourhood_a": {
+            "id": neighbourhood_id_a, "name": None, "geographic_unit": None,
+        },
+        "neighbourhood_b": {
+            "id": neighbourhood_id_b, "name": None, "geographic_unit": None,
+        },
+        "patterns": [],
+        "supporting_outcome_indicators": [],
+        "supporting_environmental_indicators": [],
+    }
+    profiles, profile_load_limitations = load_profiles()
+    if profiles is None:
+        return envelope(
+            "unavailable", empty, limitations=profile_load_limitations, notices=notices)
+
+    profile_a = next((profile for profile in profiles
+                      if profile["neighbourhood"]["id"] == neighbourhood_id_a), None)
+    profile_b = next((profile for profile in profiles
+                      if profile["neighbourhood"]["id"] == neighbourhood_id_b), None)
+    if profile_a is None or profile_b is None:
+        missing_parameters = [
+            parameter
+            for profile, parameter in (
+                (profile_a, "neighbourhood_id_a"),
+                (profile_b, "neighbourhood_id_b"),
+            )
+            if profile is None
+        ]
+        return envelope("missing", empty, limitations=[limitation(
+            "unsupported_neighbourhood",
+            "One or both neighbourhood identifiers do not have a supported profile.",
+            *missing_parameters,
+        )], notices=notices)
+    if neighbourhood_id_a == neighbourhood_id_b:
+        return envelope("incompatible", empty, limitations=[limitation(
+            "same_neighbourhood_selected",
+            "Choose two different neighbourhoods for a pattern insight.",
+            "neighbourhood_id_a", "neighbourhood_id_b",
+        )], notices=notices)
+    if (profile_a["neighbourhood"]["geographic_unit"]
+            != profile_b["neighbourhood"]["geographic_unit"]):
+        return envelope("incompatible", empty, limitations=[limitation(
+            "incompatible_geographic_unit",
+            "The selected neighbourhood profiles use incompatible geographic units.",
+            "neighbourhood_id_a", "neighbourhood_id_b", "geographic_unit",
+        )], notices=notices)
+
+    empty["neighbourhood_a"] = profile_a["neighbourhood"]
+    empty["neighbourhood_b"] = profile_b["neighbourhood"]
+    insights, metadata, data_limitations = load_pattern_insights()
+    if insights is None:
+        return envelope(
+            "unavailable", empty, limitations=data_limitations, notices=notices)
+    insight = next((item for item in insights
+                    if item["neighbourhood_a"]["id"] == neighbourhood_id_a
+                    and item["neighbourhood_b"]["id"] == neighbourhood_id_b), None)
+    if insight is None:
+        return envelope("unavailable", empty, metadata=metadata, limitations=[limitation(
+            "pattern_insight_unavailable",
+            "No approved pattern insight is available for the selected ordered pair.",
+            "neighbourhood_id_a", "neighbourhood_id_b",
+        )], notices=notices)
+    if (insight["neighbourhood_a"]["geographic_unit"]
+            != profile_a["neighbourhood"]["geographic_unit"]
+            or insight["neighbourhood_b"]["geographic_unit"]
+            != profile_b["neighbourhood"]["geographic_unit"]):
+        return envelope("incompatible", empty, metadata=metadata, limitations=[limitation(
+            "incompatible_geographic_unit",
+            "The approved pattern insight and selected profiles use incompatible geographic units.",
+            "geographic_unit",
+        )], notices=notices)
+    return envelope(
+        insight["status"], pattern_insight_data(insight), metadata=metadata,
+        limitations=insight.get("limitations", []), notices=notices)
 
 
 @app.get("/api/neighbourhoods/{neighbourhood_id}/boundary")

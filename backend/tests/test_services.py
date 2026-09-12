@@ -5,6 +5,7 @@ from data_loader import (
     ENVIRONMENTAL_DIFFERENCE_DATA_PATH_ENV,
     EXPLANATION_DATA_PATH_ENV,
     OUTCOME_COMPARISON_DATA_PATH_ENV,
+    PATTERN_INSIGHT_DATA_PATH_ENV,
     PRIORITY_DATA_PATH_ENV,
     PROFILE_DATA_PATH_ENV,
 )
@@ -506,3 +507,121 @@ def test_environmental_difference_does_not_reverse_difference(client, monkeypatc
     assert body["status"] == "unavailable"
     assert body["data"]["environmental_indicators"] == []
     assert body["limitations"][0]["code"] == "environmental_difference_unavailable"
+
+
+def pattern_insight_source(*, no_pattern: bool = False,
+                           invalid_reference: bool = False,
+                           limited: bool = False) -> dict:
+    outcome = outcome_comparison_source()["comparisons"][0]["outcome_indicators"][0]
+    environmental = environmental_difference_source()["differences"][0][
+        "environmental_indicators"][0]
+    patterns = [] if no_pattern else [{
+        "id": "pattern-1",
+        "title": "Approved pattern",
+        "description": "Approved area-level description.",
+        "status": "limited" if limited else "available",
+        "supporting_outcome_indicator_ids": [
+            "unknown" if invalid_reference else "outcome"],
+        "supporting_environmental_indicator_ids": ["heat"],
+        "confidence": {"value": None if limited else "TBC",
+                       "status": "missing" if limited else "available"},
+        "quality": {"value": "TBC", "status": "available"},
+        "stability": {"value": "TBC", "status": "available"},
+    }]
+    status = "no_pattern" if no_pattern else "limited" if limited else "available"
+    insight = {
+        "status": status,
+        "neighbourhood_a": {"id": "a", "name": "A", "geographic_unit": "TBC"},
+        "neighbourhood_b": {"id": "b", "name": "B", "geographic_unit": "TBC"},
+        "patterns": patterns,
+        "supporting_outcome_indicators": [] if no_pattern else [outcome],
+        "supporting_environmental_indicators": [] if no_pattern else [environmental],
+    }
+    if no_pattern or limited:
+        insight["limitations"] = [{
+            "code": "no_supported_pattern" if no_pattern else "confidence_missing",
+            "message": "The approved output does not support a complete pattern result.",
+            "affected_fields": ["patterns"],
+        }]
+    return {
+        "approved": True,
+        "metadata": METADATA,
+        "insights": [insight],
+    }
+
+
+def configure_pattern_sources(monkeypatch, write_json, source: dict) -> None:
+    profile_path = write_json("profiles.json", json.dumps({
+        "profiles": [profile("a", 1), profile("b", 2)],
+    }))
+    insight_path = write_json("pattern_insights.json", json.dumps(source))
+    monkeypatch.setenv(PROFILE_DATA_PATH_ENV, str(profile_path))
+    monkeypatch.setenv(PATTERN_INSIGHT_DATA_PATH_ENV, str(insight_path))
+
+
+def test_pattern_insight_returns_approved_patterns(client, monkeypatch, write_json) -> None:
+    configure_pattern_sources(monkeypatch, write_json, pattern_insight_source())
+
+    body = client.get("/api/pattern-insight", params={
+        "neighbourhood_id_a": "a", "neighbourhood_id_b": "b",
+    }).json()
+
+    assert body["status"] == "available"
+    assert body["data"]["patterns"][0]["id"] == "pattern-1"
+    assert body["data"]["supporting_outcome_indicators"][0]["id"] == "outcome"
+    assert body["data"]["supporting_environmental_indicators"][0]["id"] == "heat"
+    assert {notice["code"] for notice in body["notices"]} == {
+        "association_not_causation", "investigation_leads",
+    }
+
+
+def test_pattern_insight_preserves_missing_assessment(client, monkeypatch, write_json) -> None:
+    configure_pattern_sources(
+        monkeypatch, write_json, pattern_insight_source(limited=True))
+
+    body = client.get("/api/pattern-insight", params={
+        "neighbourhood_id_a": "a", "neighbourhood_id_b": "b",
+    }).json()
+
+    assert body["status"] == "limited"
+    confidence = body["data"]["patterns"][0]["confidence"]
+    assert confidence == {"value": None, "status": "missing"}
+
+
+def test_pattern_insight_returns_explicit_no_pattern(client, monkeypatch, write_json) -> None:
+    configure_pattern_sources(
+        monkeypatch, write_json, pattern_insight_source(no_pattern=True))
+
+    body = client.get("/api/pattern-insight", params={
+        "neighbourhood_id_a": "a", "neighbourhood_id_b": "b",
+    }).json()
+
+    assert body["status"] == "no_pattern"
+    assert body["data"]["patterns"] == []
+    assert body["limitations"][0]["code"] == "no_supported_pattern"
+
+
+def test_pattern_insight_rejects_unknown_evidence_reference(client, monkeypatch, write_json) -> None:
+    configure_pattern_sources(
+        monkeypatch, write_json, pattern_insight_source(invalid_reference=True))
+
+    body = client.get("/api/pattern-insight", params={
+        "neighbourhood_id_a": "a", "neighbourhood_id_b": "b",
+    }).json()
+
+    assert body["status"] == "unavailable"
+    assert body["limitations"][0]["code"] == "pattern_insight_dataset_invalid"
+
+
+def test_pattern_insight_reports_unconfigured_output(client, monkeypatch, write_json) -> None:
+    profile_path = write_json("profiles.json", json.dumps({
+        "profiles": [profile("a", 1), profile("b", 2)],
+    }))
+    monkeypatch.setenv(PROFILE_DATA_PATH_ENV, str(profile_path))
+
+    body = client.get("/api/pattern-insight", params={
+        "neighbourhood_id_a": "a", "neighbourhood_id_b": "b",
+    }).json()
+
+    assert body["status"] == "unavailable"
+    assert body["limitations"][0]["code"] == "pattern_insight_dataset_not_configured"
