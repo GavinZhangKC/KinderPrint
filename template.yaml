@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: "2010-09-09"
 Transform: AWS::Serverless-2016-10-31
-Description: KinderPrint Iteration 1 FastAPI backend
+Description: KinderPrint FastAPI backend
 
 Parameters:
   VercelOrigin:
@@ -56,7 +56,7 @@ Resources:
     Properties:
       CodeUri: backend/lambda_package/
       Handler: main.handler
-      Description: KinderPrint Iteration 1 API
+      Description: KinderPrint API
       Environment:
         Variables:
           KINDERPRINT_PROFILE_DATA_PATH: /var/task/data/profiles.json

@@ -3,6 +3,7 @@ from copy import deepcopy
 from validation import (
     profile_limitations,
     profile_status,
+    valid_comparison_value,
     valid_explanation,
     valid_indicator,
     valid_priority_result,
@@ -65,6 +66,13 @@ def test_indicator_value_follows_status() -> None:
     assert not valid_indicator(indicator("a", "available", None), "TBC")
     assert valid_indicator(indicator("a", "missing", None), "TBC")
     assert not valid_indicator(indicator("a", "missing", 0), "TBC")
+    assert valid_indicator(indicator("a", "suppressed", None), "TBC")
+    assert not valid_indicator(indicator("a", "suppressed", 0), "TBC")
+
+
+def test_comparison_value_preserves_suppression() -> None:
+    assert valid_comparison_value({"value": None, "status": "suppressed"})
+    assert not valid_comparison_value({"value": 0, "status": "suppressed"})
 
 
 def test_profile_requires_three_domains() -> None:

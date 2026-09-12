@@ -24,7 +24,7 @@ Service responses use a consistent top-level envelope:
 }
 ```
 
-`status` is one of `available`, `missing`, `incompatible`, `unavailable`, or `limited` where applicable. An endpoint may define an additional explicit state such as `no_match` when required by its semantics; final status vocabulary is TBC.
+`status` is one of `available`, `missing`, `suppressed`, `incompatible`, `unavailable`, or `limited` where applicable. An endpoint may define an additional explicit state such as `no_match` when required by its semantics; final status vocabulary is TBC.
 
 - `data` contains the requested resource. Values that are not supported remain `null`; they must not be generated or estimated.
 - `metadata` records provenance and interpretation context, including source, reference year, geographic unit, data quality, and boundary version where relevant.
@@ -73,7 +73,7 @@ Returns an aggregate neighbourhood profile. The final geographic identifier form
             "id": "TBC",
             "name": "TBC",
             "value": null,
-            "status": "available | missing | incompatible | unavailable | limited",
+            "status": "available | missing | suppressed | incompatible | unavailable | limited",
             "source": "TBC",
             "geographic_unit": "TBC",
             "reference_year": "TBC"
@@ -127,7 +127,7 @@ The final map indicator list and any query parameters for selecting indicators o
         "indicators": {
           "TBC-indicator-id": {
             "value": null,
-            "status": "available | missing | incompatible | unavailable | limited"
+            "status": "available | missing | suppressed | incompatible | unavailable | limited"
           }
         }
       }
@@ -266,7 +266,7 @@ Returns the approved explanation associated with a neighbourhood priority result
           {
             "id": "TBC",
             "name": "TBC",
-            "status": "available | missing | incompatible | unavailable | limited",
+            "status": "available | missing | suppressed | incompatible | unavailable | limited",
             "source": "TBC",
             "geographic_unit": "TBC",
             "reference_year": "TBC"
@@ -397,15 +397,15 @@ This service is distinct from `GET /api/compare`: the existing endpoint prepares
         "unit": "TBC",
         "neighbourhood_a": {
           "value": null,
-          "status": "available | missing | incompatible | unavailable | limited"
+          "status": "available | missing | suppressed | incompatible | unavailable | limited"
         },
         "neighbourhood_b": {
           "value": null,
-          "status": "available | missing | incompatible | unavailable | limited"
+          "status": "available | missing | suppressed | incompatible | unavailable | limited"
         },
         "approved_difference": {
           "value": null,
-          "status": "available | missing | incompatible | unavailable | limited"
+          "status": "available | missing | suppressed | incompatible | unavailable | limited"
         },
         "source": "TBC",
         "reference_year": "TBC",
@@ -467,15 +467,15 @@ Returns approved environmental-difference results for two selected neighbourhood
         "unit": "TBC",
         "neighbourhood_a": {
           "value": null,
-          "status": "available | missing | incompatible | unavailable | limited"
+          "status": "available | missing | suppressed | incompatible | unavailable | limited"
         },
         "neighbourhood_b": {
           "value": null,
-          "status": "available | missing | incompatible | unavailable | limited"
+          "status": "available | missing | suppressed | incompatible | unavailable | limited"
         },
         "approved_difference": {
           "value": null,
-          "status": "available | missing | incompatible | unavailable | limited"
+          "status": "available | missing | suppressed | incompatible | unavailable | limited"
         },
         "source": "TBC",
         "reference_year": "TBC",
@@ -544,15 +544,15 @@ Returns approved pattern-insight outputs associated with a neighbourhood compari
         "supporting_environmental_indicator_ids": [],
         "confidence": {
           "value": null,
-          "status": "available | missing | incompatible | unavailable | limited"
+          "status": "available | missing | suppressed | incompatible | unavailable | limited"
         },
         "quality": {
           "value": null,
-          "status": "available | missing | incompatible | unavailable | limited"
+          "status": "available | missing | suppressed | incompatible | unavailable | limited"
         },
         "stability": {
           "value": null,
-          "status": "available | missing | incompatible | unavailable | limited"
+          "status": "available | missing | suppressed | incompatible | unavailable | limited"
         }
       }
     ],
@@ -619,15 +619,15 @@ Returns approved potentially modifiable environmental conditions associated with
         "related_pattern_ids": [],
         "modifiability": {
           "value": null,
-          "status": "available | missing | incompatible | unavailable | limited"
+          "status": "available | missing | suppressed | incompatible | unavailable | limited"
         },
         "quality": {
           "value": null,
-          "status": "available | missing | incompatible | unavailable | limited"
+          "status": "available | missing | suppressed | incompatible | unavailable | limited"
         },
         "uncertainty": {
           "value": null,
-          "status": "available | missing | incompatible | unavailable | limited"
+          "status": "available | missing | suppressed | incompatible | unavailable | limited"
         }
       }
     ],

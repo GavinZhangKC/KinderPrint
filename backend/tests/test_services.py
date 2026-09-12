@@ -1,5 +1,7 @@
 import json
 
+import pytest
+
 from data_loader import (
     COMPARISON_DATA_PATH_ENV,
     ENVIRONMENTAL_DIFFERENCE_DATA_PATH_ENV,
@@ -287,7 +289,10 @@ def outcome_comparison_source(*, missing: bool = False) -> dict:
     comparison_status = "limited" if missing else "available"
     comparison = {
         "status": comparison_status,
-        "neighbourhood_a": {"id": "a", "name": "A", "geographic_unit": "TBC"},
+        "neighbourhood_a": {
+            "id": "a", "name": "A", "geographic_unit": "TBC",
+            "internal_key": "must not be exposed",
+        },
         "neighbourhood_b": {"id": "b", "name": "B", "geographic_unit": "TBC"},
         "outcome_indicators": [{
             "id": "outcome",
@@ -300,6 +305,7 @@ def outcome_comparison_source(*, missing: bool = False) -> dict:
             "source": "approved",
             "reference_year": "TBC",
             "geographic_unit": "TBC",
+            "internal_score": 99,
         }],
     }
     if comparison_status != "available":
@@ -335,6 +341,8 @@ def test_outcome_comparison_returns_only_approved_values(client, monkeypatch, wr
     indicator = body["data"]["outcome_indicators"][0]
     assert indicator["neighbourhood_a"]["value"] == 0
     assert indicator["approved_difference"]["value"] == 0
+    assert "internal_score" not in indicator
+    assert "internal_key" not in body["data"]["neighbourhood_a"]
     assert {notice["code"] for notice in body["notices"]} == {
         "area_level_comparison", "association_not_causation",
     }
@@ -413,6 +421,7 @@ def environmental_difference_source(*, missing: bool = False,
             "source": "approved",
             "reference_year": "TBC",
             "geographic_unit": "TBC",
+            "internal_rank": 1,
         }],
         "approved_standout_indicator_ids": (
             ["heat"] if standout_ids is None else standout_ids),
@@ -452,6 +461,7 @@ def test_environmental_difference_returns_approved_output(client, monkeypatch, w
     assert indicator["neighbourhood_a"]["value"] == 0
     assert indicator["approved_difference"]["value"] == -2
     assert body["data"]["approved_standout_indicator_ids"] == ["heat"]
+    assert "internal_rank" not in indicator
     assert body["notices"][1]["code"] == "association_not_causation"
 
 
@@ -528,6 +538,7 @@ def pattern_insight_source(*, no_pattern: bool = False,
                        "status": "missing" if limited else "available"},
         "quality": {"value": "TBC", "status": "available"},
         "stability": {"value": "TBC", "status": "available"},
+        "model_explanation": "This internal field must not be exposed.",
     }]
     status = "no_pattern" if no_pattern else "limited" if limited else "available"
     insight = {
@@ -571,6 +582,9 @@ def test_pattern_insight_returns_approved_patterns(client, monkeypatch, write_js
     assert body["data"]["patterns"][0]["id"] == "pattern-1"
     assert body["data"]["supporting_outcome_indicators"][0]["id"] == "outcome"
     assert body["data"]["supporting_environmental_indicators"][0]["id"] == "heat"
+    assert "model_explanation" not in body["data"]["patterns"][0]
+    assert "internal_score" not in body["data"]["supporting_outcome_indicators"][0]
+    assert "internal_rank" not in body["data"]["supporting_environmental_indicators"][0]
     assert {notice["code"] for notice in body["notices"]} == {
         "association_not_causation", "investigation_leads",
     }
@@ -614,6 +628,20 @@ def test_pattern_insight_rejects_unknown_evidence_reference(client, monkeypatch,
     assert body["limitations"][0]["code"] == "pattern_insight_dataset_invalid"
 
 
+def test_available_pattern_cannot_hide_incomplete_evidence(client, monkeypatch, write_json) -> None:
+    source = pattern_insight_source()
+    evidence = source["insights"][0]["supporting_outcome_indicators"][0]
+    evidence["neighbourhood_b"] = {"value": None, "status": "suppressed"}
+    configure_pattern_sources(monkeypatch, write_json, source)
+
+    body = client.get("/api/pattern-insight", params={
+        "neighbourhood_id_a": "a", "neighbourhood_id_b": "b",
+    }).json()
+
+    assert body["status"] == "unavailable"
+    assert body["limitations"][0]["code"] == "pattern_insight_dataset_invalid"
+
+
 def test_pattern_insight_reports_unconfigured_output(client, monkeypatch, write_json) -> None:
     profile_path = write_json("profiles.json", json.dumps({
         "profiles": [profile("a", 1), profile("b", 2)],
@@ -639,6 +667,7 @@ def prevention_opportunity_source(*, no_opportunity: bool = False,
         "title": "Approved pattern",
         "description": "Approved area-level description.",
         "status": "available",
+        "model_details": "This internal field must not be exposed.",
     }]
     opportunities = [] if no_opportunity else [{
         "id": "opportunity-1",
@@ -704,6 +733,9 @@ def test_prevention_opportunity_returns_only_approved_fields(client, monkeypatch
     assert opportunity["id"] == "opportunity-1"
     assert opportunity["related_pattern_ids"] == ["pattern-1"]
     assert "intervention_recommendation" not in opportunity
+    assert "internal_score" not in body["data"]["supporting_outcome_indicators"][0]
+    assert "internal_rank" not in body["data"]["supporting_environmental_indicators"][0]
+    assert "model_details" not in body["data"]["related_patterns"][0]
     assert {notice["code"] for notice in body["notices"]} == {
         "association_not_causation", "investigation_leads", "human_decision",
     }
@@ -749,6 +781,20 @@ def test_prevention_opportunity_rejects_unknown_evidence_reference(client, monke
     assert body["limitations"][0]["code"] == "prevention_opportunity_dataset_invalid"
 
 
+def test_available_opportunity_cannot_hide_incomplete_evidence(client, monkeypatch, write_json) -> None:
+    source = prevention_opportunity_source()
+    evidence = source["results"][0]["supporting_environmental_indicators"][0]
+    evidence["approved_difference"] = {"value": None, "status": "suppressed"}
+    configure_prevention_sources(monkeypatch, write_json, source)
+
+    body = client.get("/api/prevention-opportunity", params={
+        "neighbourhood_id_a": "a", "neighbourhood_id_b": "b",
+    }).json()
+
+    assert body["status"] == "unavailable"
+    assert body["limitations"][0]["code"] == "prevention_opportunity_dataset_invalid"
+
+
 def test_prevention_opportunity_reports_unconfigured_output(client, monkeypatch, write_json) -> None:
     profile_path = write_json("profiles.json", json.dumps({
         "profiles": [profile("a", 1), profile("b", 2)],
@@ -762,3 +808,59 @@ def test_prevention_opportunity_reports_unconfigured_output(client, monkeypatch,
     assert body["status"] == "unavailable"
     assert body["limitations"][0]["code"] == (
         "prevention_opportunity_dataset_not_configured")
+
+
+ITERATION_TWO_ENDPOINTS = (
+    "/api/outcome-comparison",
+    "/api/environmental-difference",
+    "/api/pattern-insight",
+    "/api/prevention-opportunity",
+)
+
+
+@pytest.mark.parametrize("endpoint", ITERATION_TWO_ENDPOINTS)
+def test_iteration_two_services_reject_unknown_neighbourhood(
+    endpoint, client, monkeypatch, write_json,
+) -> None:
+    profile_path = write_json("profiles.json", json.dumps({"profiles": [profile("a", 1)]}))
+    monkeypatch.setenv(PROFILE_DATA_PATH_ENV, str(profile_path))
+
+    body = client.get(endpoint, params={
+        "neighbourhood_id_a": "a", "neighbourhood_id_b": "unknown",
+    }).json()
+
+    assert set(body) == {"status", "data", "metadata", "limitations", "notices"}
+    assert body["status"] == "missing"
+    assert body["limitations"][0]["affected_fields"] == ["neighbourhood_id_b"]
+
+
+@pytest.mark.parametrize("endpoint", ITERATION_TWO_ENDPOINTS)
+def test_iteration_two_services_reject_same_neighbourhood(
+    endpoint, client, monkeypatch, write_json,
+) -> None:
+    profile_path = write_json("profiles.json", json.dumps({"profiles": [profile("a", 1)]}))
+    monkeypatch.setenv(PROFILE_DATA_PATH_ENV, str(profile_path))
+
+    body = client.get(endpoint, params={
+        "neighbourhood_id_a": "a", "neighbourhood_id_b": "a",
+    }).json()
+
+    assert body["status"] == "incompatible"
+    assert body["limitations"][0]["code"] == "same_neighbourhood_selected"
+
+
+@pytest.mark.parametrize("endpoint", ITERATION_TWO_ENDPOINTS)
+def test_iteration_two_services_reject_incompatible_geography(
+    endpoint, client, monkeypatch, write_json,
+) -> None:
+    profile_path = write_json("profiles.json", json.dumps({
+        "profiles": [profile("a", 1), profile("b", 2, geographic_unit="other")],
+    }))
+    monkeypatch.setenv(PROFILE_DATA_PATH_ENV, str(profile_path))
+
+    body = client.get(endpoint, params={
+        "neighbourhood_id_a": "a", "neighbourhood_id_b": "b",
+    }).json()
+
+    assert body["status"] == "incompatible"
+    assert body["limitations"][0]["code"] == "incompatible_geographic_unit"

@@ -1,4 +1,4 @@
-"""KinderPrint FastAPI application and Iteration 1 routes."""
+"""KinderPrint FastAPI application and versioned service routes."""
 
 import logging
 import time
@@ -36,7 +36,7 @@ from validation import (
     profile_metadata, profile_status,
 )
 
-app = FastAPI(title="KinderPrint API", version="0.1.0")
+app = FastAPI(title="KinderPrint API", version="0.2.0")
 app.add_middleware(GZipMiddleware, minimum_size=1000)
 logger = logging.getLogger("kinderprint.api")
 

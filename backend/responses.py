@@ -1,10 +1,12 @@
-"""Shared Iteration 1 response structures and notices."""
+"""Shared KinderPrint response structures and notices."""
 
 from typing import Any
 
 TBC_NOTICE_MESSAGE = "TBC"
 AREA_LEVEL_NOTICE = {"code": "area_level_information", "message": TBC_NOTICE_MESSAGE}
-INDICATOR_STATUSES = {"available", "missing", "incompatible", "unavailable", "limited"}
+INDICATOR_STATUSES = {
+    "available", "missing", "suppressed", "incompatible", "unavailable", "limited",
+}
 PRIORITY_DOMAINS = {"Child Development", "Social", "Environment"}
 HUMAN_DECISION_NOTICE = {
     "code": "human_decision",
@@ -19,7 +21,7 @@ COMPARISON_AREA_NOTICE = {"code": "area_level_comparison", "message": TBC_NOTICE
 def envelope(status: str, data: Any, *, metadata: dict[str, Any] | None = None,
              limitations: list[dict[str, Any]] | None = None,
              notices: list[dict[str, str]] | None = None) -> dict[str, Any]:
-    """Return the shared Iteration 1 response envelope."""
+    """Return the shared KinderPrint response envelope."""
     return {"status": status, "data": data, "metadata": metadata or {},
             "limitations": limitations or [], "notices": notices or []}
 

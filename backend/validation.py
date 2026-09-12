@@ -586,6 +586,32 @@ def valid_comparison_value(value: Any) -> bool:
             else value.get("value") is None)
 
 
+def comparison_area_data(area: dict[str, Any]) -> dict[str, Any]:
+    """Expose only the public identity fields from a validated comparison area."""
+    return {field: area[field] for field in ("id", "name", "geographic_unit")}
+
+
+def comparison_indicator_data(indicator: dict[str, Any]) -> dict[str, Any]:
+    """Exclude internal analytical fields from a validated comparison indicator."""
+    return {
+        **{field: indicator[field] for field in (
+            "id", "name", "unit", "source", "reference_year", "geographic_unit",
+        )},
+        **{
+            field: {
+                "value": indicator[field]["value"],
+                "status": indicator[field]["status"],
+            }
+            for field in ("neighbourhood_a", "neighbourhood_b", "approved_difference")
+        },
+    }
+
+
+def comparison_indicator_is_available(indicator: dict[str, Any]) -> bool:
+    return all(indicator[field]["status"] == "available" for field in (
+        "neighbourhood_a", "neighbourhood_b", "approved_difference"))
+
+
 def valid_outcome_indicator(indicator: Any, geographic_unit: str) -> bool:
     if not isinstance(indicator, dict):
         return False
@@ -666,9 +692,12 @@ def load_outcome_comparisons() -> tuple[list[dict[str, Any]] | None, dict[str, A
 def outcome_comparison_data(comparison: dict[str, Any]) -> dict[str, Any]:
     """Whitelist public E5 fields from the approved output."""
     return {
-        "neighbourhood_a": comparison["neighbourhood_a"],
-        "neighbourhood_b": comparison["neighbourhood_b"],
-        "outcome_indicators": comparison["outcome_indicators"],
+        "neighbourhood_a": comparison_area_data(comparison["neighbourhood_a"]),
+        "neighbourhood_b": comparison_area_data(comparison["neighbourhood_b"]),
+        "outcome_indicators": [
+            comparison_indicator_data(indicator)
+            for indicator in comparison["outcome_indicators"]
+        ],
     }
 
 
@@ -758,9 +787,12 @@ def load_environmental_differences() -> tuple[list[dict[str, Any]] | None, dict[
 def environmental_difference_data(result: dict[str, Any]) -> dict[str, Any]:
     """Whitelist public E6 fields from the approved output."""
     return {
-        "neighbourhood_a": result["neighbourhood_a"],
-        "neighbourhood_b": result["neighbourhood_b"],
-        "environmental_indicators": result["environmental_indicators"],
+        "neighbourhood_a": comparison_area_data(result["neighbourhood_a"]),
+        "neighbourhood_b": comparison_area_data(result["neighbourhood_b"]),
+        "environmental_indicators": [
+            comparison_indicator_data(indicator)
+            for indicator in result["environmental_indicators"]
+        ],
         "approved_standout_indicator_ids": result["approved_standout_indicator_ids"],
     }
 
@@ -826,12 +858,13 @@ def valid_pattern_insight(insight: Any) -> bool:
     if insight["status"] == "no_pattern":
         return patterns == [] and bool(limitations)
     if insight["status"] == "available":
-        return bool(patterns) and all(
+        return (bool(patterns) and all(
             pattern["status"] == "available"
             and all(pattern[field]["status"] == "available"
                     for field in ("confidence", "quality", "stability"))
             for pattern in patterns
-        )
+        ) and all(comparison_indicator_is_available(indicator)
+                  for indicator in [*outcomes, *environmental]))
     return bool(limitations)
 
 
@@ -868,12 +901,31 @@ def load_pattern_insights() -> tuple[list[dict[str, Any]] | None, dict[str, Any]
 
 def pattern_insight_data(insight: dict[str, Any]) -> dict[str, Any]:
     """Whitelist public E7 fields from the approved output."""
+    pattern_fields = (
+        "id", "title", "description", "status",
+        "supporting_outcome_indicator_ids", "supporting_environmental_indicator_ids",
+    )
     return {
-        "neighbourhood_a": insight["neighbourhood_a"],
-        "neighbourhood_b": insight["neighbourhood_b"],
-        "patterns": insight["patterns"],
-        "supporting_outcome_indicators": insight["supporting_outcome_indicators"],
-        "supporting_environmental_indicators": insight["supporting_environmental_indicators"],
+        "neighbourhood_a": comparison_area_data(insight["neighbourhood_a"]),
+        "neighbourhood_b": comparison_area_data(insight["neighbourhood_b"]),
+        "patterns": [{
+            **{field: pattern[field] for field in pattern_fields},
+            **{
+                field: {
+                    "value": pattern[field]["value"],
+                    "status": pattern[field]["status"],
+                }
+                for field in ("confidence", "quality", "stability")
+            },
+        } for pattern in insight["patterns"]],
+        "supporting_outcome_indicators": [
+            comparison_indicator_data(indicator)
+            for indicator in insight["supporting_outcome_indicators"]
+        ],
+        "supporting_environmental_indicators": [
+            comparison_indicator_data(indicator)
+            for indicator in insight["supporting_environmental_indicators"]
+        ],
     }
 
 
@@ -958,12 +1010,14 @@ def valid_prevention_result(result: Any) -> bool:
     if result["status"] == "no_opportunity":
         return opportunities == [] and bool(limitations)
     if result["status"] == "available":
-        return bool(opportunities) and all(
+        return (bool(opportunities) and all(
             opportunity["status"] == "available"
             and all(opportunity[field]["status"] == "available"
                     for field in ("modifiability", "quality", "uncertainty"))
             for opportunity in opportunities
-        )
+        ) and all(comparison_indicator_is_available(indicator)
+                  for indicator in [*outcomes, *environmental])
+        and all(pattern["status"] == "available" for pattern in patterns))
     return bool(limitations)
 
 
@@ -1007,13 +1061,22 @@ def prevention_opportunity_data(result: dict[str, Any]) -> dict[str, Any]:
         "related_pattern_ids", "modifiability", "quality", "uncertainty",
     )
     return {
-        "neighbourhood_a": result["neighbourhood_a"],
-        "neighbourhood_b": result["neighbourhood_b"],
+        "neighbourhood_a": comparison_area_data(result["neighbourhood_a"]),
+        "neighbourhood_b": comparison_area_data(result["neighbourhood_b"]),
         "opportunities": [
             {field: opportunity[field] for field in opportunity_fields}
             for opportunity in result["opportunities"]
         ],
-        "supporting_outcome_indicators": result["supporting_outcome_indicators"],
-        "supporting_environmental_indicators": result["supporting_environmental_indicators"],
-        "related_patterns": result["related_patterns"],
+        "supporting_outcome_indicators": [
+            comparison_indicator_data(indicator)
+            for indicator in result["supporting_outcome_indicators"]
+        ],
+        "supporting_environmental_indicators": [
+            comparison_indicator_data(indicator)
+            for indicator in result["supporting_environmental_indicators"]
+        ],
+        "related_patterns": [
+            {field: pattern[field] for field in ("id", "title", "description", "status")}
+            for pattern in result["related_patterns"]
+        ],
     }
