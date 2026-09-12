@@ -514,6 +514,80 @@ Missing, suppressed, unavailable, limited, or incompatible values and difference
 
 The backend must not calculate environmental differences, normalise values, assign ranks, choose standout factors, infer missing values, or make causal claims. The final environmental indicator list, units, difference direction, coverage representation, standout/ranking structure, pair ordering, dataset location, schema, and notice wording are TBC pending the Data Science output contract.
 
+## BE-9 — Pattern Insight Service (supports E7)
+
+### `GET /api/pattern-insight` (provisional)
+
+Returns approved pattern-insight outputs associated with a neighbourhood comparison. Provisional query parameters are `neighbourhood_id_a` and `neighbourhood_id_b`.
+
+```json
+{
+  "status": "available | limited | no_pattern | missing | incompatible | unavailable",
+  "data": {
+    "neighbourhood_a": {
+      "id": "TBC",
+      "name": "TBC",
+      "geographic_unit": "TBC"
+    },
+    "neighbourhood_b": {
+      "id": "TBC",
+      "name": "TBC",
+      "geographic_unit": "TBC"
+    },
+    "patterns": [
+      {
+        "id": "TBC",
+        "title": "TBC",
+        "description": "TBC",
+        "status": "available | limited | missing | incompatible | unavailable",
+        "supporting_outcome_indicator_ids": [],
+        "supporting_environmental_indicator_ids": [],
+        "confidence": {
+          "value": null,
+          "status": "available | missing | incompatible | unavailable | limited"
+        },
+        "quality": {
+          "value": null,
+          "status": "available | missing | incompatible | unavailable | limited"
+        },
+        "stability": {
+          "value": null,
+          "status": "available | missing | incompatible | unavailable | limited"
+        }
+      }
+    ],
+    "supporting_outcome_indicators": [],
+    "supporting_environmental_indicators": []
+  },
+  "metadata": {
+    "source": "TBC",
+    "reference_year": "TBC",
+    "geographic_unit": "TBC",
+    "data_quality": "TBC",
+    "output_schema_version": "TBC"
+  },
+  "limitations": [],
+  "notices": [
+    {
+      "code": "association_not_causation",
+      "message": "TBC"
+    },
+    {
+      "code": "investigation_leads",
+      "message": "TBC"
+    }
+  ]
+}
+```
+
+Every supporting indicator reference in a pattern must identify an entry in the corresponding complete supporting-indicator list. A pattern may reference zero or more indicators from either list only when that structure is explicitly supplied by the approved output contract; final minimum evidence requirements are TBC.
+
+Confidence, quality, and stability are source-supplied assessment fields and may be categorical or numeric when available. A non-available assessment has a `null` value and an explicit status. Their final meanings, ranges, thresholds, and representation are TBC; the backend must not derive them.
+
+When the approved output explicitly states that no supported pattern exists, the response uses `no_pattern`, returns an empty `patterns` list, and includes the supplied limitation. The backend must not create a pattern from the supporting indicators. Missing or incompatible evidence remains explicit and must not be imputed.
+
+Patterns describe potential area-level associations for further investigation, not causes or validated interventions. The backend must not identify patterns, calculate feature importance, run SHAP, generate model explanations, or add analytical conclusions. The final pattern fields, evidence structure, no-pattern representation, assessment fields, pair ordering, dataset location, schema, and notice wording are TBC pending the approved Data Science or AI output contract.
+
 ## Error handling
 
 Errors use the same envelope shape:
@@ -570,6 +644,10 @@ It confirms that the FastAPI service is running and makes no statement about bus
 - Final environmental indicator list, units, and difference direction
 - Final environmental coverage and standout/ranking representations
 - Final environmental-difference dataset location and schema version
+- Final Iteration 2 pattern-insight endpoint and query parameter names
+- Final pattern, supporting-evidence, and no-pattern structures
+- Final confidence, quality, stability, and uncertainty representations
+- Final pattern-insight dataset location and schema version
 - Final approved disclaimer and notice wording where not already confirmed
 - Final bounding-box query format
 - Final map-indicator query parameters and indicator selection
