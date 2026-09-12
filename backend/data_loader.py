@@ -13,6 +13,7 @@ PRIORITY_DATA_PATH_ENV = "KINDERPRINT_PRIORITY_DATA_PATH"
 EXPLANATION_DATA_PATH_ENV = "KINDERPRINT_EXPLANATION_DATA_PATH"
 COMPARISON_DATA_PATH_ENV = "KINDERPRINT_COMPARISON_DATA_PATH"
 OUTCOME_COMPARISON_DATA_PATH_ENV = "KINDERPRINT_OUTCOME_COMPARISON_DATA_PATH"
+ENVIRONMENTAL_DIFFERENCE_DATA_PATH_ENV = "KINDERPRINT_ENVIRONMENTAL_DIFFERENCE_DATA_PATH"
 
 
 def boundary_data_path() -> Path | None:
@@ -42,6 +43,11 @@ def comparison_data_path() -> Path | None:
 
 def outcome_comparison_data_path() -> Path | None:
     value = os.getenv(OUTCOME_COMPARISON_DATA_PATH_ENV)
+    return Path(value).expanduser() if value else None
+
+
+def environmental_difference_data_path() -> Path | None:
+    value = os.getenv(ENVIRONMENTAL_DIFFERENCE_DATA_PATH_ENV)
     return Path(value).expanduser() if value else None
 
 

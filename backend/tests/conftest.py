@@ -10,6 +10,7 @@ sys.path.insert(0, str(BACKEND_DIR))
 from data_loader import (  # noqa: E402
     BOUNDARY_DATA_PATH_ENV,
     COMPARISON_DATA_PATH_ENV,
+    ENVIRONMENTAL_DIFFERENCE_DATA_PATH_ENV,
     EXPLANATION_DATA_PATH_ENV,
     OUTCOME_COMPARISON_DATA_PATH_ENV,
     PRIORITY_DATA_PATH_ENV,
@@ -26,6 +27,7 @@ def clear_dataset_environment(monkeypatch: pytest.MonkeyPatch) -> None:
         PRIORITY_DATA_PATH_ENV,
         EXPLANATION_DATA_PATH_ENV,
         COMPARISON_DATA_PATH_ENV,
+        ENVIRONMENTAL_DIFFERENCE_DATA_PATH_ENV,
         OUTCOME_COMPARISON_DATA_PATH_ENV,
     ):
         monkeypatch.delenv(variable, raising=False)

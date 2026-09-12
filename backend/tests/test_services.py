@@ -2,6 +2,7 @@ import json
 
 from data_loader import (
     COMPARISON_DATA_PATH_ENV,
+    ENVIRONMENTAL_DIFFERENCE_DATA_PATH_ENV,
     EXPLANATION_DATA_PATH_ENV,
     OUTCOME_COMPARISON_DATA_PATH_ENV,
     PRIORITY_DATA_PATH_ENV,
@@ -388,3 +389,120 @@ def test_outcome_comparison_does_not_reverse_an_unapproved_direction(client, mon
     assert body["status"] == "unavailable"
     assert body["data"]["outcome_indicators"] == []
     assert body["limitations"][0]["code"] == "outcome_comparison_unavailable"
+
+
+def environmental_difference_source(*, missing: bool = False,
+                                    standout_ids=None) -> dict:
+    value_status = "missing" if missing else "available"
+    result_status = "limited" if missing else "available"
+    result = {
+        "status": result_status,
+        "neighbourhood_a": {"id": "a", "name": "A", "geographic_unit": "TBC"},
+        "neighbourhood_b": {"id": "b", "name": "B", "geographic_unit": "TBC"},
+        "environmental_indicators": [{
+            "id": "heat",
+            "name": "Heat",
+            "unit": "TBC",
+            "neighbourhood_a": {"value": 0, "status": "available"},
+            "neighbourhood_b": {"value": None if missing else 2,
+                                  "status": value_status},
+            "approved_difference": {"value": None if missing else -2,
+                                    "status": value_status},
+            "source": "approved",
+            "reference_year": "TBC",
+            "geographic_unit": "TBC",
+        }],
+        "approved_standout_indicator_ids": (
+            ["heat"] if standout_ids is None else standout_ids),
+    }
+    if result_status != "available":
+        result["limitations"] = [{
+            "code": "environmental_value_missing",
+            "message": "The approved output identifies a missing environmental value.",
+            "affected_fields": ["heat"],
+        }]
+    return {
+        "approved": True,
+        "metadata": METADATA,
+        "differences": [result],
+    }
+
+
+def configure_environmental_sources(monkeypatch, write_json, source: dict) -> None:
+    profile_path = write_json("profiles.json", json.dumps({
+        "profiles": [profile("a", 1), profile("b", 2)],
+    }))
+    difference_path = write_json("environmental_differences.json", json.dumps(source))
+    monkeypatch.setenv(PROFILE_DATA_PATH_ENV, str(profile_path))
+    monkeypatch.setenv(ENVIRONMENTAL_DIFFERENCE_DATA_PATH_ENV, str(difference_path))
+
+
+def test_environmental_difference_returns_approved_output(client, monkeypatch, write_json) -> None:
+    configure_environmental_sources(
+        monkeypatch, write_json, environmental_difference_source())
+
+    body = client.get("/api/environmental-difference", params={
+        "neighbourhood_id_a": "a", "neighbourhood_id_b": "b",
+    }).json()
+
+    assert body["status"] == "available"
+    indicator = body["data"]["environmental_indicators"][0]
+    assert indicator["neighbourhood_a"]["value"] == 0
+    assert indicator["approved_difference"]["value"] == -2
+    assert body["data"]["approved_standout_indicator_ids"] == ["heat"]
+    assert body["notices"][1]["code"] == "association_not_causation"
+
+
+def test_environmental_difference_preserves_missing_null(client, monkeypatch, write_json) -> None:
+    configure_environmental_sources(
+        monkeypatch, write_json, environmental_difference_source(missing=True))
+
+    body = client.get("/api/environmental-difference", params={
+        "neighbourhood_id_a": "a", "neighbourhood_id_b": "b",
+    }).json()
+
+    assert body["status"] == "limited"
+    indicator = body["data"]["environmental_indicators"][0]
+    assert indicator["neighbourhood_b"]["value"] is None
+    assert indicator["approved_difference"]["value"] is None
+
+
+def test_environmental_difference_rejects_unknown_standout(client, monkeypatch, write_json) -> None:
+    configure_environmental_sources(
+        monkeypatch, write_json,
+        environmental_difference_source(standout_ids=["not-an-indicator"]))
+
+    body = client.get("/api/environmental-difference", params={
+        "neighbourhood_id_a": "a", "neighbourhood_id_b": "b",
+    }).json()
+
+    assert body["status"] == "unavailable"
+    assert body["limitations"][0]["code"] == "environmental_difference_dataset_invalid"
+
+
+def test_environmental_difference_reports_unconfigured_output(client, monkeypatch, write_json) -> None:
+    profile_path = write_json("profiles.json", json.dumps({
+        "profiles": [profile("a", 1), profile("b", 2)],
+    }))
+    monkeypatch.setenv(PROFILE_DATA_PATH_ENV, str(profile_path))
+
+    body = client.get("/api/environmental-difference", params={
+        "neighbourhood_id_a": "a", "neighbourhood_id_b": "b",
+    }).json()
+
+    assert body["status"] == "unavailable"
+    assert body["limitations"][0]["code"] == (
+        "environmental_difference_dataset_not_configured")
+
+
+def test_environmental_difference_does_not_reverse_difference(client, monkeypatch, write_json) -> None:
+    configure_environmental_sources(
+        monkeypatch, write_json, environmental_difference_source())
+
+    body = client.get("/api/environmental-difference", params={
+        "neighbourhood_id_a": "b", "neighbourhood_id_b": "a",
+    }).json()
+
+    assert body["status"] == "unavailable"
+    assert body["data"]["environmental_indicators"] == []
+    assert body["limitations"][0]["code"] == "environmental_difference_unavailable"

@@ -25,8 +25,10 @@ from responses import (
     HUMAN_DECISION_NOTICE, INVESTIGATION_LEADS_NOTICE, envelope, limitation,
 )
 from validation import (
-    aggregate_status, explanation_data, load_comparison_data, load_explanations,
-    load_outcome_comparisons, load_priority_results, load_profiles, map_indicator_data, match_data,
+    aggregate_status, environmental_difference_data, explanation_data,
+    load_comparison_data, load_environmental_differences, load_explanations,
+    load_outcome_comparisons, load_priority_results, load_profiles,
+    map_indicator_data, match_data,
     outcome_comparison_data,
     priority_data, profile_boundary_limitations, profile_collection_metadata,
     profile_comparison_data, profile_comparison_limitations, profile_limitations,
@@ -409,6 +411,89 @@ def outcome_comparison(
     return envelope(
         comparison["status"], outcome_comparison_data(comparison), metadata=metadata,
         limitations=comparison.get("limitations", []), notices=notices)
+
+
+@app.get("/api/environmental-difference")
+def environmental_difference(
+    neighbourhood_id_a: str = Query(..., min_length=1, max_length=100),
+    neighbourhood_id_b: str = Query(..., min_length=1, max_length=100),
+) -> dict[str, Any]:
+    """Return approved E6 environmental differences without calculating them."""
+    notices = [COMPARISON_AREA_NOTICE, ASSOCIATION_NOTICE]
+    empty = {
+        "neighbourhood_a": {
+            "id": neighbourhood_id_a, "name": None, "geographic_unit": None,
+        },
+        "neighbourhood_b": {
+            "id": neighbourhood_id_b, "name": None, "geographic_unit": None,
+        },
+        "environmental_indicators": [],
+        "approved_standout_indicator_ids": [],
+    }
+    profiles, profile_load_limitations = load_profiles()
+    if profiles is None:
+        return envelope(
+            "unavailable", empty, limitations=profile_load_limitations, notices=notices)
+
+    profile_a = next((profile for profile in profiles
+                      if profile["neighbourhood"]["id"] == neighbourhood_id_a), None)
+    profile_b = next((profile for profile in profiles
+                      if profile["neighbourhood"]["id"] == neighbourhood_id_b), None)
+    if profile_a is None or profile_b is None:
+        missing_parameters = [
+            parameter
+            for profile, parameter in (
+                (profile_a, "neighbourhood_id_a"),
+                (profile_b, "neighbourhood_id_b"),
+            )
+            if profile is None
+        ]
+        return envelope("missing", empty, limitations=[limitation(
+            "unsupported_neighbourhood",
+            "One or both neighbourhood identifiers do not have a supported profile.",
+            *missing_parameters,
+        )], notices=notices)
+    if neighbourhood_id_a == neighbourhood_id_b:
+        return envelope("incompatible", empty, limitations=[limitation(
+            "same_neighbourhood_selected",
+            "Choose two different neighbourhoods for an environmental comparison.",
+            "neighbourhood_id_a", "neighbourhood_id_b",
+        )], notices=notices)
+    if (profile_a["neighbourhood"]["geographic_unit"]
+            != profile_b["neighbourhood"]["geographic_unit"]):
+        return envelope("incompatible", empty, limitations=[limitation(
+            "incompatible_geographic_unit",
+            "The selected neighbourhood profiles use incompatible geographic units.",
+            "neighbourhood_id_a", "neighbourhood_id_b", "geographic_unit",
+        )], notices=notices)
+
+    empty["neighbourhood_a"] = profile_a["neighbourhood"]
+    empty["neighbourhood_b"] = profile_b["neighbourhood"]
+    differences, metadata, data_limitations = load_environmental_differences()
+    if differences is None:
+        return envelope(
+            "unavailable", empty, limitations=data_limitations, notices=notices)
+    result = next((item for item in differences
+                   if item["neighbourhood_a"]["id"] == neighbourhood_id_a
+                   and item["neighbourhood_b"]["id"] == neighbourhood_id_b), None)
+    if result is None:
+        return envelope("unavailable", empty, metadata=metadata, limitations=[limitation(
+            "environmental_difference_unavailable",
+            "No approved environmental-difference result is available for the selected ordered pair.",
+            "neighbourhood_id_a", "neighbourhood_id_b",
+        )], notices=notices)
+    if (result["neighbourhood_a"]["geographic_unit"]
+            != profile_a["neighbourhood"]["geographic_unit"]
+            or result["neighbourhood_b"]["geographic_unit"]
+            != profile_b["neighbourhood"]["geographic_unit"]):
+        return envelope("incompatible", empty, metadata=metadata, limitations=[limitation(
+            "incompatible_geographic_unit",
+            "The approved environmental result and selected profiles use incompatible geographic units.",
+            "geographic_unit",
+        )], notices=notices)
+    return envelope(
+        result["status"], environmental_difference_data(result), metadata=metadata,
+        limitations=result.get("limitations", []), notices=notices)
 
 
 @app.get("/api/neighbourhoods/{neighbourhood_id}/boundary")

@@ -4,11 +4,13 @@ from typing import Any
 
 from data_loader import (
     COMPARISON_DATA_PATH_ENV,
+    ENVIRONMENTAL_DIFFERENCE_DATA_PATH_ENV,
     EXPLANATION_DATA_PATH_ENV,
     OUTCOME_COMPARISON_DATA_PATH_ENV,
     PRIORITY_DATA_PATH_ENV,
     PROFILE_DATA_PATH_ENV,
     comparison_data_path,
+    environmental_difference_data_path,
     explanation_data_path,
     load_json_source,
     outcome_comparison_data_path,
@@ -572,7 +574,7 @@ def manual_comparison_data(comparison: dict[str, Any], reverse: bool = False) ->
     }
 
 
-def valid_outcome_value(value: Any) -> bool:
+def valid_comparison_value(value: Any) -> bool:
     """Require explicit availability and preserve null for every unavailable value."""
     if not isinstance(value, dict) or value.get("status") not in INDICATOR_STATUSES:
         return False
@@ -589,7 +591,7 @@ def valid_outcome_indicator(indicator: Any, geographic_unit: str) -> bool:
         return False
     if indicator["geographic_unit"] != geographic_unit:
         return False
-    return all(valid_outcome_value(indicator.get(field)) for field in (
+    return all(valid_comparison_value(indicator.get(field)) for field in (
         "neighbourhood_a", "neighbourhood_b", "approved_difference"))
 
 
@@ -663,4 +665,97 @@ def outcome_comparison_data(comparison: dict[str, Any]) -> dict[str, Any]:
         "neighbourhood_a": comparison["neighbourhood_a"],
         "neighbourhood_b": comparison["neighbourhood_b"],
         "outcome_indicators": comparison["outcome_indicators"],
+    }
+
+
+def valid_environmental_indicator(indicator: Any, geographic_unit: str) -> bool:
+    if not isinstance(indicator, dict):
+        return False
+    required_text = ("id", "name", "unit", "source", "reference_year", "geographic_unit")
+    if not all(isinstance(indicator.get(field), (str, int)) and str(indicator[field]).strip()
+               for field in required_text):
+        return False
+    if indicator["geographic_unit"] != geographic_unit:
+        return False
+    return all(valid_comparison_value(indicator.get(field)) for field in (
+        "neighbourhood_a", "neighbourhood_b", "approved_difference"))
+
+
+def valid_environmental_difference(result: Any) -> bool:
+    """Validate supplied E6 differences and approved standout references."""
+    if not isinstance(result, dict) or result.get("status") not in INDICATOR_STATUSES:
+        return False
+    area_a, area_b = result.get("neighbourhood_a"), result.get("neighbourhood_b")
+    if not valid_comparison_area(area_a) or not valid_comparison_area(area_b):
+        return False
+    if area_a["id"] == area_b["id"] or area_a["geographic_unit"] != area_b["geographic_unit"]:
+        return False
+    indicators = result.get("environmental_indicators")
+    if not isinstance(indicators, list) or not all(
+            valid_environmental_indicator(indicator, area_a["geographic_unit"])
+            for indicator in indicators):
+        return False
+    indicator_ids = [indicator["id"] for indicator in indicators]
+    if len(indicator_ids) != len(set(indicator_ids)):
+        return False
+    standout_ids = result.get("approved_standout_indicator_ids")
+    if (not isinstance(standout_ids, list)
+            or not all(isinstance(identifier, str) for identifier in standout_ids)
+            or len(standout_ids) != len(set(standout_ids))
+            or not set(standout_ids).issubset(indicator_ids)):
+        return False
+    limitations = result.get("limitations", [])
+    if not isinstance(limitations, list) or not all(valid_priority_limitation(item) for item in limitations):
+        return False
+    if result["status"] == "available":
+        return bool(indicators) and all(
+            value["status"] == "available"
+            for indicator in indicators
+            for value in (
+                indicator["neighbourhood_a"],
+                indicator["neighbourhood_b"],
+                indicator["approved_difference"],
+            )
+        )
+    return bool(limitations)
+
+
+def load_environmental_differences() -> tuple[list[dict[str, Any]] | None, dict[str, Any] | None, list[dict[str, Any]]]:
+    """Load only explicitly approved E6 environmental-difference outputs."""
+    source, limitations = load_json_source(
+        environmental_difference_data_path(), ENVIRONMENTAL_DIFFERENCE_DATA_PATH_ENV,
+        "environmental_difference")
+    if source is None:
+        return None, None, limitations
+    results, metadata = source.get("differences"), source.get("metadata")
+    if (source.get("approved") is not True or not isinstance(results, list)
+            or not valid_priority_metadata(metadata)):
+        return None, None, [limitation(
+            "environmental_difference_dataset_invalid",
+            "The environmental-difference dataset must be explicitly approved and contain differences with complete provenance metadata.",
+            "environmental_difference")]
+    if not all(valid_environmental_difference(result) for result in results):
+        return None, None, [limitation(
+            "environmental_difference_dataset_invalid",
+            "The environmental-difference dataset contains an invalid result, standout reference, value status, or non-null unavailable value.",
+            "differences")]
+    pair_ids = [
+        (result["neighbourhood_a"]["id"], result["neighbourhood_b"]["id"])
+        for result in results
+    ]
+    if len(pair_ids) != len(set(pair_ids)):
+        return None, None, [limitation(
+            "environmental_difference_dataset_invalid",
+            "The environmental-difference dataset contains duplicate ordered neighbourhood pairs.",
+            "differences")]
+    return results, metadata, []
+
+
+def environmental_difference_data(result: dict[str, Any]) -> dict[str, Any]:
+    """Whitelist public E6 fields from the approved output."""
+    return {
+        "neighbourhood_a": result["neighbourhood_a"],
+        "neighbourhood_b": result["neighbourhood_b"],
+        "environmental_indicators": result["environmental_indicators"],
+        "approved_standout_indicator_ids": result["approved_standout_indicator_ids"],
     }
