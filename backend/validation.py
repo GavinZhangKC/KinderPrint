@@ -8,6 +8,7 @@ from data_loader import (
     EXPLANATION_DATA_PATH_ENV,
     OUTCOME_COMPARISON_DATA_PATH_ENV,
     PATTERN_INSIGHT_DATA_PATH_ENV,
+    PREVENTION_OPPORTUNITY_DATA_PATH_ENV,
     PRIORITY_DATA_PATH_ENV,
     PROFILE_DATA_PATH_ENV,
     comparison_data_path,
@@ -16,6 +17,7 @@ from data_loader import (
     load_json_source,
     outcome_comparison_data_path,
     pattern_insight_data_path,
+    prevention_opportunity_data_path,
     priority_data_path,
     profile_data_path,
 )
@@ -872,4 +874,146 @@ def pattern_insight_data(insight: dict[str, Any]) -> dict[str, Any]:
         "patterns": insight["patterns"],
         "supporting_outcome_indicators": insight["supporting_outcome_indicators"],
         "supporting_environmental_indicators": insight["supporting_environmental_indicators"],
+    }
+
+
+def valid_related_pattern(pattern: Any) -> bool:
+    return (
+        isinstance(pattern, dict)
+        and pattern.get("status") in INDICATOR_STATUSES
+        and all(isinstance(pattern.get(field), str) and pattern[field].strip()
+                for field in ("id", "title", "description"))
+    )
+
+
+def valid_prevention_opportunity(
+    opportunity: Any,
+    outcome_ids: set[str],
+    environmental_ids: set[str],
+    pattern_ids: set[str],
+) -> bool:
+    """Validate an approved condition and its evidence links without deriving it."""
+    if not isinstance(opportunity, dict) or opportunity.get("status") not in INDICATOR_STATUSES:
+        return False
+    if not all(isinstance(opportunity.get(field), str) and opportunity[field].strip()
+               for field in ("id", "condition", "description")):
+        return False
+    references = (
+        ("supporting_outcome_indicator_ids", outcome_ids),
+        ("supporting_environmental_indicator_ids", environmental_ids),
+        ("related_pattern_ids", pattern_ids),
+    )
+    for field, allowed_ids in references:
+        identifiers = opportunity.get(field)
+        if (not isinstance(identifiers, list)
+                or not all(isinstance(identifier, str) for identifier in identifiers)
+                or len(identifiers) != len(set(identifiers))
+                or not set(identifiers).issubset(allowed_ids)):
+            return False
+    return all(valid_comparison_value(opportunity.get(field))
+               for field in ("modifiability", "quality", "uncertainty"))
+
+
+def valid_prevention_result(result: Any) -> bool:
+    """Validate an approved E8 result without deciding or ranking opportunities."""
+    allowed_statuses = {*INDICATOR_STATUSES, "no_opportunity"}
+    if not isinstance(result, dict) or result.get("status") not in allowed_statuses:
+        return False
+    area_a, area_b = result.get("neighbourhood_a"), result.get("neighbourhood_b")
+    if not valid_comparison_area(area_a) or not valid_comparison_area(area_b):
+        return False
+    if area_a["id"] == area_b["id"] or area_a["geographic_unit"] != area_b["geographic_unit"]:
+        return False
+    outcomes = result.get("supporting_outcome_indicators")
+    environmental = result.get("supporting_environmental_indicators")
+    patterns = result.get("related_patterns")
+    if (not isinstance(outcomes, list)
+            or not all(valid_outcome_indicator(item, area_a["geographic_unit"])
+                       for item in outcomes)
+            or not isinstance(environmental, list)
+            or not all(valid_environmental_indicator(item, area_a["geographic_unit"])
+                       for item in environmental)
+            or not isinstance(patterns, list)
+            or not all(valid_related_pattern(pattern) for pattern in patterns)):
+        return False
+    outcome_ids = [item["id"] for item in outcomes]
+    environmental_ids = [item["id"] for item in environmental]
+    pattern_ids = [pattern["id"] for pattern in patterns]
+    if (len(outcome_ids) != len(set(outcome_ids))
+            or len(environmental_ids) != len(set(environmental_ids))
+            or len(pattern_ids) != len(set(pattern_ids))):
+        return False
+    opportunities = result.get("opportunities")
+    if not isinstance(opportunities, list) or not all(
+            valid_prevention_opportunity(
+                opportunity, set(outcome_ids), set(environmental_ids), set(pattern_ids))
+            for opportunity in opportunities):
+        return False
+    opportunity_ids = [opportunity["id"] for opportunity in opportunities]
+    if len(opportunity_ids) != len(set(opportunity_ids)):
+        return False
+    limitations = result.get("limitations", [])
+    if not isinstance(limitations, list) or not all(valid_priority_limitation(item) for item in limitations):
+        return False
+    if result["status"] == "no_opportunity":
+        return opportunities == [] and bool(limitations)
+    if result["status"] == "available":
+        return bool(opportunities) and all(
+            opportunity["status"] == "available"
+            and all(opportunity[field]["status"] == "available"
+                    for field in ("modifiability", "quality", "uncertainty"))
+            for opportunity in opportunities
+        )
+    return bool(limitations)
+
+
+def load_prevention_opportunities() -> tuple[list[dict[str, Any]] | None, dict[str, Any] | None, list[dict[str, Any]]]:
+    """Load only explicitly approved E8 prevention-opportunity outputs."""
+    source, limitations = load_json_source(
+        prevention_opportunity_data_path(), PREVENTION_OPPORTUNITY_DATA_PATH_ENV,
+        "prevention_opportunity")
+    if source is None:
+        return None, None, limitations
+    results, metadata = source.get("results"), source.get("metadata")
+    if (source.get("approved") is not True or not isinstance(results, list)
+            or not valid_priority_metadata(metadata)):
+        return None, None, [limitation(
+            "prevention_opportunity_dataset_invalid",
+            "The prevention-opportunity dataset must be explicitly approved and contain results with complete provenance metadata.",
+            "prevention_opportunity")]
+    if not all(valid_prevention_result(result) for result in results):
+        return None, None, [limitation(
+            "prevention_opportunity_dataset_invalid",
+            "The prevention-opportunity dataset contains an invalid condition, evidence reference, assessment, or non-null unavailable value.",
+            "results")]
+    pair_ids = [
+        (result["neighbourhood_a"]["id"], result["neighbourhood_b"]["id"])
+        for result in results
+    ]
+    if len(pair_ids) != len(set(pair_ids)):
+        return None, None, [limitation(
+            "prevention_opportunity_dataset_invalid",
+            "The prevention-opportunity dataset contains duplicate ordered neighbourhood pairs.",
+            "results")]
+    return results, metadata, []
+
+
+def prevention_opportunity_data(result: dict[str, Any]) -> dict[str, Any]:
+    """Whitelist public E8 fields and omit any unapproved recommendation fields."""
+    opportunity_fields = (
+        "id", "condition", "description", "status",
+        "supporting_outcome_indicator_ids",
+        "supporting_environmental_indicator_ids",
+        "related_pattern_ids", "modifiability", "quality", "uncertainty",
+    )
+    return {
+        "neighbourhood_a": result["neighbourhood_a"],
+        "neighbourhood_b": result["neighbourhood_b"],
+        "opportunities": [
+            {field: opportunity[field] for field in opportunity_fields}
+            for opportunity in result["opportunities"]
+        ],
+        "supporting_outcome_indicators": result["supporting_outcome_indicators"],
+        "supporting_environmental_indicators": result["supporting_environmental_indicators"],
+        "related_patterns": result["related_patterns"],
     }

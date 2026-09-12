@@ -6,6 +6,7 @@ from data_loader import (
     EXPLANATION_DATA_PATH_ENV,
     OUTCOME_COMPARISON_DATA_PATH_ENV,
     PATTERN_INSIGHT_DATA_PATH_ENV,
+    PREVENTION_OPPORTUNITY_DATA_PATH_ENV,
     PRIORITY_DATA_PATH_ENV,
     PROFILE_DATA_PATH_ENV,
 )
@@ -625,3 +626,139 @@ def test_pattern_insight_reports_unconfigured_output(client, monkeypatch, write_
 
     assert body["status"] == "unavailable"
     assert body["limitations"][0]["code"] == "pattern_insight_dataset_not_configured"
+
+
+def prevention_opportunity_source(*, no_opportunity: bool = False,
+                                  invalid_reference: bool = False,
+                                  limited: bool = False) -> dict:
+    outcome = outcome_comparison_source()["comparisons"][0]["outcome_indicators"][0]
+    environmental = environmental_difference_source()["differences"][0][
+        "environmental_indicators"][0]
+    related_patterns = [] if no_opportunity else [{
+        "id": "pattern-1",
+        "title": "Approved pattern",
+        "description": "Approved area-level description.",
+        "status": "available",
+    }]
+    opportunities = [] if no_opportunity else [{
+        "id": "opportunity-1",
+        "condition": "Approved potentially modifiable condition",
+        "description": "Approved investigation framing.",
+        "status": "limited" if limited else "available",
+        "supporting_outcome_indicator_ids": ["outcome"],
+        "supporting_environmental_indicator_ids": [
+            "unknown" if invalid_reference else "heat"],
+        "related_pattern_ids": ["pattern-1"],
+        "modifiability": {"value": None if limited else "TBC",
+                          "status": "missing" if limited else "available"},
+        "quality": {"value": "TBC", "status": "available"},
+        "uncertainty": {"value": "TBC", "status": "available"},
+        "intervention_recommendation": "This field must not be exposed.",
+    }]
+    status = (
+        "no_opportunity" if no_opportunity
+        else "limited" if limited
+        else "available"
+    )
+    result = {
+        "status": status,
+        "neighbourhood_a": {"id": "a", "name": "A", "geographic_unit": "TBC"},
+        "neighbourhood_b": {"id": "b", "name": "B", "geographic_unit": "TBC"},
+        "opportunities": opportunities,
+        "supporting_outcome_indicators": [] if no_opportunity else [outcome],
+        "supporting_environmental_indicators": [] if no_opportunity else [environmental],
+        "related_patterns": related_patterns,
+    }
+    if no_opportunity or limited:
+        result["limitations"] = [{
+            "code": "no_supported_opportunity" if no_opportunity else "modifiability_missing",
+            "message": "The approved output does not support a complete opportunity result.",
+            "affected_fields": ["opportunities"],
+        }]
+    return {
+        "approved": True,
+        "metadata": METADATA,
+        "results": [result],
+    }
+
+
+def configure_prevention_sources(monkeypatch, write_json, source: dict) -> None:
+    profile_path = write_json("profiles.json", json.dumps({
+        "profiles": [profile("a", 1), profile("b", 2)],
+    }))
+    opportunity_path = write_json("prevention_opportunities.json", json.dumps(source))
+    monkeypatch.setenv(PROFILE_DATA_PATH_ENV, str(profile_path))
+    monkeypatch.setenv(PREVENTION_OPPORTUNITY_DATA_PATH_ENV, str(opportunity_path))
+
+
+def test_prevention_opportunity_returns_only_approved_fields(client, monkeypatch, write_json) -> None:
+    configure_prevention_sources(
+        monkeypatch, write_json, prevention_opportunity_source())
+
+    body = client.get("/api/prevention-opportunity", params={
+        "neighbourhood_id_a": "a", "neighbourhood_id_b": "b",
+    }).json()
+
+    assert body["status"] == "available"
+    opportunity = body["data"]["opportunities"][0]
+    assert opportunity["id"] == "opportunity-1"
+    assert opportunity["related_pattern_ids"] == ["pattern-1"]
+    assert "intervention_recommendation" not in opportunity
+    assert {notice["code"] for notice in body["notices"]} == {
+        "association_not_causation", "investigation_leads", "human_decision",
+    }
+
+
+def test_prevention_opportunity_preserves_missing_assessment(client, monkeypatch, write_json) -> None:
+    configure_prevention_sources(
+        monkeypatch, write_json, prevention_opportunity_source(limited=True))
+
+    body = client.get("/api/prevention-opportunity", params={
+        "neighbourhood_id_a": "a", "neighbourhood_id_b": "b",
+    }).json()
+
+    assert body["status"] == "limited"
+    assert body["data"]["opportunities"][0]["modifiability"] == {
+        "value": None, "status": "missing",
+    }
+
+
+def test_prevention_opportunity_returns_explicit_no_opportunity(client, monkeypatch, write_json) -> None:
+    configure_prevention_sources(
+        monkeypatch, write_json, prevention_opportunity_source(no_opportunity=True))
+
+    body = client.get("/api/prevention-opportunity", params={
+        "neighbourhood_id_a": "a", "neighbourhood_id_b": "b",
+    }).json()
+
+    assert body["status"] == "no_opportunity"
+    assert body["data"]["opportunities"] == []
+    assert body["limitations"][0]["code"] == "no_supported_opportunity"
+
+
+def test_prevention_opportunity_rejects_unknown_evidence_reference(client, monkeypatch, write_json) -> None:
+    configure_prevention_sources(
+        monkeypatch, write_json,
+        prevention_opportunity_source(invalid_reference=True))
+
+    body = client.get("/api/prevention-opportunity", params={
+        "neighbourhood_id_a": "a", "neighbourhood_id_b": "b",
+    }).json()
+
+    assert body["status"] == "unavailable"
+    assert body["limitations"][0]["code"] == "prevention_opportunity_dataset_invalid"
+
+
+def test_prevention_opportunity_reports_unconfigured_output(client, monkeypatch, write_json) -> None:
+    profile_path = write_json("profiles.json", json.dumps({
+        "profiles": [profile("a", 1), profile("b", 2)],
+    }))
+    monkeypatch.setenv(PROFILE_DATA_PATH_ENV, str(profile_path))
+
+    body = client.get("/api/prevention-opportunity", params={
+        "neighbourhood_id_a": "a", "neighbourhood_id_b": "b",
+    }).json()
+
+    assert body["status"] == "unavailable"
+    assert body["limitations"][0]["code"] == (
+        "prevention_opportunity_dataset_not_configured")
