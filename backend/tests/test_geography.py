@@ -1,4 +1,5 @@
 import json
+from pathlib import Path
 
 from data_loader import BOUNDARY_DATA_PATH_ENV
 from geography import (
@@ -91,3 +92,28 @@ def test_visible_boundaries_whitelists_properties(client, monkeypatch, write_jso
     body = client.get("/api/neighbourhoods/boundaries", params={"bbox": "1,1,2,2"}).json()
     properties = body["data"]["features"][0]["properties"]
     assert properties == {"id": "n", "name": "N", "geographic_unit": "TBC"}
+
+
+def test_repeated_boundary_requests_reuse_validated_file(client, monkeypatch, write_json) -> None:
+    collection = {"type": "FeatureCollection", "features": [feature()]}
+    path = write_json("cached-boundaries.json", json.dumps(collection))
+    monkeypatch.setenv(BOUNDARY_DATA_PATH_ENV, str(path))
+    original_read_text = Path.read_text
+    reads = 0
+
+    def counted_read_text(file_path, *args, **kwargs):
+        nonlocal reads
+        if file_path == path:
+            reads += 1
+        return original_read_text(file_path, *args, **kwargs)
+
+    monkeypatch.setattr(Path, "read_text", counted_read_text)
+
+    first = client.get(
+        "/api/neighbourhoods/boundaries", params={"bbox": "1,1,2,2"}).json()
+    second = client.get(
+        "/api/neighbourhoods/boundaries", params={"bbox": "1,1,2,2"}).json()
+
+    assert first == second
+    assert first["status"] == "available"
+    assert reads == 1

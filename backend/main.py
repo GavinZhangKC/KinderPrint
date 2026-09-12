@@ -18,6 +18,7 @@ from geography import (
     neighbourhood,
     parse_bbox,
     public_boundary_feature,
+    public_boundary_geometry,
 )
 from responses import (
     AREA_LEVEL_NOTICE, ASSOCIATION_NOTICE, COMPARABLE_NOTICE, COMPARISON_AREA_NOTICE,
@@ -422,7 +423,8 @@ def neighbourhood_boundary(neighbourhood_id: str) -> dict[str, Any]:
         return envelope("missing", empty, limitations=[limitation(
             "unsupported_neighbourhood", "No supported neighbourhood boundary exists for this identifier.",
             "neighbourhood_id", "geometry")])
-    return envelope("available", {"neighbourhood": neighbourhood(feature), "geometry": feature["geometry"]},
+    return envelope("available", {"neighbourhood": neighbourhood(feature),
+                                  "geometry": public_boundary_geometry(feature)},
                     metadata=feature_metadata(feature))
 
 

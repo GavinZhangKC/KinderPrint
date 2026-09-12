@@ -1,13 +1,17 @@
 """GeoJSON source validation and boundary query helpers."""
 
+from copy import deepcopy
+from functools import lru_cache
 import json
 import math
+from pathlib import Path
 from typing import Any
 
 from data_loader import BOUNDARY_DATA_PATH_ENV, boundary_data_path
 from responses import limitation
 
 DEFAULT_BOUNDARY_VERSION = "Not supplied"
+
 
 def valid_position(position: Any) -> bool:
     if not isinstance(position, list) or len(position) < 2:
@@ -51,39 +55,69 @@ def valid_boundary_feature(feature: Any) -> bool:
     return False
 
 
-def load_boundary_features() -> tuple[list[dict[str, Any]] | None, list[dict[str, Any]]]:
-    """Load a GeoJSON FeatureCollection without repairing or transforming it."""
+class BoundaryDatasetError(Exception):
+    """Carry an existing public boundary limitation out of the cached loader."""
+
+    def __init__(self, code: str, message: str, *affected_fields: str) -> None:
+        super().__init__(message)
+        self.code = code
+        self.message = message
+        self.affected_fields = affected_fields
+
+
+@lru_cache(maxsize=1)
+def _load_validated_boundary_features(path: Path) -> tuple[dict[str, Any], ...]:
+    """Read, parse and validate one static boundary file per warm process."""
+    if not path.is_file():
+        raise BoundaryDatasetError(
+            "boundary_dataset_unavailable",
+            "The configured boundary dataset could not be found.",
+            "geometry",
+        )
+    try:
+        source = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        raise BoundaryDatasetError(
+            "boundary_dataset_unreadable",
+            "The configured boundary dataset could not be read as valid GeoJSON.",
+            "geometry",
+        ) from None
+    if (not isinstance(source, dict) or source.get("type") != "FeatureCollection"
+            or not isinstance(source.get("features"), list)):
+        raise BoundaryDatasetError(
+            "boundary_dataset_invalid",
+            "The configured boundary dataset is not a GeoJSON FeatureCollection.",
+            "geometry",
+        )
+    features = source["features"]
+    if not all(valid_boundary_feature(feature) for feature in features):
+        raise BoundaryDatasetError(
+            "boundary_dataset_invalid",
+            "The boundary dataset contains a feature without a supported neighbourhood identity, geographic unit, or polygon geometry.",
+            "geometry",
+        )
+    identifiers = [feature["properties"]["id"] for feature in features]
+    if len(identifiers) != len(set(identifiers)):
+        raise BoundaryDatasetError(
+            "boundary_dataset_invalid",
+            "The boundary dataset contains duplicate neighbourhood identifiers.",
+            "features",
+        )
+    return tuple(features)
+
+
+def load_boundary_features() -> tuple[tuple[dict[str, Any], ...] | None, list[dict[str, Any]]]:
+    """Reuse an unchanged, validated GeoJSON source without transforming it."""
     path = boundary_data_path()
     if path is None:
         return None, [limitation(
             "boundary_dataset_not_configured",
             f"No boundary dataset is configured. Set {BOUNDARY_DATA_PATH_ENV} to an approved GeoJSON FeatureCollection.",
             "geometry")]
-    if not path.is_file():
-        return None, [limitation("boundary_dataset_unavailable",
-                                 "The configured boundary dataset could not be found.", "geometry")]
     try:
-        source = json.loads(path.read_text(encoding="utf-8"))
-    except (OSError, json.JSONDecodeError):
-        return None, [limitation("boundary_dataset_unreadable",
-                                 "The configured boundary dataset could not be read as valid GeoJSON.", "geometry")]
-    if (not isinstance(source, dict) or source.get("type") != "FeatureCollection"
-            or not isinstance(source.get("features"), list)):
-        return None, [limitation("boundary_dataset_invalid",
-                                 "The configured boundary dataset is not a GeoJSON FeatureCollection.", "geometry")]
-    features = source["features"]
-    if not all(valid_boundary_feature(feature) for feature in features):
-        return None, [limitation(
-            "boundary_dataset_invalid",
-            "The boundary dataset contains a feature without a supported neighbourhood identity, geographic unit, or polygon geometry.",
-            "geometry")]
-    identifiers = [feature["properties"]["id"] for feature in features]
-    if len(identifiers) != len(set(identifiers)):
-        return None, [limitation(
-            "boundary_dataset_invalid",
-            "The boundary dataset contains duplicate neighbourhood identifiers.",
-            "features")]
-    return features, []
+        return _load_validated_boundary_features(path), []
+    except BoundaryDatasetError as error:
+        return None, [limitation(error.code, error.message, *error.affected_fields)]
 
 
 def feature_metadata(feature: dict[str, Any]) -> dict[str, Any]:
@@ -106,8 +140,13 @@ def public_boundary_feature(feature: dict[str, Any]) -> dict[str, Any]:
     return {
         "type": "Feature",
         "properties": neighbourhood(feature),
-        "geometry": feature["geometry"],
+        "geometry": public_boundary_geometry(feature),
     }
+
+
+def public_boundary_geometry(feature: dict[str, Any]) -> dict[str, Any]:
+    """Copy geometry before placing it in a response so cached data stays private."""
+    return deepcopy(feature["geometry"])
 
 
 def parse_bbox(bbox: str) -> tuple[float, float, float, float] | None:
