@@ -5,6 +5,7 @@ import '../styles/menu.css'
 interface MenuPageProps {
   onInsight?: () => void
   onMap?: () => void
+  onSimulation?: () => void
   onAboutUs?: () => void
 }
 
@@ -79,7 +80,7 @@ function PreviewMenuLink({
   )
 }
 
-export default function MenuPage({ onInsight, onMap, onAboutUs }: MenuPageProps) {
+export default function MenuPage({ onInsight, onMap, onSimulation, onAboutUs }: MenuPageProps) {
   return (
     <section className="menu-page" id="menu" aria-labelledby="menu-title" data-ripple-surface>
       <div className="menu-intro" data-no-ripple>
@@ -90,7 +91,8 @@ export default function MenuPage({ onInsight, onMap, onAboutUs }: MenuPageProps)
       <nav className="menu-links" aria-label="Explore sections" data-no-ripple>
         <PreviewMenuLink number="01" label="INSIGHT" videoSrc="/insight-preview.mp4" active onClick={onInsight} />
         <PreviewMenuLink number="02" label="MAP" videoSrc="/map-preview.mp4" onClick={onMap} />
-        <PreviewMenuLink number="03" label="ABOUT US" videoSrc="/about-preview.mp4" onClick={onAboutUs} />
+        <PreviewMenuLink number="03" label="SIMULATION" videoSrc="/simulation-preview.mp4" onClick={onSimulation} />
+        <PreviewMenuLink number="04" label="ABOUT US" videoSrc="/about-preview.mp4" onClick={onAboutUs} />
       </nav>
 
       <div className="menu-visual" aria-hidden="true" data-no-ripple>

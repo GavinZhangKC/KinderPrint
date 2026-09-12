@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 
 import './styles.css'
+import './components/SimulationPage.css'
 
 import AboutUsPage from './components/AboutUsPage'
 import BrandHeader from './components/BrandHeader'
@@ -14,6 +15,7 @@ import MenuPage from './components/MenuPage'
 import NeighbourhoodMap from './components/NeighbourhoodMap'
 import PreferencePanel from './components/PreferencePanel'
 import ProfileModal from './components/ProfileModal'
+import SimulationPage from './components/SimulationPage'
 import WaterRippleBackground from './components/WaterRippleBackground'
 
 import { useNeighbourhoodSearch } from './hooks/useNeighbourhoodSearch'
@@ -42,6 +44,7 @@ type AppPage =
   | 'insight'
   | 'map'
   | 'about'
+  | 'simulation'
 
 export default function App() {
 const [appPage, setAppPage] =
@@ -290,6 +293,7 @@ if (appPage === 'landing' || appPage === 'menu') {
           <MenuPage
             onInsight={() => setAppPage('insight')}
             onMap={() => setAppPage('map')}
+            onSimulation={() => setAppPage('simulation')}
             onAboutUs={() => setAppPage('about')}
           />
         )}
@@ -299,6 +303,16 @@ if (appPage === 'landing' || appPage === 'menu') {
 
   if (appPage === 'about') {
     return <AboutUsPage onBack={backToMenu} />
+  }
+
+  if (appPage === 'simulation') {
+    return (
+      <SimulationPage
+        onLogoClick={backToLanding}
+        onBackToMenu={backToMenu}
+        onExploreMap={openMapPage}
+      />
+    )
   }
 
   if (appPage === 'insight') {
