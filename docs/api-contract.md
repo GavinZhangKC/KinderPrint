@@ -588,6 +588,86 @@ When the approved output explicitly states that no supported pattern exists, the
 
 Patterns describe potential area-level associations for further investigation, not causes or validated interventions. The backend must not identify patterns, calculate feature importance, run SHAP, generate model explanations, or add analytical conclusions. The final pattern fields, evidence structure, no-pattern representation, assessment fields, pair ordering, dataset location, schema, and notice wording are TBC pending the approved Data Science or AI output contract.
 
+## BE-10 — Prevention Opportunity Service (supports E8)
+
+### `GET /api/prevention-opportunity` (provisional)
+
+Returns approved potentially modifiable environmental conditions associated with a neighbourhood comparison. Provisional query parameters are `neighbourhood_id_a` and `neighbourhood_id_b`.
+
+```json
+{
+  "status": "available | limited | no_opportunity | missing | incompatible | unavailable",
+  "data": {
+    "neighbourhood_a": {
+      "id": "TBC",
+      "name": "TBC",
+      "geographic_unit": "TBC"
+    },
+    "neighbourhood_b": {
+      "id": "TBC",
+      "name": "TBC",
+      "geographic_unit": "TBC"
+    },
+    "opportunities": [
+      {
+        "id": "TBC",
+        "condition": "TBC",
+        "description": "TBC",
+        "status": "available | limited | missing | incompatible | unavailable",
+        "supporting_outcome_indicator_ids": [],
+        "supporting_environmental_indicator_ids": [],
+        "related_pattern_ids": [],
+        "modifiability": {
+          "value": null,
+          "status": "available | missing | incompatible | unavailable | limited"
+        },
+        "quality": {
+          "value": null,
+          "status": "available | missing | incompatible | unavailable | limited"
+        },
+        "uncertainty": {
+          "value": null,
+          "status": "available | missing | incompatible | unavailable | limited"
+        }
+      }
+    ],
+    "supporting_outcome_indicators": [],
+    "supporting_environmental_indicators": [],
+    "related_patterns": []
+  },
+  "metadata": {
+    "source": "TBC",
+    "reference_year": "TBC",
+    "geographic_unit": "TBC",
+    "data_quality": "TBC",
+    "output_schema_version": "TBC"
+  },
+  "limitations": [],
+  "notices": [
+    {
+      "code": "association_not_causation",
+      "message": "TBC"
+    },
+    {
+      "code": "investigation_leads",
+      "message": "TBC"
+    },
+    {
+      "code": "human_decision",
+      "message": "The system does not make the final investigation or resource-allocation decision; people do."
+    }
+  ]
+}
+```
+
+Every opportunity reference must identify an item in the corresponding complete supporting-indicator or related-pattern list. The final evidence-linking structure and minimum evidence requirements are TBC.
+
+`modifiability` is an approved source-supplied assessment; its presence does not authorise the backend to decide whether a condition is modifiable. Quality and uncertainty are also supplied by the approved output. A non-available assessment uses `null` with an explicit status. Final assessment meanings, ranges, and categories are TBC.
+
+When the approved output states that no supported prevention opportunity exists, the response uses `no_opportunity`, returns an empty `opportunities` list, and includes the supplied limitation. The backend must not generate an opportunity from outcome, environmental, or pattern data.
+
+Opportunities are investigation leads, not causal findings, intervention recommendations, or resource-allocation decisions. The backend must not decide which conditions are modifiable, recommend an intervention, rank opportunities, fill missing evidence, or create a new analytical conclusion. The final opportunity fields, evidence and pattern references, no-opportunity representation, pair ordering, dataset location, schema, and notice wording are TBC pending the approved Data Science or AI output contract.
+
 ## Error handling
 
 Errors use the same envelope shape:
@@ -648,6 +728,10 @@ It confirms that the FastAPI service is running and makes no statement about bus
 - Final pattern, supporting-evidence, and no-pattern structures
 - Final confidence, quality, stability, and uncertainty representations
 - Final pattern-insight dataset location and schema version
+- Final Iteration 2 prevention-opportunity endpoint and query parameter names
+- Final prevention-opportunity, evidence-link, and related-pattern structures
+- Final modifiability, quality, uncertainty, and no-opportunity representations
+- Final prevention-opportunity dataset location and schema version
 - Final approved disclaimer and notice wording where not already confirmed
 - Final bounding-box query format
 - Final map-indicator query parameters and indicator selection
