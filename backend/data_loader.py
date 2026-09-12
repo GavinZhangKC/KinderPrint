@@ -7,6 +7,47 @@ from typing import Any
 
 from responses import limitation
 
+
+def _load_env_file(path: Path) -> None:
+    """Load environment variables from a .env file without requiring an extra dependency."""
+    if not path.exists():
+        return
+
+    for raw_line in path.read_text(encoding="utf-8").splitlines():
+        line = raw_line.strip()
+        if not line or line.startswith("#"):
+            continue
+
+        if line.startswith("export "):
+            line = line[len("export "):].strip()
+
+        if "=" not in line:
+            continue
+
+        key, value = line.split("=", 1)
+        key = key.strip()
+        value = value.strip()
+
+        if len(value) >= 2 and value[0] == value[-1] and value[0] in {'"', "'"}:
+            value = value[1:-1]
+
+        os.environ.setdefault(key, value)
+
+
+def _load_project_env_files() -> None:
+    """Load the repo root .env and any backend-local .env before reading config."""
+    project_root = Path(__file__).resolve().parent.parent
+    backend_root = Path(__file__).resolve().parent
+
+    for candidate in (
+        project_root / ".env",
+        backend_root / ".env",
+    ):
+        _load_env_file(candidate)
+
+
+_load_project_env_files()
+
 BOUNDARY_DATA_PATH_ENV = "KINDERPRINT_BOUNDARY_DATA_PATH"
 PROFILE_DATA_PATH_ENV = "KINDERPRINT_PROFILE_DATA_PATH"
 PRIORITY_DATA_PATH_ENV = "KINDERPRINT_PRIORITY_DATA_PATH"

@@ -1,4 +1,7 @@
+import { useState } from 'react'
+
 import logo from '../assets/LogoMark.png'
+import { useNeighbourhoodSearch } from '../hooks/useNeighbourhoodSearch'
 
 interface SimulationPageProps {
   onLogoClick: () => void
@@ -11,6 +14,29 @@ export default function SimulationPage({
   onBackToMenu,
   onExploreMap,
 }: SimulationPageProps) {
+  const [selectedNeighbourhood, setSelectedNeighbourhood] = useState('')
+
+  const {
+    search,
+    setSearch,
+    showSearchResults,
+    setShowSearchResults,
+    searchResults,
+    searchLoading,
+    handleSearchResultSelect,
+    submitSearch,
+  } = useNeighbourhoodSearch({
+    onSelectResult: async (item) => {
+      setSelectedNeighbourhood(item.name)
+      setSearch(item.name)
+    },
+  })
+
+  const handleSearchSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    await submitSearch()
+  }
+
   return (
     <div className="simulation-shell">
       <header className="simulation-topbar glass">
@@ -36,12 +62,58 @@ export default function SimulationPage({
 
             <div className="field-group">
               <label htmlFor="simulation-neighbourhood">Neighbourhood</label>
-              <div className="select-shell">
-                <select id="simulation-neighbourhood" defaultValue="Neighbourhood A">
-                  <option>Neighbourhood A</option>
-                  <option>Neighbourhood B</option>
-                  <option>Neighbourhood C</option>
-                </select>
+              <div className="simulation-search-wrap">
+                <form
+                  className="glass search-input-shell simulation-search-shell"
+                  onSubmit={handleSearchSubmit}
+                >
+                  <input
+                    id="simulation-neighbourhood"
+                    type="search"
+                    value={search}
+                    placeholder={selectedNeighbourhood || 'Search neighbourhood'}
+                    autoComplete="off"
+                    onFocus={() => setShowSearchResults(true)}
+                    onChange={(event) => {
+                      const nextValue = event.target.value
+                      setSearch(nextValue)
+                      setShowSearchResults(true)
+                    }}
+                  />
+                  <button
+                    className="search-submit-button"
+                    type="submit"
+                    aria-label="Search neighbourhood"
+                    disabled={searchLoading}
+                  >
+                    <span aria-hidden="true">⌕</span>
+                  </button>
+                </form>
+
+                {showSearchResults && (
+                  <div className="glass simulation-search-results">
+                    {searchLoading && (
+                      <div className="search-state">Searching neighbourhoods…</div>
+                    )}
+
+                    {!searchLoading && searchResults.length > 0 && searchResults.map((item) => (
+                      <button
+                        key={item.id}
+                        type="button"
+                        onClick={() => {
+                          void handleSearchResultSelect(item)
+                        }}
+                      >
+                        <span>{item.name}</span>
+                        <small>{item.geographic_unit}</small>
+                      </button>
+                    ))}
+
+                    {!searchLoading && searchResults.length === 0 && (
+                      <div className="search-state">No neighbourhood found</div>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
 
