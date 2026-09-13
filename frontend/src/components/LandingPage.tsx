@@ -31,7 +31,7 @@ function ExploreMenuLink({ item, onSelect }: ExploreMenuLinkProps) {
   useEffect(() => {
     const video = videoRef.current
     if (!video) return
-    video.playbackRate = 0.85
+    video.playbackRate = item.id === 'map' ? 2 : 0.85
     video.pause()
     video.currentTime = 0
   }, [])
@@ -123,7 +123,7 @@ export default function LandingPage({ onInsight, onMap }: LandingPageProps) {
 
       <main className="home-content">
         <section className="home-hero" id="home-hero" aria-labelledby="landing-title">
-          <div className="home-hero-copy" data-no-ripple>
+          <div className="home-hero-copy">
             <h1 id="landing-title">Discover how neighbourhoods<br />shape childhood.</h1>
             <p className="landing-subheading">
               Child development + community + environment.
@@ -187,7 +187,6 @@ export default function LandingPage({ onInsight, onMap }: LandingPageProps) {
           className="home-explore"
           id="home-explore"
           aria-labelledby="home-explore-title"
-          data-no-ripple
         >
           <p className="home-section-kicker">Continue exploring</p>
           <h2 id="home-explore-title">Explore KinderPrint</h2>

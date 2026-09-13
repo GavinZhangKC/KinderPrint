@@ -23,7 +23,11 @@ import { api } from './services/api'
 import { toNeighbourhood } from './services/profileAdapter'
 
 import type {
+  ApiEnvelope,
+  EnvironmentalDifference,
   NeighbourhoodComparison,
+  OutcomeComparison,
+  PatternInsight,
 } from './services/api'
 
 import type {
@@ -62,6 +66,15 @@ const [view, setView] =
   const [compareError, setCompareError] = useState<string | null>(null)
   const [comparisonLimitations, setComparisonLimitations] =
     useState<string[]>([])
+  const [outcomeComparison, setOutcomeComparison] =
+    useState<ApiEnvelope<OutcomeComparison> | null>(null)
+  const [environmentalDifference, setEnvironmentalDifference] =
+    useState<ApiEnvelope<EnvironmentalDifference> | null>(null)
+  const [outcomeComparisonError, setOutcomeComparisonError] = useState<string | null>(null)
+  const [environmentalDifferenceError, setEnvironmentalDifferenceError] = useState<string | null>(null)
+  const [patternInsight, setPatternInsight] =
+    useState<ApiEnvelope<PatternInsight> | null>(null)
+  const [patternInsightError, setPatternInsightError] = useState<string | null>(null)
   const [isMapSelectionMode, setIsMapSelectionMode] = useState(false)
   const compareRequestNumberRef = useRef(0)
   const profileRequestNumberRef = useRef(0)
@@ -233,6 +246,12 @@ function resetComparisonState() {
     setCompareError(null)
     setCompareLoading(false)
     setComparisonLimitations([])
+    setOutcomeComparison(null)
+    setEnvironmentalDifference(null)
+    setOutcomeComparisonError(null)
+    setEnvironmentalDifferenceError(null)
+    setPatternInsight(null)
+    setPatternInsightError(null)
   }
 function handleCloseCompare(targetView: 'profile' | 'map' = 'profile') {
     profileRequestNumberRef.current += 1
@@ -329,6 +348,8 @@ function choosePrimary(
           ? explanationResponse.data : null,
         {
           metadata: profileResponse.metadata,
+          profileLimitations: profileResponse.limitations,
+          profileNotices: profileResponse.notices,
           limitations: [profileResponse, priorityResponse, explanationResponse]
             .flatMap((response) => response.limitations)
             .map((item) => item.message),
@@ -398,15 +419,50 @@ function startComparison() {
     try {
       setCompareLoading(true)
       setCompareError(null)
-      const response = await api.compare(selected.id, comparison.id)
+      setComparisonResult(null)
+      setComparisonLimitations([])
+      setOutcomeComparison(null)
+      setEnvironmentalDifference(null)
+      setOutcomeComparisonError(null)
+      setEnvironmentalDifferenceError(null)
+      setPatternInsight(null)
+      setPatternInsightError(null)
+
+      const [comparisonRequest, outcomeRequest, environmentRequest, patternRequest] = await Promise.allSettled([
+        api.compare(selected.id, comparison.id),
+        api.getOutcomeComparison(selected.id, comparison.id),
+        api.getEnvironmentalDifference(selected.id, comparison.id),
+        api.getPatternInsight(selected.id, comparison.id),
+      ])
       if (requestNumber !== compareRequestNumberRef.current) {
         return
       }
+
+      if (comparisonRequest.status === 'rejected') {
+        throw comparisonRequest.reason
+      }
+
+      const response = comparisonRequest.value
       if (response.status !== 'available' && response.status !== 'limited') {
         throw new Error(response.limitations[0]?.message ?? 'No approved comparison is available for these neighbourhoods.')
       }
       setComparisonResult(response.data)
       setComparisonLimitations(response.limitations.map((item) => item.message))
+      if (outcomeRequest.status === 'fulfilled') {
+        setOutcomeComparison(outcomeRequest.value)
+      } else {
+        setOutcomeComparisonError('Child development comparison data is currently unavailable.')
+      }
+      if (environmentRequest.status === 'fulfilled') {
+        setEnvironmentalDifference(environmentRequest.value)
+      } else {
+        setEnvironmentalDifferenceError('Environmental comparison data is currently unavailable.')
+      }
+      if (patternRequest.status === 'fulfilled') {
+        setPatternInsight(patternRequest.value)
+      } else {
+        setPatternInsightError('Pattern insight is currently unavailable.')
+      }
       setView('comparison')
       window.scrollTo({ top: 0, behavior: 'smooth' })
     } catch (error) {
@@ -484,6 +540,12 @@ if (
         <DetailedComparison
           comparisonResult={comparisonResult}
           limitations={comparisonLimitations}
+          outcomeComparison={outcomeComparison}
+          outcomeError={outcomeComparisonError}
+          environmentalDifference={environmentalDifference}
+          environmentalError={environmentalDifferenceError}
+          patternInsight={patternInsight}
+          patternError={patternInsightError}
           onBack={() => handleCloseCompare('profile')}
         />
       </div>

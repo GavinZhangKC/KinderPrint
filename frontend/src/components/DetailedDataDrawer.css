@@ -35,6 +35,25 @@
 .drawer-metric { min-height: 46px; border-top: 1px solid rgba(113,137,176,.16); display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 16px; align-items: start; padding: 14px 0; font-size: 12px; }
 .drawer-metric span { min-width: 0; overflow-wrap: anywhere; }
 .drawer-metric strong { white-space: nowrap; text-align: right; font-size: 14px; }
+.drawer-evidence { grid-column: 1 / -1; color: #7e8ca6; font-size: 10px; }
+.drawer-evidence summary { display: flex; align-items: center; justify-content: space-between; gap: 8px; width: 100%; color: #617494; font-weight: 700; cursor: pointer; list-style: none; }
+.drawer-evidence summary::-webkit-details-marker { display: none; }
+.drawer-evidence summary::after { content: ''; width: 6px; height: 6px; flex: 0 0 auto; border-right: 1.5px solid currentColor; border-bottom: 1.5px solid currentColor; transform: translateY(-25%) rotate(45deg); transition: transform .16s ease; }
+.drawer-evidence[open] summary::after { transform: translateY(25%) rotate(225deg); }
+.drawer-metric-provenance { grid-column: 1 / -1; padding-top: 2px; color: #7e8ca6; font-size: 10px; }
+.drawer-evidence { grid-column: 1 / -1; }
+.drawer-evidence summary { display: flex; align-items: center; gap: 8px; color: #617494; font-size: 10px; font-weight: 700; cursor: pointer; list-style: none; }
+.drawer-evidence summary::-webkit-details-marker { display: none; }
+.drawer-evidence summary::after { content: ''; width: 6px; height: 6px; margin-left: auto; border-right: 1.5px solid currentColor; border-bottom: 1.5px solid currentColor; transform: translateY(-2px) rotate(45deg); transition: transform .16s ease; }
+.drawer-evidence:not([open]) summary span { display: none; }
+.drawer-evidence[open] summary::after { transform: translateY(2px) rotate(225deg); }
+.drawer-metric-provenance dl { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 3px 14px; margin: 0; }
+.drawer-metric-provenance dl div { display: flex; min-width: 0; gap: 5px; }
+.drawer-metric-provenance dt { flex: 0 0 auto; font-weight: 700; }
+.drawer-metric-provenance dd { min-width: 0; margin: 0; overflow-wrap: anywhere; }
+.drawer-metric-provenance p { margin: 6px 0 0; line-height: 1.4; }
+.drawer-metric-provenance .evidence-limitation { color: #8a6a44; }
+.drawer-metric-provenance .evidence-notice { color: #71809a; }
 .drawer-info p { margin: 5px 0; font-size: 11px; color: var(--muted); }.drawer-info small { display: block; margin-top: 12px; line-height: 1.5; color: #7e8ca6; }
 
 .data-drawer.page-enter { animation: drawer-enter 360ms cubic-bezier(.22, 1, .36, 1) both; }
