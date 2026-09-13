@@ -24,3 +24,13 @@ Contains G-NAF © Commonwealth of Australia (Geoscape Australia), available unde
 the applicable Open G-NAF End User Licence Agreement and CC BY 4.0 metadata terms.
 The release EULA and use-restriction fact sheet linked from the data.gov.au dataset
 page must accompany any redistributed derivative for which they apply.
+
+## Initial QA result
+
+The conservative deterministic pass matched 3,314 of 5,016 ACECQA services:
+3,187 unique full-address matches and 127 high-confidence matches. It retained 114
+ambiguous records for review and 1,588 unmatched records. Of the accepted matches,
+2,450 fall within KinderPrint's Greater Melbourne reporting boundary and received an
+Edition 3 SA2 and reporting locality. No residual was assigned through a paid API or
+weak fuzzy match. These results form a QA layer and do not silently replace the
+previous ACECQA output until comparative review is complete.
