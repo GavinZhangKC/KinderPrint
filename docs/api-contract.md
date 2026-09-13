@@ -105,6 +105,14 @@ Results are paginated with `offset` and `limit`; metadata reports page and total
 
 Returns an aggregate neighbourhood profile. The final geographic identifier format, geographic unit, and indicator lists are TBC.
 
+### `GET /api/neighbourhoods/{neighbourhood_id}/child-development`
+
+Returns only the approved Child Development domain from the configured profile artefact,
+with AEDC identified as KinderPrint's primary aggregate child-development outcome source.
+Social and environmental indicators are not included. Suppressed or unavailable AEDC
+values remain `null` with their source status and a corresponding limitation; the backend
+does not impute, downscale, or replace them.
+
 ```json
 {
   "status": "available",

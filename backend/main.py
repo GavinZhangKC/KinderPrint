@@ -304,6 +304,53 @@ def neighbourhood_profile(neighbourhood_id: str) -> dict[str, Any]:
     }, metadata=profile_metadata(profile), limitations=profile_limitations(profile), notices=[AREA_LEVEL_NOTICE])
 
 
+@app.get("/api/neighbourhoods/{neighbourhood_id}/child-development")
+def neighbourhood_child_development(neighbourhood_id: str) -> dict[str, Any]:
+    """Return only approved aggregate child-development indicators from the profile."""
+    profiles, limitations = load_profiles()
+    empty = {
+        "neighbourhood": {"id": neighbourhood_id, "name": None, "geographic_unit": None},
+        "indicators": [],
+    }
+    if profiles is None:
+        return envelope("unavailable", empty, limitations=limitations,
+                        notices=[AREA_LEVEL_NOTICE])
+    profile = next((item for item in profiles
+                    if item["neighbourhood"]["id"] == neighbourhood_id), None)
+    if profile is None:
+        return envelope("missing", empty, limitations=[limitation(
+            "unsupported_neighbourhood",
+            "No supported child-development profile exists for this identifier.",
+            "neighbourhood_id", "child_development",
+        )], notices=[AREA_LEVEL_NOTICE])
+    domain = next((item for item in profile["domains"]
+                   if item["id"] == "child-development"), None)
+    if domain is None:
+        return envelope("unavailable", {
+            "neighbourhood": profile["neighbourhood"], "indicators": [],
+        }, limitations=[limitation(
+            "child_development_domain_unavailable",
+            "The approved profile does not contain a child-development domain.",
+            "child_development",
+        )], notices=[AREA_LEVEL_NOTICE])
+    indicators = domain["indicators"]
+    status = aggregate_status([indicator["status"] for indicator in indicators])
+    domain_limitations = [limitation(
+        f"indicator_{indicator['status']}",
+        f"{indicator['name']} is {indicator['status']} and no value has been created.",
+        indicator["id"],
+    ) for indicator in indicators if indicator["status"] != "available"]
+    return envelope(status, {
+        "neighbourhood": profile["neighbourhood"], "indicators": indicators,
+    }, metadata={
+        "sources": sorted({str(indicator["source"]) for indicator in indicators}),
+        "reference_years": sorted({str(indicator["reference_year"]) for indicator in indicators}),
+        "geographic_unit": profile["neighbourhood"]["geographic_unit"],
+        "primary_outcome_dataset": "AEDC",
+        "result_count": len(indicators),
+    }, limitations=domain_limitations, notices=[AREA_LEVEL_NOTICE])
+
+
 @app.get("/api/neighbourhoods/indicators")
 def neighbourhood_indicators() -> dict[str, Any]:
     """Return lightweight approved indicator values for all supported map areas."""

@@ -363,6 +363,45 @@ def test_unknown_profile_is_missing(client, monkeypatch, write_json) -> None:
     assert body["data"]["neighbourhood"]["id"] == "unknown"
 
 
+def test_child_development_endpoint_excludes_other_profile_domains(
+    client, monkeypatch, write_json
+) -> None:
+    source_profile = profile("child-area")
+    source_profile["domains"][0]["id"] = "child-development"
+    source_profile["domains"][0]["indicators"][0].update(
+        source="AEDC 2024", reference_year="2024")
+    source_profile["domains"][1]["indicators"][0].update(
+        source="ABS Census", reference_year="2021")
+    path = write_json("profiles.json", json.dumps({"profiles": [source_profile]}))
+    monkeypatch.setenv(PROFILE_DATA_PATH_ENV, str(path))
+
+    body = client.get("/api/neighbourhoods/child-area/child-development").json()
+
+    assert_envelope(body)
+    assert body["status"] == "available"
+    assert [item["id"] for item in body["data"]["indicators"]] == ["development"]
+    assert body["metadata"]["sources"] == ["AEDC 2024"]
+    assert body["metadata"]["primary_outcome_dataset"] == "AEDC"
+    assert "social" not in str(body["data"]["indicators"])
+
+
+def test_child_development_preserves_suppressed_null(
+    client, monkeypatch, write_json
+) -> None:
+    source_profile = profile("suppressed-area")
+    source_profile["domains"][0]["id"] = "child-development"
+    source_profile["domains"][0]["indicators"][0].update(
+        status="suppressed", value=None)
+    path = write_json("profiles.json", json.dumps({"profiles": [source_profile]}))
+    monkeypatch.setenv(PROFILE_DATA_PATH_ENV, str(path))
+
+    body = client.get("/api/neighbourhoods/suppressed-area/child-development").json()
+
+    assert body["status"] == "suppressed"
+    assert body["data"]["indicators"][0]["value"] is None
+    assert body["limitations"][0]["code"] == "indicator_suppressed"
+
+
 def test_invalid_profile_dataset_is_unavailable(client, monkeypatch, write_json) -> None:
     path = write_json("profiles.json", "[]")
     monkeypatch.setenv(PROFILE_DATA_PATH_ENV, str(path))
