@@ -1,3 +1,11 @@
+@font-face {
+  font-family: 'CanelaDeck-Medium-Trial';
+  src: url('../assets/fonts/CanelaDeck-Medium-Trial.otf') format('opentype');
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+}
+
 html:has(.home-page),
 html:has(.home-page) body {
   scrollbar-width: none;
@@ -138,8 +146,8 @@ html:has(.home-page) body::-webkit-scrollbar {
 .home-hero {
   min-height: 100svh;
   display: flex;
-  align-items: center;
-  padding: clamp(170px, 21vh, 230px) clamp(28px, 7vw, 108px) clamp(96px, 13vh, 150px);
+  align-items: flex-start;
+  padding: clamp(170px, 21vh, 230px) clamp(28px, 3vw, 56px) clamp(96px, 13vh, 150px);
 }
 
 .home-hero-copy {
@@ -161,16 +169,25 @@ html:has(.home-page) body::-webkit-scrollbar {
   max-width: 1080px;
   margin: 0;
   color: var(--text);
+  font-family: 'CanelaDeck-Medium-Trial', Georgia, serif;
   font-size: clamp(54px, 7.5vw, 108px);
-  font-weight: 700;
-  line-height: .98;
-  letter-spacing: -.065em;
+  font-weight: 500;
+  line-height: .96;
+  letter-spacing: -.04em;
   text-wrap: balance;
+}
+
+.landing-subheading {
+  margin: 36px 0 0;
+  color: var(--text);
+  font-size: clamp(18px, 1.65vw, 24px);
+  font-weight: 600;
+  line-height: 1.45;
 }
 
 .landing-copy {
   max-width: 690px;
-  margin: 36px 0 0;
+  margin: 18px 0 0;
   color: var(--muted);
   font-size: clamp(17px, 1.55vw, 22px);
   line-height: 1.7;
@@ -181,7 +198,7 @@ html:has(.home-page) body::-webkit-scrollbar {
   align-items: center;
   flex-wrap: wrap;
   gap: 20px 28px;
-  margin-top: 42px;
+  margin-top: 36px;
 }
 
 .home-hero-button,
@@ -549,6 +566,10 @@ html:has(.home-page) body::-webkit-scrollbar {
   }
 
   .landing-copy {
+    margin-top: 16px;
+  }
+
+  .landing-subheading {
     margin-top: 28px;
   }
 

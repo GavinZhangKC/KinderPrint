@@ -1,5 +1,13 @@
 @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap');
 
+@font-face {
+  font-family: 'LayGrotesk-Trial-Medium';
+  src: url('../assets/fonts/LayGrotesk-Trial-Medium.otf') format('opentype');
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+}
+
 :root {
   font-family: 'Manrope', 'Segoe UI', sans-serif;
   color: #233a63;
@@ -24,6 +32,7 @@
 }
 
 * { box-sizing: border-box; }
+h2 { font-family: 'LayGrotesk-Trial-Medium', 'Manrope', 'Segoe UI', sans-serif; }
 html *::-webkit-scrollbar-button,
 html *::-webkit-scrollbar-button:single-button,
 html *::-webkit-scrollbar-button:vertical,
