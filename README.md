@@ -68,8 +68,9 @@ sam deploy --guided
 ```
 
 The template allows the production origins `https://kinderprint.vercel.app`,
-`https://kinderprint.me`, and `https://www.kinderprint.me`. Override the
-corresponding template parameters if these domains change.
+`https://kinderprint.me`, `https://www.kinderprint.me`, `https://vkinder.me`,
+and `https://www.vkinder.me`. Override the corresponding template parameters
+if these domains change.
 
 Use the `ApiUrl` stack output as the Vercel `VITE_API_BASE_URL`, then redeploy
 the frontend. The generated `backend/lambda_package/` and `.aws-sam/`
