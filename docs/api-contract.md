@@ -8,6 +8,15 @@
 
 ## BE-0 — Dataset readiness service
 
+### `GET /api/health/data`
+
+Runs schema validation for configured AEDC locality profiles, VIF projections, EPA
+station observations, and ACECQA/G-NAF geocoding output. The AEDC check additionally
+verifies exact identifier and geographic-unit alignment with configured boundaries.
+It reports only readiness states, record counts, and limitation codes—not source rows,
+addresses, environment values, or filesystem paths. This is distinct from the minimal
+process-liveness endpoint at `GET /api/health`.
+
 ### `GET /api/datasets/status`
 
 Returns the configured state, intended role, geographic unit, interpretation status,

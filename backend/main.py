@@ -11,6 +11,7 @@ from fastapi.responses import JSONResponse
 from mangum import Mangum
 
 from data_loader import boundary_data_path
+from data_readiness import runtime_data_readiness
 from dataset_status import dataset_statuses
 from air_quality import load_station_year_observations, station_catalog
 from geography import (
@@ -76,6 +77,17 @@ def root() -> dict[str, str]:
 def health() -> dict[str, str]:
     """Confirm that the FastAPI application is running."""
     return {"status": "available"}
+
+
+@app.get("/api/health/data")
+def data_health() -> dict[str, Any]:
+    """Validate configured runtime datasets and their locality-boundary alignment."""
+    checks = runtime_data_readiness()
+    ready_count = sum(check["readiness"] == "ready" for check in checks)
+    return envelope("available" if ready_count == len(checks) else "limited",
+                    {"checks": checks}, metadata={
+                        "check_count": len(checks), "ready_count": ready_count,
+                    })
 
 
 @app.get("/api/datasets/status")

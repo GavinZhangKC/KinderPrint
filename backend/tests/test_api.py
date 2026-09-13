@@ -249,6 +249,16 @@ def test_health_is_minimal(client) -> None:
     assert response.json() == {"status": "available"}
 
 
+def test_data_health_distinguishes_process_health_from_unconfigured_data(client) -> None:
+    body = client.get("/api/health/data").json()
+
+    assert_envelope(body)
+    assert body["status"] == "limited"
+    assert body["metadata"] == {"check_count": 4, "ready_count": 0}
+    assert {check["readiness"] for check in body["data"]["checks"]} == {"not_configured"}
+    assert all(check["record_count"] is None for check in body["data"]["checks"])
+
+
 def test_scientific_notices_do_not_expose_placeholders(client) -> None:
     profile = client.get("/api/neighbourhoods/example/profile").json()
 
