@@ -1,0 +1,15 @@
+{
+  "source_id": "phidu_pha_child_health_2026",
+  "sha256": "661df83e05dc1794fc524b60354ad274f59d7854917d58d10f18a3334d6c8681",
+  "victorian_sa2s_in_bridge": 522,
+  "victorian_phas": 276,
+  "selected_indicators": 12,
+  "indicator_rows": 3312,
+  "publication_status": {
+    "PUBLISHED": 3144,
+    "SUPPRESSED": 168
+  },
+  "licence": "CC BY-NC-SA 3.0 Australia",
+  "product_status": "VALIDATED_RESEARCH_CONTEXT_ONLY",
+  "geographic_rule": "Analyse at PHA or aggregate SA2 covariates to PHA; never disaggregate PHA outcomes to SA2."
+}

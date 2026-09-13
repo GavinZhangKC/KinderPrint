@@ -1,0 +1,523 @@
+sa2_code_2021,sa2_name_2021,pha_code_2021,pha_name_2021
+201011001,Alfredton,20184,Alfredton/ Buninyong/ Smythes Creek
+201011002,Ballarat,20185,Ballarat
+201011005,Buninyong,20184,Alfredton/ Buninyong/ Smythes Creek
+201011006,Delacombe,20187,Ballarat - South/ Delacombe
+201011007,Smythes Creek,20184,Alfredton/ Buninyong/ Smythes Creek
+201011008,Wendouree - Miners Rest,20188,Wendouree - Miners Rest
+201011481,Ballarat East - Warrenheip,20186,Ballarat East/ Ballarat North
+201011482,Ballarat North - Invermay,20186,Ballarat East/ Ballarat North
+201011483,Canadian - Mount Clear,20187,Ballarat - South/ Delacombe
+201011484,Sebastopol - Redan,20187,Ballarat - South/ Delacombe
+201021009,Bacchus Marsh Surrounds,20189,Bacchus Marsh Region/ Gordon (Vic.)
+201021010,Creswick - Clunes,20190,Creswick - Clunes
+201021011,Daylesford,20191,Daylesford
+201021012,Gordon (Vic.),20189,Bacchus Marsh Region/ Gordon (Vic.)
+201031013,Avoca,20192,Avoca/ Beaufort/ Maryborough Region
+201031014,Beaufort,20192,Avoca/ Beaufort/ Maryborough Region
+201031015,Golden Plains - North,20193,Golden Plains - North
+201031016,Maryborough (Vic.),20194,Maryborough (Vic.)
+201031017,Maryborough Surrounds,20192,Avoca/ Beaufort/ Maryborough Region
+202011018,Bendigo,20195,Bendigo
+202011019,California Gully - Eaglehawk,20196,California Gully - Eaglehawk
+202011020,East Bendigo - Kennington,20197,Bendigo - Central East
+202011021,Flora Hill - Spring Gully,20197,Bendigo - Central East
+202011022,Kangaroo Flat - Golden Square,20198,Kangaroo Flat - Golden Square
+202011023,Maiden Gully,20199,Maiden Gully
+202011024,Strathfieldsaye,20200,Strathfieldsaye
+202011025,White Hills - Ascot,20197,Bendigo - Central East
+202021026,Bendigo Surrounds - South,20201,Bendigo Region - South
+202021027,Castlemaine,20202,Castlemaine/ Castlemaine Region
+202021028,Castlemaine Surrounds,20202,Castlemaine/ Castlemaine Region
+202021029,Heathcote,20203,Heathcote
+202021030,Kyneton,20204,Kyneton
+202021031,Woodend,20205,Woodend
+202031032,Bendigo Surrounds - North,20206,Bendigo Region - North
+202031033,Loddon,20207,Loddon
+203011034,Bannockburn,20208,Bannockburn/ Golden Plains - South/ Winchelsea
+203011035,Golden Plains - South,20208,Bannockburn/ Golden Plains - South/ Winchelsea
+203011036,Winchelsea,20208,Bannockburn/ Golden Plains - South/ Winchelsea
+203021037,Belmont,20209,Belmont/ Geelong
+203021039,Geelong,20209,Belmont/ Geelong
+203021040,Geelong West - Hamlyn Heights,20211,Geelong West - Hamlyn Heights
+203021042,Highton,20213,Highton/ Newtown (Vic.)
+203021043,Lara,20214,Lara
+203021044,Leopold,20215,Leopold
+203021045,Newcomb - Moolap,20216,Newcomb - Moolap
+203021046,Newtown (Vic.),20213,Highton/ Newtown (Vic.)
+203021047,North Geelong - Bell Park,20217,North Geelong - Bell Park
+203021485,Charlemont,20212,Grovedale
+203021486,Corio - Lovely Banks,20210,Corio - Lovely Banks/ Norlane
+203021487,Grovedale - Mount Duneed,20212,Grovedale
+203021488,Norlane,20210,Corio - Lovely Banks/ Norlane
+203031048,Clifton Springs,20218,Clifton Springs
+203031049,Lorne - Anglesea,20219,Lorne - Anglesea/ Torquay
+203031051,Portarlington,20221,Portarlington
+203031052,Point Lonsdale - Queenscliff,20220,Ocean Grove/ Barwon Heads - Armstrong Creek
+203031053,Torquay,20219,Lorne - Anglesea/ Torquay
+203031489,Barwon Heads - Armstrong Creek,20220,Ocean Grove/ Barwon Heads - Armstrong Creek
+203031490,Ocean Grove,20220,Ocean Grove/ Barwon Heads - Armstrong Creek
+204011054,Alexandra,20222,Alexandra/ Euroa/ Nagambie/ Upper Yarra Valley
+204011055,Euroa,20222,Alexandra/ Euroa/ Nagambie/ Upper Yarra Valley
+204011056,Kilmore - Broadford,20223,Kilmore - Broadford/ Yea
+204011057,Mansfield (Vic.),20224,Mansfield (Vic.)
+204011058,Nagambie,20222,Alexandra/ Euroa/ Nagambie/ Upper Yarra Valley
+204011059,Seymour,20225,Seymour
+204011060,Seymour Surrounds,20226,Seymour Region
+204011061,Upper Yarra Valley,20222,Alexandra/ Euroa/ Nagambie/ Upper Yarra Valley
+204011062,Yea,20223,Kilmore - Broadford/ Yea
+204021063,Benalla,20227,Benalla
+204021064,Benalla Surrounds,20228,Benalla Region/ Wangaratta Region
+204021065,Rutherglen,20229,Rutherglen
+204021066,Wangaratta,20230,Wangaratta
+204021067,Wangaratta Surrounds,20228,Benalla Region/ Wangaratta Region
+204031068,Beechworth,20231,Beechworth/ Chiltern - Indigo Valley
+204031069,Bright - Mount Beauty,20232,Bright - Mount Beauty/ Towong
+204031070,Chiltern - Indigo Valley,20231,Beechworth/ Chiltern - Indigo Valley
+204031071,Myrtleford,20233,Myrtleford
+204031072,Towong,20232,Bright - Mount Beauty/ Towong
+204031073,West Wodonga,20234,West Wodonga/ Wodonga
+204031075,Yackandandah,20235,Yackandandah
+204031491,Baranduda - Leneva,20234,West Wodonga/ Wodonga
+204031492,Wodonga,20234,West Wodonga/ Wodonga
+205011076,Drouin,20236,Drouin
+205011077,Mount Baw Baw Region,20237,Mount Baw Baw Region/ Trafalgar (Vic.)/ Warragul
+205011078,Trafalgar (Vic.),20237,Mount Baw Baw Region/ Trafalgar (Vic.)/ Warragul
+205011079,Warragul,20237,Mount Baw Baw Region/ Trafalgar (Vic.)/ Warragul
+205021080,Alps - East,20238,Alps - East/ Bruthen - Omeo/ Orbost/ Paynesville
+205021081,Bairnsdale,20239,Bairnsdale/ Lake King/ Lakes Entrance
+205021082,Bruthen - Omeo,20238,Alps - East/ Bruthen - Omeo/ Orbost/ Paynesville
+205021083,Lake King,20239,Bairnsdale/ Lake King/ Lakes Entrance
+205021084,Lakes Entrance,20239,Bairnsdale/ Lake King/ Lakes Entrance
+205021085,Orbost,20238,Alps - East/ Bruthen - Omeo/ Orbost/ Paynesville
+205021086,Paynesville,20238,Alps - East/ Bruthen - Omeo/ Orbost/ Paynesville
+205031087,Foster,20240,Foster/ Korumburra/ Leongatha/ Wilsons Promontory
+205031088,French Island,20241,French Island
+205031089,Korumburra,20240,Foster/ Korumburra/ Leongatha/ Wilsons Promontory
+205031090,Leongatha,20240,Foster/ Korumburra/ Leongatha/ Wilsons Promontory
+205031091,Phillip Island,20242,Phillip Island
+205031092,Wilsons Promontory,20240,Foster/ Korumburra/ Leongatha/ Wilsons Promontory
+205031093,Wonthaggi - Inverloch,20243,Wonthaggi - Inverloch
+205041094,Churchill,20244,Churchill
+205041095,Moe - Newborough,20245,Moe - Newborough/ Morwell
+205041096,Morwell,20245,Moe - Newborough/ Morwell
+205041098,Yallourn North - Glengarry,20246,Traralgon/ Yallourn North - Glengarry
+205041493,Traralgon - East,20246,Traralgon/ Yallourn North - Glengarry
+205041494,Traralgon - West,20246,Traralgon/ Yallourn North - Glengarry
+205051099,Alps - West,20247,Alps - West/ Maffra/ Rosedale
+205051100,Longford - Loch Sport,20248,Longford - Loch Sport/ Yarram
+205051101,Maffra,20247,Alps - West/ Maffra/ Rosedale
+205051102,Rosedale,20247,Alps - West/ Maffra/ Rosedale
+205051103,Sale,20249,Sale
+205051104,Yarram,20248,Longford - Loch Sport/ Yarram
+206011106,Brunswick East,20001,Brunswick/ Brunswick East
+206011107,Brunswick West,20000,Brunswick West/ Pascoe Vale South
+206011109,Pascoe Vale South,20000,Brunswick West/ Pascoe Vale South
+206011495,Brunswick - North,20001,Brunswick/ Brunswick East
+206011496,Brunswick - South,20001,Brunswick/ Brunswick East
+206011497,Coburg - East,20002,Coburg
+206011498,Coburg - West,20002,Coburg
+206021110,Alphington - Fairfield,20003,Alphington - Fairfield/ Northcote
+206021112,Thornbury,20004,Thornbury
+206021499,Northcote - East,20003,Alphington - Fairfield/ Northcote
+206021500,Northcote - West,20003,Alphington - Fairfield/ Northcote
+206031113,Ascot Vale,20005,Ascot Vale
+206031115,Flemington,20007,Flemington
+206031116,Moonee Ponds,20006,Essendon - Aberfeldie/ Moonee Ponds
+206031501,Essendon (West) - Aberfeldie,20006,Essendon - Aberfeldie/ Moonee Ponds
+206031502,Essendon - East,20006,Essendon - Aberfeldie/ Moonee Ponds
+206041117,Carlton,20008,Carlton
+206041118,Docklands,20009,Docklands/ Southbank
+206041119,East Melbourne,20010,East Melbourne/ South Yarra - West
+206041120,Flemington Racecourse,20011,Flemington Racecourse/ Kensington
+206041121,Kensington (Vic.),20011,Flemington Racecourse/ Kensington
+206041124,Parkville,20014,Parkville
+206041125,South Yarra - West,20010,East Melbourne/ South Yarra - West
+206041127,West Melbourne - Industrial,20009,Docklands/ Southbank
+206041503,Melbourne CBD - East,20012,Melbourne CBD
+206041504,Melbourne CBD - North,20012,Melbourne CBD
+206041505,Melbourne CBD - West,20012,Melbourne CBD
+206041506,North Melbourne,20013,North Melbourne/ West Melbourne - Residential
+206041507,Royal Botanic Gardens Victoria,20009,Docklands/ Southbank
+206041508,Southbank (West) - South Wharf,20009,Docklands/ Southbank
+206041509,Southbank - East,20009,Docklands/ Southbank
+206041510,West Melbourne - Residential,20013,North Melbourne/ West Melbourne - Residential
+206051128,Albert Park,20015,Albert Park
+206051129,Elwood,20016,Elwood
+206051130,Port Melbourne,20017,Port Melbourne/ Port Melbourne Industrial
+206051134,St Kilda East,20019,St Kilda
+206051511,Port Melbourne Industrial,20017,Port Melbourne/ Port Melbourne Industrial
+206051512,South Melbourne,20018,South Melbourne
+206051513,St Kilda - Central,20019,St Kilda
+206051514,St Kilda - West,20019,St Kilda
+206061135,Armadale,20020,Armadale/ Toorak
+206061136,Prahran - Windsor,20021,Prahran - Windsor/ South Yarra
+206061138,Toorak,20020,Armadale/ Toorak
+206061515,South Yarra - North,20021,Prahran - Windsor/ South Yarra
+206061516,South Yarra - South,20021,Prahran - Windsor/ South Yarra
+206071139,Abbotsford,20022,Abbotsford/ Yarra - North
+206071140,Carlton North - Princes Hill,20023,Carlton North - Princes Hill/ Fitzroy North
+206071141,Collingwood,20024,Collingwood/ Fitzroy
+206071142,Fitzroy,20024,Collingwood/ Fitzroy
+206071143,Fitzroy North,20023,Carlton North - Princes Hill/ Fitzroy North
+206071145,Clifton Hill - Alphington,20022,Abbotsford/ Yarra - North
+206071517,Richmond (South) - Cremorne,20025,Richmond (Vic.)
+206071518,Richmond - North,20025,Richmond (Vic.)
+207011146,Ashburton (Vic.),20026,Ashburton (Vic.)
+207011147,Balwyn,20027,Balwyn/ Balwyn North
+207011148,Balwyn North,20027,Balwyn/ Balwyn North
+207011149,Camberwell,20028,Camberwell/ Surrey Hills (West) - Canterbury
+207011150,Glen Iris - East,20029,Glen Iris - East
+207011152,Hawthorn East,20030,Hawthorn
+207011154,Kew East,20031,Kew
+207011155,Surrey Hills (West) - Canterbury,20028,Camberwell/ Surrey Hills (West) - Canterbury
+207011519,Hawthorn - North,20030,Hawthorn
+207011520,Hawthorn - South,20030,Hawthorn
+207011521,Kew - South,20031,Kew
+207011522,Kew - West,20031,Kew
+207021156,Bulleen,20032,Bulleen/ Doncaster
+207021157,Doncaster,20032,Bulleen/ Doncaster
+207021159,Templestowe,20034,Templestowe/ Templestowe Lower
+207021160,Templestowe Lower,20034,Templestowe/ Templestowe Lower
+207021424,Doncaster East - North,20033,Doncaster East
+207021425,Doncaster East - South,20033,Doncaster East
+207031161,Blackburn,20035,Blackburn/ Blackburn South
+207031162,Blackburn South,20035,Blackburn/ Blackburn South
+207031163,Box Hill,20036,Box Hill/ Box Hill North
+207031164,Box Hill North,20036,Box Hill/ Box Hill North
+207031165,Burwood (Vic.),20037,Burwood/ Burwood East
+207031166,Burwood East,20037,Burwood/ Burwood East
+207031167,Surrey Hills (East) - Mont Albert,20038,Surrey Hills (East) - Mont Albert
+208011168,Beaumaris,20039,Beaumaris/ Sandringham - Black Rock
+208011169,Brighton (Vic.),20040,Brighton (Vic.)/ Brighton East
+208011170,Brighton East,20040,Brighton (Vic.)/ Brighton East
+208011171,Highett (West) - Cheltenham,20041,Cheltenham - Highett (West)
+208011172,Hampton,20042,Hampton
+208011173,Sandringham - Black Rock,20039,Beaumaris/ Sandringham - Black Rock
+208021174,Bentleigh - McKinnon,20043,Bentleigh - McKinnon/ Bentleigh East
+208021176,Carnegie,20044,Carnegie/ Ormond - Glen Huntly
+208021177,Caulfield - North,20045,Caulfield - North/ Caulfield - South
+208021178,Caulfield - South,20045,Caulfield - North/ Caulfield - South
+208021179,Elsternwick,20046,Elsternwick
+208021180,Hughesdale,20047,Hughesdale
+208021181,Murrumbeena,20048,Murrumbeena
+208021182,Ormond - Glen Huntly,20044,Carnegie/ Ormond - Glen Huntly
+208021426,Bentleigh East - North,20043,Bentleigh - McKinnon/ Bentleigh East
+208021427,Bentleigh East - South,20043,Bentleigh - McKinnon/ Bentleigh East
+208031183,Aspendale Gardens - Waterways,20049,Kingston - Central
+208031184,Braeside,20049,Kingston - Central
+208031185,Carrum - Patterson Lakes,20050,Carrum - Patterson Lakes
+208031186,Chelsea - Bonbeach,20051,Chelsea - Bonbeach/ Chelsea Heights
+208031187,Chelsea Heights,20051,Chelsea - Bonbeach/ Chelsea Heights
+208031188,Highett (East) - Cheltenham,20052,Kingston - North
+208031189,Edithvale - Aspendale,20049,Kingston - Central
+208031190,Mentone,20052,Kingston - North
+208031191,Moorabbin - Heatherton,20052,Kingston - North
+208031192,Moorabbin Airport,20052,Kingston - North
+208031193,Mordialloc - Parkdale,20049,Kingston - Central
+208041194,Malvern - Glen Iris,20053,Malvern - Glen Iris/ Malvern East
+208041195,Malvern East,20053,Malvern - Glen Iris/ Malvern East
+209011196,Bundoora - East,20054,Bundoora - East/ Watsonia
+209011197,Greensborough,20055,Greensborough/ Montmorency - Briar Hill
+209011198,Heidelberg - Rosanna,20056,Heidelberg - Rosanna/ Viewbank - Yallambie
+209011199,Heidelberg West,20057,Heidelberg West
+209011200,Ivanhoe,20058,Ivanhoe
+209011201,Ivanhoe East - Eaglemont,20059,Ivanhoe East - Eaglemont
+209011202,Montmorency - Briar Hill,20055,Greensborough/ Montmorency - Briar Hill
+209011203,Viewbank - Yallambie,20056,Heidelberg - Rosanna/ Viewbank - Yallambie
+209011204,Watsonia,20054,Bundoora - East/ Watsonia
+209021205,Kingsbury,20060,Kingsbury
+209021428,Preston - East,20061,Preston
+209021429,Preston - West,20061,Preston
+209021523,Reservoir - North East,20062,Reservoir - East
+209021524,Reservoir - North West,20063,Reservoir - West
+209021525,Reservoir - South East,20062,Reservoir - East
+209021526,Reservoir - South West,20063,Reservoir - West
+209031209,Eltham,20064,Eltham
+209031210,Hurstbridge,20065,Hurstbridge/ Panton Hill/ Research
+209031211,Kinglake,20066,Kinglake
+209031212,Panton Hill - St Andrews,20065,Hurstbridge/ Panton Hill/ Research
+209031213,Plenty - Yarrambat,20067,Plenty - Yarrambat/ Wattle Glen - Diamond Creek
+209031214,Research - North Warrandyte,20065,Hurstbridge/ Panton Hill/ Research
+209031215,Wattle Glen - Diamond Creek,20067,Plenty - Yarrambat/ Wattle Glen - Diamond Creek
+209041216,Bundoora - North,20068,Bundoora - North
+209041217,Bundoora - West,20069,Bundoora - West
+209041220,Mill Park - North,20072,Mill Park - North
+209041221,Mill Park - South,20073,Mill Park - South
+209041223,Thomastown,20071,Lalor/ Thomastown
+209041224,Wallan,20075,Wallan/ Whittlesea
+209041225,Whittlesea,20075,Wallan/ Whittlesea
+209041431,Epping - East,20070,Epping / Wollert
+209041432,Epping - South,20070,Epping / Wollert
+209041433,Epping (Vic.) - West,20070,Epping / Wollert
+209041435,South Morang - North,20074,Doreen/ Mernda/ South Morang
+209041436,South Morang - South,20074,Doreen/ Mernda/ South Morang
+209041437,Wollert,20070,Epping / Wollert
+209041527,Doreen - North,20074,Doreen/ Mernda/ South Morang
+209041528,Doreen - South,20074,Doreen/ Mernda/ South Morang
+209041529,Lalor - East,20071,Lalor/ Thomastown
+209041530,Lalor - West,20071,Lalor/ Thomastown
+209041531,Mernda - North,20074,Doreen/ Mernda/ South Morang
+209041532,Mernda - South,20074,Doreen/ Mernda/ South Morang
+210011226,Airport West,20076,Airport West/ Avondale Heights/ Keilor East
+210011227,Essendon Airport,20076,Airport West/ Avondale Heights/ Keilor East
+210011228,Keilor,20077,Keilor
+210011230,Niddrie - Essendon West,20078,Niddrie - Essendon West
+210011231,Strathmore,20079,Strathmore
+210011533,Avondale Heights,20076,Airport West/ Avondale Heights/ Keilor East
+210011534,Keilor East,20076,Airport West/ Avondale Heights/ Keilor East
+210021232,Gisborne,20080,Gisborne/ Macedon/ Riddells Creek
+210021233,Macedon,20080,Gisborne/ Macedon/ Riddells Creek
+210021234,Riddells Creek,20080,Gisborne/ Macedon/ Riddells Creek
+210021235,Romsey,20081,Romsey
+210031236,Coburg North,20082,Coburg North
+210031237,Fawkner,20083,Fawkner
+210031439,Gowanbrae,20084,Glenroy/ Gowanbrae/ Hadfield
+210031440,Hadfield,20084,Glenroy/ Gowanbrae/ Hadfield
+210031535,Glenroy - East,20084,Glenroy/ Gowanbrae/ Hadfield
+210031536,Glenroy - West,20084,Glenroy/ Gowanbrae/ Hadfield
+210031537,Oak Park,20085,Oak Park/ Pascoe Vale
+210031538,Pascoe Vale,20085,Oak Park/ Pascoe Vale
+210041240,Sunbury,20086,Sunbury
+210041539,Diggers Rest,20086,Sunbury
+210041540,Sunbury - South,20086,Sunbury
+210041541,Sunbury - West,20086,Sunbury
+210051242,Broadmeadows,20087,Broadmeadows
+210051243,Campbellfield - Coolaroo,20088,Campbellfield - Coolaroo
+210051245,Gladstone Park - Westmeadows,20090,Gladstone Park - Westmeadows/ Tullamarine
+210051246,Greenvale - Bulla,20091,Greenvale - Bulla/ Melbourne Airport
+210051247,Meadow Heights,20092,Meadow Heights
+210051248,Melbourne Airport,20091,Greenvale - Bulla/ Melbourne Airport
+210051250,Tullamarine,20090,Gladstone Park - Westmeadows/ Tullamarine
+210051441,Craigieburn - Central,20089,Craigieburn - Mickleham
+210051442,Craigieburn - North,20089,Craigieburn - Mickleham
+210051443,Craigieburn - South,20089,Craigieburn - Mickleham
+210051445,Mickleham - Yuroke,20089,Craigieburn - Mickleham
+210051542,Craigieburn - North West,20089,Craigieburn - Mickleham
+210051543,Craigieburn - West,20089,Craigieburn - Mickleham
+210051544,Roxburgh Park (South) - Somerton,20093,Roxburgh Park - Somerton
+210051545,Roxburgh Park - North,20093,Roxburgh Park - Somerton
+211011251,Bayswater,20094,Bayswater/ Boronia/ The Basin
+211011254,Knoxfield - Scoresby,20096,Knoxfield - Scoresby
+211011255,Lysterfield,20097,Lysterfield/ Rowville
+211011256,Rowville - Central,20097,Lysterfield/ Rowville
+211011257,Rowville - North,20097,Lysterfield/ Rowville
+211011258,Rowville - South,20097,Lysterfield/ Rowville
+211011259,Wantirna,20098,Wantirna/ Wantirna South
+211011260,Wantirna South,20098,Wantirna/ Wantirna South
+211011446,Boronia,20094,Bayswater/ Boronia/ The Basin
+211011447,Ferntree Gully - North,20095,Ferntree Gully
+211011448,Ferntree Gully (South) - Upper Ferntree Gully,20095,Ferntree Gully
+211011449,The Basin,20094,Bayswater/ Boronia/ The Basin
+211021261,Donvale - Park Orchards,20099,Donvale - Park Orchards/ Warrandyte - Wonga Park
+211021262,Warrandyte - Wonga Park,20099,Donvale - Park Orchards/ Warrandyte - Wonga Park
+211031263,Bayswater North,20100,Bayswater North/ Ringwood East
+211031265,Croydon Hills - Warranwood,20102,Croydon Hills - Warranwood/ Ringwood North
+211031266,Ringwood,20103,Ringwood
+211031267,Ringwood East,20100,Bayswater North/ Ringwood East
+211031268,Ringwood North,20102,Croydon Hills - Warranwood/ Ringwood North
+211031450,Croydon - East,20101,Croydon
+211031451,Croydon - West,20101,Croydon
+211031452,Croydon South,20101,Croydon
+211041269,Forest Hill,20104,Forest Hill
+211041270,Mitcham (Vic.),20105,Mitcham (Vic.)/ Vermont/ Vermont South
+211041271,Nunawading,20106,Nunawading
+211041272,Vermont,20105,Mitcham (Vic.)/ Vermont/ Vermont South
+211041273,Vermont South,20105,Mitcham (Vic.)/ Vermont/ Vermont South
+211051274,Belgrave - Selby,20107,Yarra Ranges - South West
+211051275,Chirnside Park,20108,Chirnside Park/ Montrose/ Mooroolbark
+211051276,Healesville - Yarra Glen,20109,Healesville - Yarra Glen
+211051277,Kilsyth,20110,Kilsyth
+211051278,Lilydale - Coldstream,20111,Lilydale - Coldstream/ Wandin - Seville
+211051279,Monbulk - Silvan,20112,Monbulk - Silvan/ Mount Evelyn
+211051280,Montrose,20108,Chirnside Park/ Montrose/ Mooroolbark
+211051281,Mooroolbark,20108,Chirnside Park/ Montrose/ Mooroolbark
+211051282,Mount Dandenong - Olinda,20107,Yarra Ranges - South West
+211051283,Mount Evelyn,20112,Monbulk - Silvan/ Mount Evelyn
+211051284,Upwey - Tecoma,20107,Yarra Ranges - South West
+211051285,Wandin - Seville,20111,Lilydale - Coldstream/ Wandin - Seville
+211051286,Yarra Valley,20113,Yarra Valley
+212011289,Emerald - Cockatoo,20114,Beaconsfield - Officer/ Emerald - Cockatoo
+212011546,Beaconsfield - Officer,20114,Beaconsfield - Officer/ Emerald - Cockatoo
+212011547,Bunyip - Garfield,20115,Bunyip - Garfield
+212011548,Koo Wee Rup,20116,Koo Wee Rup
+212011549,Pakenham - North East,20117,Pakenham
+212011550,Pakenham - North West,20117,Pakenham
+212011551,Pakenham - South East,20117,Pakenham
+212011552,Pakenham - South West,20117,Pakenham
+212021293,Berwick - North,20118,Berwick - North/ Narre Warren North
+212021295,Doveton,20120,Doveton
+212021297,Hallam,20122,Hallam
+212021299,Narre Warren North,20118,Berwick - North/ Narre Warren North
+212021453,Endeavour Hills - North,20121,Endeavour Hills
+212021454,Endeavour Hills - South,20121,Endeavour Hills
+212021455,Narre Warren - North East,20123,Narre Warren
+212021456,Narre Warren - South West,20123,Narre Warren
+212021553,Berwick - South East,20119,Berwick - South
+212021554,Berwick - South West,20119,Berwick - South
+212031300,Cranbourne,20126,Cranbourne/ Cranbourne West
+212031303,Cranbourne South,20124,Cranbourne East/ Cranbourne South
+212031304,Cranbourne West,20126,Cranbourne/ Cranbourne West
+212031306,Lynbrook - Lyndhurst,20128,Lynbrook - Lyndhurst
+212031308,Pearcedale - Tooradin,20124,Cranbourne East/ Cranbourne South
+212031457,Narre Warren South - East,20129,Narre Warren South
+212031458,Narre Warren South - West,20129,Narre Warren South
+212031555,Clyde North - North,20124,Cranbourne East/ Cranbourne South
+212031556,Clyde North - South,20124,Cranbourne East/ Cranbourne South
+212031557,Cranbourne East - North,20124,Cranbourne East/ Cranbourne South
+212031558,Cranbourne East - South,20124,Cranbourne East/ Cranbourne South
+212031559,Cranbourne North - East,20125,Cranbourne North
+212031560,Cranbourne North - West,20125,Cranbourne North
+212031561,Hampton Park - East,20127,Hampton Park
+212031562,Hampton Park - West,20127,Hampton Park
+212041309,Clarinda - Oakleigh South,20130,Clarinda - Oakleigh South/ Clayton South
+212041310,Clayton South,20130,Clarinda - Oakleigh South/ Clayton South
+212041312,Dandenong North,20132,Dandenong North/ Noble Park North
+212041313,Dingley Village,20133,Dingley Village
+212041316,Noble Park North,20132,Dandenong North/ Noble Park North
+212041317,Springvale,20136,Springvale/ Springvale South
+212041318,Springvale South,20136,Springvale/ Springvale South
+212041459,Noble Park - East,20135,Noble Park
+212041460,Noble Park - West,20135,Noble Park
+212041563,Dandenong - North,20131,Dandenong
+212041564,Dandenong - South,20131,Dandenong
+212041565,Keysborough - North,20134,Keysborough
+212041566,Keysborough - South,20134,Keysborough
+212051319,Ashwood - Chadstone,20137,Ashwood - Chadstone/ Oakleigh - Huntingdale
+212051321,Glen Waverley - East,20139,Glen Waverley - East/ Wheelers Hill
+212051322,Glen Waverley - West,20140,Glen Waverley - West/ Mulgrave
+212051323,Mount Waverley - North,20141,Mount Waverley - North/ Mount Waverley - South
+212051324,Mount Waverley - South,20141,Mount Waverley - North/ Mount Waverley - South
+212051325,Mulgrave,20140,Glen Waverley - West/ Mulgrave
+212051326,Oakleigh - Huntingdale,20137,Ashwood - Chadstone/ Oakleigh - Huntingdale
+212051327,Wheelers Hill,20139,Glen Waverley - East/ Wheelers Hill
+212051567,Clayton (North) - Notting Hill,20138,Clayton
+212051568,Clayton - Central,20138,Clayton
+213011328,Ardeer - Albion,20142,Ardeer - Albion/ Sunshine/ Sunshine West
+213011329,Cairnlea,20143,Cairnlea
+213011331,Delahey,20145,Delahey
+213011332,Keilor Downs,20146,Keilor Downs
+213011333,Kings Park (Vic.),20147,St Albans – North/ Kings Park (Vic.)
+213011334,St Albans - North,20147,St Albans – North/ Kings Park (Vic.)
+213011335,St Albans - South,20148,St Albans - South/ Sunshine North
+213011336,Sunshine,20142,Ardeer - Albion/ Sunshine/ Sunshine West
+213011337,Sunshine North,20148,St Albans - South/ Sunshine North
+213011338,Sunshine West,20142,Ardeer - Albion/ Sunshine/ Sunshine West
+213011339,Sydenham,20149,Sydenham
+213011340,Taylors Lakes,20150,Taylors Lakes
+213011569,Deer Park,20144,Deer Park/ Derrimut
+213011570,Derrimut,20144,Deer Park/ Derrimut
+213021341,Altona,20151,Altona
+213021342,Altona Meadows,20152,Altona Meadows
+213021343,Altona North,20153,Altona North
+213021344,Newport,20154,Newport/ Williamstown
+213021345,Seabrook,20155,Seabrook
+213021346,Williamstown,20154,Newport/ Williamstown
+213031347,Braybrook,20156,Braybrook
+213031348,Footscray,20157,Footscray/ West Footscray - Tottenham
+213031349,Maribyrnong,20158,Maribyrnong
+213031350,Seddon - Kingsville,20159,Seddon - Kingsville/ Yarraville
+213031351,West Footscray - Tottenham,20157,Footscray/ West Footscray - Tottenham
+213031352,Yarraville,20159,Seddon - Kingsville/ Yarraville
+213041353,Bacchus Marsh,20160,Bacchus Marsh
+213041358,Melton West,20163,Melton West
+213041359,Rockbank - Mount Cottrell,20164,Melton/ Melton South/ Rockbank - Mount Cottrell
+213041360,Taylors Hill,20162,Hillside/ Taylors Hill
+213041461,Burnside,20161,Caroline Springs
+213041462,Burnside Heights,20161,Caroline Springs
+213041463,Caroline Springs,20161,Caroline Springs
+213041571,Brookfield,20164,Melton/ Melton South/ Rockbank - Mount Cottrell
+213041572,Cobblebank - Strathtulloh,20164,Melton/ Melton South/ Rockbank - Mount Cottrell
+213041573,Eynesbury - Exford,20164,Melton/ Melton South/ Rockbank - Mount Cottrell
+213041574,Fraser Rise - Plumpton,20162,Hillside/ Taylors Hill
+213041575,Hillside,20162,Hillside/ Taylors Hill
+213041576,Kurunjang - Toolern Vale,20164,Melton/ Melton South/ Rockbank - Mount Cottrell
+213041577,Melton,20164,Melton/ Melton South/ Rockbank - Mount Cottrell
+213041578,Melton South - Weir Views,20164,Melton/ Melton South/ Rockbank - Mount Cottrell
+213051361,Hoppers Crossing - North,20165,Hoppers Crossing - North/ Truganina
+213051362,Hoppers Crossing - South,20166,Hoppers Crossing - South/ Werribee - South
+213051363,Laverton,20167,Laverton
+213051368,Werribee - South,20166,Hoppers Crossing - South/ Werribee - South
+213051464,Point Cook - East,20168,Point Cook
+213051466,Point Cook - South,20168,Point Cook
+213051467,Werribee - East,20170,Werribee
+213051468,Werribee - West,20170,Werribee
+213051579,Manor Lakes - Quandong,20171,Wyndham Vale
+213051580,Point Cook - North East,20168,Point Cook
+213051581,Point Cook - North West,20168,Point Cook
+213051582,Tarneit (West) - Mount Cottrell,20169,Tarneit
+213051583,Tarneit - Central,20169,Tarneit
+213051584,Tarneit - North,20169,Tarneit
+213051585,Tarneit - South,20169,Tarneit
+213051586,Truganina - North,20165,Hoppers Crossing - North/ Truganina
+213051587,Truganina - South East,20165,Hoppers Crossing - North/ Truganina
+213051588,Truganina - South West,20165,Hoppers Crossing - North/ Truganina
+213051589,Wyndham Vale - North,20171,Wyndham Vale
+213051590,Wyndham Vale - South,20171,Wyndham Vale
+214011370,Carrum Downs,20172,Carrum Downs/ Seaford (Vic.)
+214011371,Frankston,20173,Frankston
+214011372,Frankston North,20174,Frankston North
+214011373,Frankston South,20175,Frankston South
+214011374,Langwarrin,20176,Langwarrin/ Skye - Sandhurst
+214011375,Seaford (Vic.),20172,Carrum Downs/ Seaford (Vic.)
+214011376,Skye - Sandhurst,20176,Langwarrin/ Skye - Sandhurst
+214021377,Dromana,20177,Dromana
+214021378,Flinders,20178,Flinders/ Mount Martha
+214021379,Hastings - Somers,20179,Hastings - Somers
+214021381,Mount Eliza,20181,Mount Eliza
+214021382,Mount Martha,20178,Flinders/ Mount Martha
+214021383,Point Nepean,20182,Point Nepean
+214021384,Rosebud - McCrae,20183,Rosebud - McCrae
+214021385,Somerville,20180,Mornington/ Somerville
+214021591,Mornington - East,20180,Mornington/ Somerville
+214021592,Mornington - West,20180,Mornington/ Somerville
+215011386,Ararat,20251,Ararat/ St Arnaud/ Stawell
+215011387,Ararat Surrounds,20250,Ararat Region
+215011388,Horsham,20252,Horsham
+215011389,Horsham Surrounds,20253,Horsham Region
+215011390,Nhill Region,20254,Nhill Region/ West Wimmera/ Yarriambiack
+215011391,St Arnaud,20251,Ararat/ St Arnaud/ Stawell
+215011392,Stawell,20251,Ararat/ St Arnaud/ Stawell
+215011393,West Wimmera,20254,Nhill Region/ West Wimmera/ Yarriambiack
+215011394,Yarriambiack,20254,Nhill Region/ West Wimmera/ Yarriambiack
+215021395,Irymple,20255,Irymple/ Mildura Region
+215021396,Merbein,20256,Merbein
+215021398,Mildura Surrounds,20255,Irymple/ Mildura Region
+215021399,Red Cliffs,20258,Red Cliffs
+215021469,Mildura - North,20257,Mildura
+215021470,Mildura - South,20257,Mildura
+215031400,Buloke,20259,Buloke/ Gannawarra/ Kerang
+215031401,Gannawarra,20259,Buloke/ Gannawarra/ Kerang
+215031402,Kerang,20259,Buloke/ Gannawarra/ Kerang
+215031403,Robinvale,20260,Robinvale
+215031404,Swan Hill,20261,Swan Hill/ Swan Hill Region
+215031405,Swan Hill Surrounds,20261,Swan Hill/ Swan Hill Region
+216011406,Echuca,20262,Echuca/ Lockington - Gunbower
+216011407,Kyabram,20263,Kyabram/ Rochester/ Rushworth
+216011408,Lockington - Gunbower,20262,Echuca/ Lockington - Gunbower
+216011409,Rochester,20263,Kyabram/ Rochester/ Rushworth
+216011410,Rushworth,20263,Kyabram/ Rochester/ Rushworth
+216021411,Cobram,20264,Cobram/ Numurkah
+216021412,Moira,20265,Moira/ Yarrawonga
+216021413,Numurkah,20264,Cobram/ Numurkah
+216021414,Yarrawonga,20265,Moira/ Yarrawonga
+216031415,Mooroopna,20266,Kialla/ Mooroopna/ Shepparton - South East
+216031416,Shepparton - North,20267,Shepparton - North/ Shepparton Region - West
+216031418,Shepparton Surrounds - East,20268,Shepparton Region - East
+216031419,Shepparton Surrounds - West,20267,Shepparton - North/ Shepparton Region - West
+216031593,Kialla,20266,Kialla/ Mooroopna/ Shepparton - South East
+216031594,Shepparton - South East,20266,Kialla/ Mooroopna/ Shepparton - South East
+217011420,Glenelg (Vic.),20269,Glenelg (Vic.)/ Portland
+217011421,Hamilton (Vic.),20270,Hamilton (Vic.)/ Southern Grampians
+217011422,Portland,20269,Glenelg (Vic.)/ Portland
+217011423,Southern Grampians,20270,Hamilton (Vic.)/ Southern Grampians
+217031471,Camperdown,20271,Camperdown/ Corangamite - North
+217031472,Colac,20272,Colac
+217031473,Colac Surrounds,20273,Colac Region/ Corangamite – South / Otway
+217031474,Corangamite - North,20271,Camperdown/ Corangamite - North
+217031475,Corangamite - South,20273,Colac Region/ Corangamite – South / Otway
+217031476,Otway,20273,Colac Region/ Corangamite – South / Otway
+217041477,Moyne - East,20274,Moyne – East/ Moyne – West
+217041478,Moyne - West,20274,Moyne – East/ Moyne – West
+217041479,Warrnambool - North,20275,Warrnambool - North/ Warrnambool - South
+217041480,Warrnambool - South,20275,Warrnambool - North/ Warrnambool - South
