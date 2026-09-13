@@ -504,7 +504,11 @@ Both identifiers must be validated as supported neighbourhoods. The two neighbou
 
 The service must preserve source-provided missing, suppressed, unavailable, limited, and incompatible states. A non-available numeric value or difference is `null`, never zero, an average, a neighbouring-area value, or an inferred value. If no approved outcome-comparison result exists for the pair, the service returns `unavailable` or `missing` with a clear limitation and does not derive a result from profile data.
 
-The backend must not calculate outcome differences, statistical significance, confidence, rankings, or similarity. The final child-development outcome list, units, difference direction, significance or uncertainty representation, dataset location, schema, and approved notice wording are TBC pending the Data Science output contract.
+The backend must not calculate outcome differences, statistical significance, confidence,
+rankings, or similarity. The approved Iteration 2 artefact contains AEDC vulnerability on
+one or more domains, expressed as a percentage, and an `a - b` precomputed difference.
+It preserves non-significance limitations and null unavailable values. Seven self-pairs
+found in the earlier matched-comparison output are excluded by the data pipeline.
 
 ## BE-8 — Environmental Difference Service (supports E6)
 

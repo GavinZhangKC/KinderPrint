@@ -7,7 +7,7 @@ from early_childhood import load_early_childhood_context
 from geography import load_boundary_features
 from geocoding_quality import load_geocoding_quality
 from population import load_population_projections
-from validation import load_profiles, profile_boundary_limitations
+from validation import load_outcome_comparisons, load_profiles, profile_boundary_limitations
 
 
 def _state(limitations: list[dict[str, Any]]) -> str:
@@ -38,6 +38,7 @@ def runtime_data_readiness() -> list[dict[str, Any]]:
     observations, observation_limitations = load_station_year_observations()
     geocoding, geocoding_limitations = load_geocoding_quality()
     early_childhood, early_childhood_limitations = load_early_childhood_context()
+    outcome_comparisons, _, outcome_limitations = load_outcome_comparisons()
 
     return [
         _check("aedc_locality_profiles", locality_value, locality_limitations,
@@ -50,4 +51,6 @@ def runtime_data_readiness() -> list[dict[str, Any]]:
                geocoding["total_services"] if geocoding is not None else None),
         _check("acecqa_gnaf_locality_context", early_childhood, early_childhood_limitations,
                len(early_childhood) if early_childhood is not None else None),
+        _check("aedc_outcome_comparisons", outcome_comparisons, outcome_limitations,
+               len(outcome_comparisons) if outcome_comparisons is not None else None),
     ]
