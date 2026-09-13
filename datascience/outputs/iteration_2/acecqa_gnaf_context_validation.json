@@ -1,0 +1,12 @@
+{
+  "source_id": "acecqa_open_gnaf_community_context",
+  "reporting_localities": 346,
+  "included_geocoded_services": 2450,
+  "temporarily_closed_excluded": 18,
+  "active_services_aggregated": 2432,
+  "localities_with_active_services": 338,
+  "exact_active_services": 2317,
+  "high_confidence_active_services": 115,
+  "address_fields_in_output": false,
+  "product_status": "VALIDATED_AGGREGATE_CONTEXT"
+}
