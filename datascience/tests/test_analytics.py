@@ -33,6 +33,12 @@ def test_no_community_is_matched_to_itself(matched):
     m = matched[matched.match_idx >= 0]
     assert (m.index.values != m.match_idx.values).all()
 
+def test_stable_peer_identifier_matches_the_positional_result(matched):
+    m = matched[matched.match_idx >= 0]
+    expected = matched.loc[m.match_idx.astype(int), "community_id"].to_numpy()
+    assert (m.match_community_id.to_numpy() == expected).all()
+    assert (m.community_id.to_numpy() != m.match_community_id.to_numpy()).all()
+
 def test_matches_are_within_the_same_sa4(matched):
     idx = matched.reset_index(drop=True)
     m = idx[idx.match_idx >= 0]

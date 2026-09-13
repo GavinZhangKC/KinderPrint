@@ -1,0 +1,9 @@
+{
+  "source": "validated processed matched_table.csv and final_table.csv",
+  "community_rows": 346,
+  "matched_pairs": 273,
+  "no_match": 69,
+  "self_matches": 0,
+  "stable_peer_identifier": "match_community_id",
+  "full_raw_refresh_status": "DEFERRED_RAW_AEDC_WORKBOOK_NOT_PRESENT"
+}

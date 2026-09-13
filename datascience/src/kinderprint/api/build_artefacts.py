@@ -212,6 +212,9 @@ def build_explanations(d: pd.DataFrame) -> dict:
 
 def build_comparisons(d: pd.DataFrame) -> dict:
     idx = d.reset_index(drop=True)
+    if "match_community_id" not in idx.columns:
+        raise ValueError("Stable match_community_id is required to build comparison artefacts")
+    peer_lookup = idx.set_index("community_id", drop=False, verify_integrity=True)
     SIDE = [("aedc_vulnerable_one_or_more", "Developmentally vulnerable on one or more domains", "vulnerable_pct"),
             ("seifa_irsd_score", "SEIFA IRSD score", "irsd_score"),
             ("census_median_hh_income", "Median household income", "median_hh_income_weekly"),
@@ -223,14 +226,18 @@ def build_comparisons(d: pd.DataFrame) -> dict:
     matches, comparisons = [], []
     for _, r in idx.iterrows():
         src = {"id": r.neighbourhood_id, "name": r.community_name, "geographic_unit": GEO_UNIT}
-        if r.match_idx is None or pd.isna(r.match_idx) or int(r.match_idx) < 0:
+        if pd.isna(r.match_community_id) or not str(r.match_community_id).strip():
             matches.append({"source_neighbourhood": src, "matched_neighbourhood": None,
                             "match_strength": None, "similarity_basis": [], "status": "no_match",
                             "limitations": [{"code": "no_comparable_community",
                                              "message": "No community within the same region is similar enough on the matching measures to support a fair comparison.",
                                              "affected_fields": ["matched_neighbourhood"]}]})
             continue
-        p = idx.loc[int(r.match_idx)]
+        if r.match_community_id not in peer_lookup.index:
+            raise ValueError(f"Unknown matched community identifier: {r.match_community_id}")
+        p = peer_lookup.loc[r.match_community_id]
+        if p.community_id == r.community_id:
+            raise ValueError("A community cannot be its own comparison")
         tgt = {"id": p.neighbourhood_id, "name": p.community_name, "geographic_unit": GEO_UNIT}
         matches.append({"source_neighbourhood": src, "matched_neighbourhood": tgt,
                         "match_strength": str(r.match_strength), "similarity_basis": BASIS,
@@ -261,7 +268,7 @@ def build_comparisons(d: pd.DataFrame) -> dict:
                             "status": "limited" if lims else "available",
                             "limitations": lims})
     return {"approved": True, "matches": matches, "comparisons": comparisons,
-            "metadata": {"source": "KinderPrint matching model M3 (stratified Mahalanobis with caliper)",
+            "metadata": {"source": "KinderPrint matching model M4 (stratified Mahalanobis with caliper)",
                          "reference_year": "2024", "geographic_unit": GEO_UNIT,
                          "data_quality": "Matched within SA4 on socioeconomic and demographic measures only. Environmental measures deliberately excluded from matching to avoid removing the differences under investigation."}}
 

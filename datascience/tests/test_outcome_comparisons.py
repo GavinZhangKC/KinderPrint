@@ -14,7 +14,7 @@ def test_outcome_comparisons_are_explicitly_approved_and_unique():
     pairs = [(row["neighbourhood_a"]["id"], row["neighbourhood_b"]["id"])
              for row in source["comparisons"]]
     assert source["approved"] is True
-    assert len(pairs) == len(set(pairs)) == 266
+    assert len(pairs) == len(set(pairs)) == 273
     assert all(area_a != area_b for area_a, area_b in pairs)
 
 
@@ -45,5 +45,5 @@ def test_available_differences_reconcile_exactly():
 def test_non_significant_differences_remain_disclosed():
     limitations = [limitation for comparison in data()["comparisons"]
                    for limitation in comparison["limitations"]]
-    assert sum(item["code"] == "difference_not_significant" for item in limitations) == 208
-    assert data()["metadata"]["self_comparison_pairs_excluded"] == 7
+    assert sum(item["code"] == "difference_not_significant" for item in limitations) == 212
+    assert data()["metadata"]["self_comparison_pairs_excluded"] == 0

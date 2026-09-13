@@ -271,6 +271,12 @@ def main() -> int:
         from kinderprint.analytics import matching as M
         d = M.match(usable, MATCH_FEATURES)          # raises if the leakage rule is broken
         ok = (d.match_idx >= 0).values
+        d["match_community_id"] = [
+            d.loc[int(match_index), "community_id"] if match_index >= 0 else ""
+            for match_index in d.match_idx
+        ]
+        if d.loc[ok, "community_id"].eq(d.loc[ok, "match_community_id"]).any():
+            raise ValueError("A community was matched to itself")
         bal = M.balance(d, MATCH_FEATURES)
         val = M.irsd_validation(d)
         manifest["metrics"]["max_pair_smd"] = round(float(bal.pair_smd.max()), 4)
@@ -336,7 +342,7 @@ def main() -> int:
 
     # ---------------------------------------------------------------- 09
     with Stage("09 assemble final table", manifest):
-        carry = ["community_id", "v1_z", "v1_band", "v0_count", "match_idx", "match_dist",
+        carry = ["community_id", "v1_z", "v1_band", "v0_count", "match_idx", "match_community_id", "match_dist",
                  "match_strength", "sig", "ci_overlap", "ci_lo", "ci_hi",
                  "peer_ci_lo", "peer_ci_hi"]
         final = full.merge(d[[c for c in carry if c in d.columns]], on="community_id", how="left")
