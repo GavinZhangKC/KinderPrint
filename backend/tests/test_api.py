@@ -25,6 +25,45 @@ def test_dataset_status_exposes_boundaries_without_local_paths(client, monkeypat
     assert str(tmp_path) not in str(body)
 
 
+def test_population_projections_filter_native_sa2_values(client, monkeypatch, tmp_path) -> None:
+    path = tmp_path / "vif.csv"
+    path.write_text(
+        "sa2_code_2021,sa2_name_2021,projection_year,sex,population_age_0_4_projected,"
+        "population_age_5_9_projected,population_age_10_14_projected,"
+        "population_age_0_9_projected,population_age_0_14_projected,"
+        "population_all_ages_projected,source_id,value_status\n"
+        "201011001,Alfredton,2026,persons,10,20,30,30,60,100,vif2023,PROJECTED\n"
+        "201011002,Ballarat,2026,persons,11,21,31,32,63,101,vif2023,PROJECTED\n",
+        encoding="utf-8",
+    )
+    monkeypatch.setenv("KINDERPRINT_VIF_PROJECTION_DATA_PATH", str(path))
+
+    body = client.get("/api/population-projections?sa2_code=201011001&year=2026").json()
+
+    assert_envelope(body)
+    assert body["status"] == "available"
+    assert body["data"]["projections"] == [{
+        "sa2_code": "201011001", "sa2_name": "Alfredton", "projection_year": 2026,
+        "sex": "persons", "population_age_0_4_projected": 10.0,
+        "population_age_5_9_projected": 20.0, "population_age_10_14_projected": 30.0,
+        "population_age_0_9_projected": 30.0, "population_age_0_14_projected": 60.0,
+        "population_all_ages_projected": 100.0, "status": "projected",
+    }]
+    assert body["metadata"]["geographic_unit"] == "ASGS Edition 3 SA2"
+    assert body["metadata"]["value_type"] == "projection"
+
+
+def test_population_projections_reject_invalid_source(client, monkeypatch, tmp_path) -> None:
+    path = tmp_path / "invalid.csv"
+    path.write_text("sa2_code_2021\nnot-a-code\n", encoding="utf-8")
+    monkeypatch.setenv("KINDERPRINT_VIF_PROJECTION_DATA_PATH", str(path))
+
+    body = client.get("/api/population-projections").json()
+
+    assert body["status"] == "unavailable"
+    assert body["limitations"][0]["code"] == "population_projection_dataset_invalid"
+
+
 def assert_envelope(response: dict) -> None:
     assert set(response) == {"status", "data", "metadata", "limitations", "notices"}
 

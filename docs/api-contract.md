@@ -61,6 +61,13 @@ Final limitation codes, notice codes, and data-quality representation are TBC.
 
 ## BE-1 — Neighbourhood Profile Service
 
+### `GET /api/population-projections`
+
+Returns Victoria in Future 2023 Release 2 child-population projections at their
+native ASGS Edition 3 SA2 geography. Optional `sa2_code`, `year`, and `sex` filters
+select source rows without interpolation or geographic redistribution. Responses
+identify every value as a projection and preserve the area-level-information notice.
+
 ### `GET /api/neighbourhoods/{neighbourhood_id}/profile`
 
 Returns an aggregate neighbourhood profile. The final geographic identifier format, geographic unit, and indicator lists are TBC.

@@ -21,6 +21,7 @@ from geography import (
     public_boundary_feature,
     public_boundary_geometry,
 )
+from population import load_population_projections
 from responses import (
     AREA_LEVEL_NOTICE, ASSOCIATION_NOTICE, COMPARABLE_NOTICE, COMPARISON_AREA_NOTICE,
     HUMAN_DECISION_NOTICE, INVESTIGATION_LEADS_NOTICE, envelope, limitation,
@@ -84,6 +85,35 @@ def datasets_status() -> dict[str, Any]:
         "configured_count": configured_count,
         "contract_version": "0.3",
     })
+
+
+@app.get("/api/population-projections")
+def population_projections(
+    sa2_code: str | None = Query(None, min_length=9, max_length=9, pattern=r"^\d{9}$"),
+    year: int | None = Query(None, ge=2021, le=2036),
+    sex: str = Query("persons", pattern=r"^(persons|males|females)$"),
+) -> dict[str, Any]:
+    """Return published VIF projections at their native ASGS Edition 3 SA2 geography."""
+    rows, limitations = load_population_projections()
+    if rows is None:
+        return envelope("unavailable", {"projections": []}, limitations=limitations,
+                        notices=[AREA_LEVEL_NOTICE])
+    selected = [row for row in rows
+                if row["sex"] == sex
+                and (sa2_code is None or row["sa2_code"] == sa2_code)
+                and (year is None or row["projection_year"] == year)]
+    status = "available" if selected else "missing"
+    if not selected:
+        limitations = [limitation("population_projection_not_found",
+            "No VIF projection matches the requested SA2, year and sex.",
+            "sa2_code", "year", "sex")]
+    return envelope(status, {"projections": selected}, metadata={
+        "source": "Victoria in Future 2023 Release 2",
+        "geographic_unit": "ASGS Edition 3 SA2",
+        "value_type": "projection",
+        "result_count": len(selected),
+        "available_years": sorted({row["projection_year"] for row in rows}),
+    }, limitations=limitations, notices=[AREA_LEVEL_NOTICE])
 
 
 @app.get("/api/priority")
