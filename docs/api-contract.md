@@ -582,7 +582,12 @@ Both identifiers must be validated as supported neighbourhoods using the confirm
 
 Missing, suppressed, unavailable, limited, or incompatible values and differences remain `null` with their supplied status. If the approved environmental-difference output is unavailable or does not contain the selected pair, the service returns an explicit unavailable state and does not calculate a difference from profile data.
 
-The backend must not calculate environmental differences, normalise values, assign ranks, choose standout factors, infer missing values, or make causal claims. The final environmental indicator list, units, difference direction, coverage representation, standout/ranking structure, pair ordering, dataset location, schema, and notice wording are TBC pending the Data Science output contract.
+The backend must not calculate environmental differences, normalise values, assign ranks,
+choose standout factors, infer missing values, or make causal claims. The approved output
+contains tree canopy percentage, urban heat-island degrees Celsius, and public open-space
+percentage for complete matched pairs. Differences are `a - b`; one pre-ranked standout
+identifier is supplied by the data pipeline. Pairs without all three harmonised indicators
+are withheld.
 
 ## BE-9 — Pattern Insight Service (supports E7)
 
