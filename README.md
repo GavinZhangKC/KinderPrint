@@ -35,11 +35,15 @@ it only on Private networks.
 
 ### Approved data configuration
 
-The Iteration 1 services read only approved, processed datasets. Copy
+The services read only approved or explicitly bounded processed datasets. Copy
 [`backend/.env.example`](backend/.env.example) into deployment-managed
-environment configuration and provide the five dataset paths. Do not commit
+environment configuration and provide the applicable dataset paths. Do not commit
 the datasets or any secrets. The service deliberately returns an unavailable
 or limited state when a source is not configured or cannot be validated.
+
+VIF projections are exposed at their native SA2 geography. EPA historical data
+is exposed only as monitoring-station context, and ACECQA/G-NAF data is exposed
+only as an aggregate quality report; the service never returns address rows.
 
 `GET /api/health` confirms that the FastAPI application is running.
 
@@ -58,7 +62,7 @@ The backend is deployed as a zip-based Python 3.13 Lambda behind an API
 Gateway HTTP API. The preparation script installs Linux x86_64 wheels into the
 generated package, so Docker is not required.
 
-Prepare only the five approved Iteration 1 runtime datasets, then build and
+Prepare the approved Iteration 1 artefacts and bounded Iteration 2 runtime datasets, then build and
 deploy with AWS SAM:
 
 ```bash
