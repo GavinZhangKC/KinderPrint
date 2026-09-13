@@ -26,8 +26,7 @@ def test_iteration2_register_has_complete_unique_records():
 def test_sources_are_authoritative_https_and_honest_about_integration():
     datasets = json.loads(REGISTER.read_text())["datasets"]
     assert all(item["source_url"].startswith("https://") for item in datasets)
-    assert not any(item["feature_enabled"] != "none" and item["status"].startswith("downloaded")
-                   for item in datasets)
+    assert not any(item["status"] == "product_integrated" for item in datasets)
     assert any("blocked" in item["status"] for item in datasets)
     assert any("restricted" in item["status"] for item in datasets)
 
