@@ -12,6 +12,7 @@ from mangum import Mangum
 
 from data_loader import boundary_data_path
 from dataset_status import dataset_statuses
+from air_quality import load_station_year_observations
 from geography import (
     feature_metadata,
     intersects_bbox,
@@ -24,7 +25,8 @@ from geography import (
 from population import load_population_projections
 from responses import (
     AREA_LEVEL_NOTICE, ASSOCIATION_NOTICE, COMPARABLE_NOTICE, COMPARISON_AREA_NOTICE,
-    HUMAN_DECISION_NOTICE, INVESTIGATION_LEADS_NOTICE, envelope, limitation,
+    HUMAN_DECISION_NOTICE, INVESTIGATION_LEADS_NOTICE, STATION_CONTEXT_NOTICE,
+    envelope, limitation,
 )
 from validation import (
     aggregate_status, environmental_difference_data, explanation_data,
@@ -114,6 +116,35 @@ def population_projections(
         "result_count": len(selected),
         "available_years": sorted({row["projection_year"] for row in rows}),
     }, limitations=limitations, notices=[AREA_LEVEL_NOTICE])
+
+
+@app.get("/api/air-quality/stations")
+def station_air_quality(
+    station_id: str | None = Query(None, min_length=1, max_length=50),
+    year: int | None = Query(None, ge=2018, le=2025),
+    pollutant: str | None = Query(None, pattern=r"^(PM2\.5|PM10|NO2|O3)$"),
+) -> dict[str, Any]:
+    """Return station-year summaries without deriving area-level exposure."""
+    rows, limitations = load_station_year_observations()
+    if rows is None:
+        return envelope("unavailable", {"observations": []}, limitations=limitations,
+                        notices=[STATION_CONTEXT_NOTICE])
+    selected = [row for row in rows
+                if (station_id is None or row["station_id"] == station_id)
+                and (year is None or row["year"] == year)
+                and (pollutant is None or row["pollutant"] == pollutant)]
+    status = "available" if selected else "missing"
+    if not selected:
+        limitations = [limitation("station_observation_not_found",
+            "No station observation matches the requested filters.",
+            "station_id", "year", "pollutant")]
+    return envelope(status, {"observations": selected}, metadata={
+        "source": "EPA Victoria historical hourly monitoring releases",
+        "geographic_unit": "monitoring_station",
+        "aggregation": "annual mean of published hourly observations",
+        "result_count": len(selected),
+        "sa2_exposure_status": "not_derived",
+    }, limitations=limitations, notices=[STATION_CONTEXT_NOTICE])
 
 
 @app.get("/api/priority")

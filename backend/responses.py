@@ -16,6 +16,10 @@ ASSOCIATION_NOTICE = {"code": "association_not_causation", "message": TBC_NOTICE
 INVESTIGATION_LEADS_NOTICE = {"code": "investigation_leads", "message": TBC_NOTICE_MESSAGE}
 COMPARABLE_NOTICE = {"code": "comparable_not_identical", "message": TBC_NOTICE_MESSAGE}
 COMPARISON_AREA_NOTICE = {"code": "area_level_comparison", "message": TBC_NOTICE_MESSAGE}
+STATION_CONTEXT_NOTICE = {
+    "code": "station_context_only",
+    "message": "These observations describe monitoring stations. They are not SA2 or locality exposure estimates.",
+}
 
 
 def envelope(status: str, data: Any, *, metadata: dict[str, Any] | None = None,

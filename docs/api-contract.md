@@ -61,6 +61,13 @@ Final limitation codes, notice codes, and data-quality representation are TBC.
 
 ## BE-1 — Neighbourhood Profile Service
 
+### `GET /api/air-quality/stations`
+
+Returns annual summaries of published EPA Victoria hourly observations. Optional
+`station_id`, `year`, and `pollutant` filters operate only on monitoring-station rows.
+The endpoint deliberately has no SA2 or locality parameter and always states that
+area-level exposure was not derived. It must not be used as a neighbourhood indicator.
+
 ### `GET /api/population-projections`
 
 Returns Victoria in Future 2023 Release 2 child-population projections at their

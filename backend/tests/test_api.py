@@ -64,6 +64,46 @@ def test_population_projections_reject_invalid_source(client, monkeypatch, tmp_p
     assert body["limitations"][0]["code"] == "population_projection_dataset_invalid"
 
 
+def test_air_quality_serves_station_context_without_area_exposure(client, monkeypatch, tmp_path) -> None:
+    path = tmp_path / "epa.csv"
+    path.write_text(
+        "year,station_id,station_name,pollutant,unit,method_code,validation_status,"
+        "observed_days,valid_hours,first_observed_date,last_observed_date,"
+        "annual_mean_of_hourly_values,negative_hours_retained,monitoring_status,sa2_exposure_status\n"
+        "2022,10001,Alphington,NO2,ppb,NO2,PUBLISHED,360,8000,2022-01-01,2022-12-31,"
+        "8.5,0,STATION_OBSERVATION_CONTEXT_ONLY,NOT_DERIVED\n",
+        encoding="utf-8",
+    )
+    monkeypatch.setenv("KINDERPRINT_EPA_STATION_YEAR_DATA_PATH", str(path))
+
+    body = client.get("/api/air-quality/stations?station_id=10001&year=2022&pollutant=NO2").json()
+
+    assert_envelope(body)
+    assert body["status"] == "available"
+    assert body["data"]["observations"][0]["annual_mean_of_hourly_values"] == 8.5
+    assert body["data"]["observations"][0]["sa2_exposure_status"] == "not_derived"
+    assert body["metadata"]["geographic_unit"] == "monitoring_station"
+    assert body["notices"][0]["code"] == "station_context_only"
+
+
+def test_air_quality_rejects_claimed_sa2_exposure(client, monkeypatch, tmp_path) -> None:
+    path = tmp_path / "invalid-epa.csv"
+    path.write_text(
+        "year,station_id,station_name,pollutant,unit,method_code,validation_status,"
+        "observed_days,valid_hours,first_observed_date,last_observed_date,"
+        "annual_mean_of_hourly_values,negative_hours_retained,monitoring_status,sa2_exposure_status\n"
+        "2022,10001,Alphington,NO2,ppb,NO2,PUBLISHED,360,8000,2022-01-01,2022-12-31,"
+        "8.5,0,STATION_OBSERVATION_CONTEXT_ONLY,DERIVED\n",
+        encoding="utf-8",
+    )
+    monkeypatch.setenv("KINDERPRINT_EPA_STATION_YEAR_DATA_PATH", str(path))
+
+    body = client.get("/api/air-quality/stations").json()
+
+    assert body["status"] == "unavailable"
+    assert body["limitations"][0]["code"] == "air_quality_dataset_invalid"
+
+
 def assert_envelope(response: dict) -> None:
     assert set(response) == {"status", "data", "metadata", "limitations", "notices"}
 
