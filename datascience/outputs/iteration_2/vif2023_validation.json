@@ -1,0 +1,21 @@
+{
+  "source_id": "vif2023_sa2_age_projections",
+  "sa2_records": 522,
+  "years": [
+    2021,
+    2026,
+    2031,
+    2036
+  ],
+  "sex_categories": [
+    "persons",
+    "males",
+    "females"
+  ],
+  "output_rows": 6264,
+  "missing_population_values": 0,
+  "negative_population_values": 0,
+  "persons_equals_males_plus_females": true,
+  "interpretation": "Projection, not observation or prediction.",
+  "age_warning": "Exact ages 0-5 cannot be derived from five-year bands without estimation."
+}
