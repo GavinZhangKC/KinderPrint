@@ -201,6 +201,49 @@ def test_geocoding_quality_rejects_weak_match_inclusion(client, monkeypatch, tmp
     assert body["limitations"][0]["code"] == "geocoding_dataset_invalid"
 
 
+def test_early_childhood_context_exposes_only_locality_aggregates(client, monkeypatch, tmp_path) -> None:
+    path = tmp_path / "context.csv"
+    path.write_text(
+        "community_id,neighbourhood_id,community_name,active_education_care_services,"
+        "exact_match_services,high_confidence_match_services,services_with_approved_places,"
+        "total_approved_places,long_day_care_services,kindergarten_services,"
+        "services_with_current_rating,rating_coverage_pct,geocoding_source,match_policy,context_status\n"
+        "MEL0001,206011106,Brunswick East,4,3,1,4,249,3,1,4,100,Open G-NAF,"
+        "EXACT_OR_HIGH_CONFIDENCE_WITHIN_REPORTING_SCOPE,AGGREGATE_SERVICE_CONTEXT\n",
+        encoding="utf-8",
+    )
+    monkeypatch.setenv("KINDERPRINT_ACECQA_CONTEXT_DATA_PATH", str(path))
+
+    body = client.get("/api/neighbourhoods/206011106/early-childhood-services").json()
+
+    assert_envelope(body)
+    assert body["status"] == "available"
+    assert body["data"]["active_education_care_services"] == 4
+    assert body["data"]["high_confidence_match_services"] == 1
+    assert body["metadata"]["address_fields_exposed"] is False
+    assert "community_id" not in body["data"]
+    assert "address" not in body["data"]
+
+
+def test_early_childhood_context_rejects_unreconciled_match_counts(client, monkeypatch, tmp_path) -> None:
+    path = tmp_path / "invalid-context.csv"
+    path.write_text(
+        "community_id,neighbourhood_id,community_name,active_education_care_services,"
+        "exact_match_services,high_confidence_match_services,services_with_approved_places,"
+        "total_approved_places,long_day_care_services,kindergarten_services,"
+        "services_with_current_rating,rating_coverage_pct,geocoding_source,match_policy,context_status\n"
+        "MEL0001,206011106,Brunswick East,4,2,1,4,249,3,1,4,100,Open G-NAF,"
+        "EXACT_OR_HIGH_CONFIDENCE_WITHIN_REPORTING_SCOPE,AGGREGATE_SERVICE_CONTEXT\n",
+        encoding="utf-8",
+    )
+    monkeypatch.setenv("KINDERPRINT_ACECQA_CONTEXT_DATA_PATH", str(path))
+
+    body = client.get("/api/neighbourhoods/206011106/early-childhood-services").json()
+
+    assert body["status"] == "unavailable"
+    assert body["limitations"][0]["code"] == "early_childhood_context_dataset_invalid"
+
+
 def assert_envelope(response: dict) -> None:
     assert set(response) == {"status", "data", "metadata", "limitations", "notices"}
 
@@ -254,7 +297,7 @@ def test_data_health_distinguishes_process_health_from_unconfigured_data(client)
 
     assert_envelope(body)
     assert body["status"] == "limited"
-    assert body["metadata"] == {"check_count": 4, "ready_count": 0}
+    assert body["metadata"] == {"check_count": 5, "ready_count": 0}
     assert {check["readiness"] for check in body["data"]["checks"]} == {"not_configured"}
     assert all(check["record_count"] is None for check in body["data"]["checks"])
 

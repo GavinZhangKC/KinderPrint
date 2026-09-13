@@ -113,6 +113,14 @@ Social and environmental indicators are not included. Suppressed or unavailable 
 values remain `null` with their source status and a corresponding limitation; the backend
 does not impute, downscale, or replace them.
 
+### `GET /api/neighbourhoods/{neighbourhood_id}/early-childhood-services`
+
+Returns aggregate ACECQA service counts for a KinderPrint reporting locality using only
+EXACT or HIGH_CONFIDENCE Open G-NAF matches within the reporting scope. Temporarily closed
+services are excluded. The response never contains service names, addresses, coordinates,
+postcodes, or G-NAF identifiers. These counts describe service availability context, not
+service quality, accessibility, capacity sufficiency, or child outcomes.
+
 ```json
 {
   "status": "available",

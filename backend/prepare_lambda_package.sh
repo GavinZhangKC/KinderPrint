@@ -22,6 +22,7 @@ cp "$TASK_ITERATION_2_DATA_DIR/suitability.json" "$TASK_PACKAGE_DIR/data/"
 cp "$TASK_PROCESSED_DATA_DIR/vif_child_population_projections_sa2.csv" "$TASK_PACKAGE_DIR/data/"
 cp "$TASK_PROCESSED_DATA_DIR/epa_air_quality_station_year.csv" "$TASK_PACKAGE_DIR/data/"
 cp "$TASK_PROCESSED_DATA_DIR/acecqa_gnaf_geocoding.csv" "$TASK_PACKAGE_DIR/data/"
+cp "$TASK_PROCESSED_DATA_DIR/acecqa_gnaf_context_community.csv" "$TASK_PACKAGE_DIR/data/"
 
 python3 -m pip install \
     --disable-pip-version-check \

@@ -13,6 +13,7 @@ from mangum import Mangum
 from data_loader import boundary_data_path
 from data_readiness import runtime_data_readiness
 from dataset_status import dataset_statuses
+from early_childhood import load_early_childhood_context
 from air_quality import load_station_year_observations, station_catalog
 from geography import (
     feature_metadata,
@@ -349,6 +350,29 @@ def neighbourhood_child_development(neighbourhood_id: str) -> dict[str, Any]:
         "primary_outcome_dataset": "AEDC",
         "result_count": len(indicators),
     }, limitations=domain_limitations, notices=[AREA_LEVEL_NOTICE])
+
+
+@app.get("/api/neighbourhoods/{neighbourhood_id}/early-childhood-services")
+def neighbourhood_early_childhood_services(neighbourhood_id: str) -> dict[str, Any]:
+    """Return address-free service context from accepted G-NAF matches."""
+    rows, limitations = load_early_childhood_context()
+    if rows is None:
+        return envelope("unavailable", None, limitations=limitations,
+                        notices=[AREA_LEVEL_NOTICE])
+    result = next((row for row in rows if row["neighbourhood_id"] == neighbourhood_id), None)
+    if result is None:
+        return envelope("missing", None, limitations=[limitation(
+            "early_childhood_context_not_found",
+            "No aggregate early-childhood service context exists for this neighbourhood.",
+            "neighbourhood_id",
+        )], notices=[AREA_LEVEL_NOTICE])
+    return envelope("available", result, metadata={
+        "source": "ACECQA service register and Open G-NAF August 2026 GDA2020",
+        "geographic_unit": "KinderPrint reporting locality",
+        "match_policy": "EXACT or HIGH_CONFIDENCE within reporting scope",
+        "address_fields_exposed": False,
+        "interpretation": "Service availability context; not service quality or child outcome.",
+    }, notices=[AREA_LEVEL_NOTICE])
 
 
 @app.get("/api/neighbourhoods/indicators")

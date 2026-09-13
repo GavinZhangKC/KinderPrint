@@ -4,10 +4,12 @@ from pathlib import Path
 from typing import Any
 
 from data_loader import (
+    ACECQA_CONTEXT_DATA_PATH_ENV,
     ACECQA_GEOCODING_DATA_PATH_ENV,
     EPA_STATION_YEAR_DATA_PATH_ENV,
     PROFILE_DATA_PATH_ENV,
     VIF_PROJECTION_DATA_PATH_ENV,
+    acecqa_context_data_path,
     acecqa_geocoding_data_path,
     epa_station_year_data_path,
     profile_data_path,
@@ -59,6 +61,16 @@ def dataset_statuses() -> list[dict[str, Any]]:
             "configuration_variable": None,
             "user_facing": False,
             "boundary": "PHA values must not be assigned to component SA2s.",
+        },
+        {
+            "id": "acecqa_gnaf_locality_context",
+            "role": "early_childhood_service_context",
+            "geographic_unit": "KinderPrint reporting locality",
+            "interpretation_status": "aggregate_context",
+            "configured": _configured(acecqa_context_data_path()),
+            "configuration_variable": ACECQA_CONTEXT_DATA_PATH_ENV,
+            "user_facing": True,
+            "boundary": "Counts include only accepted in-scope matches and expose no addresses.",
         },
         {
             "id": "acecqa_gnaf_geocoding",
