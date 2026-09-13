@@ -76,6 +76,7 @@ Returns annual summaries of published EPA Victoria hourly observations. Optional
 `station_id`, `year`, and `pollutant` filters operate only on monitoring-station rows.
 The endpoint deliberately has no SA2 or locality parameter and always states that
 area-level exposure was not derived. It must not be used as a neighbourhood indicator.
+Results are paginated with `offset` and `limit`; metadata reports page and total counts.
 
 ### `GET /api/population-projections`
 
@@ -83,6 +84,7 @@ Returns Victoria in Future 2023 Release 2 child-population projections at their
 native ASGS Edition 3 SA2 geography. Optional `sa2_code`, `year`, and `sex` filters
 select source rows without interpolation or geographic redistribution. Responses
 identify every value as a projection and preserve the area-level-information notice.
+Results are paginated with `offset` and `limit`; metadata reports page and total counts.
 
 ### `GET /api/neighbourhoods/{neighbourhood_id}/profile`
 

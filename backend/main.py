@@ -41,7 +41,7 @@ from validation import (
     profile_metadata, profile_status,
 )
 
-app = FastAPI(title="KinderPrint API", version="0.2.0")
+app = FastAPI(title="KinderPrint API", version="0.3.0")
 app.add_middleware(GZipMiddleware, minimum_size=1000)
 logger = logging.getLogger("kinderprint.api")
 
@@ -95,6 +95,8 @@ def population_projections(
     sa2_code: str | None = Query(None, min_length=9, max_length=9, pattern=r"^\d{9}$"),
     year: int | None = Query(None, ge=2021, le=2036),
     sex: str = Query("persons", pattern=r"^(persons|males|females)$"),
+    offset: int = Query(0, ge=0),
+    limit: int = Query(500, ge=1, le=1000),
 ) -> dict[str, Any]:
     """Return published VIF projections at their native ASGS Edition 3 SA2 geography."""
     rows, limitations = load_population_projections()
@@ -105,16 +107,25 @@ def population_projections(
                 if row["sex"] == sex
                 and (sa2_code is None or row["sa2_code"] == sa2_code)
                 and (year is None or row["projection_year"] == year)]
+    total_result_count = len(selected)
+    selected = selected[offset:offset + limit]
     status = "available" if selected else "missing"
     if not selected:
-        limitations = [limitation("population_projection_not_found",
+        limitations = [limitation(
+            "page_out_of_range" if total_result_count else "population_projection_not_found",
+            "The requested page is beyond the available results." if total_result_count else
             "No VIF projection matches the requested SA2, year and sex.",
-            "sa2_code", "year", "sex")]
+            "offset" if total_result_count else "sa2_code",
+            *("year", "sex") if not total_result_count else (),
+        )]
     return envelope(status, {"projections": selected}, metadata={
         "source": "Victoria in Future 2023 Release 2",
         "geographic_unit": "ASGS Edition 3 SA2",
         "value_type": "projection",
         "result_count": len(selected),
+        "total_result_count": total_result_count,
+        "offset": offset,
+        "limit": limit,
         "available_years": sorted({row["projection_year"] for row in rows}),
     }, limitations=limitations, notices=[AREA_LEVEL_NOTICE])
 
@@ -124,6 +135,8 @@ def station_air_quality(
     station_id: str | None = Query(None, min_length=1, max_length=50),
     year: int | None = Query(None, ge=2018, le=2025),
     pollutant: str | None = Query(None, pattern=r"^(PM2\.5|PM10|NO2|O3)$"),
+    offset: int = Query(0, ge=0),
+    limit: int = Query(200, ge=1, le=500),
 ) -> dict[str, Any]:
     """Return station-year summaries without deriving area-level exposure."""
     rows, limitations = load_station_year_observations()
@@ -134,16 +147,25 @@ def station_air_quality(
                 if (station_id is None or row["station_id"] == station_id)
                 and (year is None or row["year"] == year)
                 and (pollutant is None or row["pollutant"] == pollutant)]
+    total_result_count = len(selected)
+    selected = selected[offset:offset + limit]
     status = "available" if selected else "missing"
     if not selected:
-        limitations = [limitation("station_observation_not_found",
+        limitations = [limitation(
+            "page_out_of_range" if total_result_count else "station_observation_not_found",
+            "The requested page is beyond the available results." if total_result_count else
             "No station observation matches the requested filters.",
-            "station_id", "year", "pollutant")]
+            "offset" if total_result_count else "station_id",
+            *("year", "pollutant") if not total_result_count else (),
+        )]
     return envelope(status, {"observations": selected}, metadata={
         "source": "EPA Victoria historical hourly monitoring releases",
         "geographic_unit": "monitoring_station",
         "aggregation": "annual mean of published hourly observations",
         "result_count": len(selected),
+        "total_result_count": total_result_count,
+        "offset": offset,
+        "limit": limit,
         "sa2_exposure_status": "not_derived",
     }, limitations=limitations, notices=[STATION_CONTEXT_NOTICE])
 

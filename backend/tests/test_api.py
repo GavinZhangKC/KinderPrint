@@ -64,6 +64,28 @@ def test_population_projections_reject_invalid_source(client, monkeypatch, tmp_p
     assert body["limitations"][0]["code"] == "population_projection_dataset_invalid"
 
 
+def test_population_projections_are_paginated(client, monkeypatch, tmp_path) -> None:
+    path = tmp_path / "vif-page.csv"
+    header = (
+        "sa2_code_2021,sa2_name_2021,projection_year,sex,population_age_0_4_projected,"
+        "population_age_5_9_projected,population_age_10_14_projected,"
+        "population_age_0_9_projected,population_age_0_14_projected,"
+        "population_all_ages_projected,source_id,value_status\n"
+    )
+    path.write_text(header +
+        "201011001,One,2026,persons,1,1,1,2,3,10,vif,PROJECTED\n"
+        "201011002,Two,2026,persons,1,1,1,2,3,10,vif,PROJECTED\n",
+        encoding="utf-8")
+    monkeypatch.setenv("KINDERPRINT_VIF_PROJECTION_DATA_PATH", str(path))
+
+    body = client.get("/api/population-projections?limit=1&offset=1").json()
+
+    assert [row["sa2_code"] for row in body["data"]["projections"]] == ["201011002"]
+    assert body["metadata"]["result_count"] == 1
+    assert body["metadata"]["total_result_count"] == 2
+    assert body["metadata"]["offset"] == 1
+
+
 def test_air_quality_serves_station_context_without_area_exposure(client, monkeypatch, tmp_path) -> None:
     path = tmp_path / "epa.csv"
     path.write_text(
@@ -102,6 +124,16 @@ def test_air_quality_rejects_claimed_sa2_exposure(client, monkeypatch, tmp_path)
 
     assert body["status"] == "unavailable"
     assert body["limitations"][0]["code"] == "air_quality_dataset_invalid"
+
+
+def test_new_collection_page_limits_are_validated(client) -> None:
+    population = client.get("/api/population-projections?limit=1001").json()
+    air = client.get("/api/air-quality/stations?limit=501").json()
+
+    assert population["status"] == "unavailable"
+    assert population["limitations"][0]["code"] == "invalid_request"
+    assert air["status"] == "unavailable"
+    assert air["limitations"][0]["code"] == "invalid_request"
 
 
 def test_geocoding_quality_reports_aggregates_without_addresses(client, monkeypatch, tmp_path) -> None:
