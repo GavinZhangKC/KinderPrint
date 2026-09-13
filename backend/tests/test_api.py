@@ -7,6 +7,24 @@ from data_loader import (
 )
 
 
+def test_dataset_status_exposes_boundaries_without_local_paths(client, monkeypatch, tmp_path) -> None:
+    configured = tmp_path / "vif.csv"
+    configured.write_text("header\n", encoding="utf-8")
+    monkeypatch.setenv("KINDERPRINT_VIF_PROJECTION_DATA_PATH", str(configured))
+
+    body = client.get("/api/datasets/status").json()
+
+    assert_envelope(body)
+    assert body["status"] == "available"
+    products = {item["id"]: item for item in body["data"]["datasets"]}
+    assert products["vif_child_population_projections"]["configured"] is True
+    assert products["epa_historical_air_quality"]["interpretation_status"] == "station_context_only"
+    assert products["epa_historical_air_quality"]["user_facing"] is False
+    assert products["phidu_child_health"]["interpretation_status"] == "research_only"
+    assert products["acecqa_gnaf_geocoding"]["boundary"].startswith("Only accepted matches")
+    assert str(tmp_path) not in str(body)
+
+
 def assert_envelope(response: dict) -> None:
     assert set(response) == {"status", "data", "metadata", "limitations", "notices"}
 

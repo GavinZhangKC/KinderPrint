@@ -11,6 +11,7 @@ from fastapi.responses import JSONResponse
 from mangum import Mangum
 
 from data_loader import boundary_data_path
+from dataset_status import dataset_statuses
 from geography import (
     feature_metadata,
     intersects_bbox,
@@ -71,6 +72,18 @@ def root() -> dict[str, str]:
 def health() -> dict[str, str]:
     """Confirm that the FastAPI application is running."""
     return {"status": "available"}
+
+
+@app.get("/api/datasets/status")
+def datasets_status() -> dict[str, Any]:
+    """Return configuration readiness and interpretation boundaries for data products."""
+    datasets = dataset_statuses()
+    configured_count = sum(bool(dataset["configured"]) for dataset in datasets)
+    return envelope("available", {"datasets": datasets}, metadata={
+        "dataset_count": len(datasets),
+        "configured_count": configured_count,
+        "contract_version": "0.3",
+    })
 
 
 @app.get("/api/priority")

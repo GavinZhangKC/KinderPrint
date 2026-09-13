@@ -1,10 +1,20 @@
 # KinderPrint API Contract
 
-**Version:** 0.2
+**Version:** 0.3
 
 **Status:** Working Iteration 1 contract with provisional Iteration 2 extensions
 
-**Last updated:** 12 September 2026
+**Last updated:** 14 September 2026
+
+## BE-0 — Dataset readiness service
+
+### `GET /api/datasets/status`
+
+Returns the configured state, intended role, geographic unit, interpretation status,
+and user-facing eligibility of each Iteration 2 data product. It never returns local
+filesystem paths. A configured dataset is not automatically approved for user-facing
+interpretation: EPA observations remain station context only, PHIDU child-health
+outcomes remain research only, and ACECQA/G-NAF output remains a quality-control input.
 
 This document describes the agreed API shape for Iteration 1 and provisional Backend + Integration contracts for Iteration 2. It is a design contract only. It does not define implementation logic, connect datasets, or approve Data Science or AI methods. Every unresolved decision is marked `TBC`.
 
