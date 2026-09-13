@@ -64,7 +64,9 @@ Service responses use a consistent top-level envelope:
 }
 ```
 
-Final limitation codes, notice codes, and data-quality representation are TBC.
+Notice wording is the approved scientific framing recorded in
+`datascience/outputs/iteration_1/NOTICES.md`. Limitation codes and final
+data-quality representation remain subject to their individual endpoint contracts.
 
 ## BE-1 — Neighbourhood Profile Service
 

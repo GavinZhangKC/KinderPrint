@@ -194,6 +194,14 @@ def test_health_is_minimal(client) -> None:
     assert response.json() == {"status": "available"}
 
 
+def test_scientific_notices_do_not_expose_placeholders(client) -> None:
+    profile = client.get("/api/neighbourhoods/example/profile").json()
+
+    assert profile["notices"][0]["code"] == "area_level_information"
+    assert profile["notices"][0]["message"] != "TBC"
+    assert "not individual children" in profile["notices"][0]["message"]
+
+
 def test_validation_error_uses_envelope(client) -> None:
     response = client.get("/api/compare")
     assert response.status_code == 422
