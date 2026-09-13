@@ -2,31 +2,32 @@ import { cameraPose, routePosition, terrainHeight, type Point } from './landscap
 import { stationProgress } from './journey'
 
 type Region = { x: number; z: number; rx: number; rz: number }
-type TreePlacement = { x: number; z: number; scale: number; rotation: number }
+export type TreePlacement = { x: number; z: number; scale: number; rotation: number }
+export type ShrubPlacement = { x: number; z: number; scale: number; rotation: number }
 
 /** Scene units only. Edit these regions rather than the tree meshes. */
 export const vegetationSettings = {
   seed: 73129,
-  maxTrees: 190,
+  maxTrees: 205,
   maxSlope: .8,
   thinningHeight: 36,
   maxHeight: 69,
-  minSpacing: 2.8,
+  minSpacing: 2.6,
   routeClearance: 7,
   stationClearance: 10,
-  scale: [.65, 1.12] as const,
+  scale: [.75, 1.28] as const,
   groves: [
-    { x: -24, z: 30, rx: 24, rz: 32, count: 23 },
-    { x: 42, z: 53, rx: 27, rz: 23, count: 24 },
-    { x: 43, z: 133, rx: 25, rz: 30, count: 18 },
-    { x: 106, z: 181, rx: 26, rz: 33, count: 19 },
-    { x: -73, z: 247, rx: 23, rz: 29, count: 13 },
-    { x: -8, z: 279, rx: 30, rz: 28, count: 19 },
-    { x: 5, z: 362, rx: 32, rz: 35, count: 20 },
-    { x: 92, z: 416, rx: 24, rz: 32, count: 14 },
-    { x: 44, z: 485, rx: 27, rz: 34, count: 15 },
-    { x: -4, z: 570, rx: 32, rz: 36, count: 17 },
-    { x: 92, z: 655, rx: 34, rz: 38, count: 22 },
+    { x: -24, z: 30, rx: 24, rz: 32, count: 25 },
+    { x: 42, z: 53, rx: 27, rz: 23, count: 26 },
+    { x: 43, z: 133, rx: 25, rz: 30, count: 20 },
+    { x: 106, z: 181, rx: 26, rz: 33, count: 21 },
+    { x: -73, z: 247, rx: 23, rz: 29, count: 14 },
+    { x: -8, z: 279, rx: 30, rz: 28, count: 21 },
+    { x: 5, z: 362, rx: 32, rz: 35, count: 22 },
+    { x: 92, z: 416, rx: 24, rz: 32, count: 15 },
+    { x: 44, z: 485, rx: 27, rz: 34, count: 16 },
+    { x: -4, z: 570, rx: 32, rz: 36, count: 19 },
+    { x: 92, z: 655, rx: 34, rz: 38, count: 24 },
   ],
   exclusions: [
     { x: -9, z: 207, rx: 28, rz: 25 }, // Open saddle.
@@ -69,7 +70,7 @@ export function createVegetationLayout(): TreePlacement[] {
       const t = ((x - from.x) * dx + (z - from.z) * dz) / (dx * dx + dz * dz)
       const rayY = from.y + (to.y - from.y) * t
       return t > 0 && t < 1 && Math.hypot(x - from.x - dx * t, z - from.z - dz * t) < scale + 1.3
-        && rayY > y - .3 && rayY < y + 3.8 * scale + 1
+        && rayY > y - .3 && rayY < y + 4.8 * scale + 1
     })) return false
     result.push(tree)
     return true
@@ -92,4 +93,50 @@ export function createVegetationLayout(): TreePlacement[] {
     }
   }
   return result
+}
+
+export function createShrubLayout(trees: TreePlacement[]): ShrubPlacement[] {
+  let seed = 41863
+  const random = () => { seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0; return seed / 4294967296 }
+  const route = Array.from({ length: 181 }, (_, i) => routePosition(i / 180))
+  const stations = stationProgress.map(routePosition)
+  const patches = [
+    { x: -62, z: 86, rx: 22, rz: 26, count: 21 },
+    { x: 78, z: 245, rx: 25, rz: 30, count: 24 },
+    { x: -74, z: 360, rx: 24, rz: 31, count: 24 },
+    { x: 76, z: 526, rx: 28, rz: 34, count: 24 },
+    { x: -68, z: 640, rx: 27, rz: 32, count: 21 },
+  ]
+  const shrubs: ShrubPlacement[] = []
+
+  for (const patch of patches) {
+    let planted = 0
+    for (let attempt = 0; attempt < patch.count * 40 && planted < patch.count; attempt++) {
+      const angle = random() * Math.PI * 2
+      const radius = Math.sqrt(random())
+      const x = patch.x + Math.cos(angle) * radius * patch.rx
+      const z = patch.z + Math.sin(angle) * radius * patch.rz
+      const y = terrainHeight(x, z)
+      const slope = Math.hypot(
+        terrainHeight(x + .5, z) - terrainHeight(x - .5, z),
+        terrainHeight(x, z + .5) - terrainHeight(x, z - .5),
+      )
+      if (slope > .9 || y > vegetationSettings.maxHeight) continue
+      if (vegetationSettings.exclusions.some(region => ((x - region.x) / region.rx) ** 2 + ((z - region.z) / region.rz) ** 2 < 1)) continue
+      if (route.some(point => Math.hypot(x - point.x, z - point.z) < 5)) continue
+      if (stations.some(point => Math.hypot(x - point.x, z - point.z) < 8)) continue
+      if (trees.some(tree => Math.hypot(x - tree.x, z - tree.z) < 5.5)) continue
+      if (shrubs.some(shrub => Math.hypot(x - shrub.x, z - shrub.z) < 1.8)) continue
+
+      shrubs.push({
+        x,
+        z,
+        scale: 1.1 + random() * .56,
+        rotation: random() * Math.PI * 2,
+      })
+      planted++
+    }
+  }
+
+  return shrubs
 }
