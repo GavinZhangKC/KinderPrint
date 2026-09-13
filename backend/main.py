@@ -22,6 +22,7 @@ from geography import (
     public_boundary_feature,
     public_boundary_geometry,
 )
+from geocoding_quality import load_geocoding_quality
 from population import load_population_projections
 from responses import (
     AREA_LEVEL_NOTICE, ASSOCIATION_NOTICE, COMPARABLE_NOTICE, COMPARISON_AREA_NOTICE,
@@ -145,6 +146,20 @@ def station_air_quality(
         "result_count": len(selected),
         "sa2_exposure_status": "not_derived",
     }, limitations=limitations, notices=[STATION_CONTEXT_NOTICE])
+
+
+@app.get("/api/data-quality/acecqa-geocoding")
+def acecqa_geocoding_quality() -> dict[str, Any]:
+    """Return aggregate match QA while withholding service-level address records."""
+    report, limitations = load_geocoding_quality()
+    if report is None:
+        return envelope("unavailable", None, limitations=limitations)
+    return envelope("available", report, metadata={
+        "source": "ACECQA service register matched to official Open G-NAF",
+        "geographic_assignment": "ASGS Edition 3 SA2 point-in-polygon",
+        "accepted_match_statuses": ["EXACT", "HIGH_CONFIDENCE"],
+        "address_fields_exposed": False,
+    })
 
 
 @app.get("/api/priority")

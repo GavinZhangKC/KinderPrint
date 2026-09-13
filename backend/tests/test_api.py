@@ -104,6 +104,48 @@ def test_air_quality_rejects_claimed_sa2_exposure(client, monkeypatch, tmp_path)
     assert body["limitations"][0]["code"] == "air_quality_dataset_invalid"
 
 
+def test_geocoding_quality_reports_aggregates_without_addresses(client, monkeypatch, tmp_path) -> None:
+    path = tmp_path / "geocoding.csv"
+    path.write_text(
+        "service_approval_number,match_status,assigned_sa2,assigned_kinderprint_locality,"
+        "included_in_spatial_analysis,original_address\n"
+        "SE-1,EXACT,201011001,MEL001,true,Secret Street\n"
+        "SE-2,HIGH_CONFIDENCE,201011002,MEL002,true,Private Road\n"
+        "SE-3,REVIEW,,,false,Hidden Avenue\n"
+        "SE-4,UNMATCHED,,,false,Unknown Place\n",
+        encoding="utf-8",
+    )
+    monkeypatch.setenv("KINDERPRINT_ACECQA_GEOCODING_DATA_PATH", str(path))
+
+    body = client.get("/api/data-quality/acecqa-geocoding").json()
+
+    assert_envelope(body)
+    assert body["status"] == "available"
+    assert body["data"] == {
+        "total_services": 4, "exact_matches": 1, "high_confidence_matches": 1,
+        "review_matches": 1, "unmatched": 1, "sa2_assignment_success": 2,
+        "locality_assignment_success": 2, "included_in_spatial_analysis": 2,
+        "excluded_from_spatial_analysis": 2,
+    }
+    assert body["metadata"]["address_fields_exposed"] is False
+    assert "Secret Street" not in str(body)
+
+
+def test_geocoding_quality_rejects_weak_match_inclusion(client, monkeypatch, tmp_path) -> None:
+    path = tmp_path / "invalid-geocoding.csv"
+    path.write_text(
+        "service_approval_number,match_status,assigned_sa2,assigned_kinderprint_locality,"
+        "included_in_spatial_analysis\nSE-1,REVIEW,201011001,MEL001,true\n",
+        encoding="utf-8",
+    )
+    monkeypatch.setenv("KINDERPRINT_ACECQA_GEOCODING_DATA_PATH", str(path))
+
+    body = client.get("/api/data-quality/acecqa-geocoding").json()
+
+    assert body["status"] == "unavailable"
+    assert body["limitations"][0]["code"] == "geocoding_dataset_invalid"
+
+
 def assert_envelope(response: dict) -> None:
     assert set(response) == {"status", "data", "metadata", "limitations", "notices"}
 

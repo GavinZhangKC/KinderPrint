@@ -16,6 +16,13 @@ filesystem paths. A configured dataset is not automatically approved for user-fa
 interpretation: EPA observations remain station context only, PHIDU child-health
 outcomes remain research only, and ACECQA/G-NAF output remains a quality-control input.
 
+### `GET /api/data-quality/acecqa-geocoding`
+
+Returns aggregate EXACT, HIGH_CONFIDENCE, REVIEW, UNMATCHED, SA2-assignment, inclusion,
+and exclusion counts. Service names, original and normalised addresses, G-NAF identifiers,
+and coordinates are never returned. The loader rejects any REVIEW or UNMATCHED row marked
+for inclusion in spatial analysis.
+
 This document describes the agreed API shape for Iteration 1 and provisional Backend + Integration contracts for Iteration 2. It is a design contract only. It does not define implementation logic, connect datasets, or approve Data Science or AI methods. Every unresolved decision is marked `TBC`.
 
 ## Contract conventions
