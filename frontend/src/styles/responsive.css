@@ -31,7 +31,6 @@
 
 @media (max-height: 800px) {
   .map-page { padding-block: 9px; }
-  .map-page > .nav-shell { height: 64px; }
   .map-page .map-shell { margin-top: 8px; }
   .map-page .search-input-shell { height: 46px; }
   .map-page .neighbourhood-search-block { top: 14px; }
@@ -47,8 +46,6 @@
 
 @media (max-height: 700px) {
   .map-page { padding-block: 6px; }
-  .map-page > .nav-shell { height: 58px; min-height: 58px; }
-  .map-page .brand-logo { width: 42px; height: 42px; }
   .map-page .map-shell { margin-top: 6px; }
   .map-page .neighbourhood-search-block { top: 10px; }
   .map-page .search-input-shell { height: 42px; }
@@ -65,7 +62,7 @@
 
 @media (max-width: 760px) {
   .map-page { padding: 8px 10px; }
-  .map-page > .nav-shell { width: 100%; top: auto; padding-inline: 12px; }
+  .map-page > .nav-shell { width: 100%; height: 66px; top: auto; padding: 0 14px; }
   .map-page .map-shell { width: 100%; }
   .map-page .map-surface { height: 100%; min-height: 0; padding-bottom: 0; }
   .map-page .neighbourhood-search-block { left: 16px; width: clamp(260px, 72vw, 420px); max-width: calc(100% - 32px); }
@@ -75,8 +72,6 @@
 }
 
 @media (max-width: 520px) {
-  .map-page .brand-button span { display: none; }
-  .map-page .nav-links { gap: 7px; font-size: 11px; }
   .map-page .map-controls-row { right: 12px; left: 12px; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, .8fr); }
   .map-page .preference-card,
   .map-page .legend-card { width: auto; }

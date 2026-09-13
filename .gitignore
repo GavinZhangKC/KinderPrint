@@ -26,3 +26,7 @@ __pycache__/
 
 # Local run logs and screenshots
 /.run-logs/
+
+# Local-only development launchers
+/start-dev.ps1
+/stop-dev.ps1

@@ -50,21 +50,13 @@
   flex: 0 0 auto;
   width: 100%;
   max-width: 1440px;
-  height: clamp(64px, 8dvh, 76px);
+  height: 76px;
   margin: 0 auto;
   top: auto;
   transform: none;
-  padding-inline: clamp(14px, 2vw, 30px);
-  border-radius: clamp(18px, 2vw, 24px);
+  padding: 0 30px 0 20px;
+  border-radius: 24px;
 }
-
-.map-page .brand-logo {
-  width: clamp(42px, 5vw, 58px);
-  height: clamp(42px, 5vw, 58px);
-}
-
-.map-page .brand-button { font-size: clamp(21px, 2.2vw, 30px); }
-.map-page .nav-links { gap: clamp(10px, 2vw, 30px); font-size: clamp(11px, 1.1vw, 14px); }
 
 @media (max-width: 680px) {
   .nav-shell { width: calc(100vw - 20px); height: 62px; padding: 0 12px 0 8px; border-radius: 20px; }

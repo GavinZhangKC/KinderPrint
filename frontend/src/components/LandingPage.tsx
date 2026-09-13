@@ -124,18 +124,17 @@ export default function LandingPage({ onInsight, onMap }: LandingPageProps) {
       <main className="home-content">
         <section className="home-hero" id="home-hero" aria-labelledby="landing-title">
           <div className="home-hero-copy" data-no-ripple>
-            <p className="landing-kicker">Neighbourhood evidence, brought together</p>
-            <h1 id="landing-title">See the bigger picture of where children grow.</h1>
+            <h1 id="landing-title">Discover how neighbourhoods<br />shape childhood.</h1>
+            <p className="landing-subheading">
+              Child development + community + environment.
+            </p>
             <p className="landing-copy">
-              Explore child development, social, and environmental evidence across local
-              communities in one clear view.
+              Explore the connections between local conditions and children’s development
+              through a clearer, more engaging evidence experience.
             </p>
             <div className="home-hero-actions">
-              <button className="button primary home-hero-button" type="button" onClick={onInsight}>
-                Enter the 3D Insight Journey <span aria-hidden="true">↗</span>
-              </button>
-              <button className="home-text-link" type="button" onClick={() => scrollToSection('home-insight')}>
-                See how the evidence connects <span aria-hidden="true">↓</span>
+              <button className="button primary home-hero-button" type="button" onClick={onMap}>
+                Enter the Map <span aria-hidden="true">↗</span>
               </button>
             </div>
           </div>
