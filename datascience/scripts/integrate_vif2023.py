@@ -44,10 +44,11 @@ def main() -> None:
         for sex, (frame, prefix) in prefixes.items():
             age_0_4 = pd.to_numeric(frame[f"{prefix}  0-4"])
             age_5_9 = pd.to_numeric(frame[f"{prefix}  5-9"])
+            age_10_14 = pd.to_numeric(frame[f"{prefix}  10-14"])
             total_columns = [column for column in frame if column.startswith(f"{year}|{sex}  ")]
             totals = frame[total_columns].apply(pd.to_numeric).sum(axis=1)
-            for code, name, first, second, total in zip(
-                    frame["SA2 code"], frame["Region"], age_0_4, age_5_9, totals):
+            for code, name, first, second, third, total in zip(
+                    frame["SA2 code"], frame["Region"], age_0_4, age_5_9, age_10_14, totals):
                 records.append({
                     "sa2_code_2021": code,
                     "sa2_name_2021": name,
@@ -55,7 +56,9 @@ def main() -> None:
                     "sex": sex.lower(),
                     "population_age_0_4_projected": round(float(first), 6),
                     "population_age_5_9_projected": round(float(second), 6),
+                    "population_age_10_14_projected": round(float(third), 6),
                     "population_age_0_9_projected": round(float(first + second), 6),
+                    "population_age_0_14_projected": round(float(first + second + third), 6),
                     "population_all_ages_projected": round(float(total), 6),
                     "source_id": "vif2023_sa2_age_projections",
                     "value_status": "PROJECTED",

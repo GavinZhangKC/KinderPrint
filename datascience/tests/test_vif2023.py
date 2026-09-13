@@ -17,6 +17,9 @@ def test_vif_projection_contract_is_complete_and_labelled():
     assert set(data.sex) == {"persons", "males", "females"}
     assert set(data.value_status) == {"PROJECTED"}
     assert data.filter(like="population_").ge(0).all().all()
+    assert (abs(data.population_age_0_14_projected - (
+        data.population_age_0_4_projected + data.population_age_5_9_projected
+        + data.population_age_10_14_projected)) < 0.00001).all()
 
 
 def test_vif_persons_equal_sex_components():
