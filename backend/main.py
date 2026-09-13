@@ -12,7 +12,7 @@ from mangum import Mangum
 
 from data_loader import boundary_data_path
 from dataset_status import dataset_statuses
-from air_quality import load_station_year_observations
+from air_quality import load_station_year_observations, station_catalog
 from geography import (
     feature_metadata,
     intersects_bbox,
@@ -168,6 +168,23 @@ def station_air_quality(
         "limit": limit,
         "sa2_exposure_status": "not_derived",
     }, limitations=limitations, notices=[STATION_CONTEXT_NOTICE])
+
+
+@app.get("/api/air-quality/station-catalog")
+def air_quality_station_catalog() -> dict[str, Any]:
+    """List valid station-level filter dimensions without locality interpretation."""
+    rows, limitations = load_station_year_observations()
+    if rows is None:
+        return envelope("unavailable", {"stations": []}, limitations=limitations,
+                        notices=[STATION_CONTEXT_NOTICE])
+    stations = station_catalog(rows)
+    return envelope("available", {"stations": stations}, metadata={
+        "source": "EPA Victoria historical hourly monitoring releases",
+        "geographic_unit": "monitoring_station",
+        "station_identifier_count": len(stations),
+        "station_name_count": len({station["station_name"] for station in stations}),
+        "sa2_exposure_status": "not_derived",
+    }, notices=[STATION_CONTEXT_NOTICE])
 
 
 @app.get("/api/data-quality/acecqa-geocoding")

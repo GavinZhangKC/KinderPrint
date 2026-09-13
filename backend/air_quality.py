@@ -65,3 +65,26 @@ def load_station_year_observations() -> tuple[list[dict[str, Any]] | None, list[
             "The configured EPA station-year dataset failed schema or value validation.",
             "air_quality")]
     return rows, []
+
+
+def station_catalog(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Summarise available source dimensions without creating exposure values."""
+    stations: dict[str, dict[str, Any]] = {}
+    for row in rows:
+        station = stations.setdefault(row["station_id"], {
+            "station_id": row["station_id"],
+            "station_name": row["station_name"],
+            "years": set(), "pollutants": set(), "units": set(), "method_codes": set(),
+        })
+        station["years"].add(row["year"])
+        station["pollutants"].add(row["pollutant"])
+        station["units"].add(row["unit"])
+        station["method_codes"].add(row["method_code"])
+    return [{
+        **station,
+        "years": sorted(station["years"]),
+        "pollutants": sorted(station["pollutants"]),
+        "units": sorted(station["units"]),
+        "method_codes": sorted(station["method_codes"]),
+    } for station in sorted(stations.values(), key=lambda item: (
+        item["station_name"].casefold(), item["station_id"]))]

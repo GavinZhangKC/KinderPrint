@@ -108,6 +108,29 @@ def test_air_quality_serves_station_context_without_area_exposure(client, monkey
     assert body["notices"][0]["code"] == "station_context_only"
 
 
+def test_air_quality_catalog_exposes_available_filter_dimensions(client, monkeypatch, tmp_path) -> None:
+    path = tmp_path / "epa-catalog.csv"
+    path.write_text(
+        "year,station_id,station_name,pollutant,unit,method_code,validation_status,"
+        "observed_days,valid_hours,first_observed_date,last_observed_date,"
+        "annual_mean_of_hourly_values,negative_hours_retained,monitoring_status,sa2_exposure_status\n"
+        "2021,2,Bravo,PM2.5,ug/m3,BAM,PUBLISHED,1,1,2021-01-01,2021-01-01,5,0,STATION_OBSERVATION_CONTEXT_ONLY,NOT_DERIVED\n"
+        "2022,1,Alpha,NO2,ppb,NO2,PUBLISHED,1,1,2022-01-01,2022-01-01,4,0,STATION_OBSERVATION_CONTEXT_ONLY,NOT_DERIVED\n"
+        "2022,1,Alpha,O3,ppb,O3,PUBLISHED,1,1,2022-01-01,2022-01-01,3,0,STATION_OBSERVATION_CONTEXT_ONLY,NOT_DERIVED\n",
+        encoding="utf-8",
+    )
+    monkeypatch.setenv("KINDERPRINT_EPA_STATION_YEAR_DATA_PATH", str(path))
+
+    body = client.get("/api/air-quality/station-catalog").json()
+
+    assert body["status"] == "available"
+    assert [station["station_name"] for station in body["data"]["stations"]] == ["Alpha", "Bravo"]
+    assert body["data"]["stations"][0]["pollutants"] == ["NO2", "O3"]
+    assert body["metadata"]["station_identifier_count"] == 2
+    assert body["metadata"]["station_name_count"] == 2
+    assert body["metadata"]["sa2_exposure_status"] == "not_derived"
+
+
 def test_air_quality_rejects_claimed_sa2_exposure(client, monkeypatch, tmp_path) -> None:
     path = tmp_path / "invalid-epa.csv"
     path.write_text(

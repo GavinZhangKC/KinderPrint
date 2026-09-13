@@ -78,6 +78,12 @@ The endpoint deliberately has no SA2 or locality parameter and always states tha
 area-level exposure was not derived. It must not be used as a neighbourhood indicator.
 Results are paginated with `offset` and `limit`; metadata reports page and total counts.
 
+### `GET /api/air-quality/station-catalog`
+
+Lists each monitoring station with its available years, pollutants, units, and method
+codes. This allows clients to construct valid station-level queries without presenting
+the station catalogue as a neighbourhood exposure layer.
+
 ### `GET /api/population-projections`
 
 Returns Victoria in Future 2023 Release 2 child-population projections at their
