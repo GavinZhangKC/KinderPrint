@@ -223,6 +223,16 @@ export default function ProfileModal({ neighbourhood, onCompare, onExploreData, 
       </article>
 
       <article className="glass-subtle key-insight-card">
+        <h2>Child Population Outlook</h2>
+        {neighbourhood.projectedChildren0To14 === null ? (
+          <p>No compatible locality projection is available.</p>
+        ) : (
+          <p><strong>{neighbourhood.projectedChildren0To14.toLocaleString()}</strong> projected children aged 0–14 in {neighbourhood.projectionYear}.</p>
+        )}
+        <p>Victoria in Future projection at native SA2 geography; this is a projection, not an observed count.</p>
+      </article>
+
+      <article className="glass-subtle key-insight-card">
         <h2>Highlighted Factors</h2>
         {neighbourhood.highlightedFactors.length > 0 ? (
           <ul>

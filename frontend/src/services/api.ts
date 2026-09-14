@@ -253,6 +253,43 @@ export interface EarlyChildhoodContext {
   status: 'aggregate_context'
 }
 
+export interface ContextMetric {
+  value: number | null
+  status: ApiStatus | string
+}
+
+export interface PopulationProjection {
+  sa2_code: string
+  sa2_name: string
+  projection_year: number
+  sex: string
+  population_age_0_4_projected: number
+  population_age_5_9_projected: number
+  population_age_10_14_projected: number
+  population_age_0_9_projected: number
+  population_age_0_14_projected: number
+  population_all_ages_projected: number
+  status: string
+}
+
+export interface OverviewSection<T> {
+  status: ApiStatus | string
+  data: T
+  metadata: Record<string, unknown>
+  limitations: ApiLimitation[]
+}
+
+export interface NeighbourhoodOverview {
+  neighbourhood: NeighbourhoodSearchResult
+  sections: {
+    profile: OverviewSection<NeighbourhoodProfile | null>
+    early_childhood: OverviewSection<EarlyChildhoodContext | null>
+    traffic: OverviewSection<{ neighbourhood: NeighbourhoodSearchResult; metrics: Record<string, ContextMetric> } | null>
+    industrial_emissions: OverviewSection<{ neighbourhood: NeighbourhoodSearchResult; metrics: Record<string, ContextMetric> } | null>
+    population_outlook: OverviewSection<{ projections: PopulationProjection[] }>
+  }
+}
+
 export interface SuitableLocality {
   id: string
   name: string
@@ -440,6 +477,14 @@ export const api = {
   ) =>
     request<EarlyChildhoodContext>(
       `/api/neighbourhoods/${encodeURIComponent(id)}/early-childhood-services`,
+      signal,
+    ),
+  getNeighbourhoodOverview: (
+    id: string,
+    signal?: AbortSignal,
+  ) =>
+    request<NeighbourhoodOverview>(
+      `/api/neighbourhoods/${encodeURIComponent(id)}/overview`,
       signal,
     ),
   getSuitableLocalities: (

@@ -26,6 +26,15 @@ export interface Neighbourhood {
   kindergartenServices: number | null
   longDayCareServices: number | null
   serviceRatingCoverage: number | null
+  projectedChildren0To14: number | null
+  projectionYear: number | null
+  populationOutlookStatus: string
+  lengthWeightedTraffic: number | null
+  highTrafficRoadShare: number | null
+  trafficContextStatus: string
+  npiFacilities: number | null
+  nearestNpiFacilityKm: number | null
+  industrialContextStatus: string
   indicatorProvenance: Record<string, IndicatorProvenance>
   priority: string | null
   highlightedFactors: string[]

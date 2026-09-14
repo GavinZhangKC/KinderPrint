@@ -88,6 +88,20 @@ export default function DetailedDataDrawer({ neighbourhood, onClose, isActive, o
           <small>Accepted Open G-NAF matches only. These counts do not measure accessibility or service quality.</small>
         </section>
         <section>
+          <h3>Population Outlook</h3>
+          <div className="drawer-metric"><span>Projected children aged 0–14</span><strong>{display(neighbourhood.projectedChildren0To14)}</strong></div>
+          <div className="drawer-metric"><span>Projection year</span><strong>{display(neighbourhood.projectionYear)}</strong></div>
+          <small>Native-SA2 VIF projection. Combined reporting localities remain unavailable rather than being estimated.</small>
+        </section>
+        <section>
+          <h3>Transport and Industry Context</h3>
+          <div className="drawer-metric"><span>Length-weighted daily traffic</span><strong>{display(neighbourhood.lengthWeightedTraffic)}</strong></div>
+          <div className="drawer-metric"><span>High-traffic declared-road share</span><strong>{display(neighbourhood.highTrafficRoadShare, '%')}</strong></div>
+          <div className="drawer-metric"><span>NPI reporting facilities</span><strong>{display(neighbourhood.npiFacilities)}</strong></div>
+          <div className="drawer-metric"><span>Nearest NPI facility</span><strong>{display(neighbourhood.nearestNpiFacilityKm, ' km')}</strong></div>
+          <small>Context only: these values are not personal exposure, ambient air quality or health-risk measures.</small>
+        </section>
+        <section>
           <h3>Social Context</h3>
           <div className="drawer-metric"><span>SEIFA IRSD national decile</span><strong>{display(neighbourhood.socialDisadvantageDecile)}</strong><IndicatorProvenanceDetails details={neighbourhood.indicatorProvenance.seifa_irsd_decile} /></div>
         </section>

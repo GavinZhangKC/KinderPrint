@@ -3,6 +3,7 @@ import type {
   ApiNotice,
   EarlyChildhoodContext,
   NeighbourhoodExplanation,
+  NeighbourhoodOverview,
   NeighbourhoodPriority,
   NeighbourhoodProfile,
   ProfileIndicator,
@@ -47,6 +48,7 @@ export function toNeighbourhood(
   priority: NeighbourhoodPriority | null,
   explanation: NeighbourhoodExplanation | null,
   earlyChildhood: EarlyChildhoodContext | null,
+  overview: NeighbourhoodOverview | null,
   context: ProfileContext,
   fallbackId: string,
   fallbackName?: string,
@@ -76,6 +78,13 @@ export function toNeighbourhood(
   const profileNotices = context.profileNotices
     .map((notice) => notice.message)
     .filter((message) => message && message !== 'TBC')
+  const populationSection = overview?.sections.population_outlook
+  const projections = populationSection?.data.projections ?? []
+  const latestProjection = projections[projections.length - 1]
+  const trafficSection = overview?.sections.traffic
+  const industrialSection = overview?.sections.industrial_emissions
+  const trafficMetrics = trafficSection?.data?.metrics
+  const industrialMetrics = industrialSection?.data?.metrics
   const indicatorProvenance = Object.fromEntries(
     profile.domains.flatMap((domain) => domain.indicators).map((item) => [
       item.id,
@@ -111,6 +120,15 @@ export function toNeighbourhood(
     kindergartenServices: earlyChildhood?.kindergarten_services ?? null,
     longDayCareServices: earlyChildhood?.long_day_care_services ?? null,
     serviceRatingCoverage: round(earlyChildhood?.rating_coverage_pct ?? null),
+    projectedChildren0To14: round(latestProjection?.population_age_0_14_projected ?? null),
+    projectionYear: latestProjection?.projection_year ?? null,
+    populationOutlookStatus: populationSection?.status ?? 'unavailable',
+    lengthWeightedTraffic: round(trafficMetrics?.length_weighted_aadt?.value ?? null),
+    highTrafficRoadShare: round(trafficMetrics?.high_traffic_road_share_pct?.value ?? null),
+    trafficContextStatus: trafficSection?.status ?? 'unavailable',
+    npiFacilities: round(industrialMetrics?.npi_facilities?.value ?? null),
+    nearestNpiFacilityKm: round(industrialMetrics?.nearest_npi_facility_km?.value ?? null),
+    industrialContextStatus: industrialSection?.status ?? 'unavailable',
     indicatorProvenance,
     priority: priority?.priority_band ?? null,
     highlightedFactors,
