@@ -8,6 +8,7 @@ import ComparePanel from './components/ComparePanel'
 import DetailedComparison from './components/DetailedComparison'
 import DetailedDataDrawer from './components/DetailedDataDrawer'
 import InsightPage from './components/InsightPage'
+import InteractiveAtmosphere from './components/InteractiveAtmosphere'
 import Legend from './components/Legend'
 import LandingPage from './components/LandingPage'
 import MenuPage from './components/MenuPage'
@@ -532,6 +533,7 @@ if (
   ) {
     return (
       <div className="app-background detailed-background">
+        <InteractiveAtmosphere mode="compare" />
         <div className="ambient ambient-one" />
         <div className="ambient ambient-two" />
 
@@ -562,6 +564,7 @@ return (
       className="app-background map-page"
       id="explore"
     >
+      <InteractiveAtmosphere mode="explore" />
       <div className="ambient ambient-one" />
       <div className="ambient ambient-two" />
 

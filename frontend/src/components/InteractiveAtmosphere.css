@@ -1,0 +1,24 @@
+.interactive-atmosphere { --atmosphere-x:0; --atmosphere-y:0; position:fixed; inset:0; z-index:0; overflow:hidden; pointer-events:none; background:#dceef6; }
+.app-background:has(.interactive-atmosphere) { background:transparent; }
+.atmosphere-sky { position:absolute; inset:-5%; background:linear-gradient(180deg,#8dbfe0 0%,#cde7ef 48%,#e4f1f3 100%); transform:translate(calc(var(--atmosphere-x) * -9px),calc(var(--atmosphere-y) * -7px)); }
+.atmosphere-sun { position:absolute; width:56vw; height:56vw; right:-12vw; top:-23vw; border-radius:50%; background:radial-gradient(circle,#fffde9 0 5%,#fff4c98c 14%,#fff0c42b 34%,transparent 66%); transform:translate(calc(var(--atmosphere-x) * 22px),calc(var(--atmosphere-y) * 15px)); }
+.atmosphere-cloud { position:absolute; width:70vw; height:30vw; opacity:.27; filter:blur(3px); background:url('/insight-clouds.svg') center/contain no-repeat; animation:atmosphere-drift 34s ease-in-out infinite alternate; }
+.atmosphere-cloud-a { left:-20vw; top:-5vw; transform:translate(calc(var(--atmosphere-x) * -30px),calc(var(--atmosphere-y) * -15px)); }
+.atmosphere-cloud-b { right:-24vw; top:14vh; opacity:.16; animation-delay:-14s; animation-duration:42s; transform:scaleX(-1) translate(calc(var(--atmosphere-x) * 20px),calc(var(--atmosphere-y) * 11px)); }
+.atmosphere-land { position:absolute; left:-4%; right:-4%; bottom:-4%; transform-origin:center bottom; }
+.atmosphere-land-back { height:42vh; opacity:.38; background:url('/insight-landscape.svg') center bottom/cover no-repeat; transform:translate(calc(var(--atmosphere-x) * -12px),calc(var(--atmosphere-y) * -5px)) scale(1.06); filter:saturate(.85) hue-rotate(-4deg); }
+.atmosphere-land-front { height:22vh; opacity:.2; background:linear-gradient(165deg,transparent 25%,#5f9ca6 26% 48%,#447b82 49%); clip-path:polygon(0 55%,14% 31%,30% 52%,45% 25%,63% 52%,79% 19%,100% 48%,100% 100%,0 100%); transform:translate(calc(var(--atmosphere-x) * -24px),calc(var(--atmosphere-y) * -9px)) scale(1.05); }
+.atmosphere-grain { position:absolute; inset:0; opacity:.035; background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.5'/%3E%3C/svg%3E"); }
+.interactive-atmosphere[data-mode='compare'] .atmosphere-sky { background:linear-gradient(180deg,#93b9d8,#d5e6ee 48%,#e8f0ef); }
+.interactive-atmosphere[data-mode='compare'] .atmosphere-sun { right:auto;left:-8vw;opacity:.7; }
+@keyframes atmosphere-drift { to { margin-left:6vw; margin-top:2vh; } }
+.profile-domain-card,.key-insight-card,.summary-card,.environmental-compare-card,.next-step-card { --surface-x:0;--surface-y:0; transform:perspective(900px) rotateX(calc(var(--surface-y) * -3deg)) rotateY(calc(var(--surface-x) * 3deg)); transition:transform .22s ease,box-shadow .22s ease; transform-style:preserve-3d; }
+.profile-domain-card:hover,.key-insight-card:hover,.summary-card:hover,.environmental-compare-card:hover,.next-step-card:hover { box-shadow:0 20px 45px rgba(51,82,140,.16); }
+.profile-domain-card>* ,.key-insight-card>* ,.summary-card>* ,.environmental-compare-card>* ,.next-step-card>* { transform:translateZ(8px); }
+.app-background:has(.interactive-atmosphere) .nav-shell { animation:journey-ui-drop .65s cubic-bezier(.22,1,.36,1) both; }
+.app-background:has(.interactive-atmosphere) .map-surface { animation:journey-ui-rise .8s .08s cubic-bezier(.22,1,.36,1) both; }
+.detailed-background .comparison-section { animation:journey-ui-rise .7s cubic-bezier(.22,1,.36,1) both; }
+.detailed-background .comparison-section:nth-of-type(2){animation-delay:.06s}.detailed-background .comparison-section:nth-of-type(3){animation-delay:.12s}.detailed-background .comparison-section:nth-of-type(4){animation-delay:.18s}.detailed-background .comparison-section:nth-of-type(5){animation-delay:.24s}
+@keyframes journey-ui-drop{from{opacity:0;transform:translateY(-22px)}to{opacity:1;transform:translateY(0)}}
+@keyframes journey-ui-rise{from{opacity:0;transform:translateY(28px) scale(.985)}to{opacity:1;transform:translateY(0) scale(1)}}
+@media(prefers-reduced-motion:reduce){.atmosphere-cloud{animation:none}.interactive-atmosphere *{transform:none!important}}
