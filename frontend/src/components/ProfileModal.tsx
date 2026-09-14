@@ -48,20 +48,6 @@ export default function ProfileModal({ neighbourhood, onCompare, onExploreData, 
       </div>
 
       <article className="glass-subtle key-insight-card">
-        <h2>Early Childhood Service Context</h2>
-        {neighbourhood.activeEducationCareServices === null ? (
-          <p>No validated aggregate service context is available.</p>
-        ) : (
-          <p>
-            <strong>{neighbourhood.activeEducationCareServices}</strong> active education and care services ·{' '}
-            <strong>{display(neighbourhood.totalApprovedPlaces)}</strong> total approved places ·{' '}
-            <strong>{neighbourhood.kindergartenServices}</strong> kindergarten services
-          </p>
-        )}
-        <p>Accepted Open G-NAF matches only. Counts describe local service context, not accessibility, quality or capacity sufficiency.</p>
-      </article>
-
-      <article className="glass-subtle key-insight-card">
         <h2>Highlighted Factors</h2>
         {neighbourhood.highlightedFactors.length > 0 ? (
           <ul>
