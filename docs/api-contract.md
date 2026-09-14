@@ -443,7 +443,8 @@ Both identifiers are validated against the approved profile dataset. The pair do
 The response uses the standard envelope and supports:
 
 - both neighbourhood identifiers, names, and confirmed geographic units;
-- side-by-side comparison fields (final fields TBC);
+- side-by-side comparison fields including indicator name, unit, source, reference year,
+  geographic unit, values and availability states;
 - an empty `similarity_basis` list, because manual comparison does not run matching logic;
 - a `null` `match_strength`, because manual comparison does not calculate similarity;
 - source, reference year, geographic unit, and data quality;

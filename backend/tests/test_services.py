@@ -165,6 +165,7 @@ def profile(identifier: str, value: int, *, geographic_unit: str = "TBC",
             "source": "approved",
             "geographic_unit": geographic_unit,
             "reference_year": "TBC",
+            "unit": "percent",
         }
 
     social_value = value + 1 if social_status == "available" else None
@@ -221,6 +222,10 @@ def test_manual_comparison_supports_any_two_profiles(client, monkeypatch, write_
     assert body["data"]["source_neighbourhood"]["id"] == "b"
     assert body["data"]["side_by_side"][0]["source_value"] == 2
     assert body["data"]["side_by_side"][0]["comparison_value"] == 0
+    assert body["data"]["side_by_side"][0]["unit"] == "percent"
+    assert body["data"]["side_by_side"][0]["source"] == "approved"
+    assert body["data"]["side_by_side"][0]["reference_year"] == "TBC"
+    assert body["data"]["side_by_side"][0]["geographic_unit"] == "TBC"
     assert body["data"]["similarity_basis"] == []
     assert body["data"]["match_strength"] is None
 

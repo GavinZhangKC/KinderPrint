@@ -282,6 +282,10 @@ def profile_comparison_data(
         side_by_side.append({
             "id": identifier,
             "name": exemplar["name"],
+            "unit": exemplar.get("unit"),
+            "source": exemplar["source"],
+            "reference_year": exemplar["reference_year"],
+            "geographic_unit": exemplar["geographic_unit"],
             "source_value": source["value"] if source else None,
             "comparison_value": compared["value"] if compared else None,
             "source_status": source["status"] if source else "unavailable",
