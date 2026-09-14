@@ -15,6 +15,15 @@
   transform: translateX(-50%);
 }
 
+.about-us-page > .nav-shell,
+.about-us-panel {
+  z-index: 2;
+}
+
+.about-us-panel {
+  animation: journey-ui-rise .9s .08s cubic-bezier(.22, 1, .36, 1) both;
+}
+
 .about-us-panel {
   width: min(1050px, 100%);
   border-radius: 42px;

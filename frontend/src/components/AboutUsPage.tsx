@@ -1,5 +1,6 @@
 import logo from '../assets/LogoMark.png'
 import BrandHeader from './BrandHeader'
+import InteractiveAtmosphere from './InteractiveAtmosphere'
 import '../styles/about-us.css'
 
 interface AboutUsPageProps {
@@ -11,6 +12,7 @@ interface AboutUsPageProps {
 export default function AboutUsPage({ onHome, onInsight, onMap }: AboutUsPageProps) {
   return (
     <section className="about-us-page" id="about-us" aria-labelledby="about-us-title">
+      <InteractiveAtmosphere mode="explore" />
       <BrandHeader
         activePage="about"
         onHome={onHome}
