@@ -79,6 +79,15 @@ export default function DetailedDataDrawer({ neighbourhood, onClose, isActive, o
           <div className="drawer-metric"><span>Developmental vulnerability</span><strong>{display(neighbourhood.developmentalVulnerability, '%')}</strong><IndicatorProvenanceDetails details={neighbourhood.indicatorProvenance.aedc_vulnerable_one_or_more} /></div>
         </section>
         <section>
+          <h3>Early Childhood Services</h3>
+          <div className="drawer-metric"><span>Active education and care services</span><strong>{display(neighbourhood.activeEducationCareServices)}</strong></div>
+          <div className="drawer-metric"><span>Total approved places</span><strong>{display(neighbourhood.totalApprovedPlaces)}</strong></div>
+          <div className="drawer-metric"><span>Kindergarten services</span><strong>{display(neighbourhood.kindergartenServices)}</strong></div>
+          <div className="drawer-metric"><span>Long day care services</span><strong>{display(neighbourhood.longDayCareServices)}</strong></div>
+          <div className="drawer-metric"><span>Services with a current rating</span><strong>{display(neighbourhood.serviceRatingCoverage, '%')}</strong></div>
+          <small>Accepted Open G-NAF matches only. These counts do not measure accessibility or service quality.</small>
+        </section>
+        <section>
           <h3>Social Context</h3>
           <div className="drawer-metric"><span>SEIFA IRSD national decile</span><strong>{display(neighbourhood.socialDisadvantageDecile)}</strong><IndicatorProvenanceDetails details={neighbourhood.indicatorProvenance.seifa_irsd_decile} /></div>
         </section>

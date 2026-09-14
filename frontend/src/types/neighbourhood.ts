@@ -21,6 +21,11 @@ export interface Neighbourhood {
   heatExposure: number | null
   treeCanopy: number | null
   greenSpaceAccess: number | null
+  activeEducationCareServices: number | null
+  totalApprovedPlaces: number | null
+  kindergartenServices: number | null
+  longDayCareServices: number | null
+  serviceRatingCoverage: number | null
   indicatorProvenance: Record<string, IndicatorProvenance>
   priority: string | null
   highlightedFactors: string[]
@@ -29,4 +34,3 @@ export interface Neighbourhood {
   limitations: string[]
   notices: string[]
 }
-

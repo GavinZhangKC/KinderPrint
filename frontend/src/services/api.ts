@@ -238,6 +238,21 @@ export interface PatternInsight {
   supporting_environmental_indicators: ApprovedComparisonIndicator[]
 }
 
+export interface EarlyChildhoodContext {
+  neighbourhood_id: string
+  neighbourhood_name: string
+  active_education_care_services: number
+  exact_match_services: number
+  high_confidence_match_services: number
+  services_with_approved_places: number
+  total_approved_places: number
+  long_day_care_services: number
+  kindergarten_services: number
+  services_with_current_rating: number
+  rating_coverage_pct: number | null
+  status: 'aggregate_context'
+}
+
 export interface SuitableLocality {
   id: string
   name: string
@@ -418,6 +433,14 @@ export const api = {
       )}&neighbourhood_id_b=${encodeURIComponent(
         b,
       )}`,
+    ),
+  getEarlyChildhoodContext: (
+    id: string,
+    signal?: AbortSignal,
+  ) =>
+    request<EarlyChildhoodContext>(
+      `/api/neighbourhoods/${encodeURIComponent(id)}/early-childhood-services`,
+      signal,
     ),
   getSuitableLocalities: (
     criteria: string[],
