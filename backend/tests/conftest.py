@@ -26,10 +26,25 @@ from data_loader import (  # noqa: E402
     VIF_PROJECTION_DATA_PATH_ENV,
 )
 from main import app  # noqa: E402
+from validation import (  # noqa: E402
+    load_comparison_data,
+    load_explanations,
+    load_priority_results,
+    load_profiles,
+    load_suitability_rankings,
+)
 
 
 @pytest.fixture(autouse=True)
 def clear_dataset_environment(monkeypatch: pytest.MonkeyPatch) -> None:
+    for loader in (
+        load_profiles,
+        load_suitability_rankings,
+        load_priority_results,
+        load_explanations,
+        load_comparison_data,
+    ):
+        loader.cache_clear()
     for variable in (
         ACECQA_CONTEXT_DATA_PATH_ENV,
         ACECQA_GEOCODING_DATA_PATH_ENV,

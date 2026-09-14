@@ -69,6 +69,7 @@ def valid_profile(profile: Any) -> bool:
     return len(domain_ids) == len(set(domain_ids)) and len(indicator_ids) == len(set(indicator_ids))
 
 
+@lru_cache(maxsize=1)
 def load_profiles() -> tuple[list[dict[str, Any]] | None, list[dict[str, Any]]]:
     """Load profiles exactly as prepared by the approved data pipeline."""
     source, limitations = load_json_source(profile_data_path(), PROFILE_DATA_PATH_ENV, "profile")
@@ -120,6 +121,7 @@ def _valid_suitability_locality(locality: Any) -> bool:
     )
 
 
+@lru_cache(maxsize=1)
 def load_suitability_rankings() -> tuple[
     list[dict[str, Any]] | None,
     dict[str, Any] | None,
@@ -434,6 +436,7 @@ def numeric_string(value: str) -> bool:
     return True
 
 
+@lru_cache(maxsize=1)
 def load_priority_results() -> tuple[list[dict[str, Any]] | None, dict[str, Any] | None, list[dict[str, Any]]]:
     """Load only an explicitly approved, precomputed Data Science output."""
     source, limitations = load_json_source(priority_data_path(), PRIORITY_DATA_PATH_ENV, "priority")
@@ -523,6 +526,7 @@ def valid_explanation(explanation: Any) -> bool:
     return True
 
 
+@lru_cache(maxsize=1)
 def load_explanations() -> tuple[list[dict[str, Any]] | None, dict[str, Any] | None, list[dict[str, Any]]]:
     """Load an explicitly approved explanation output without recalculating it."""
     source, limitations = load_json_source(explanation_data_path(), EXPLANATION_DATA_PATH_ENV, "explanation")
@@ -624,6 +628,7 @@ def valid_manual_comparison(comparison: Any) -> bool:
     )
 
 
+@lru_cache(maxsize=1)
 def load_comparison_data() -> tuple[dict[str, list[dict[str, Any]]] | None, dict[str, Any] | None, list[dict[str, Any]]]:
     """Load only approved matching outputs; the API never finds or forces a match."""
     source, limitations = load_json_source(comparison_data_path(), COMPARISON_DATA_PATH_ENV, "comparison")

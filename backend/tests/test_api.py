@@ -18,6 +18,13 @@ from data_loader import (
 from early_childhood import _load_early_childhood_context, load_early_childhood_context
 from geocoding_quality import _load_geocoding_quality, load_geocoding_quality
 from population import _load_population_projections, load_population_projections
+from validation import (
+    load_comparison_data,
+    load_explanations,
+    load_priority_results,
+    load_profiles,
+    load_suitability_rankings,
+)
 
 
 def test_dataset_status_exposes_boundaries_without_local_paths(client, monkeypatch, tmp_path) -> None:
@@ -632,6 +639,35 @@ def test_unknown_profile_is_missing(client, monkeypatch, write_json) -> None:
     assert_envelope(body)
     assert body["status"] == "missing"
     assert body["data"]["neighbourhood"]["id"] == "unknown"
+
+
+def test_approved_json_loaders_are_process_cached(
+    client, monkeypatch, write_json
+) -> None:
+    path = write_json("cached-profiles.json", json.dumps({"profiles": [profile()]}))
+    monkeypatch.setenv(PROFILE_DATA_PATH_ENV, str(path))
+    reads = 0
+    original_read_text = Path.read_text
+
+    def counted_read_text(file_path, *args, **kwargs):
+        nonlocal reads
+        if file_path == path:
+            reads += 1
+        return original_read_text(file_path, *args, **kwargs)
+
+    monkeypatch.setattr(Path, "read_text", counted_read_text)
+
+    assert client.get("/api/neighbourhoods/n/profile").json()["status"] == "limited"
+    assert client.get("/api/neighbourhoods/n/profile").json()["status"] == "limited"
+    assert reads == 1
+    assert all(loader.cache_parameters() == {"maxsize": 1, "typed": False}
+               for loader in (
+                   load_profiles,
+                   load_suitability_rankings,
+                   load_priority_results,
+                   load_explanations,
+                   load_comparison_data,
+               ))
 
 
 def test_child_development_endpoint_excludes_other_profile_domains(
