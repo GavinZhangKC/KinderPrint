@@ -172,8 +172,11 @@ export default function ProfileModal({ neighbourhood, onCompare, onExploreData, 
   return (
     <section className="glass profile-modal page-enter" aria-labelledby="profile-title" onPointerDown={onActivate}>
       <button className="icon-close" type="button" onClick={onClose} aria-label="Close profile">×</button>
-      <h1 id="profile-title">{neighbourhood.name} Profile</h1>
-      <p className="profile-subtitle">A snapshot of child development, social and environmental conditions in this neighbourhood.</p>
+      <header className="profile-opening">
+        <span className="profile-eyebrow">Child health &amp; environment profile</span>
+        <h1 id="profile-title">{neighbourhood.name}</h1>
+        <p className="profile-subtitle">Enter the evidence layers surrounding childhood in this place.</p>
+      </header>
 
       <div className="profile-meta glass-subtle">
         <span>{neighbourhood.geographicUnit} · Reference period {neighbourhood.referencePeriod}</span>
@@ -184,16 +187,17 @@ export default function ProfileModal({ neighbourhood, onCompare, onExploreData, 
         </div>
       </div>
 
-      <div className="profile-domain-grid">
+      <div className="profile-section-heading"><span>01</span><div><small>First impression</small><h2>What stands out here?</h2></div></div>
+      <div className="profile-domain-grid" aria-label="Key locality signals">
         <article className="glass-subtle profile-domain-card child-card">
-          <h2>CHILD DEVELOPMENT</h2>
+          <h2>Development</h2>
           <MetricRing value={neighbourhood.childDevelopmentScore} label="Child development score" />
           <p>On track on all five AEDC domains</p>
           <IndicatorMetaLine details={neighbourhood.indicatorProvenance.aedc_on_track_five} />
         </article>
 
         <article className="glass-subtle profile-domain-card social-card">
-          <h2>SOCIAL CONTEXT</h2>
+          <h2>Social context</h2>
           <p className="metric-label">Socioeconomic<br />disadvantage</p>
           <strong className="metric-large">{display(neighbourhood.socialDisadvantageDecile)}</strong>
           <p>National SEIFA IRSD decile</p>
@@ -201,15 +205,17 @@ export default function ProfileModal({ neighbourhood, onCompare, onExploreData, 
         </article>
 
         <article className="glass-subtle profile-domain-card environment-card">
-          <h2>ENVIRONMENT</h2>
+          <h2>Environment</h2>
           <div className="environment-row"><span>Urban heat island effect</span><strong>{display(neighbourhood.heatExposure, '°C')}</strong><IndicatorMetaLine details={neighbourhood.indicatorProvenance.env_urban_heat} /></div>
           <div className="environment-row"><span>Tree canopy</span><strong>{display(neighbourhood.treeCanopy, '%')}</strong><IndicatorMetaLine details={neighbourhood.indicatorProvenance.env_vegetation_cover} /></div>
           <div className="environment-row"><span>Public open space</span><strong>{display(neighbourhood.greenSpaceAccess, '%')}</strong><IndicatorMetaLine details={neighbourhood.indicatorProvenance.env_open_space_access} /></div>
         </article>
       </div>
 
-      <article className="glass-subtle key-insight-card">
-        <h2>Early Childhood Service Context</h2>
+      <div className="profile-section-heading profile-section-heading--context"><span>02</span><div><small>Explore further</small><h2>Support and change over time</h2></div></div>
+      <details className="key-insight-card profile-disclosure">
+        <summary><span>Early-years support</span><strong>View evidence</strong></summary>
+        <div className="profile-disclosure-content"><h2>Early Childhood Service Context</h2>
         {neighbourhood.activeEducationCareServices === null ? (
           <p>No validated aggregate service context is available.</p>
         ) : (
@@ -219,29 +225,31 @@ export default function ProfileModal({ neighbourhood, onCompare, onExploreData, 
             <strong>{neighbourhood.kindergartenServices}</strong> kindergarten services
           </p>
         )}
-        <p>Accepted Open G-NAF matches only. Counts describe local service context, not accessibility, quality or capacity sufficiency.</p>
-      </article>
+        <p>Accepted Open G-NAF matches only. Counts describe local service context, not accessibility, quality or capacity sufficiency.</p></div>
+      </details>
 
-      <article className="glass-subtle key-insight-card">
-        <h2>Child Population Outlook</h2>
+      <details className="key-insight-card profile-disclosure">
+        <summary><span>Future lens</span><strong>View trajectory</strong></summary>
+        <div className="profile-disclosure-content"><h2>Child Population Outlook</h2>
         {neighbourhood.projectedChildren0To14 === null ? (
           <p>No compatible locality projection is available.</p>
         ) : (
           <p><strong>{neighbourhood.projectedChildren0To14.toLocaleString()}</strong> projected children aged 0–14 in {neighbourhood.projectionYear}.</p>
         )}
-        <p>Victoria in Future projection at native SA2 geography; this is a projection, not an observed count.</p>
-      </article>
+        <p>Victoria in Future projection at native SA2 geography; this is a projection, not an observed count.</p></div>
+      </details>
 
-      <article className="glass-subtle key-insight-card">
-        <h2>Highlighted Factors</h2>
+      <details className="key-insight-card profile-disclosure">
+        <summary><span>Evidence signals</span><strong>Why this place?</strong></summary>
+        <div className="profile-disclosure-content"><h2>Highlighted Factors</h2>
         {neighbourhood.highlightedFactors.length > 0 ? (
           <ul>
             {neighbourhood.highlightedFactors.map((factor) => <li key={factor}>{factor}</li>)}
           </ul>
         ) : (
           <p>No approved highlighted factors are available.</p>
-        )}
-      </article>
+        )}</div>
+      </details>
 
       <div className="profile-actions">
         <button className="button secondary" type="button" onClick={onCompare}>Compare Neighbourhoods</button>

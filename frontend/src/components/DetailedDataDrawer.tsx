@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react'
 import { indicatorStatusLabel } from '../services/profileAdapter'
 import type { IndicatorProvenance, Neighbourhood } from '../types/neighbourhood'
+import HealthPathwayExplorer from './HealthPathwayExplorer'
 
 interface DetailedDataDrawerProps {
   neighbourhood: Neighbourhood
@@ -73,6 +74,7 @@ export default function DetailedDataDrawer({ neighbourhood, onClose, isActive, o
       </header>
 
       <div ref={bodyRef} className="data-drawer-scroll">
+        <HealthPathwayExplorer neighbourhood={neighbourhood} />
         <section>
           <h3>Child Development</h3>
           <div className="drawer-metric"><span>On track on all five domains</span><strong>{display(neighbourhood.childDevelopmentScore, '%')}</strong><IndicatorProvenanceDetails details={neighbourhood.indicatorProvenance.aedc_on_track_five} /></div>
