@@ -76,3 +76,22 @@
   .map-page .preference-card,
   .map-page .legend-card { width: auto; }
 }
+
+/* Full-bleed map and spectrum control refinements */
+@media (max-width: 900px) {
+  .map-page .preference-options { max-width:calc(100vw - 48px);overflow-x:auto;scrollbar-width:none; }
+  .map-page .preference-option { min-width:104px; }
+  .map-page .preference-card { width:auto;max-width:calc(100vw - 24px); }
+  .map-page .legend-card { display:none; }
+}
+
+@media (max-width: 760px) {
+  .map-page { padding:0; }
+  .map-page > .nav-shell { top:10px;width:calc(100% - 20px); }
+  .map-page .map-shell,.map-page .map-surface { width:100%;height:100dvh; }
+  .map-page .neighbourhood-search-block { top:92px;left:14px;width:calc(100% - 28px); }
+  .map-page .suitability-launch-button { top:174px;left:14px;right:auto; }
+  .map-page .map-controls-row { left:50%;right:auto;bottom:12px;display:flex;transform:translateX(-50%); }
+  .map-page .preference-heading { display:none; }
+  .map-page .preference-copy small { display:none; }
+}

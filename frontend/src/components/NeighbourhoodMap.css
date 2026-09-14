@@ -124,6 +124,16 @@
   -webkit-backdrop-filter: blur(14px);
 }
 
+/* Map as the product's full-bleed spatial canvas */
+.map-page { padding:0;background:#dceef6; }
+.map-page > .nav-shell { position:absolute;z-index:30;top:18px;left:50%;width:min(1180px,calc(100vw - 40px));transform:translateX(-50%);background:rgba(238,248,246,.72); }
+.map-page .map-shell { width:100%;max-width:none;height:100dvh;margin:0; }
+.map-page .map-surface { height:100dvh;border:0;border-radius:0;background:rgba(220,238,246,.28); }
+.map-page .real-map-wrapper { border-radius:0; }
+.map-page .neighbourhood-search-block { top:118px;left:clamp(22px,3vw,46px); }
+.map-page .suitability-launch-button { top:118px; }
+.map-page .map-hover-label { top:116px; }
+
 .real-map .mapboxgl-ctrl-bottom-right {
   right: clamp(10px, 1.4vw, 18px);
   bottom: clamp(34px, 5dvh, 48px);

@@ -1,10 +1,10 @@
 import type { PreferenceId } from '../types/neighbourhood'
-const preferenceOptions: Array<{ id: PreferenceId; label: string }> = [
-  { id: 'development', label: 'Development' },
-  { id: 'heat', label: 'Heat' },
-  { id: 'social', label: 'Social Disadvantage' },
-  { id: 'vegetation', label: 'Vegetation' },
-  { id: 'green-space', label: 'Green Space' },
+const preferenceOptions: Array<{ id: PreferenceId; label: string; short: string }> = [
+  { id: 'development', label: 'Learning & development', short: 'Development' },
+  { id: 'heat', label: 'Heat & outdoor comfort', short: 'Heat' },
+  { id: 'social', label: 'Social context', short: 'Context' },
+  { id: 'vegetation', label: 'Canopy & nature', short: 'Nature' },
+  { id: 'green-space', label: 'Parks & open space', short: 'Play' },
 ]
 
 
@@ -16,7 +16,10 @@ interface PreferencePanelProps {
 export default function PreferencePanel({ value, onChange }: PreferencePanelProps) {
   return (
     <section className="glass map-control preference-card" aria-labelledby="preference-title">
-      <h2 id="preference-title">Overall Priority</h2>
+      <div className="preference-heading">
+        <span>Explore a layer</span>
+        <h2 id="preference-title">What matters here?</h2>
+      </div>
       <div className="preference-options" role="radiogroup" aria-labelledby="preference-title">
         {preferenceOptions.map((option) => (
           <label key={option.id} className="preference-option">
@@ -32,8 +35,8 @@ export default function PreferencePanel({ value, onChange }: PreferencePanelProp
               }}
               onChange={() => onChange(option.id)}
             />
-            <span className={`custom-radio ${value === option.id ? 'is-selected' : ''}`} aria-hidden="true" />
-            <span>{option.label}</span>
+            <span className="preference-orbit" aria-hidden="true"><i /></span>
+            <span className="preference-copy"><strong>{option.short}</strong><small>{option.label}</small></span>
           </label>
         ))}
       </div>
