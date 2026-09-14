@@ -3,10 +3,13 @@ from collections import Counter
 from pathlib import Path
 
 from air_quality import _load_station_year_observations, load_station_year_observations
+from community_context import _load_community_context
 from data_loader import (
     ACECQA_CONTEXT_DATA_PATH_ENV,
     ACECQA_GEOCODING_DATA_PATH_ENV,
     BOUNDARY_DATA_PATH_ENV,
+    COMMUNITY_CONTEXT_DATA_PATH_ENV,
+    COMMUNITY_IDENTITY_DATA_PATH_ENV,
     EPA_STATION_YEAR_DATA_PATH_ENV,
     PROFILE_DATA_PATH_ENV,
     SUITABILITY_DATA_PATH_ENV,
@@ -32,6 +35,7 @@ def test_dataset_status_exposes_boundaries_without_local_paths(client, monkeypat
     assert products["epa_historical_air_quality"]["user_facing"] is False
     assert products["phidu_child_health"]["interpretation_status"] == "research_only"
     assert products["acecqa_gnaf_geocoding"]["boundary"].startswith("Only accepted matches")
+    assert products["declared_road_and_industrial_context"]["interpretation_status"] == "context_only"
     assert str(tmp_path) not in str(body)
 
 
@@ -254,6 +258,73 @@ def test_early_childhood_context_rejects_unreconciled_match_counts(client, monke
     assert body["limitations"][0]["code"] == "early_childhood_context_dataset_invalid"
 
 
+def configure_community_context(monkeypatch, tmp_path, *, missing_traffic: bool = False):
+    identities = tmp_path / "communities.csv"
+    identities.write_text(
+        "community_id,community_name,neighbourhood_id\n"
+        "MEL0001,Brunswick East,206011106\n",
+        encoding="utf-8",
+    )
+    context = tmp_path / "community-context.csv"
+    traffic = ",,,,," if missing_traffic else "11,7000,400,1,9,68"
+    context.write_text(
+        "community_id,declared_road_km,length_weighted_aadt,length_weighted_heavy_aadt,"
+        "high_traffic_road_km,high_traffic_road_share_pct,actual_observation_road_share_pct,"
+        "npi_facilities,npi_respiratory_reporting_facilities,nearest_npi_facility_km,"
+        "nearest_npi_respiratory_reporting_facility_km,context_quality_flag\n"
+        f"MEL0001,{traffic},2,1,3.5,4.5,CONTEXT_ONLY\n",
+        encoding="utf-8",
+    )
+    monkeypatch.setenv(COMMUNITY_CONTEXT_DATA_PATH_ENV, str(context))
+    monkeypatch.setenv(COMMUNITY_IDENTITY_DATA_PATH_ENV, str(identities))
+    _load_community_context.cache_clear()
+    return context, identities
+
+
+def test_traffic_context_returns_precomputed_values(client, monkeypatch, tmp_path) -> None:
+    configure_community_context(monkeypatch, tmp_path)
+
+    body = client.get("/api/neighbourhoods/206011106/traffic-context").json()
+
+    assert_envelope(body)
+    assert body["status"] == "available"
+    assert body["data"]["neighbourhood"]["name"] == "Brunswick East"
+    assert body["data"]["metrics"]["length_weighted_aadt"] == {
+        "value": 7000.0, "status": "available",
+    }
+    assert body["metadata"]["data_quality"] == "CONTEXT_ONLY"
+    assert body["notices"][1]["code"] == "traffic_context_only"
+
+
+def test_traffic_context_preserves_missing_null(client, monkeypatch, tmp_path) -> None:
+    configure_community_context(monkeypatch, tmp_path, missing_traffic=True)
+
+    body = client.get("/api/neighbourhoods/206011106/traffic-context").json()
+
+    assert body["status"] == "limited"
+    assert all(metric == {"value": None, "status": "missing"}
+               for metric in body["data"]["metrics"].values())
+    assert body["limitations"][0]["code"] == "traffic_context_missing"
+
+
+def test_community_context_loader_is_cached(client, monkeypatch, tmp_path) -> None:
+    context, identity = configure_community_context(monkeypatch, tmp_path)
+    reads: Counter[Path] = Counter()
+    original_open = Path.open
+
+    def counted_open(path, *args, **kwargs):
+        if path in {context, identity}:
+            reads[path] += 1
+        return original_open(path, *args, **kwargs)
+
+    monkeypatch.setattr(Path, "open", counted_open)
+
+    client.get("/api/neighbourhoods/206011106/traffic-context")
+    client.get("/api/neighbourhoods/206011106/traffic-context")
+
+    assert reads == Counter({context: 1, identity: 1})
+
+
 def test_static_csv_loaders_reuse_validated_files(monkeypatch, tmp_path) -> None:
     population_path = tmp_path / "vif-cache.csv"
     population_path.write_text(
@@ -375,7 +446,7 @@ def test_data_health_distinguishes_process_health_from_unconfigured_data(client)
 
     assert_envelope(body)
     assert body["status"] == "limited"
-    assert body["metadata"] == {"check_count": 7, "ready_count": 0}
+    assert body["metadata"] == {"check_count": 8, "ready_count": 0}
     assert {check["readiness"] for check in body["data"]["checks"]} == {"not_configured"}
     assert all(check["record_count"] is None for check in body["data"]["checks"])
 

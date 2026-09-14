@@ -34,6 +34,10 @@ STATION_CONTEXT_NOTICE = {
     "code": "station_context_only",
     "message": "These observations describe monitoring stations. They are not SA2 or locality exposure estimates.",
 }
+TRAFFIC_CONTEXT_NOTICE = {
+    "code": "traffic_context_only",
+    "message": "Traffic measures describe declared-road context. They do not cover all roads or represent personal exposure.",
+}
 
 
 def envelope(status: str, data: Any, *, metadata: dict[str, Any] | None = None,

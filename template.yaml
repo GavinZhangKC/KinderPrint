@@ -81,6 +81,8 @@ Resources:
           KINDERPRINT_EPA_STATION_YEAR_DATA_PATH: /var/task/data/epa_air_quality_station_year.csv
           KINDERPRINT_ACECQA_GEOCODING_DATA_PATH: /var/task/data/acecqa_gnaf_geocoding.csv
           KINDERPRINT_ACECQA_CONTEXT_DATA_PATH: /var/task/data/acecqa_gnaf_context_community.csv
+          KINDERPRINT_COMMUNITY_CONTEXT_DATA_PATH: /var/task/data/community_context.csv
+          KINDERPRINT_COMMUNITY_IDENTITY_DATA_PATH: /var/task/data/communities.csv
       Events:
         ApiProxy:
           Type: HttpApi

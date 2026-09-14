@@ -21,6 +21,8 @@ VIF_PROJECTION_DATA_PATH_ENV = "KINDERPRINT_VIF_PROJECTION_DATA_PATH"
 EPA_STATION_YEAR_DATA_PATH_ENV = "KINDERPRINT_EPA_STATION_YEAR_DATA_PATH"
 ACECQA_GEOCODING_DATA_PATH_ENV = "KINDERPRINT_ACECQA_GEOCODING_DATA_PATH"
 ACECQA_CONTEXT_DATA_PATH_ENV = "KINDERPRINT_ACECQA_CONTEXT_DATA_PATH"
+COMMUNITY_CONTEXT_DATA_PATH_ENV = "KINDERPRINT_COMMUNITY_CONTEXT_DATA_PATH"
+COMMUNITY_IDENTITY_DATA_PATH_ENV = "KINDERPRINT_COMMUNITY_IDENTITY_DATA_PATH"
 
 
 def boundary_data_path() -> Path | None:
@@ -90,6 +92,16 @@ def acecqa_geocoding_data_path() -> Path | None:
 
 def acecqa_context_data_path() -> Path | None:
     value = os.getenv(ACECQA_CONTEXT_DATA_PATH_ENV)
+    return Path(value).expanduser() if value else None
+
+
+def community_context_data_path() -> Path | None:
+    value = os.getenv(COMMUNITY_CONTEXT_DATA_PATH_ENV)
+    return Path(value).expanduser() if value else None
+
+
+def community_identity_data_path() -> Path | None:
+    value = os.getenv(COMMUNITY_IDENTITY_DATA_PATH_ENV)
     return Path(value).expanduser() if value else None
 
 

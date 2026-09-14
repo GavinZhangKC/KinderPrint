@@ -3,6 +3,7 @@
 from typing import Any
 
 from air_quality import load_station_year_observations
+from community_context import load_community_context
 from early_childhood import load_early_childhood_context
 from geography import load_boundary_features
 from geocoding_quality import load_geocoding_quality
@@ -43,6 +44,7 @@ def runtime_data_readiness() -> list[dict[str, Any]]:
     early_childhood, early_childhood_limitations = load_early_childhood_context()
     outcome_comparisons, _, outcome_limitations = load_outcome_comparisons()
     environmental, _, environmental_limitations = load_environmental_differences()
+    community_context, community_context_limitations = load_community_context()
 
     return [
         _check("aedc_locality_profiles", locality_value, locality_limitations,
@@ -60,4 +62,7 @@ def runtime_data_readiness() -> list[dict[str, Any]]:
         _check("harmonised_environmental_differences", environmental,
                environmental_limitations,
                len(environmental) if environmental is not None else None),
+        _check("declared_road_and_industrial_context", community_context,
+               community_context_limitations,
+               len(community_context) if community_context is not None else None),
     ]

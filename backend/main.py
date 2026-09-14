@@ -15,6 +15,7 @@ from data_readiness import runtime_data_readiness
 from dataset_status import dataset_statuses
 from early_childhood import load_early_childhood_context
 from air_quality import load_station_year_observations, station_catalog
+from community_context import load_community_context
 from geography import (
     feature_metadata,
     intersects_bbox,
@@ -29,6 +30,7 @@ from population import load_population_projections
 from responses import (
     AREA_LEVEL_NOTICE, ASSOCIATION_NOTICE, COMPARABLE_NOTICE, COMPARISON_AREA_NOTICE,
     HUMAN_DECISION_NOTICE, INVESTIGATION_LEADS_NOTICE, STATION_CONTEXT_NOTICE,
+    TRAFFIC_CONTEXT_NOTICE,
     envelope, limitation,
 )
 from validation import (
@@ -375,6 +377,47 @@ def neighbourhood_early_childhood_services(neighbourhood_id: str) -> dict[str, A
         "address_fields_exposed": False,
         "interpretation": "Service availability context; not service quality or child outcome.",
     }, notices=[AREA_LEVEL_NOTICE])
+
+
+@app.get("/api/neighbourhoods/{neighbourhood_id}/traffic-context")
+def neighbourhood_traffic_context(neighbourhood_id: str) -> dict[str, Any]:
+    """Return precomputed declared-road context without deriving exposure."""
+    index, limitations = load_community_context()
+    notices = [AREA_LEVEL_NOTICE, TRAFFIC_CONTEXT_NOTICE]
+    if index is None:
+        return envelope("unavailable", None, limitations=limitations, notices=notices)
+    result = index.get(neighbourhood_id)
+    if result is None:
+        return envelope("missing", None, limitations=[limitation(
+            "traffic_context_not_found",
+            "No traffic context exists for this neighbourhood.",
+            "neighbourhood_id",
+        )], notices=notices)
+    metrics = {
+        identifier: {
+            "value": value,
+            "status": "available" if value is not None else "missing",
+        }
+        for identifier, value in result["traffic"].items()
+    }
+    missing_fields = [identifier for identifier, metric in metrics.items()
+                      if metric["status"] == "missing"]
+    return envelope(
+        "limited" if missing_fields else "available",
+        {"neighbourhood": result["neighbourhood"], "metrics": metrics},
+        metadata={
+            "source": "DTP Historical Annual Average Daily Traffic Volume 2019",
+            "reference_year": "2019",
+            "geographic_unit": "KinderPrint reporting locality",
+            "data_quality": "CONTEXT_ONLY",
+        },
+        limitations=[limitation(
+            "traffic_context_missing",
+            "The source contains no intersecting declared-road data; no replacement value was created.",
+            *missing_fields,
+        )] if missing_fields else [],
+        notices=notices,
+    )
 
 
 @app.get("/api/neighbourhoods/indicators")

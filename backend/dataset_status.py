@@ -6,6 +6,7 @@ from typing import Any
 from data_loader import (
     ACECQA_CONTEXT_DATA_PATH_ENV,
     ACECQA_GEOCODING_DATA_PATH_ENV,
+    COMMUNITY_CONTEXT_DATA_PATH_ENV,
     EPA_STATION_YEAR_DATA_PATH_ENV,
     ENVIRONMENTAL_DIFFERENCE_DATA_PATH_ENV,
     OUTCOME_COMPARISON_DATA_PATH_ENV,
@@ -13,6 +14,7 @@ from data_loader import (
     VIF_PROJECTION_DATA_PATH_ENV,
     acecqa_context_data_path,
     acecqa_geocoding_data_path,
+    community_context_data_path,
     epa_station_year_data_path,
     environmental_difference_data_path,
     outcome_comparison_data_path,
@@ -65,6 +67,16 @@ def dataset_statuses() -> list[dict[str, Any]]:
             "configuration_variable": ENVIRONMENTAL_DIFFERENCE_DATA_PATH_ENV,
             "user_facing": True,
             "boundary": "Only complete harmonised pairs are published; association is not causation.",
+        },
+        {
+            "id": "declared_road_and_industrial_context",
+            "role": "provisional_locality_context",
+            "geographic_unit": "KinderPrint reporting locality",
+            "interpretation_status": "context_only",
+            "configured": _configured(community_context_data_path()),
+            "configuration_variable": COMMUNITY_CONTEXT_DATA_PATH_ENV,
+            "user_facing": False,
+            "boundary": "Traffic and industrial-emission context are not personal exposure or health-risk measures.",
         },
         {
             "id": "epa_historical_air_quality",

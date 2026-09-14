@@ -121,6 +121,12 @@ services are excluded. The response never contains service names, addresses, coo
 postcodes, or G-NAF identifiers. These counts describe service availability context, not
 service quality, accessibility, capacity sufficiency, or child outcomes.
 
+### `GET /api/neighbourhoods/{neighbourhood_id}/traffic-context`
+
+Returns precomputed 2019 declared-road context for a supported KinderPrint reporting
+locality. Missing source coverage remains `null`; it is never replaced with zero. These
+measures do not cover local roads and must not be interpreted as personal exposure.
+
 ```json
 {
   "status": "available",
