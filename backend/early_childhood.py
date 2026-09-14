@@ -1,7 +1,9 @@
 """Validated locality aggregates from accepted ACECQA/Open G-NAF matches."""
 
 import csv
+from functools import lru_cache
 import math
+from pathlib import Path
 from typing import Any
 
 from data_loader import ACECQA_CONTEXT_DATA_PATH_ENV, acecqa_context_data_path
@@ -19,16 +21,13 @@ REQUIRED_FIELDS = {
 }
 
 
-def load_early_childhood_context() -> tuple[list[dict[str, Any]] | None, list[dict[str, Any]]]:
-    path = acecqa_context_data_path()
-    if path is None:
-        return None, [limitation("early_childhood_context_dataset_not_configured",
-            f"Set {ACECQA_CONTEXT_DATA_PATH_ENV} to the validated locality aggregate CSV.",
-            "early_childhood_context")]
+@lru_cache(maxsize=1)
+def _load_early_childhood_context(path: Path) -> tuple[tuple[dict[str, Any], ...] | None, tuple[dict[str, Any], ...]]:
+    """Read and validate the static locality context once per warm process."""
     if not path.is_file():
-        return None, [limitation("early_childhood_context_dataset_unavailable",
+        return None, (limitation("early_childhood_context_dataset_unavailable",
             "The configured early-childhood context dataset could not be found.",
-            "early_childhood_context")]
+            "early_childhood_context"),)
     try:
         with path.open(encoding="utf-8-sig", newline="") as source:
             reader = csv.DictReader(source)
@@ -59,7 +58,17 @@ def load_early_childhood_context() -> tuple[list[dict[str, Any]] | None, list[di
                     "status": "aggregate_context",
                 })
     except (OSError, UnicodeError, csv.Error, TypeError, ValueError):
-        return None, [limitation("early_childhood_context_dataset_invalid",
+        return None, (limitation("early_childhood_context_dataset_invalid",
             "The configured early-childhood context dataset failed schema or reconciliation validation.",
+            "early_childhood_context"),)
+    return tuple(rows), ()
+
+
+def load_early_childhood_context() -> tuple[tuple[dict[str, Any], ...] | None, list[dict[str, Any]]]:
+    path = acecqa_context_data_path()
+    if path is None:
+        return None, [limitation("early_childhood_context_dataset_not_configured",
+            f"Set {ACECQA_CONTEXT_DATA_PATH_ENV} to the validated locality aggregate CSV.",
             "early_childhood_context")]
-    return rows, []
+    rows, limitations = _load_early_childhood_context(path)
+    return rows, list(limitations)

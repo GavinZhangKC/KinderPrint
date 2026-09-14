@@ -1,6 +1,7 @@
 """Validated access to VIF SA2 child-population projections."""
 
 import csv
+from functools import lru_cache
 import math
 from pathlib import Path
 from typing import Any
@@ -22,15 +23,12 @@ NUMERIC_FIELDS = {
 }
 
 
-def load_population_projections() -> tuple[list[dict[str, Any]] | None, list[dict[str, Any]]]:
-    path = vif_projection_data_path()
-    if path is None:
-        return None, [limitation("population_projection_dataset_not_configured",
-            f"Set {VIF_PROJECTION_DATA_PATH_ENV} to the validated VIF projection CSV.",
-            "population_projections")]
+@lru_cache(maxsize=1)
+def _load_population_projections(path: Path) -> tuple[tuple[dict[str, Any], ...] | None, tuple[dict[str, Any], ...]]:
+    """Read and validate the static projection file once per warm process."""
     if not path.is_file():
-        return None, [limitation("population_projection_dataset_unavailable",
-            "The configured VIF projection dataset could not be found.", "population_projections")]
+        return None, (limitation("population_projection_dataset_unavailable",
+            "The configured VIF projection dataset could not be found.", "population_projections"),)
     try:
         with path.open(encoding="utf-8-sig", newline="") as source:
             reader = csv.DictReader(source)
@@ -59,7 +57,17 @@ def load_population_projections() -> tuple[list[dict[str, Any]] | None, list[dic
                     "status": "projected",
                 })
     except (OSError, UnicodeError, csv.Error, TypeError, ValueError):
-        return None, [limitation("population_projection_dataset_invalid",
+        return None, (limitation("population_projection_dataset_invalid",
             "The configured VIF projection dataset failed schema or value validation.",
+            "population_projections"),)
+    return tuple(rows), ()
+
+
+def load_population_projections() -> tuple[tuple[dict[str, Any], ...] | None, list[dict[str, Any]]]:
+    path = vif_projection_data_path()
+    if path is None:
+        return None, [limitation("population_projection_dataset_not_configured",
+            f"Set {VIF_PROJECTION_DATA_PATH_ENV} to the validated VIF projection CSV.",
             "population_projections")]
-    return rows, []
+    rows, limitations = _load_population_projections(path)
+    return rows, list(limitations)

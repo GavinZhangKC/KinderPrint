@@ -1,10 +1,20 @@
 import json
+from collections import Counter
+from pathlib import Path
 
+from air_quality import _load_station_year_observations, load_station_year_observations
 from data_loader import (
+    ACECQA_CONTEXT_DATA_PATH_ENV,
+    ACECQA_GEOCODING_DATA_PATH_ENV,
     BOUNDARY_DATA_PATH_ENV,
+    EPA_STATION_YEAR_DATA_PATH_ENV,
     PROFILE_DATA_PATH_ENV,
     SUITABILITY_DATA_PATH_ENV,
+    VIF_PROJECTION_DATA_PATH_ENV,
 )
+from early_childhood import _load_early_childhood_context, load_early_childhood_context
+from geocoding_quality import _load_geocoding_quality, load_geocoding_quality
+from population import _load_population_projections, load_population_projections
 
 
 def test_dataset_status_exposes_boundaries_without_local_paths(client, monkeypatch, tmp_path) -> None:
@@ -242,6 +252,74 @@ def test_early_childhood_context_rejects_unreconciled_match_counts(client, monke
 
     assert body["status"] == "unavailable"
     assert body["limitations"][0]["code"] == "early_childhood_context_dataset_invalid"
+
+
+def test_static_csv_loaders_reuse_validated_files(monkeypatch, tmp_path) -> None:
+    population_path = tmp_path / "vif-cache.csv"
+    population_path.write_text(
+        "sa2_code_2021,sa2_name_2021,projection_year,sex,population_age_0_4_projected,"
+        "population_age_5_9_projected,population_age_10_14_projected,"
+        "population_age_0_9_projected,population_age_0_14_projected,"
+        "population_all_ages_projected,source_id,value_status\n"
+        "201011001,Alfredton,2026,persons,10,20,30,30,60,100,vif,PROJECTED\n",
+        encoding="utf-8",
+    )
+    air_path = tmp_path / "epa-cache.csv"
+    air_path.write_text(
+        "year,station_id,station_name,pollutant,unit,method_code,validation_status,"
+        "observed_days,valid_hours,first_observed_date,last_observed_date,"
+        "annual_mean_of_hourly_values,negative_hours_retained,monitoring_status,sa2_exposure_status\n"
+        "2022,10001,Alphington,NO2,ppb,NO2,PUBLISHED,360,8000,2022-01-01,2022-12-31,"
+        "8.5,0,STATION_OBSERVATION_CONTEXT_ONLY,NOT_DERIVED\n",
+        encoding="utf-8",
+    )
+    geocoding_path = tmp_path / "geocoding-cache.csv"
+    geocoding_path.write_text(
+        "service_approval_number,match_status,assigned_sa2,assigned_kinderprint_locality,"
+        "included_in_spatial_analysis\nSE-1,EXACT,201011001,MEL001,true\n",
+        encoding="utf-8",
+    )
+    context_path = tmp_path / "context-cache.csv"
+    context_path.write_text(
+        "community_id,neighbourhood_id,community_name,active_education_care_services,"
+        "exact_match_services,high_confidence_match_services,services_with_approved_places,"
+        "total_approved_places,long_day_care_services,kindergarten_services,"
+        "services_with_current_rating,rating_coverage_pct,geocoding_source,match_policy,context_status\n"
+        "MEL0001,201011001,Alfredton,1,1,0,1,10,1,0,1,100,Open G-NAF,"
+        "EXACT_OR_HIGH_CONFIDENCE_WITHIN_REPORTING_SCOPE,AGGREGATE_SERVICE_CONTEXT\n",
+        encoding="utf-8",
+    )
+    configured = {
+        population_path: (VIF_PROJECTION_DATA_PATH_ENV, load_population_projections),
+        air_path: (EPA_STATION_YEAR_DATA_PATH_ENV, load_station_year_observations),
+        geocoding_path: (ACECQA_GEOCODING_DATA_PATH_ENV, load_geocoding_quality),
+        context_path: (ACECQA_CONTEXT_DATA_PATH_ENV, load_early_childhood_context),
+    }
+    for path, (variable, _) in configured.items():
+        monkeypatch.setenv(variable, str(path))
+    for cached_loader in (
+        _load_population_projections,
+        _load_station_year_observations,
+        _load_geocoding_quality,
+        _load_early_childhood_context,
+    ):
+        cached_loader.cache_clear()
+
+    reads: Counter[Path] = Counter()
+    original_open = Path.open
+
+    def counted_open(path, *args, **kwargs):
+        if path in configured:
+            reads[path] += 1
+        return original_open(path, *args, **kwargs)
+
+    monkeypatch.setattr(Path, "open", counted_open)
+
+    for _, loader in configured.values():
+        assert loader()[0] is not None
+        assert loader()[0] is not None
+
+    assert reads == Counter({path: 1 for path in configured})
 
 
 def assert_envelope(response: dict) -> None:

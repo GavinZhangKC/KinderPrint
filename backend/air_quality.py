@@ -1,7 +1,9 @@
 """Validated station-level access to published EPA historical observations."""
 
 import csv
+from functools import lru_cache
 import math
+from pathlib import Path
 from typing import Any
 
 from data_loader import EPA_STATION_YEAR_DATA_PATH_ENV, epa_station_year_data_path
@@ -16,15 +18,12 @@ REQUIRED_FIELDS = {
 POLLUTANTS = {"PM2.5", "PM10", "NO2", "O3"}
 
 
-def load_station_year_observations() -> tuple[list[dict[str, Any]] | None, list[dict[str, Any]]]:
-    path = epa_station_year_data_path()
-    if path is None:
-        return None, [limitation("air_quality_dataset_not_configured",
-            f"Set {EPA_STATION_YEAR_DATA_PATH_ENV} to the validated EPA station-year CSV.",
-            "air_quality")]
+@lru_cache(maxsize=1)
+def _load_station_year_observations(path: Path) -> tuple[tuple[dict[str, Any], ...] | None, tuple[dict[str, Any], ...]]:
+    """Read and validate the static station-year file once per warm process."""
     if not path.is_file():
-        return None, [limitation("air_quality_dataset_unavailable",
-            "The configured EPA station-year dataset could not be found.", "air_quality")]
+        return None, (limitation("air_quality_dataset_unavailable",
+            "The configured EPA station-year dataset could not be found.", "air_quality"),)
     try:
         with path.open(encoding="utf-8-sig", newline="") as source:
             reader = csv.DictReader(source)
@@ -61,13 +60,23 @@ def load_station_year_observations() -> tuple[list[dict[str, Any]] | None, list[
                     "sa2_exposure_status": "not_derived",
                 })
     except (OSError, UnicodeError, csv.Error, TypeError, ValueError):
-        return None, [limitation("air_quality_dataset_invalid",
+        return None, (limitation("air_quality_dataset_invalid",
             "The configured EPA station-year dataset failed schema or value validation.",
+            "air_quality"),)
+    return tuple(rows), ()
+
+
+def load_station_year_observations() -> tuple[tuple[dict[str, Any], ...] | None, list[dict[str, Any]]]:
+    path = epa_station_year_data_path()
+    if path is None:
+        return None, [limitation("air_quality_dataset_not_configured",
+            f"Set {EPA_STATION_YEAR_DATA_PATH_ENV} to the validated EPA station-year CSV.",
             "air_quality")]
-    return rows, []
+    rows, limitations = _load_station_year_observations(path)
+    return rows, list(limitations)
 
 
-def station_catalog(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
+def station_catalog(rows: tuple[dict[str, Any], ...]) -> list[dict[str, Any]]:
     """Summarise available source dimensions without creating exposure values."""
     stations: dict[str, dict[str, Any]] = {}
     for row in rows:
