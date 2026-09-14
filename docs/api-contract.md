@@ -141,7 +141,7 @@ link, publisher, reference period, method and reporting-coverage limitation.
 ### `GET /api/map/context`
 
 Returns traffic and industrial-emissions context for all supported map localities in one
-request. Each row exposes the same `neighbourhood_id` used by the boundary API so clients
+request. Each row exposes the same `id` used by the boundary API so clients
 can join values to polygons without repeated profile requests. Geometry remains in the
 boundary endpoint and is not duplicated. Metric definitions and evidence metadata appear
 once at collection level; missing values remain `null` with a Limited state.

@@ -379,7 +379,7 @@ def test_map_context_returns_joinable_lightweight_collection(
     assert_envelope(body)
     assert body["status"] == "available"
     assert body["metadata"]["result_count"] == 1
-    assert body["metadata"]["join_key"] == "neighbourhood_id"
+    assert body["metadata"]["join_key"] == "id"
     assert body["metadata"]["geometry_included"] is False
     neighbourhood = body["data"]["neighbourhoods"][0]
     assert neighbourhood["id"] == "206011106"

@@ -503,7 +503,7 @@ def map_context() -> dict[str, Any]:
         {"neighbourhoods": neighbourhoods},
         metadata={
             "result_count": len(neighbourhoods),
-            "join_key": "neighbourhood_id",
+            "join_key": "id",
             "geometry_included": False,
             "traffic": {
                 **TRAFFIC_EVIDENCE,
