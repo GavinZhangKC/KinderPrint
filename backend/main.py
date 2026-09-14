@@ -36,7 +36,8 @@ from population import load_population_projections
 from responses import (
     AREA_LEVEL_NOTICE, ASSOCIATION_NOTICE, COMPARABLE_NOTICE, COMPARISON_AREA_NOTICE,
     HUMAN_DECISION_NOTICE, INDUSTRIAL_EMISSIONS_CONTEXT_NOTICE,
-    INVESTIGATION_LEADS_NOTICE, STATION_CONTEXT_NOTICE, TRAFFIC_CONTEXT_NOTICE,
+    INVESTIGATION_LEADS_NOTICE, MANUAL_COMPARISON_NOTICE, STATION_CONTEXT_NOTICE,
+    TRAFFIC_CONTEXT_NOTICE,
     envelope, limitation,
 )
 from validation import (
@@ -45,7 +46,8 @@ from validation import (
     load_comparison_data, load_explanations, load_pattern_insights,
     load_prevention_opportunities,
     load_priority_results, load_profiles, load_suitability_rankings,
-    map_indicator_data, match_data,
+    map_indicator_data, match_data, multi_profile_comparison_data,
+    multi_profile_comparison_limitations,
     outcome_comparison_data, outcome_comparison_for_pair, pattern_insight_data,
     prevention_opportunity_data,
     priority_data, profile_boundary_limitations, profile_collection_metadata,
@@ -633,59 +635,130 @@ def neighbourhood_match(neighbourhood_id: str) -> dict[str, Any]:
 
 @app.get("/api/compare")
 def manual_compare(
-    neighbourhood_id_a: str = Query(..., min_length=1, max_length=100),
-    neighbourhood_id_b: str = Query(..., min_length=1, max_length=100),
+    neighbourhood_id_a: str | None = Query(None, min_length=1, max_length=100),
+    neighbourhood_id_b: str | None = Query(None, min_length=1, max_length=100),
+    neighbourhood_ids: list[str] | None = Query(None),
 ) -> dict[str, Any]:
-    """Compare profile indicators for any two supported neighbourhoods."""
-    notices = [COMPARABLE_NOTICE, COMPARISON_AREA_NOTICE]
+    """Compare profile indicators for two to four supported neighbourhoods."""
+    notices = [COMPARISON_AREA_NOTICE, MANUAL_COMPARISON_NOTICE]
+    supplied_legacy = neighbourhood_id_a is not None or neighbourhood_id_b is not None
+    supplied_multi = neighbourhood_ids is not None
+    parsed_ids = [
+        identifier.strip()
+        for value in (neighbourhood_ids or [])
+        for identifier in value.split(",")
+        if identifier.strip()
+    ]
+    legacy_mode = supplied_legacy and not supplied_multi
+
+    if supplied_legacy and supplied_multi:
+        return envelope("unavailable", None, limitations=[limitation(
+            "conflicting_comparison_parameters",
+            "Use either neighbourhood_id_a and neighbourhood_id_b or neighbourhood_ids, not both.",
+            "neighbourhood_id_a", "neighbourhood_id_b", "neighbourhood_ids",
+        )], notices=notices)
+    if not supplied_legacy and not supplied_multi:
+        return JSONResponse(status_code=422, content=envelope(
+            "unavailable", None, limitations=[limitation(
+                "invalid_request",
+                "One or more request parameters are invalid.",
+            )], notices=notices))
+    if legacy_mode and (neighbourhood_id_a is None or neighbourhood_id_b is None):
+        return JSONResponse(status_code=422, content=envelope(
+            "unavailable", None, limitations=[limitation(
+                "incomplete_comparison_parameters",
+                "Both neighbourhood_id_a and neighbourhood_id_b are required.",
+                "neighbourhood_id_a", "neighbourhood_id_b",
+            )], notices=notices))
+    selected_ids = (
+        [neighbourhood_id_a, neighbourhood_id_b]
+        if legacy_mode else parsed_ids
+    )
+    if not legacy_mode and not 2 <= len(selected_ids) <= 4:
+        return envelope("unavailable", None, limitations=[limitation(
+            "invalid_comparison_count",
+            "Select between two and four neighbourhoods for a comparison.",
+            "neighbourhood_ids",
+        )], notices=notices)
+    if len(selected_ids) != len(set(selected_ids)):
+        if legacy_mode:
+            return envelope("no_match", None, limitations=[limitation(
+                "same_neighbourhood_selected",
+                "Choose two different neighbourhoods for a comparison.",
+                "neighbourhood_id_a", "neighbourhood_id_b",
+            )], notices=notices)
+        return envelope("no_match", None, limitations=[limitation(
+            "duplicate_neighbourhood_selected",
+            "Each selected neighbourhood must be different.",
+            "neighbourhood_ids",
+        )], notices=notices)
+
     empty = {
-        "source_neighbourhood": {"id": neighbourhood_id_a, "name": None, "geographic_unit": None},
-        "comparison_neighbourhood": {"id": neighbourhood_id_b, "name": None, "geographic_unit": None},
+        "source_neighbourhood": {
+            "id": neighbourhood_id_a, "name": None, "geographic_unit": None,
+        },
+        "comparison_neighbourhood": {
+            "id": neighbourhood_id_b, "name": None, "geographic_unit": None,
+        },
+        "side_by_side": [], "similarity_basis": [], "match_strength": None,
+    } if legacy_mode else {
+        "neighbourhoods": [
+            {"id": identifier, "name": None, "geographic_unit": None}
+            for identifier in selected_ids
+        ],
         "side_by_side": [], "similarity_basis": [], "match_strength": None,
     }
     profiles, limitations = load_profiles()
     if profiles is None:
         return envelope("unavailable", empty, limitations=limitations, notices=notices)
-    source_profile = next((profile for profile in profiles
-                           if profile["neighbourhood"]["id"] == neighbourhood_id_a), None)
-    comparison_profile = next((profile for profile in profiles
-                               if profile["neighbourhood"]["id"] == neighbourhood_id_b), None)
-    if source_profile is None or comparison_profile is None:
+    profile_index = {
+        profile["neighbourhood"]["id"]: profile for profile in profiles
+    }
+    selected_profiles = [profile_index.get(identifier) for identifier in selected_ids]
+    if any(profile is None for profile in selected_profiles):
         missing_parameters = [
-            parameter
-            for profile, parameter in (
-                (source_profile, "neighbourhood_id_a"),
-                (comparison_profile, "neighbourhood_id_b"),
-            )
+            ("neighbourhood_id_a", "neighbourhood_id_b")[index]
+            if legacy_mode else identifier
+            for index, (identifier, profile) in enumerate(zip(selected_ids, selected_profiles))
             if profile is None
         ]
         return envelope("missing", empty, limitations=[limitation(
             "unsupported_neighbourhood",
-            "One or both neighbourhood identifiers do not have a supported profile.",
+            "One or more neighbourhood identifiers do not have a supported profile.",
             *missing_parameters,
         )], notices=notices)
-    if neighbourhood_id_a == neighbourhood_id_b:
-        return envelope("no_match", empty, limitations=[limitation(
-            "same_neighbourhood_selected", "Choose two different neighbourhoods for a comparison.",
-            "neighbourhood_id_a", "neighbourhood_id_b")], notices=notices)
-    if (source_profile["neighbourhood"]["geographic_unit"]
-            != comparison_profile["neighbourhood"]["geographic_unit"]):
+    selected_profiles = [profile for profile in selected_profiles if profile is not None]
+    geographic_units = {
+        profile["neighbourhood"]["geographic_unit"] for profile in selected_profiles
+    }
+    if len(geographic_units) != 1:
         return envelope("incompatible", empty, limitations=[limitation(
             "incompatible_geographic_unit",
             "The selected neighbourhood profiles use incompatible geographic units.",
-            "neighbourhood_id_a", "neighbourhood_id_b", "geographic_unit",
+            *("neighbourhood_id_a", "neighbourhood_id_b", "geographic_unit")
+            if legacy_mode else ("neighbourhood_ids", "geographic_unit"),
         )], notices=notices)
 
-    data = profile_comparison_data(source_profile, comparison_profile)
-    comparison_limitations = profile_comparison_limitations(source_profile, comparison_profile)
-    statuses = [
-        field[status_key]
-        for field in data["side_by_side"]
-        for status_key in ("source_status", "comparison_status")
-    ]
+    if legacy_mode:
+        data = profile_comparison_data(selected_profiles[0], selected_profiles[1])
+        comparison_limitations = profile_comparison_limitations(
+            selected_profiles[0], selected_profiles[1])
+        statuses = [
+            field[status_key]
+            for field in data["side_by_side"]
+            for status_key in ("source_status", "comparison_status")
+        ]
+    else:
+        data = multi_profile_comparison_data(selected_profiles)
+        comparison_limitations = multi_profile_comparison_limitations(selected_profiles)
+        statuses = [
+            value["status"]
+            for field in data["side_by_side"]
+            for value in field["values"]
+        ]
     return envelope(
         aggregate_status(statuses), data,
-        metadata=profile_collection_metadata([source_profile, comparison_profile]),
+        metadata=profile_collection_metadata(selected_profiles),
         limitations=comparison_limitations,
         notices=notices,
     )

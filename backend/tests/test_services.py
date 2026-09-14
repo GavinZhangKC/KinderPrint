@@ -292,6 +292,96 @@ def test_manual_comparison_rejects_same_neighbourhood(client, monkeypatch, write
     assert body["limitations"][0]["code"] == "same_neighbourhood_selected"
 
 
+def test_manual_comparison_supports_three_or_four_profiles(
+    client, monkeypatch, write_json
+) -> None:
+    path = write_json("profiles.json", json.dumps({
+        "profiles": [profile(identifier, value) for identifier, value in (
+            ("a", 1), ("b", 2), ("c", 3), ("d", 4),
+        )],
+    }))
+    monkeypatch.setenv(PROFILE_DATA_PATH_ENV, str(path))
+
+    repeated = client.get("/api/compare", params=[
+        ("neighbourhood_ids", "a"),
+        ("neighbourhood_ids", "b"),
+        ("neighbourhood_ids", "c"),
+    ]).json()
+    comma_separated = client.get(
+        "/api/compare", params={"neighbourhood_ids": "a,b,c,d"}).json()
+
+    assert repeated["status"] == "available"
+    assert [area["id"] for area in repeated["data"]["neighbourhoods"]] == [
+        "a", "b", "c",
+    ]
+    assert repeated["data"]["side_by_side"][0]["values"] == [
+        {"neighbourhood_id": "a", "value": 1, "status": "available"},
+        {"neighbourhood_id": "b", "value": 2, "status": "available"},
+        {"neighbourhood_id": "c", "value": 3, "status": "available"},
+    ]
+    assert len(comma_separated["data"]["neighbourhoods"]) == 4
+    assert repeated["notices"][1]["code"] == "user_selected_comparison"
+
+
+@pytest.mark.parametrize("ids", ["a", "a,b,c,d,e", "a,a"])
+def test_manual_multi_comparison_validates_selection_count_and_uniqueness(
+    client, ids
+) -> None:
+    body = client.get("/api/compare", params={"neighbourhood_ids": ids}).json()
+
+    assert body["status"] in {"unavailable", "no_match"}
+    assert body["limitations"][0]["code"] in {
+        "invalid_comparison_count", "duplicate_neighbourhood_selected",
+    }
+
+
+def test_manual_multi_comparison_rejects_unknown_and_mixed_parameters(
+    client, monkeypatch, write_json
+) -> None:
+    path = write_json("profiles.json", json.dumps({
+        "profiles": [profile("a", 1), profile("b", 2)],
+    }))
+    monkeypatch.setenv(PROFILE_DATA_PATH_ENV, str(path))
+
+    unknown = client.get(
+        "/api/compare", params={"neighbourhood_ids": "a,unknown"}).json()
+    mixed = client.get("/api/compare", params={
+        "neighbourhood_id_a": "a",
+        "neighbourhood_id_b": "b",
+        "neighbourhood_ids": "a,b",
+    }).json()
+
+    assert unknown["status"] == "missing"
+    assert unknown["limitations"][0]["affected_fields"] == ["unknown"]
+    assert mixed["status"] == "unavailable"
+    assert mixed["limitations"][0]["code"] == "conflicting_comparison_parameters"
+
+
+def test_manual_multi_comparison_preserves_missing_null(
+    client, monkeypatch, write_json
+) -> None:
+    path = write_json("profiles.json", json.dumps({
+        "profiles": [
+            profile("a", 1, social_status="missing"),
+            profile("b", 2),
+            profile("c", 3),
+        ],
+    }))
+    monkeypatch.setenv(PROFILE_DATA_PATH_ENV, str(path))
+
+    body = client.get(
+        "/api/compare", params={"neighbourhood_ids": "a,b,c"}).json()
+    social = next(
+        field for field in body["data"]["side_by_side"]
+        if field["id"] == "social"
+    )
+
+    assert body["status"] == "limited"
+    assert social["values"][0] == {
+        "neighbourhood_id": "a", "value": None, "status": "missing",
+    }
+
+
 def outcome_comparison_source(*, missing: bool = False) -> dict:
     status = "missing" if missing else "available"
     comparison_status = "limited" if missing else "available"

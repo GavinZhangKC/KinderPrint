@@ -26,6 +26,10 @@ COMPARABLE_NOTICE = {
     "code": "comparable_not_identical",
     "message": "Matched communities are similar on the socioeconomic and demographic measures used for matching. They are not identical, and unmeasured differences remain.",
 }
+MANUAL_COMPARISON_NOTICE = {
+    "code": "user_selected_comparison",
+    "message": "These communities were selected by the user and are not necessarily matched or demographically comparable.",
+}
 COMPARISON_AREA_NOTICE = {
     "code": "area_level_comparison",
     "message": "Differences between communities are subject to sampling uncertainty. Where a difference is not statistically significant this is stated explicitly.",

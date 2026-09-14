@@ -303,12 +303,51 @@ def profile_comparison_data(
     }
 
 
-def profile_comparison_limitations(
-    source_profile: dict[str, Any], comparison_profile: dict[str, Any]
+def multi_profile_comparison_data(profiles: list[dict[str, Any]]) -> dict[str, Any]:
+    """Project two to four profiles without calculating similarity or filling gaps."""
+    indicator_indexes = [{
+        indicator["id"]: indicator
+        for domain in profile["domains"]
+        for indicator in domain["indicators"]
+    } for profile in profiles]
+    indicator_ids = list(dict.fromkeys(
+        identifier
+        for index in indicator_indexes
+        for identifier in index
+    ))
+
+    side_by_side = []
+    for identifier in indicator_ids:
+        indicators = [index.get(identifier) for index in indicator_indexes]
+        exemplar = next(indicator for indicator in indicators if indicator is not None)
+        side_by_side.append({
+            "id": identifier,
+            "name": exemplar["name"],
+            "unit": exemplar.get("unit"),
+            "source": exemplar["source"],
+            "reference_year": exemplar["reference_year"],
+            "geographic_unit": exemplar["geographic_unit"],
+            "values": [{
+                "neighbourhood_id": profile["neighbourhood"]["id"],
+                "value": indicator["value"] if indicator else None,
+                "status": indicator["status"] if indicator else "unavailable",
+            } for profile, indicator in zip(profiles, indicators)],
+        })
+
+    return {
+        "neighbourhoods": [profile["neighbourhood"] for profile in profiles],
+        "side_by_side": side_by_side,
+        "similarity_basis": [],
+        "match_strength": None,
+    }
+
+
+def multi_profile_comparison_limitations(
+    profiles: list[dict[str, Any]],
 ) -> list[dict[str, Any]]:
-    """Expose profile gaps for both selected neighbourhoods without imputing values."""
+    """Expose gaps across selected profiles without imputing values."""
     limitations: list[dict[str, Any]] = []
-    for profile in (source_profile, comparison_profile):
+    for profile in profiles:
         identifier = profile["neighbourhood"]["id"]
         limitations.extend({
             **item,
@@ -317,29 +356,34 @@ def profile_comparison_limitations(
             ])),
         } for item in profile_limitations(profile))
 
-    source_ids = {
+    indicator_sets = [{
         indicator["id"]
-        for domain in source_profile["domains"]
+        for domain in profile["domains"]
         for indicator in domain["indicators"]
-    }
-    comparison_ids = {
-        indicator["id"]
-        for domain in comparison_profile["domains"]
-        for indicator in domain["indicators"]
-    }
-    for identifier in sorted(source_ids ^ comparison_ids):
-        missing_from = (
-            comparison_profile["neighbourhood"]["id"]
-            if identifier in source_ids
-            else source_profile["neighbourhood"]["id"]
-        )
-        limitations.append(limitation(
-            "indicator_unavailable_for_comparison",
-            "This indicator is not present for both selected neighbourhoods.",
-            identifier,
-            missing_from,
-        ))
+    } for profile in profiles]
+    all_indicator_ids = set().union(*indicator_sets)
+    for identifier in sorted(all_indicator_ids):
+        missing_from = [
+            profile["neighbourhood"]["id"]
+            for profile, indicator_ids in zip(profiles, indicator_sets)
+            if identifier not in indicator_ids
+        ]
+        if missing_from:
+            limitations.append(limitation(
+                "indicator_unavailable_for_comparison",
+                "This indicator is not present for every selected neighbourhood.",
+                identifier,
+                *missing_from,
+            ))
     return limitations
+
+
+def profile_comparison_limitations(
+    source_profile: dict[str, Any], comparison_profile: dict[str, Any]
+) -> list[dict[str, Any]]:
+    """Expose profile gaps for both selected neighbourhoods without imputing values."""
+    return multi_profile_comparison_limitations(
+        [source_profile, comparison_profile])
 
 
 def profile_boundary_limitations(

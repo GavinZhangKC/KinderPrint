@@ -436,13 +436,13 @@ Only neighbourhoods with compatible confirmed geographic units and approved soci
 
 ### `GET /api/compare`
 
-Prepares a side-by-side comparison of any two supported neighbourhoods. Provisional query parameters are `neighbourhood_id_a` and `neighbourhood_id_b`; final naming is TBC.
+Prepares a side-by-side comparison of two to four supported neighbourhoods. Clients may supply repeated or comma-separated `neighbourhood_ids` values. The existing `neighbourhood_id_a` and `neighbourhood_id_b` query parameters remain supported for two-place clients; the two parameter styles must not be mixed.
 
-Both identifiers are validated against the approved profile dataset. The pair does not need to exist in the approved matching output. The backend compares source-supplied profile indicators with matching indicator identifiers and must not calculate a new similarity result, force a match, or invoke a new matching rule.
+Every identifier is validated against the approved profile dataset. The selected places do not need to exist in the approved matching output. The backend compares source-supplied profile indicators with matching indicator identifiers and must not calculate a new similarity result, force a match, or invoke a new matching rule.
 
 The response uses the standard envelope and supports:
 
-- both neighbourhood identifiers, names, and confirmed geographic units;
+- all selected neighbourhood identifiers, names, and confirmed geographic units;
 - side-by-side comparison fields including indicator name, unit, source, reference year,
   geographic unit, values and availability states;
 - an empty `similarity_basis` list, because manual comparison does not run matching logic;
@@ -450,7 +450,7 @@ The response uses the standard envelope and supports:
 - source, reference year, geographic unit, and data quality;
 - limitations and incomplete comparison inputs;
 - an area-level comparison notice; and
-- a comparable-not-identical notice.
+- a notice that user-selected communities are not necessarily matched or demographically comparable.
 
 No final matching variable, threshold, strength category, or comparison field is defined by this contract.
 
