@@ -314,9 +314,10 @@ export default function DetailedComparison({
       <div className="comparison-heading-row">
         <div>
           <button className="text-back" type="button" onClick={onBack}>← Back to map</button>
-          <h1>Detailed Comparison</h1>
-          <h2>{source.name} <span>vs</span> {compared.name}</h2>
-          <p>Approved side-by-side indicators returned by the KinderPrint comparison API.</p>
+          <span className="comparison-kicker">Two places · no overall winner</span>
+          <h1>Where do these places<br />feel different?</h1>
+          <h2>{source.name} <span>alongside</span> {compared.name}</h2>
+          <p>Move from the broad picture into approved evidence, trade-offs and data gaps.</p>
         </div>
       </div>
 
