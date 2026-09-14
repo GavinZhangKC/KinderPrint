@@ -133,20 +133,44 @@ export default function LandingPage({ onInsight, onMap }: LandingPageProps) {
             interactive
           />
           <div className="home-hero-copy">
-            <h1 id="landing-title">Discover how neighbourhoods<br />shape childhood.</h1>
+            <span className="landing-kicker"><i /> Evidence intelligence for healthier places</span>
+            <h1 id="landing-title">See the conditions shaping<br /><em>every childhood.</em></h1>
             <p className="landing-subheading">
-              Child development + community + environment.
+              One evidence platform. Every neighbourhood in context.
             </p>
             <p className="landing-copy">
-              Explore the connections between local conditions and children’s development
-              through a clearer, more engaging evidence experience.
+              KinderPrint connects trusted Australian child-development, social and
+              environmental data so teams can explore local conditions with confidence.
             </p>
             <div className="home-hero-actions">
               <button className="button primary home-hero-button" type="button" onClick={onMap}>
-                Enter the Map <span aria-hidden="true">↗</span>
+                Explore neighbourhoods <span aria-hidden="true">→</span>
+              </button>
+              <button className="button secondary home-hero-button" type="button" onClick={onInsight}>
+                View evidence journey
               </button>
             </div>
+            <div className="home-trust-row" aria-label="Platform assurances">
+              <span><b>346</b> Melbourne reporting localities</span>
+              <span><b>11</b> validated evidence sources</span>
+              <span><b>0</b> individual child records</span>
+            </div>
           </div>
+          <aside className="hero-intelligence-card" aria-label="KinderPrint evidence layers">
+            <div className="hero-card-head"><span>LIVE EVIDENCE MODEL</span><i>Validated</i></div>
+            <div className="hero-orbit" aria-hidden="true">
+              <span className="orbit orbit-one" /><span className="orbit orbit-two" />
+              <div className="orbit-core"><img src={logo} alt="" /></div>
+              <b className="orbit-label label-a">AEDC</b><b className="orbit-label label-b">Environment</b>
+              <b className="orbit-label label-c">Services</b><b className="orbit-label label-d">Population</b>
+            </div>
+            <div className="hero-card-foot"><span>ASGS Edition 3</span><span>Area-level evidence</span></div>
+          </aside>
+        </section>
+
+        <section className="evidence-ribbon" aria-label="Evidence sources">
+          <span>BUILT ON AUTHORITATIVE AUSTRALIAN DATA</span>
+          <div><b>AEDC</b><b>ABS</b><b>SEIFA</b><b>ACECQA</b><b>Open G-NAF</b><b>EPA Victoria</b></div>
         </section>
 
         <section className="home-insight" id="home-insight" aria-labelledby="home-insight-title">
@@ -165,8 +189,8 @@ export default function LandingPage({ onInsight, onMap }: LandingPageProps) {
           </dl>
 
           <blockquote className="home-insight-statement">
-            <span>Pattern to explore</span>
-            <p>Areas with lower vegetation and higher heat exposure also show higher child development vulnerability.</p>
+            <span>Evidence boundary</span>
+            <p>Explore area-level differences without turning association into causation. Unsupported findings remain unavailable.</p>
           </blockquote>
 
           <button className="button primary home-section-button" type="button" onClick={onInsight}>
