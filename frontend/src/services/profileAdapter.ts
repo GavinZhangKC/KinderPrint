@@ -43,6 +43,10 @@ function numberValue(profile: NeighbourhoodProfile, id: string): number | null {
   return available && typeof value === 'number' && Number.isFinite(value) ? value : null
 }
 
+function uniqueMessages(messages: string[]): string[] {
+  return messages.filter((message, index) => message && messages.indexOf(message) === index)
+}
+
 export function toNeighbourhood(
   profile: NeighbourhoodProfile,
   priority: NeighbourhoodPriority | null,
@@ -134,7 +138,7 @@ export function toNeighbourhood(
     highlightedFactors,
     sources,
     dataQuality,
-    limitations: context.limitations,
-    notices: context.notices,
+    limitations: uniqueMessages(context.limitations),
+    notices: uniqueMessages(context.notices),
   }
 }
