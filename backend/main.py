@@ -32,12 +32,14 @@ from responses import (
     envelope, limitation,
 )
 from validation import (
-    aggregate_status, environmental_difference_data, explanation_data,
-    load_comparison_data, load_environmental_differences, load_explanations,
-    load_outcome_comparisons, load_pattern_insights, load_prevention_opportunities,
+    aggregate_status, environmental_difference_data, environmental_difference_for_pair,
+    explanation_data,
+    load_comparison_data, load_explanations, load_pattern_insights,
+    load_prevention_opportunities,
     load_priority_results, load_profiles, load_suitability_rankings,
     map_indicator_data, match_data,
-    outcome_comparison_data, pattern_insight_data, prevention_opportunity_data,
+    outcome_comparison_data, outcome_comparison_for_pair, pattern_insight_data,
+    prevention_opportunity_data,
     priority_data, profile_boundary_limitations, profile_collection_metadata,
     profile_comparison_data, profile_comparison_limitations, profile_limitations,
     profile_metadata, profile_status,
@@ -598,13 +600,11 @@ def outcome_comparison(
 
     empty["neighbourhood_a"] = profile_a["neighbourhood"]
     empty["neighbourhood_b"] = profile_b["neighbourhood"]
-    comparisons, metadata, data_limitations = load_outcome_comparisons()
-    if comparisons is None:
+    comparison, metadata, data_limitations = outcome_comparison_for_pair(
+        neighbourhood_id_a, neighbourhood_id_b)
+    if data_limitations:
         return envelope(
             "unavailable", empty, limitations=data_limitations, notices=notices)
-    comparison = next((item for item in comparisons
-                       if item["neighbourhood_a"]["id"] == neighbourhood_id_a
-                       and item["neighbourhood_b"]["id"] == neighbourhood_id_b), None)
     if comparison is None:
         return envelope("unavailable", empty, metadata=metadata, limitations=[limitation(
             "outcome_comparison_unavailable",
@@ -681,13 +681,11 @@ def environmental_difference(
 
     empty["neighbourhood_a"] = profile_a["neighbourhood"]
     empty["neighbourhood_b"] = profile_b["neighbourhood"]
-    differences, metadata, data_limitations = load_environmental_differences()
-    if differences is None:
+    result, metadata, data_limitations = environmental_difference_for_pair(
+        neighbourhood_id_a, neighbourhood_id_b)
+    if data_limitations:
         return envelope(
             "unavailable", empty, limitations=data_limitations, notices=notices)
-    result = next((item for item in differences
-                   if item["neighbourhood_a"]["id"] == neighbourhood_id_a
-                   and item["neighbourhood_b"]["id"] == neighbourhood_id_b), None)
     if result is None:
         return envelope("unavailable", empty, metadata=metadata, limitations=[limitation(
             "environmental_difference_unavailable",

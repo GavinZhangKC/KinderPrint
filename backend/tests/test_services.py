@@ -1,4 +1,6 @@
 import json
+from collections import Counter
+from pathlib import Path
 
 import pytest
 
@@ -12,6 +14,7 @@ from data_loader import (
     PRIORITY_DATA_PATH_ENV,
     PROFILE_DATA_PATH_ENV,
 )
+from validation import _load_environmental_differences, _load_outcome_comparisons
 
 METADATA = {
     "source": "approved",
@@ -321,13 +324,14 @@ def outcome_comparison_source(*, missing: bool = False) -> dict:
     }
 
 
-def configure_outcome_sources(monkeypatch, write_json, source: dict) -> None:
+def configure_outcome_sources(monkeypatch, write_json, source: dict) -> Path:
     profile_path = write_json("profiles.json", json.dumps({
         "profiles": [profile("a", 1), profile("b", 2)],
     }))
     outcome_path = write_json("outcome_comparisons.json", json.dumps(source))
     monkeypatch.setenv(PROFILE_DATA_PATH_ENV, str(profile_path))
     monkeypatch.setenv(OUTCOME_COMPARISON_DATA_PATH_ENV, str(outcome_path))
+    return outcome_path
 
 
 def test_outcome_comparison_returns_only_approved_values(client, monkeypatch, write_json) -> None:
@@ -439,13 +443,14 @@ def environmental_difference_source(*, missing: bool = False,
     }
 
 
-def configure_environmental_sources(monkeypatch, write_json, source: dict) -> None:
+def configure_environmental_sources(monkeypatch, write_json, source: dict) -> Path:
     profile_path = write_json("profiles.json", json.dumps({
         "profiles": [profile("a", 1), profile("b", 2)],
     }))
     difference_path = write_json("environmental_differences.json", json.dumps(source))
     monkeypatch.setenv(PROFILE_DATA_PATH_ENV, str(profile_path))
     monkeypatch.setenv(ENVIRONMENTAL_DIFFERENCE_DATA_PATH_ENV, str(difference_path))
+    return difference_path
 
 
 def test_environmental_difference_returns_approved_output(client, monkeypatch, write_json) -> None:
@@ -518,6 +523,34 @@ def test_environmental_difference_does_not_reverse_difference(client, monkeypatc
     assert body["status"] == "unavailable"
     assert body["data"]["environmental_indicators"] == []
     assert body["limitations"][0]["code"] == "environmental_difference_unavailable"
+
+
+def test_comparison_endpoints_reuse_cached_pair_indexes(
+    client, monkeypatch, write_json
+) -> None:
+    outcome_path = configure_outcome_sources(
+        monkeypatch, write_json, outcome_comparison_source())
+    environmental_path = configure_environmental_sources(
+        monkeypatch, write_json, environmental_difference_source())
+    _load_outcome_comparisons.cache_clear()
+    _load_environmental_differences.cache_clear()
+    reads: Counter[Path] = Counter()
+    tracked_paths = {outcome_path, environmental_path}
+    original_read_text = Path.read_text
+
+    def counted_read_text(path, *args, **kwargs):
+        if path in tracked_paths:
+            reads[path] += 1
+        return original_read_text(path, *args, **kwargs)
+
+    monkeypatch.setattr(Path, "read_text", counted_read_text)
+    parameters = {"neighbourhood_id_a": "a", "neighbourhood_id_b": "b"}
+
+    for endpoint in ("/api/outcome-comparison", "/api/environmental-difference"):
+        assert client.get(endpoint, params=parameters).json()["status"] == "available"
+        assert client.get(endpoint, params=parameters).json()["status"] == "available"
+
+    assert reads == Counter({outcome_path: 1, environmental_path: 1})
 
 
 def pattern_insight_source(*, no_pattern: bool = False,
