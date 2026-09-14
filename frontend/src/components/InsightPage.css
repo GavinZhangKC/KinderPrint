@@ -18,50 +18,52 @@ html.insight-scrollbar-hidden body::-webkit-scrollbar { display: none; }
 .insight-page[data-scene='ready'] .insight-clouds { display: none; }
 .insight-page .insight-atmosphere { position: absolute; inset: 0; background: linear-gradient(0deg, #bcd5df15, transparent 15%); }
 .insight-page .nav-shell { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); width: min(1440px, calc(100% - 48px)); height: 76px; background: rgba(255, 255, 255, .42); border: 1px solid var(--border); box-shadow: 0 12px 36px rgba(51, 82, 140, .11); backdrop-filter: blur(22px); -webkit-backdrop-filter: blur(22px); }
-.insight-page .insight-audio-control { position: fixed; z-index: 4; top: 104px; left: auto; right: max(54px, calc((100vw - 1440px) / 2 + 30px)); width: 48px; height: 48px; display: grid; place-items: center; padding: 0; color: #315a80; background: rgba(241, 248, 255, .42); border: 1px solid rgba(255, 255, 255, .38); border-radius: 50%; box-shadow: 0 8px 32px rgba(53, 90, 138, .07), inset 0 1px 0 rgba(255, 255, 255, .18); backdrop-filter: blur(18px) saturate(115%); -webkit-backdrop-filter: blur(18px) saturate(115%); cursor: pointer; transition: background .2s, transform .2s, box-shadow .2s; }
+.insight-page .insight-audio-control { position: fixed; z-index: 4; top: 112px; left: auto; right: max(54px, calc((100vw - 1440px) / 2 + 30px)); width: 48px; height: 48px; display: grid; place-items: center; padding: 0; color: #315a80; background: rgba(241, 248, 255, .42); border: 1px solid rgba(255, 255, 255, .38); border-radius: 50%; box-shadow: 0 8px 32px rgba(53, 90, 138, .07), inset 0 1px 0 rgba(255, 255, 255, .18); backdrop-filter: blur(18px) saturate(115%); -webkit-backdrop-filter: blur(18px) saturate(115%); cursor: pointer; transition: background .2s, transform .2s, box-shadow .2s; }
 .insight-page .insight-audio-control:hover { background: rgba(241, 248, 255, .62); transform: translateY(-1px); box-shadow: 0 10px 30px rgba(53, 90, 138, .12), inset 0 1px 0 rgba(255, 255, 255, .24); }
 .insight-page .insight-audio-control:active { transform: translateY(0); }
 .insight-page .insight-audio-control svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 1.8; }
 .insight-page .insight-audio-control svg path:first-child { fill: currentColor; stroke: none; }
 .insight-page .insight-audio { display: none; }
 .insight-page .insight-chapter { position: relative; min-height: 280svh; padding: clamp(146px, 22svh, 230px) 0 24svh 7%; display: flow-root; }
-.insight-page .insight-panel { box-sizing: border-box; position: sticky; top: 120px; width: min(460px, 42vw); padding: 28px 30px; border: 1px solid rgba(255, 255, 255, .44); border-radius: 26px; background: linear-gradient(132deg, rgba(250, 253, 255, calc(.48 + var(--storm) * .12)), rgba(232, 245, 255, calc(.32 + var(--storm) * .14))); box-shadow: 0 16px 48px rgba(43, 78, 111, .09); backdrop-filter: blur(24px) saturate(118%); -webkit-backdrop-filter: blur(24px) saturate(118%); }
+.insight-page .insight-panel { box-sizing: border-box; position: sticky; top: 120px; width: min(460px, 42vw); padding: 36px 30px; border: 1px solid rgba(255, 255, 255, .44); border-radius: 26px; background: linear-gradient(132deg, rgba(250, 253, 255, calc(.48 + var(--storm) * .12)), rgba(232, 245, 255, calc(.32 + var(--storm) * .14))); box-shadow: 0 16px 48px rgba(43, 78, 111, .09); backdrop-filter: blur(24px) saturate(118%); -webkit-backdrop-filter: blur(24px) saturate(118%); }
+.insight-page .brand-button { font-size: 32px; }
+.insight-page .nav-links { font-size: 15px; }
 @media (min-width: 761px) {
   .insight-page .insight-chapter:first-child { padding-top: 120px; }
 }
-.insight-page .insight-kicker { display: flex; gap: 14px; align-items: center; margin: 0 0 18px; color: var(--brand); font-size: 9px; font-weight: 800; letter-spacing: .14em; }
+.insight-page .insight-kicker { display: flex; gap: 14px; align-items: center; margin: 0 0 18px; color: var(--brand); font-size: 10px; font-weight: 800; letter-spacing: .14em; }
 .insight-page .insight-kicker > span { letter-spacing: .07em; padding: 5px 9px; border-radius: 20px; background: rgba(104, 155, 203, .08); white-space: nowrap; }
-.insight-page h1, .insight-page h2 { font-size: clamp(30px, 3.1vw, 45px); line-height: 1.12; letter-spacing: -.045em; font-weight: 700; margin: 0 0 18px; color: #244f83; text-wrap: balance; }
-.insight-page .insight-intro { color: rgba(31, 61, 92, .88); font-size: 14px; line-height: 1.78; margin: 0; }
+.insight-page h1, .insight-page h2 { font-size: clamp(32px, 3.25vw, 48px); line-height: 1.12; letter-spacing: -.045em; font-weight: 700; margin: 0 0 18px; color: #244f83; text-wrap: balance; }
+.insight-page .insight-intro { color: rgba(31, 61, 92, .88); font-size: 15px; line-height: 1.78; margin: 0; }
 .insight-page .insight-evidence { margin-top: 20px; border-top: 1px solid rgba(55, 106, 155, .1); padding-top: 16px; }
-.insight-page .insight-example { font-size: 10px; color: #506d89; margin: 0 0 15px; display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap; }
-.insight-page .insight-example span { color: #315c89; font-size: 12px; font-weight: 800; }
+.insight-page .insight-example { font-size: 11px; color: #506d89; margin: 0 0 15px; display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap; }
+.insight-page .insight-example span { color: #315c89; font-size: 13px; font-weight: 800; }
 .insight-page .insight-metric { display: flex; flex-direction: column; gap: 6px; }
-.insight-page .insight-metric > strong { font-size: 38px; line-height: 1.1; letter-spacing: -.04em; font-weight: 600; color: var(--brand); }
-.insight-page .insight-metric > span { font-size: 12px; line-height: 1.4; font-weight: 700; }
-.insight-page .insight-metric small { font-size: 10px; line-height: 1.55; }
-.insight-page cite { display: block; font-style: normal; font-size: 9px; line-height: 1.65; color: #476383; overflow-wrap: anywhere; }
-.insight-page .insight-evidence > p:not(.insight-example) { font-size: 12px; line-height: 1.7; }
+.insight-page .insight-metric > strong { font-size: 40px; line-height: 1.1; letter-spacing: -.04em; font-weight: 600; color: var(--brand); }
+.insight-page .insight-metric > span { font-size: 13px; line-height: 1.4; font-weight: 700; }
+.insight-page .insight-metric small { font-size: 11px; line-height: 1.55; }
+.insight-page cite { display: block; font-style: normal; font-size: 10px; line-height: 1.65; color: #476383; overflow-wrap: anywhere; }
+.insight-page .insight-evidence > p:not(.insight-example) { font-size: 13px; line-height: 1.7; }
 .insight-page .insight-metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 17px; }
 .insight-page .insight-metrics .insight-metric:first-child { grid-column: 1 / -1; }
 .insight-page .insight-metrics--paired .insight-metric:first-child { grid-column: auto; }
-.insight-page .insight-metrics .insight-metric > strong { font-size: 27px; }
-.insight-page .insight-metric--missing > strong { font-size: 17px !important; }
-.insight-page .insight-priority { display: flex; justify-content: space-between; align-items: center; gap: 12px; font-size: 11px; }
-.insight-page .insight-priority strong { color: #2857a2; background: rgba(155, 197, 239, .2); border: 1px solid rgba(255, 255, 255, .3); border-radius: 16px; padding: 7px 13px; font-size: 15px; }
-.insight-page .insight-data-state { font-size: 12px; line-height: 1.7; margin: 20px 0 0; }
-.insight-page .insight-data-state .button { font-size: 12px; }
+.insight-page .insight-metrics .insight-metric > strong { font-size: 29px; }
+.insight-page .insight-metric--missing > strong { font-size: 18px !important; }
+.insight-page .insight-priority { display: flex; justify-content: space-between; align-items: center; gap: 12px; font-size: 12px; }
+.insight-page .insight-priority strong { color: #2857a2; background: rgba(155, 197, 239, .2); border: 1px solid rgba(255, 255, 255, .3); border-radius: 16px; padding: 7px 13px; font-size: 16px; }
+.insight-page .insight-data-state { font-size: 13px; line-height: 1.7; margin: 20px 0 0; }
+.insight-page .insight-data-state .button { font-size: 13px; }
 .insight-page .insight-loading-dot { display: inline-block; width: 6px; height: 6px; background: #6e92c3; border-radius: 50%; }
-.insight-page .insight-limitations { margin-top: 12px; font-size: 10px; line-height: 1.7; }
+.insight-page .insight-limitations { margin-top: 12px; font-size: 11px; line-height: 1.7; }
 .insight-page .insight-limitations summary { cursor: pointer; min-height: 30px; }
 .insight-page .insight-chapter--final { box-sizing: border-box; min-height: 100dvh; padding-top: 24svh; padding-bottom: max(24px, env(safe-area-inset-bottom)); }
-.insight-page .insight-chapter--final .insight-panel { position: relative; top: auto; padding: 26px 30px; }
+.insight-page .insight-chapter--final .insight-panel { position: relative; top: auto; padding: 34px 30px; }
 .insight-page .insight-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 24px; }
-.insight-page .insight-actions .button { font-size: 11px; min-width: 0; padding: 0 16px; border: 0; }
+.insight-page .insight-actions .button { font-size: 12px; min-width: 0; padding: 0 16px; border: 0; }
 .insight-page .insight-actions .button span { margin-left: 10px; }
-.insight-page .insight-station { position: absolute; top: 0; left: 0; display: grid; place-items: center; width: 28px; height: 28px; background: #e4f5ff9c; color: #326697; font-size: 11px; font-weight: 800; border-radius: 50%; opacity: 0; }
+.insight-page .insight-station { position: absolute; top: 0; left: 0; display: grid; place-items: center; width: 28px; height: 28px; background: #e4f5ff9c; color: #326697; font-size: 12px; font-weight: 800; border-radius: 50%; opacity: 0; }
 .insight-page .insight-station[data-state='current'] { color: #1c608c; background: #effeffd9; box-shadow: 0 0 20px #a7f5ff; }
-.insight-page .insight-scroll-hint { position: fixed; z-index: 5; left: 50%; bottom: max(28px, env(safe-area-inset-bottom)); display: flex; align-items: center; gap: 9px; color: rgba(31, 72, 108, .9); text-shadow: 0 1px 10px rgba(244, 251, 255, .72); font-size: clamp(12px, .85vw, 14px); font-weight: 600; letter-spacing: .035em; pointer-events: none; transform: translateX(-50%); opacity: var(--scroll-hint-opacity); will-change: opacity, transform; animation: insight-hint-float 1.8s ease-in-out infinite; }
+.insight-page .insight-scroll-hint { position: fixed; z-index: 5; left: 50%; bottom: max(28px, env(safe-area-inset-bottom)); display: flex; align-items: center; gap: 9px; color: rgba(31, 72, 108, .9); text-shadow: 0 1px 10px rgba(244, 251, 255, .72); font-size: clamp(13px, .9vw, 15px); font-weight: 600; letter-spacing: .035em; pointer-events: none; transform: translateX(-50%); opacity: var(--scroll-hint-opacity); will-change: opacity, transform; animation: insight-hint-float 1.8s ease-in-out infinite; }
 .insight-page[data-scroll-hint='hidden'] .insight-scroll-hint { visibility: hidden; animation: none; }
 .insight-page .insight-scroll-arrow { display: inline-block; color: rgba(36, 83, 123, .78); font-size: 18px; font-weight: 500; line-height: 1; text-shadow: 0 1px 8px rgba(244, 251, 255, .76); }
 .insight-page button:focus-visible, .insight-page a:focus-visible, .insight-page summary:focus-visible, .insight-page h1:focus-visible, .insight-page h2:focus-visible { outline: 3px solid #275fac; outline-offset: 5px; border-radius: 8px; }
@@ -74,36 +76,36 @@ html.insight-scrollbar-hidden body::-webkit-scrollbar { display: none; }
 .insight-page .insight-nav-mark { width: 8px; height: 8px; border-radius: 20px; background: color-mix(in srgb, #6384a4, #d2e3f3 calc(var(--storm) * 75%)); opacity: .7; transition: height .25s, background .25s, opacity .25s; }
 .insight-page .insight-progress [aria-current] .insight-nav-mark { height: 34px; width: 9px; opacity: 1; background: #727bea; box-shadow: 0 0 10px #bfd3ff55; }
 .insight-page .insight-progress button:hover .insight-nav-mark { opacity: 1; }
-.insight-page .insight-nav-tooltip { position: absolute; right: 48px; padding: 8px 12px; border: 1px solid rgba(255, 255, 255, .38); border-radius: 12px; white-space: nowrap; background: rgba(234, 244, 255, .56); color: #315a80; font-size: 11px; opacity: 0; pointer-events: none; transform: translateX(4px); transition: opacity .18s, transform .18s; box-shadow: 0 5px 20px rgba(51, 88, 119, .07); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+.insight-page .insight-nav-tooltip { position: absolute; right: 48px; padding: 8px 12px; border: 1px solid rgba(255, 255, 255, .38); border-radius: 12px; white-space: nowrap; background: rgba(234, 244, 255, .56); color: #315a80; font-size: 12px; opacity: 0; pointer-events: none; transform: translateX(4px); transition: opacity .18s, transform .18s; box-shadow: 0 5px 20px rgba(51, 88, 119, .07); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
 .insight-page .insight-progress button:hover .insight-nav-tooltip, .insight-page .insight-progress button:focus-visible .insight-nav-tooltip { opacity: 1; transform: none; }
 @media (max-height: 800px) and (min-width: 761px) {
-  .insight-page .insight-panel { top: 102px; padding: 22px 27px; }
+  .insight-page .insight-panel { top: 102px; padding: 28px 27px; }
   .insight-page .insight-chapter { padding-top: 120px; }
   .insight-page .insight-chapter:first-child { padding-top: 102px; }
-  .insight-page h1, .insight-page h2 { font-size: 34px; margin-bottom: 15px; }
-  .insight-page .insight-intro { font-size: 12px; }
+  .insight-page h1, .insight-page h2 { font-size: 36px; margin-bottom: 15px; }
+  .insight-page .insight-intro { font-size: 13px; }
   .insight-page .insight-kicker { margin-bottom: 14px; }
   .insight-page .insight-evidence { margin-top: 15px; padding-top: 12px; }
 }
 @media (max-width: 760px) {
   .insight-page .nav-shell { top: 10px; width: calc(100% - 20px); height: 62px; padding: 0 12px 0 8px; border-radius: 20px; }
-  .insight-page .brand-button { font-size: 19px; gap: 2px; }
+  .insight-page .brand-button { font-size: 20px; gap: 2px; }
   .insight-page .brand-logo { width: 42px; height: 42px; }
-  .insight-page .nav-links { gap: 10px; font-size: 10px; }
-  .insight-page .insight-audio-control { top: 82px; left: auto; right: 22px; width: 44px; height: 44px; }
+  .insight-page .nav-links { gap: 10px; font-size: 11px; }
+  .insight-page .insight-audio-control { top: 90px; left: auto; right: 22px; width: 44px; height: 44px; }
   .insight-page .insight-chapter { padding: 29svh 52px 30svh 14px; min-height: 280svh; }
-  .insight-page .insight-panel { position: relative; width: min(100%, 480px); padding: 24px; border-radius: 24px; top: auto; background: linear-gradient(132deg, rgba(246, 251, 255, .58), rgba(232, 244, 255, .4)); }
+  .insight-page .insight-panel { position: relative; width: min(100%, 480px); padding: 30px 24px; border-radius: 24px; top: auto; background: linear-gradient(132deg, rgba(246, 251, 255, .58), rgba(232, 244, 255, .4)); }
   .insight-page .insight-progress { right: 2px; gap: 1px; }
   .insight-page .insight-progress button { width: 44px; height: 46px; }
   .insight-page .insight-nav-tooltip { display: none; }
-  .insight-page h1, .insight-page h2 { font-size: 33px; }
-  .insight-page .insight-intro { font-size: 13px; }
-  .insight-page cite { font-size: 10px; }
-  .insight-page .insight-metric small { font-size: 11px; }
-  .insight-page .insight-kicker { font-size: 8px; gap: 9px; }
+  .insight-page h1, .insight-page h2 { font-size: 35px; }
+  .insight-page .insight-intro { font-size: 14px; }
+  .insight-page cite { font-size: 11px; }
+  .insight-page .insight-metric small { font-size: 12px; }
+  .insight-page .insight-kicker { font-size: 9px; gap: 9px; }
   .insight-page .insight-scroll-hint { bottom: max(16px, env(safe-area-inset-bottom)); max-width: calc(100vw - 40px); white-space: nowrap; }
   .insight-page .insight-chapter--final { min-height: 100dvh; padding-top: max(144px, 24svh); padding-bottom: max(24px, env(safe-area-inset-bottom)); }
-  .insight-page .insight-chapter--final .insight-panel { padding: 24px; }
+  .insight-page .insight-chapter--final .insight-panel { padding: 30px 24px; }
 }
 @media (prefers-reduced-motion: reduce) {
   .insight-page *, .insight-page *::before, .insight-page *::after { animation: none !important; transition: none !important; scroll-behavior: auto; }

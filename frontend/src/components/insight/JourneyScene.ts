@@ -2,7 +2,7 @@ import * as THREE from 'three'
 import { stationProgress, weatherAt, type JourneyState } from './journey'
 import { routePosition, routeLength, terrainHeight, cameraPose, cameraSettings, terrainOccludes } from './landscape'
 import { createJourneyWeather } from './JourneyWeather'
-import { createVegetationLayout } from './vegetation'
+import { createShrubLayout, createVegetationLayout } from './vegetation'
 import { createTerrainSurface } from './TerrainSurface'
 
 /** Local traveller lighting only; all distances are scene units. */
@@ -140,7 +140,7 @@ export function createJourneyScene(host: HTMLElement, read: () => JourneyState, 
   }
   const placements = createVegetationLayout()
   const trees = new THREE.InstancedMesh(new THREE.ConeGeometry(1, 3.6, 5), new THREE.MeshStandardMaterial({ color: '#568e98', roughness: 1, flatShading: true }), placements.length)
-  const trunks = new THREE.InstancedMesh(new THREE.CylinderGeometry(.1, .15, 1.7, 4), new THREE.MeshStandardMaterial({ color: '#668996' }), placements.length)
+  const trunks = new THREE.InstancedMesh(new THREE.CylinderGeometry(.18, .24, 2.1, 6), new THREE.MeshStandardMaterial({ color: '#795b45', roughness: 1, flatShading: true }), placements.length)
   trees.castShadow = true
   trunks.castShadow = true
   const dummy = new THREE.Object3D()
@@ -151,12 +151,42 @@ export function createJourneyScene(host: HTMLElement, read: () => JourneyState, 
     groundRay.ray.origin.set(x, 200, z)
     const y = groundRay.intersectObject(terrainMesh, false)[0]?.point.y ?? terrainHeight(x, z)
     dummy.rotation.set(0, rotation, 0)
-    dummy.position.set(x, y + 2 * scale, z)
+    dummy.position.set(x, y + 3 * scale, z)
     dummy.scale.setScalar(scale); dummy.updateMatrix(); trees.setMatrixAt(i, dummy.matrix)
-    dummy.position.y = y + .85 * scale
+    dummy.position.y = y + 1.05 * scale
     dummy.updateMatrix(); trunks.setMatrixAt(i, dummy.matrix)
   })
   scene.add(trees, trunks)
+  const shrubPlacements = createShrubLayout(placements)
+  const shrubs = new THREE.InstancedMesh(
+    new THREE.SphereGeometry(.72, 8, 6),
+    new THREE.MeshStandardMaterial({ color: '#5f9972', roughness: 1, flatShading: true }),
+    shrubPlacements.length * 3,
+  )
+  shrubs.castShadow = true
+  shrubPlacements.forEach(({ x, z, scale, rotation }, shrubIndex) => {
+    groundRay.ray.origin.set(x, 200, z)
+    const y = groundRay.intersectObject(terrainMesh, false)[0]?.point.y ?? terrainHeight(x, z)
+    const lobes = [
+      { x: 0, z: 0, size: 1 },
+      { x: -.58, z: .16, size: .82 },
+      { x: .55, z: .22, size: .76 },
+    ]
+    lobes.forEach((lobe, lobeIndex) => {
+      const cos = Math.cos(rotation)
+      const sin = Math.sin(rotation)
+      dummy.position.set(
+        x + (lobe.x * cos - lobe.z * sin) * scale,
+        y + .48 * scale * lobe.size,
+        z + (lobe.x * sin + lobe.z * cos) * scale,
+      )
+      dummy.rotation.set(0, rotation, 0)
+      dummy.scale.set(scale * lobe.size, scale * lobe.size * .72, scale * lobe.size)
+      dummy.updateMatrix()
+      shrubs.setMatrixAt(shrubIndex * 3 + lobeIndex, dummy.matrix)
+    })
+  })
+  scene.add(shrubs)
   const labels = Array.from(host.querySelectorAll<HTMLElement>('[data-station]'))
   const projected = new THREE.Vector3(), target = new THREE.Vector3(), labelOffset = new THREE.Vector3(0, 2.4, 0)
   const clearFog = new THREE.Color('#bdcfd5'), stormFog = new THREE.Color('#7e919d'), sunnyFog = new THREE.Color('#d8e5e1')
@@ -230,6 +260,6 @@ export function createJourneyScene(host: HTMLElement, read: () => JourneyState, 
       if (mesh.material) (Array.isArray(mesh.material) ? mesh.material : [mesh.material]).forEach(material => materials.add(material))
     })
     geometries.forEach(geometry => geometry.dispose()); materials.forEach(material => material.dispose())
-    trees.dispose(); trunks.dispose(); terrainSurface.dispose(); glowTexture.dispose(); weatherLayer.dispose(); renderer.dispose(); renderer.forceContextLoss(); renderer.domElement.remove()
+    trees.dispose(); trunks.dispose(); shrubs.dispose(); terrainSurface.dispose(); glowTexture.dispose(); weatherLayer.dispose(); renderer.dispose(); renderer.forceContextLoss(); renderer.domElement.remove()
   }
 }

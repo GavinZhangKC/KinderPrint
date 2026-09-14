@@ -18,10 +18,11 @@ html:has(.home-page) body::-webkit-scrollbar {
 
 .landing-page {
   position: relative;
-  z-index: 1;
-  isolation: isolate;
+  z-index: auto;
+  isolation: auto;
   min-height: 100vh;
-  overflow: clip;
+  overflow-x: clip;
+  overflow-y: visible;
   color: var(--text);
 }
 
@@ -91,8 +92,8 @@ html:has(.home-page) body::-webkit-scrollbar {
   display: flex;
   align-items: center;
   gap: clamp(14px, 2.5vw, 36px);
-  color: #60769b;
-  font-size: 14px;
+  color: #526b94;
+  font-size: 15px;
   font-weight: 600;
 }
 
@@ -102,8 +103,13 @@ html:has(.home-page) body::-webkit-scrollbar {
   border: 0;
   background: transparent;
   color: inherit;
+  text-shadow: 0 1px 12px rgba(255, 255, 255, .3), 0 0 3px rgba(255, 255, 255, .16);
   cursor: pointer;
   transition: color .2s ease;
+}
+
+.home-brand {
+  text-shadow: 0 1px 12px rgba(255, 255, 255, .3), 0 0 3px rgba(255, 255, 255, .16);
 }
 
 .home-nav button:hover,
@@ -144,14 +150,37 @@ html:has(.home-page) body::-webkit-scrollbar {
 }
 
 .home-hero {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  isolation: isolate;
+  overflow: hidden;
   min-height: 100svh;
   display: flex;
   align-items: flex-start;
   padding: clamp(170px, 21vh, 230px) clamp(28px, 3vw, 56px) clamp(96px, 13vh, 150px);
 }
 
+.home-hero-liquid-chrome {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.home-hero::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background:
+    linear-gradient(90deg, rgba(239, 246, 255, .68) 0%, rgba(239, 246, 255, .56) 45%, rgba(239, 246, 255, 0) 100%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0), rgba(225, 237, 255, .26));
+  pointer-events: none;
+}
+
 .home-hero-copy {
   position: relative;
+  z-index: 2;
   max-width: 1120px;
 }
 
@@ -188,9 +217,15 @@ html:has(.home-page) body::-webkit-scrollbar {
 .landing-copy {
   max-width: 690px;
   margin: 18px 0 0;
-  color: var(--muted);
+  color: var(--text);
   font-size: clamp(17px, 1.55vw, 22px);
   line-height: 1.7;
+}
+
+.home-hero h1,
+.landing-subheading,
+.landing-copy {
+  text-shadow: 0 1px 14px rgba(255, 255, 255, .5), 0 0 4px rgba(255, 255, 255, .3);
 }
 
 .home-hero-actions {
@@ -233,9 +268,13 @@ html:has(.home-page) body::-webkit-scrollbar {
 }
 
 .home-insight {
+  position: relative;
+  z-index: auto;
   min-height: 105svh;
   padding: clamp(130px, 17vh, 190px) clamp(28px, 7vw, 108px);
   border-top: 1px solid rgba(109, 120, 232, .16);
+  background: #fff;
+  box-shadow: 0 -18px 44px rgba(51, 82, 140, .08);
   display: grid;
   grid-template-columns: minmax(0, 1.15fr) minmax(330px, .85fr);
   column-gap: clamp(70px, 10vw, 160px);
@@ -307,10 +346,14 @@ html:has(.home-page) body::-webkit-scrollbar {
 
 .home-insight-statement > span {
   color: var(--primary);
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 800;
   letter-spacing: .18em;
   text-transform: uppercase;
+}
+
+.home-explore > .home-section-kicker {
+  font-size: 13px;
 }
 
 .home-insight-statement p {
@@ -330,9 +373,12 @@ html:has(.home-page) body::-webkit-scrollbar {
 }
 
 .home-about {
+  position: relative;
+  z-index: auto;
   min-height: 100svh;
   padding: clamp(140px, 18vh, 210px) clamp(28px, 7vw, 108px);
-  border-top: 1px solid rgba(109, 120, 232, .16);
+  border-top: 0;
+  background: #fff;
   display: grid;
   grid-template-columns: minmax(180px, .42fr) minmax(0, 1.3fr);
   gap: clamp(60px, 10vw, 160px);
@@ -371,12 +417,56 @@ html:has(.home-page) body::-webkit-scrollbar {
 
 .home-explore {
   position: relative;
+  z-index: auto;
   min-height: 100svh;
   padding: clamp(140px, 18vh, 210px) clamp(28px, 7vw, 108px);
-  border-top: 1px solid rgba(109, 120, 232, .16);
+  border-top: 0;
+  background: #fff;
   display: flex;
   flex-direction: column;
   justify-content: center;
+}
+
+.home-hero-button {
+  border: 0;
+}
+
+.home-insight > *,
+.home-about > *,
+.home-explore > * {
+  position: relative;
+  z-index: 4;
+}
+
+.home-insight::before,
+.home-about::before,
+.home-explore::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.home-insight::before {
+  background:
+    radial-gradient(circle at 18% 24%, rgba(169, 160, 255, .34), transparent 34%),
+    radial-gradient(circle at 84% 54%, rgba(105, 202, 255, .3), transparent 36%),
+    linear-gradient(135deg, #e8edff 0%, #def2ff 52%, #e3eaff 100%);
+}
+
+.home-about::before {
+  background:
+    radial-gradient(circle at 78% 24%, rgba(169, 160, 255, .33), transparent 34%),
+    radial-gradient(circle at 16% 72%, rgba(105, 202, 255, .29), transparent 35%),
+    linear-gradient(145deg, #e1efff 0%, #e8ebff 50%, #dcf1ff 100%);
+}
+
+.home-explore::before {
+  background:
+    radial-gradient(circle at 22% 70%, rgba(169, 160, 255, .31), transparent 35%),
+    radial-gradient(circle at 82% 30%, rgba(105, 202, 255, .32), transparent 34%),
+    linear-gradient(135deg, #e5eaff 0%, #dcf0ff 52%, #e2e9ff 100%);
 }
 
 .home-explore h2 {
@@ -410,7 +500,7 @@ html:has(.home-page) body::-webkit-scrollbar {
   border: 0;
   border-top: 1px solid rgba(109, 120, 232, .22);
   background: transparent;
-  color: #60769b;
+  color: #526b94;
   text-align: left;
   cursor: pointer;
 }
@@ -419,7 +509,7 @@ html:has(.home-page) body::-webkit-scrollbar {
   position: relative;
   z-index: 2;
   color: var(--primary);
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 800;
   letter-spacing: .12em;
 }
@@ -437,11 +527,12 @@ html:has(.home-page) body::-webkit-scrollbar {
 
 .home-explore-arrow {
   position: relative;
+  right: clamp(18px, 2vw, 28px);
   z-index: 2;
   justify-self: end;
   color: var(--brand);
   font-size: clamp(24px, 2.5vw, 36px);
-  font-weight: 500;
+  font-weight: 700;
   transition: transform .22s ease;
 }
 
@@ -496,7 +587,7 @@ html:has(.home-page) body::-webkit-scrollbar {
 }
 
 .home-explore-row-veil {
-  background: linear-gradient(90deg, rgba(237, 245, 255, .22), rgba(242, 248, 255, .48) 72%, rgba(237, 245, 255, .68));
+  background: linear-gradient(90deg, rgba(255, 255, 255, .04), rgba(255, 255, 255, .07) 72%, rgba(255, 255, 255, .10));
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, .56), inset 0 -1px 0 rgba(255, 255, 255, .4);
 }
 

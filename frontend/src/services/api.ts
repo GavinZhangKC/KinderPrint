@@ -5,6 +5,7 @@ export type ApiStatus =
   | 'unavailable'
   | 'limited'
   | 'no_match'
+  | 'no_pattern'
 
 export interface ApiLimitation {
   code: string
@@ -155,7 +156,10 @@ export interface NeighbourhoodExplanation {
     factors: ExplanationFactor[]
   }>
   highlighted_factor_ids: string[]
-  incomplete_inputs: string[]
+  incomplete_inputs: Array<{
+    indicator: string
+    reason: string
+  }>
 }
 
 
@@ -182,6 +186,56 @@ export interface NeighbourhoodComparison {
   side_by_side: ComparisonField[]
   similarity_basis: string[]
   match_strength: string | null
+}
+
+export interface ApprovedComparisonValue {
+  value: number | string | null
+  status: ApiStatus | string
+}
+
+export interface ApprovedComparisonIndicator {
+  id: string
+  name: string
+  unit: string | null
+  neighbourhood_a: ApprovedComparisonValue
+  neighbourhood_b: ApprovedComparisonValue
+  approved_difference: ApprovedComparisonValue
+  source: string | null
+  reference_year: string | number | null
+  geographic_unit?: string | null
+}
+
+export interface OutcomeComparison {
+  neighbourhood_a: NeighbourhoodSearchResult
+  neighbourhood_b: NeighbourhoodSearchResult
+  outcome_indicators: ApprovedComparisonIndicator[]
+}
+
+export interface EnvironmentalDifference {
+  neighbourhood_a: NeighbourhoodSearchResult
+  neighbourhood_b: NeighbourhoodSearchResult
+  environmental_indicators: ApprovedComparisonIndicator[]
+  approved_standout_indicator_ids: string[]
+}
+
+export interface PatternInsightItem {
+  id: string
+  title: string
+  description: string
+  status: ApiStatus | string
+  confidence: ApprovedComparisonValue
+  quality: ApprovedComparisonValue
+  stability: ApprovedComparisonValue
+  supporting_outcome_indicator_ids: string[]
+  supporting_environmental_indicator_ids: string[]
+}
+
+export interface PatternInsight {
+  neighbourhood_a: NeighbourhoodSearchResult
+  neighbourhood_b: NeighbourhoodSearchResult
+  patterns: PatternInsightItem[]
+  supporting_outcome_indicators: ApprovedComparisonIndicator[]
+  supporting_environmental_indicators: ApprovedComparisonIndicator[]
 }
 
 export interface SuitableLocality {
@@ -327,6 +381,39 @@ export const api = {
   ) =>
     request<NeighbourhoodComparison>(
       `/api/compare?neighbourhood_id_a=${encodeURIComponent(
+        a,
+      )}&neighbourhood_id_b=${encodeURIComponent(
+        b,
+      )}`,
+    ),
+  getOutcomeComparison: (
+    a: string,
+    b: string,
+  ) =>
+    request<OutcomeComparison>(
+      `/api/outcome-comparison?neighbourhood_id_a=${encodeURIComponent(
+        a,
+      )}&neighbourhood_id_b=${encodeURIComponent(
+        b,
+      )}`,
+    ),
+  getEnvironmentalDifference: (
+    a: string,
+    b: string,
+  ) =>
+    request<EnvironmentalDifference>(
+      `/api/environmental-difference?neighbourhood_id_a=${encodeURIComponent(
+        a,
+      )}&neighbourhood_id_b=${encodeURIComponent(
+        b,
+      )}`,
+    ),
+  getPatternInsight: (
+    a: string,
+    b: string,
+  ) =>
+    request<PatternInsight>(
+      `/api/pattern-insight?neighbourhood_id_a=${encodeURIComponent(
         a,
       )}&neighbourhood_id_b=${encodeURIComponent(
         b,
