@@ -9,8 +9,9 @@ from geography import load_boundary_features
 from geocoding_quality import load_geocoding_quality
 from population import load_population_projections
 from validation import (
-    load_environmental_differences, load_outcome_comparisons, load_profiles,
-    profile_boundary_limitations,
+    load_comparison_data, load_environmental_differences, load_explanations,
+    load_outcome_comparisons, load_priority_results, load_profiles,
+    load_suitability_rankings, profile_boundary_limitations,
 )
 
 
@@ -45,6 +46,10 @@ def runtime_data_readiness() -> list[dict[str, Any]]:
     outcome_comparisons, _, outcome_limitations = load_outcome_comparisons()
     environmental, _, environmental_limitations = load_environmental_differences()
     community_context, community_context_limitations = load_community_context()
+    priorities, _, priority_limitations = load_priority_results()
+    explanations, _, explanation_limitations = load_explanations()
+    comparisons, _, comparison_limitations = load_comparison_data()
+    suitability, _, suitability_limitations = load_suitability_rankings()
 
     return [
         _check("aedc_locality_profiles", locality_value, locality_limitations,
@@ -65,4 +70,14 @@ def runtime_data_readiness() -> list[dict[str, Any]]:
         _check("declared_road_and_industrial_context", community_context,
                community_context_limitations,
                len(community_context) if community_context is not None else None),
+        _check("priority_for_investigation", priorities, priority_limitations,
+               len(priorities) if priorities is not None else None),
+        _check("priority_explanations", explanations, explanation_limitations,
+               len(explanations) if explanations is not None else None),
+        _check("approved_neighbourhood_comparisons", comparisons,
+               comparison_limitations,
+               (len(comparisons["matches"]) + len(comparisons["comparisons"]))
+               if comparisons is not None else None),
+        _check("locality_suitability", suitability, suitability_limitations,
+               len(suitability) if suitability is not None else None),
     ]

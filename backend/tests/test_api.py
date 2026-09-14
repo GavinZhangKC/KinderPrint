@@ -646,9 +646,15 @@ def test_data_health_distinguishes_process_health_from_unconfigured_data(client)
 
     assert_envelope(body)
     assert body["status"] == "limited"
-    assert body["metadata"] == {"check_count": 8, "ready_count": 0}
+    assert body["metadata"] == {"check_count": 12, "ready_count": 0}
     assert {check["readiness"] for check in body["data"]["checks"]} == {"not_configured"}
     assert all(check["record_count"] is None for check in body["data"]["checks"])
+    assert {
+        "priority_for_investigation",
+        "priority_explanations",
+        "approved_neighbourhood_comparisons",
+        "locality_suitability",
+    }.issubset({check["id"] for check in body["data"]["checks"]})
 
 
 def test_scientific_notices_do_not_expose_placeholders(client) -> None:
