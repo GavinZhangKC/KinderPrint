@@ -1,67 +1,67 @@
 {
   "pipeline_version": "2.0.0",
   "schema_version": "2",
-  "started_utc": "2026-08-30T15:38:42.541645+00:00",
+  "started_utc": "2026-09-14T01:17:21.884982+00:00",
   "stages": [
     {
       "stage": "01 verify raw inputs",
       "status": "ok",
-      "seconds": 0.02
+      "seconds": 0.01
     },
     {
       "stage": "02 clean AEDC",
       "status": "ok",
-      "seconds": 15.48
+      "seconds": 11.93
     },
     {
       "stage": "03 clean SEIFA + Census",
       "status": "ok",
-      "seconds": 0.75
+      "seconds": 0.56
     },
     {
       "stage": "04 integrate environment",
       "status": "ok",
-      "seconds": 0.31
+      "seconds": 0.27
     },
     {
       "stage": "05 build analytical table",
       "status": "ok",
-      "seconds": 0.02
+      "seconds": 0.01
     },
     {
       "stage": "06 priority model V1",
       "status": "ok",
-      "seconds": 0.59
+      "seconds": 0.49
     },
     {
       "stage": "07 community matching M4",
       "status": "ok",
-      "seconds": 0.04
+      "seconds": 0.03
     },
     {
       "stage": "08 environmental difference signature",
       "status": "ok",
-      "seconds": 0.05
+      "seconds": 0.04
     },
     {
       "stage": "09 assemble final table",
       "status": "ok",
-      "seconds": 0.01
+      "seconds": 0.0
     },
     {
       "stage": "10 validate (gate)",
       "status": "ok",
-      "seconds": 1.43
+      "seconds": 1.55
     },
     {
       "stage": "11 build artefacts",
       "status": "ok",
-      "seconds": 0.28
+      "seconds": 0.27
     }
   ],
   "inputs": {
     "aedc": {
-      "path": "/Users/karthikapillaikumar/Desktop/KinderPrint/data/raw/aedc/2026-08-28/sa2-2009-24.xlsx",
+      "path": "/Users/karthikapillaikumar/Desktop/KinderPrint/data/sa2-2009-24.xlsx",
       "sha256": "4ffd8d5882f8e2f35d59eb2dae4d2bd0dab0e2afe4ac118b5913a6110c6ae8f9",
       "bytes": 6023948
     },
@@ -98,8 +98,8 @@
     "no_match": 69,
     "significant_pairs": 61,
     "difference_records": 792,
-    "tests": "59 passed, 1 warning in 1.14s"
+    "tests": "108 passed in 1.34s"
   },
-  "finished_utc": "2026-08-30T15:39:01.496778+00:00",
-  "duration_seconds": 18.96
+  "finished_utc": "2026-09-14T01:17:37.060506+00:00",
+  "duration_seconds": 15.18
 }

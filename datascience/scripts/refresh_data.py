@@ -301,6 +301,13 @@ def main() -> int:
                          "ci_overlap": bool(not (hi1 < lo2 or hi2 < lo1)),
                          "ci_lo": lo1, "ci_hi": hi1, "peer_ci_lo": lo2, "peer_ci_hi": hi2})
         d = d.merge(pd.DataFrame(rows), on="community_id", how="left")
+        match_id = d.pop("match_community_id")
+        d["match_community_id"] = match_id
+        # Suppress platform-specific floating-point noise in committed tables.
+        # Twelve decimal places is far beyond the precision of every source
+        # measure while making equivalent BLAS/Python rebuilds byte-stable.
+        calculated = ["v1_z", "match_dist", "ci_lo", "ci_hi", "peer_ci_lo", "peer_ci_hi"]
+        d[calculated] = d[calculated].round(12)
         d.to_csv(PROC / "matched_table.csv", index=False)
         manifest["metrics"]["matched_pairs"] = int(ok.sum())
         manifest["metrics"]["no_match"] = int((~ok).sum())
@@ -342,9 +349,9 @@ def main() -> int:
 
     # ---------------------------------------------------------------- 09
     with Stage("09 assemble final table", manifest):
-        carry = ["community_id", "v1_z", "v1_band", "v0_count", "match_idx", "match_community_id", "match_dist",
+        carry = ["community_id", "v1_z", "v1_band", "v0_count", "match_idx", "match_dist",
                  "match_strength", "sig", "ci_overlap", "ci_lo", "ci_hi",
-                 "peer_ci_lo", "peer_ci_hi"]
+                 "peer_ci_lo", "peer_ci_hi", "match_community_id"]
         final = full.merge(d[[c for c in carry if c in d.columns]], on="community_id", how="left")
         final.to_csv(PROC / "final_table.csv", index=False)
         log.info("  final table %d rows x %d columns", len(final), final.shape[1])
