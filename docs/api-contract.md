@@ -105,6 +105,20 @@ Results are paginated with `offset` and `limit`; metadata reports page and total
 
 Returns an aggregate neighbourhood profile. The final geographic identifier format, geographic unit, and indicator lists are TBC.
 
+### `GET /api/neighbourhoods/{neighbourhood_id}/overview`
+
+Returns a unified Locality Health & Environment Profile assembled from the existing
+profile, early-childhood service, traffic, industrial-emissions and population-projection
+sources. Each section retains its own status, data, metadata and limitations so one
+unavailable source does not cause the other sections to be withheld. This endpoint does
+not calculate new indicators, scores, exposure estimates or recommendations.
+
+The existing individual endpoints remain available for clients that need only one
+section. Population projections are included only when the reporting locality represents
+exactly one native SA2. For a locality made from multiple SA2s, this section returns an
+`incompatible` state and no values; the backend must not present one component SA2 as the
+combined locality or aggregate projections without an approved method.
+
 ### `GET /api/neighbourhoods/{neighbourhood_id}/child-development`
 
 Returns only the approved Child Development domain from the configured profile artefact,

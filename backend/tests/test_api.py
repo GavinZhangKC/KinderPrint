@@ -267,12 +267,13 @@ def test_early_childhood_context_rejects_unreconciled_match_counts(client, monke
 
 def configure_community_context(
     monkeypatch, tmp_path, *, missing_traffic: bool = False,
-    missing_industrial_distance: bool = False,
+    missing_industrial_distance: bool = False, component_sa2_count: int = 1,
 ):
     identities = tmp_path / "communities.csv"
     identities.write_text(
-        "community_id,community_name,neighbourhood_id\n"
-        "MEL0001,Brunswick East,206011106\n",
+        "community_id,community_name,neighbourhood_id,n_component_sa2,is_merged\n"
+        f"MEL0001,Brunswick East,206011106,{component_sa2_count},"
+        f"{'True' if component_sa2_count > 1 else 'False'}\n",
         encoding="utf-8",
     )
     context = tmp_path / "community-context.csv"
@@ -409,6 +410,105 @@ def test_map_context_marks_incomplete_rows_without_imputation(
     assert neighbourhood["traffic"]["status"] == "limited"
     assert neighbourhood["traffic"]["metrics"]["declared_road_km"]["value"] is None
     assert body["limitations"][0]["affected_fields"] == ["206011106"]
+
+
+def configure_overview_sources(monkeypatch, tmp_path, *, merged: bool = False) -> None:
+    configure_community_context(
+        monkeypatch, tmp_path, component_sa2_count=2 if merged else 1)
+    profile_data = profile("206011106")
+    profile_data["neighbourhood"] = {
+        "id": "206011106",
+        "name": "Brunswick East",
+        "geographic_unit": "KinderPrint reporting locality",
+    }
+    profile_data["domains"][1]["indicators"][0].update({
+        "value": 5, "status": "available",
+    })
+    for domain in profile_data["domains"]:
+        for item in domain["indicators"]:
+            item["geographic_unit"] = "KinderPrint reporting locality"
+    profile_path = tmp_path / "overview-profiles.json"
+    profile_path.write_text(
+        json.dumps({"profiles": [profile_data]}), encoding="utf-8")
+    monkeypatch.setenv(PROFILE_DATA_PATH_ENV, str(profile_path))
+
+    early_path = tmp_path / "overview-early-childhood.csv"
+    early_path.write_text(
+        "community_id,neighbourhood_id,community_name,active_education_care_services,"
+        "exact_match_services,high_confidence_match_services,services_with_approved_places,"
+        "total_approved_places,long_day_care_services,kindergarten_services,"
+        "services_with_current_rating,rating_coverage_pct,geocoding_source,match_policy,"
+        "context_status\n"
+        "MEL0001,206011106,Brunswick East,4,3,1,4,249,3,1,4,100,Open G-NAF,"
+        "EXACT_OR_HIGH_CONFIDENCE_WITHIN_REPORTING_SCOPE,AGGREGATE_SERVICE_CONTEXT\n",
+        encoding="utf-8",
+    )
+    monkeypatch.setenv(ACECQA_CONTEXT_DATA_PATH_ENV, str(early_path))
+
+    population_path = tmp_path / "overview-population.csv"
+    population_path.write_text(
+        "sa2_code_2021,sa2_name_2021,projection_year,sex,"
+        "population_age_0_4_projected,population_age_5_9_projected,"
+        "population_age_10_14_projected,population_age_0_9_projected,"
+        "population_age_0_14_projected,population_all_ages_projected,source_id,value_status\n"
+        "206011106,Brunswick East,2026,persons,10,20,30,30,60,100,vif,PROJECTED\n"
+        "206011106,Brunswick East,2031,persons,12,22,32,34,66,110,vif,PROJECTED\n",
+        encoding="utf-8",
+    )
+    monkeypatch.setenv(VIF_PROJECTION_DATA_PATH_ENV, str(population_path))
+
+
+def test_neighbourhood_overview_aggregates_existing_evidence(
+    client, monkeypatch, tmp_path
+) -> None:
+    configure_overview_sources(monkeypatch, tmp_path)
+
+    body = client.get("/api/neighbourhoods/206011106/overview").json()
+
+    assert_envelope(body)
+    assert body["status"] == "available"
+    assert body["data"]["neighbourhood"]["name"] == "Brunswick East"
+    assert set(body["data"]["sections"]) == {
+        "profile", "early_childhood", "traffic", "industrial_emissions",
+        "population_outlook",
+    }
+    population = body["data"]["sections"]["population_outlook"]
+    assert population["status"] == "available"
+    assert [row["projection_year"] for row in population["data"]["projections"]] == [
+        2026, 2031,
+    ]
+    assert body["metadata"]["available_section_count"] == 5
+
+
+def test_neighbourhood_overview_keeps_unavailable_sections_explicit(
+    client, monkeypatch, write_json
+) -> None:
+    path = write_json("profiles.json", json.dumps({"profiles": [profile("n")]}))
+    monkeypatch.setenv(PROFILE_DATA_PATH_ENV, str(path))
+
+    body = client.get("/api/neighbourhoods/n/overview").json()
+
+    assert_envelope(body)
+    assert body["status"] == "limited"
+    assert body["data"]["sections"]["profile"]["status"] == "limited"
+    assert body["data"]["sections"]["traffic"]["status"] == "unavailable"
+    assert body["limitations"][0]["code"] == "overview_sections_incomplete"
+
+
+def test_neighbourhood_overview_withholds_population_for_merged_locality(
+    client, monkeypatch, tmp_path
+) -> None:
+    configure_overview_sources(monkeypatch, tmp_path, merged=True)
+
+    body = client.get("/api/neighbourhoods/206011106/overview").json()
+    population = body["data"]["sections"]["population_outlook"]
+
+    assert body["status"] == "limited"
+    assert population["status"] == "incompatible"
+    assert population["data"]["projections"] == []
+    assert population["metadata"]["reporting_locality_component_sa2_count"] == 2
+    assert population["limitations"][0]["code"] == (
+        "population_projection_incompatible_geography")
 
 
 def test_static_csv_loaders_reuse_validated_files(monkeypatch, tmp_path) -> None:

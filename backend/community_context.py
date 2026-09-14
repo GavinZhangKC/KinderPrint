@@ -34,7 +34,10 @@ CONTEXT_FIELDS = {
     "community_id", "context_quality_flag", *TRAFFIC_FIELDS,
     *INDUSTRIAL_COUNT_FIELDS, *INDUSTRIAL_DISTANCE_FIELDS,
 }
-IDENTITY_FIELDS = {"community_id", "community_name", "neighbourhood_id"}
+IDENTITY_FIELDS = {
+    "community_id", "community_name", "neighbourhood_id",
+    "n_component_sa2", "is_merged",
+}
 TRAFFIC_METRIC_DEFINITIONS = {
     "declared_road_km": {
         "name": "Declared-road length",
@@ -130,19 +133,30 @@ def _load_community_context(
             identity_reader = csv.DictReader(source)
             if not identity_reader.fieldnames or not IDENTITY_FIELDS.issubset(identity_reader.fieldnames):
                 raise ValueError
-            identities: dict[str, dict[str, str]] = {}
+            identities: dict[str, dict[str, Any]] = {}
             neighbourhood_ids: set[str] = set()
             for row in identity_reader:
                 community_id = row["community_id"].strip()
                 neighbourhood_id = row["neighbourhood_id"].strip()
                 name = row["community_name"].strip()
+                component_sa2_count = int(row["n_component_sa2"])
+                is_merged_text = row["is_merged"].strip().lower()
+                if is_merged_text not in {"true", "false"}:
+                    raise ValueError
+                is_merged = is_merged_text == "true"
                 if (not community_id or not neighbourhood_id or not name
+                        or component_sa2_count < 1
+                        or is_merged != (component_sa2_count > 1)
                         or community_id in identities or neighbourhood_id in neighbourhood_ids):
                     raise ValueError
                 identities[community_id] = {
-                    "id": neighbourhood_id,
-                    "name": name,
-                    "geographic_unit": "KinderPrint reporting locality",
+                    "neighbourhood": {
+                        "id": neighbourhood_id,
+                        "name": name,
+                        "geographic_unit": "KinderPrint reporting locality",
+                    },
+                    "component_sa2_count": component_sa2_count,
+                    "is_merged": is_merged,
                 }
                 neighbourhood_ids.add(neighbourhood_id)
 
@@ -180,9 +194,12 @@ def _load_community_context(
                                for field in ("high_traffic_road_share_pct",
                                              "actual_observation_road_share_pct"))):
                     raise ValueError
-                neighbourhood = identities[community_id]
+                identity = identities[community_id]
+                neighbourhood = identity["neighbourhood"]
                 index[neighbourhood["id"]] = {
                     "neighbourhood": neighbourhood,
+                    "component_sa2_count": identity["component_sa2_count"],
+                    "is_merged": identity["is_merged"],
                     "traffic": traffic_values,
                     "industrial_emissions": {**counts, **distances},
                 }

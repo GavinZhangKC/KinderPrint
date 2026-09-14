@@ -468,6 +468,126 @@ def neighbourhood_industrial_emissions_context(neighbourhood_id: str) -> dict[st
     )
 
 
+def _overview_section(response: dict[str, Any]) -> dict[str, Any]:
+    """Keep each existing endpoint result self-describing inside an overview."""
+    return {
+        key: response[key]
+        for key in ("status", "data", "metadata", "limitations")
+    }
+
+
+def _population_overview_section(neighbourhood_id: str) -> dict[str, Any]:
+    """Return native-SA2 projections only when the locality is exactly one SA2."""
+    context_index, identity_limitations = load_community_context()
+    if context_index is None:
+        return _overview_section(envelope(
+            "unavailable", {"projections": []},
+            limitations=[limitation(
+                "population_locality_identity_unavailable",
+                "The reporting-locality identity needed to select native SA2 projections is unavailable.",
+                "population_projections", "neighbourhood_id",
+            ), *identity_limitations],
+        ))
+    identity = context_index.get(neighbourhood_id)
+    if identity is None:
+        return _overview_section(envelope(
+            "missing", {"projections": []}, limitations=[limitation(
+                "population_locality_identity_not_found",
+                "No reporting-locality identity exists for this neighbourhood.",
+                "population_projections", "neighbourhood_id",
+            )],
+        ))
+    if identity["is_merged"]:
+        return _overview_section(envelope(
+            "incompatible", {"projections": []}, metadata={
+                "source": "Victoria in Future 2023 Release 2",
+                "geographic_unit": "ASGS Edition 3 SA2",
+                "reporting_locality_component_sa2_count": identity["component_sa2_count"],
+            }, limitations=[limitation(
+                "population_projection_incompatible_geography",
+                "This reporting locality contains multiple SA2s; a single-SA2 projection was not used as a replacement for the combined locality.",
+                "population_projections", "geographic_unit",
+            )],
+        ))
+
+    rows, limitations = load_population_projections()
+    if rows is None:
+        return _overview_section(envelope(
+            "unavailable", {"projections": []}, limitations=limitations))
+    selected = sorted(
+        (row for row in rows
+         if row["sa2_code"] == neighbourhood_id and row["sex"] == "persons"),
+        key=lambda row: row["projection_year"],
+    )
+    if not selected:
+        return _overview_section(envelope(
+            "missing", {"projections": []}, limitations=[limitation(
+                "population_projection_not_found",
+                "No persons projection exists for this locality at its native SA2 geography.",
+                "population_projections", "neighbourhood_id",
+            )],
+        ))
+    return _overview_section(envelope(
+        "available", {"projections": selected}, metadata={
+            "source": "Victoria in Future 2023 Release 2",
+            "geographic_unit": "ASGS Edition 3 SA2",
+            "value_type": "projection",
+            "sex": "persons",
+            "available_years": [row["projection_year"] for row in selected],
+            "result_count": len(selected),
+        },
+    ))
+
+
+@app.get("/api/neighbourhoods/{neighbourhood_id}/overview")
+def neighbourhood_overview(neighbourhood_id: str) -> dict[str, Any]:
+    """Aggregate existing locality evidence without deriving new values."""
+    profile_response = neighbourhood_profile(neighbourhood_id)
+    early_childhood_response = neighbourhood_early_childhood_services(neighbourhood_id)
+    traffic_response = neighbourhood_traffic_context(neighbourhood_id)
+    industrial_response = neighbourhood_industrial_emissions_context(neighbourhood_id)
+    sections = {
+        "profile": _overview_section(profile_response),
+        "early_childhood": _overview_section(early_childhood_response),
+        "traffic": _overview_section(traffic_response),
+        "industrial_emissions": _overview_section(industrial_response),
+        "population_outlook": _population_overview_section(neighbourhood_id),
+    }
+    statuses = [section["status"] for section in sections.values()]
+    neighbourhood = profile_response.get("data", {}).get("neighbourhood")
+    if not neighbourhood or neighbourhood.get("name") is None:
+        context_data = traffic_response.get("data") or industrial_response.get("data")
+        if context_data:
+            neighbourhood = context_data.get("neighbourhood")
+    if not neighbourhood:
+        neighbourhood = {
+            "id": neighbourhood_id, "name": None, "geographic_unit": None,
+        }
+    incomplete_sections = [
+        name for name, section in sections.items()
+        if section["status"] != "available"
+    ]
+    return envelope(
+        aggregate_status(statuses),
+        {"neighbourhood": neighbourhood, "sections": sections},
+        metadata={
+            "section_count": len(sections),
+            "available_section_count": len(sections) - len(incomplete_sections),
+            "geographic_unit": neighbourhood.get("geographic_unit"),
+        },
+        limitations=[limitation(
+            "overview_sections_incomplete",
+            "One or more overview sections are not fully available; no replacement values were created.",
+            *incomplete_sections,
+        )] if incomplete_sections else [],
+        notices=[
+            AREA_LEVEL_NOTICE,
+            TRAFFIC_CONTEXT_NOTICE,
+            INDUSTRIAL_EMISSIONS_CONTEXT_NOTICE,
+        ],
+    )
+
+
 @app.get("/api/map/context")
 def map_context() -> dict[str, Any]:
     """Return lightweight traffic and industrial context for all map localities."""
