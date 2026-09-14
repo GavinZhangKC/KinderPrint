@@ -66,8 +66,6 @@ Resources:
           KINDERPRINT_COMPARISON_DATA_PATH: /var/task/data/comparisons.json
           KINDERPRINT_OUTCOME_COMPARISON_DATA_PATH: /var/task/data/outcome_comparisons.json
           KINDERPRINT_ENVIRONMENTAL_DIFFERENCE_DATA_PATH: /var/task/data/environmental_differences.json
-          KINDERPRINT_PATTERN_INSIGHT_DATA_PATH: /var/task/data/pattern_insights.json
-          KINDERPRINT_PREVENTION_OPPORTUNITY_DATA_PATH: /var/task/data/prevention_opportunities.json
           KINDERPRINT_SUITABILITY_DATA_PATH: /var/task/data/suitability.json
           KINDERPRINT_VIF_PROJECTION_DATA_PATH: /var/task/data/vif_child_population_projections_sa2.csv
           KINDERPRINT_EPA_STATION_YEAR_DATA_PATH: /var/task/data/epa_air_quality_station_year.csv

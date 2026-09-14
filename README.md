@@ -41,6 +41,11 @@ environment configuration and provide the applicable dataset paths. Do not commi
 the datasets or any secrets. The service deliberately returns an unavailable
 or limited state when a source is not configured or cannot be validated.
 
+Pattern-insight and prevention-opportunity data paths are intentionally not
+configured in the deployment template. Those endpoints remain explicitly
+unavailable until defensible, reviewed analytical outputs exist; deployment must
+not imply that hypothetical findings have been validated.
+
 VIF projections are exposed at their native SA2 geography. EPA historical data
 is exposed only as monitoring-station context, and ACECQA/G-NAF data is exposed
 only as an aggregate quality report; the service never returns address rows.
