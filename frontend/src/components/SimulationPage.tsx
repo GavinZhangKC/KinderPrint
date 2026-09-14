@@ -34,7 +34,11 @@ interface ScenarioResult {
   baselineTreeCanopy: number
   vulnerability: number
   baselineVulnerability: number
+  developmentScore: number
+  baselineDevelopmentScore: number
+  developmentDirection: string
   projectedChange: string
+  projectedDevelopmentChange: string
   insight: string
 }
 
@@ -59,6 +63,7 @@ function buildScenarioResult(baseline: SimulationBaseline, values: ScenarioValue
 
   const heatExposure = values.heat <= 5 ? 'Moderate' : values.heat <= 8 ? 'High' : 'Very high'
   const heatDirection = heatReduction > 0 ? 'Improves' : 'Higher exposure'
+  const developmentDirection = projectedDevelopment > baseline.childDevelopment ? 'Improves' : 'Lower outlook'
   const insight = heatReduction > 0
     ? 'Reducing heat exposure while increasing canopy and green access produces a lower estimated vulnerability profile for this area.'
     : 'This scenario increases heat pressure and reduces the expected benefit from buffering child-development outcomes.'
@@ -70,7 +75,11 @@ function buildScenarioResult(baseline: SimulationBaseline, values: ScenarioValue
     baselineTreeCanopy: baseline.treeCanopy,
     vulnerability: Number(projectedVulnerability.toFixed(1)),
     baselineVulnerability: baseline.vulnerability,
+    developmentScore: Number(projectedDevelopment.toFixed(1)),
+    baselineDevelopmentScore: baseline.childDevelopment,
+    developmentDirection,
     projectedChange: `${Number(baseline.vulnerability.toFixed(1))}% → ${Number(projectedVulnerability.toFixed(1))}%`,
+    projectedDevelopmentChange: `${Number(baseline.childDevelopment.toFixed(1))} → ${Number(projectedDevelopment.toFixed(1))}`,
     insight,
   }
 }
@@ -215,12 +224,27 @@ export default function SimulationPage({
       <main className="simulation-main glass">
         <div className="simulation-header-row">
           <h1>Simulation Engine</h1>
-          <span className="simulation-pill">Scenario modelling</span>
+          <span className="simulation-pill">Illustrative scenario</span>
         </div>
 
         <p className="simulation-subtitle">
           Test how changes in neighbourhood conditions could influence modelled child-development outcomes.
         </p>
+
+        <div className="simulation-assumption-banner">
+          <span>Model assumptions: evidence-based planning estimate, not a forecast</span>
+          <div className="assumption-info-wrap">
+            <button type="button" className="assumption-info-trigger" aria-label="Explain the simulation formula">
+              i
+            </button>
+            <div className="assumption-info-tooltip">
+              <strong>Scenario formula</strong>
+              <p>Estimated vulnerability = baseline vulnerability − (tree canopy gain × 0.25) − (open space gain × 0.18) − (heat reduction × 2.1)</p>
+              <p>Estimated child-development outlook = baseline score + (tree canopy gain × 0.22) + (open space gain × 0.16) + (heat reduction × 1.6)</p>
+              <p>Values are clamped to realistic ranges to keep the estimate stable and interpretable for planning comparisons.</p>
+            </div>
+          </div>
+        </div>
 
         <div className="simulation-grid">
           <section className="simulation-panel">
@@ -354,8 +378,17 @@ export default function SimulationPage({
             </div>
 
             <p className="scenario-note">
-              Uses the selected neighbourhood baseline and the proposed scenario values.
+              Assumes the current neighbourhood baseline and applies a simple evidence-based sensitivity model to compare planning options.
             </p>
+
+            <div className="method-panel">
+              <h3>How the estimate is built</h3>
+              <ul>
+                <li>Tree canopy and public open space improvements lower vulnerability in the scenario model.</li>
+                <li>Lower heat exposure reduces the expected pressure on child-development outcomes.</li>
+                <li>The output is a planning comparison, not a forecast of a future year-by-year trend.</li>
+              </ul>
+            </div>
 
             <div className="action-row simulation-actions">
               <button type="button" className="button button-secondary" onClick={resetScenario} disabled={!baseline}>Reset</button>
@@ -366,7 +399,7 @@ export default function SimulationPage({
           <section className="simulation-panel">
             <div className="results-header">
               <h2>Simulation Results</h2>
-              <span className="ready-pill">{scenarioResult ? 'Ready' : 'Awaiting data'}</span>
+              <span className="ready-pill">{scenarioResult ? 'Estimate ready' : 'Awaiting data'}</span>
             </div>
 
             <div className="result-cards">
@@ -403,7 +436,19 @@ export default function SimulationPage({
                   <span className="result-arrow">→</span>
                   <strong>{scenarioResult ? `${scenarioResult.vulnerability.toFixed(1)}%` : '—'}</strong>
                 </div>
-                <div className="result-status success">{scenarioResult ? 'Lower' : 'Pending'}</div>
+                <div className="result-status success">{scenarioResult ? scenarioResult.heatDirection : 'Pending'}</div>
+              </article>
+
+              <article className="result-card">
+                <div className="result-card-header">
+                  <span>Child-development outlook</span>
+                </div>
+                <div className="result-card-body">
+                  <strong>{baseline ? `${baseline.childDevelopment.toFixed(1)}` : '—'}</strong>
+                  <span className="result-arrow">→</span>
+                  <strong>{scenarioResult ? `${scenarioResult.developmentScore.toFixed(1)}` : '—'}</strong>
+                </div>
+                <div className="result-status success">{scenarioResult ? scenarioResult.developmentDirection : 'Pending'}</div>
               </article>
             </div>
 
@@ -446,10 +491,14 @@ export default function SimulationPage({
                 <h3>Model Insight</h3>
                 <span className="confidence-pill">Confidence · Medium</span>
               </div>
-              <p>{scenarioResult ? scenarioResult.insight : 'Select a neighbourhood and run the model to update the scenario estimate.'}</p>
+              <p>{scenarioResult ? scenarioResult.insight : 'Select a neighbourhood and run the model to update the scenario estimate. This is an illustrative model output, not a future forecast.'}</p>
               <div className="projected-change">
-                <span>Projected change:</span>
+                <span>Vulnerability change:</span>
                 <strong>{scenarioResult ? scenarioResult.projectedChange : `${baseline?.vulnerability ?? 25}% → ${baseline?.vulnerability ?? 25}%`}</strong>
+              </div>
+              <div className="projected-change secondary">
+                <span>Development outlook:</span>
+                <strong>{scenarioResult ? scenarioResult.projectedDevelopmentChange : `${baseline?.childDevelopment ?? 68} → ${baseline?.childDevelopment ?? 68}`}</strong>
               </div>
             </div>
 
