@@ -2,11 +2,77 @@ import { useState } from 'react'
 
 import logo from '../assets/LogoMark.png'
 import { useNeighbourhoodSearch } from '../hooks/useNeighbourhoodSearch'
+import { api } from '../services/api'
+import { toNeighbourhood } from '../services/profileAdapter'
 
 interface SimulationPageProps {
   onLogoClick: () => void
   onBackToMenu: () => void
   onExploreMap: () => void
+}
+
+interface SimulationBaseline {
+  id: string
+  name: string
+  treeCanopy: number
+  openSpace: number
+  heatExposure: number
+  vulnerability: number
+  childDevelopment: number
+}
+
+interface ScenarioValues {
+  treeCanopy: number
+  openSpace: number
+  heat: number
+}
+
+interface ScenarioResult {
+  heatExposure: string
+  heatDirection: string
+  treeCanopy: number
+  baselineTreeCanopy: number
+  vulnerability: number
+  baselineVulnerability: number
+  projectedChange: string
+  insight: string
+}
+
+const clamp = (value: number, min: number, max: number) => Math.min(Math.max(value, min), max)
+
+function buildScenarioResult(baseline: SimulationBaseline, values: ScenarioValues): ScenarioResult {
+  const treeIncrease = values.treeCanopy - baseline.treeCanopy
+  const openSpaceIncrease = values.openSpace - baseline.openSpace
+  const heatReduction = baseline.heatExposure - values.heat
+
+  const projectedVulnerability = clamp(
+    baseline.vulnerability - (treeIncrease * 0.25) - (openSpaceIncrease * 0.18) - (heatReduction * 2.1),
+    5,
+    100,
+  )
+
+  const projectedDevelopment = clamp(
+    baseline.childDevelopment + (treeIncrease * 0.22) + (openSpaceIncrease * 0.16) + (heatReduction * 1.6),
+    30,
+    100,
+  )
+
+  const heatExposure = values.heat <= 5 ? 'Moderate' : values.heat <= 8 ? 'High' : 'Very high'
+  const heatDirection = heatReduction > 0 ? 'Improves' : 'Higher exposure'
+  const insight = heatReduction > 0
+    ? 'Reducing heat exposure while increasing canopy and green access produces a lower estimated vulnerability profile for this area.'
+    : 'This scenario increases heat pressure and reduces the expected benefit from buffering child-development outcomes.'
+
+  return {
+    heatExposure,
+    heatDirection,
+    treeCanopy: values.treeCanopy,
+    baselineTreeCanopy: baseline.treeCanopy,
+    vulnerability: Number(projectedVulnerability.toFixed(1)),
+    baselineVulnerability: baseline.vulnerability,
+    projectedChange: `${Number(baseline.vulnerability.toFixed(1))}% → ${Number(projectedVulnerability.toFixed(1))}%`,
+    insight,
+  }
 }
 
 export default function SimulationPage({
@@ -15,6 +81,15 @@ export default function SimulationPage({
   onExploreMap,
 }: SimulationPageProps) {
   const [selectedNeighbourhood, setSelectedNeighbourhood] = useState('')
+  const [selectedNeighbourhoodId, setSelectedNeighbourhoodId] = useState<string | null>(null)
+  const [baseline, setBaseline] = useState<SimulationBaseline | null>(null)
+  const [scenarioValues, setScenarioValues] = useState<ScenarioValues>({
+    treeCanopy: 35,
+    openSpace: 42,
+    heat: 4.8,
+  })
+  const [scenarioResult, setScenarioResult] = useState<ScenarioResult | null>(null)
+  const [scenarioLoading, setScenarioLoading] = useState(false)
 
   const {
     search,
@@ -28,13 +103,104 @@ export default function SimulationPage({
   } = useNeighbourhoodSearch({
     onSelectResult: async (item) => {
       setSelectedNeighbourhood(item.name)
+      setSelectedNeighbourhoodId(item.id)
       setSearch(item.name)
+      await loadNeighbourhoodScenario(item.id, item.name)
     },
   })
+
+  async function loadNeighbourhoodScenario(id: string, name: string) {
+    setScenarioLoading(true)
+
+    try {
+      const [profileResponse, priorityResponse, explanationResponse] = await Promise.all([
+        api.getProfile(id),
+        api.getPriority(id),
+        api.getExplanation(id),
+      ])
+
+      if (profileResponse.status !== 'available' && profileResponse.status !== 'limited') {
+        throw new Error(profileResponse.limitations[0]?.message ?? 'The neighbourhood profile is unavailable.')
+      }
+
+      const neighbourhood = toNeighbourhood(
+        profileResponse.data,
+        priorityResponse.status === 'available' || priorityResponse.status === 'limited'
+          ? priorityResponse.data
+          : null,
+        explanationResponse.status === 'available' || explanationResponse.status === 'limited'
+          ? explanationResponse.data
+          : null,
+        {
+          metadata: profileResponse.metadata,
+          limitations: [profileResponse, priorityResponse, explanationResponse]
+            .flatMap((response) => response.limitations)
+            .map((item) => item.message),
+          notices: [profileResponse, priorityResponse, explanationResponse]
+            .flatMap((response) => response.notices)
+            .map((item) => item.message)
+            .filter(Boolean),
+        },
+        id,
+        name,
+      )
+
+      const nextBaseline: SimulationBaseline = {
+        id: neighbourhood.id,
+        name: neighbourhood.name,
+        treeCanopy: clamp(neighbourhood.treeCanopy ?? 22.7, 0, 100),
+        openSpace: clamp(neighbourhood.greenSpaceAccess ?? 31.6, 0, 100),
+        heatExposure: clamp(neighbourhood.heatExposure ?? 6.5, 0, 20),
+        vulnerability: clamp(neighbourhood.developmentalVulnerability ?? 25, 0, 100),
+        childDevelopment: clamp(neighbourhood.childDevelopmentScore ?? 68, 0, 100),
+      }
+
+      setBaseline(nextBaseline)
+      setScenarioValues({
+        treeCanopy: nextBaseline.treeCanopy,
+        openSpace: nextBaseline.openSpace,
+        heat: nextBaseline.heatExposure,
+      })
+      setScenarioResult(buildScenarioResult(nextBaseline, {
+        treeCanopy: nextBaseline.treeCanopy,
+        openSpace: nextBaseline.openSpace,
+        heat: nextBaseline.heatExposure,
+      }))
+    } catch (error) {
+      console.error('Failed to load simulation baseline:', error)
+      setBaseline(null)
+      setScenarioResult(null)
+    } finally {
+      setScenarioLoading(false)
+    }
+  }
 
   const handleSearchSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     await submitSearch()
+  }
+
+  const runSimulation = () => {
+    if (!baseline) {
+      return
+    }
+
+    setScenarioResult(buildScenarioResult(baseline, scenarioValues))
+  }
+
+  const resetScenario = () => {
+    if (!baseline) {
+      return
+    }
+
+    const defaultValues = {
+      treeCanopy: baseline.treeCanopy,
+      openSpace: baseline.openSpace,
+      heat: baseline.heatExposure,
+    }
+
+    setScenarioValues(defaultValues)
+    setScenarioResult(buildScenarioResult(baseline, defaultValues))
   }
 
   return (
@@ -84,7 +250,7 @@ export default function SimulationPage({
                     className="search-submit-button"
                     type="submit"
                     aria-label="Search neighbourhood"
-                    disabled={searchLoading}
+                    disabled={searchLoading || scenarioLoading}
                   >
                     <span aria-hidden="true">⌕</span>
                   </button>
@@ -123,13 +289,21 @@ export default function SimulationPage({
               <div className="slider-row">
                 <div className="slider-labels">
                   <label>Tree canopy</label>
-                  <span>Current 22.7%</span>
+                  <span>Current {baseline ? `${baseline.treeCanopy.toFixed(1)}%` : '—'}</span>
                 </div>
                 <div className="slider-control">
-                  <input type="range" min="0" max="100" value="35" readOnly aria-label="Tree canopy" />
+                  <input
+                    type="range"
+                    min="0"
+                    max="100"
+                    step="0.1"
+                    value={scenarioValues.treeCanopy}
+                    onChange={(event) => setScenarioValues((current) => ({ ...current, treeCanopy: Number(event.target.value) }))}
+                    aria-label="Tree canopy"
+                  />
                   <div className="slider-meta">
                     <span>Proposed</span>
-                    <strong>35.0%</strong>
+                    <strong>{scenarioValues.treeCanopy.toFixed(1)}%</strong>
                   </div>
                 </div>
               </div>
@@ -137,13 +311,21 @@ export default function SimulationPage({
               <div className="slider-row">
                 <div className="slider-labels">
                   <label>Public open space</label>
-                  <span>Current 31.6%</span>
+                  <span>Current {baseline ? `${baseline.openSpace.toFixed(1)}%` : '—'}</span>
                 </div>
                 <div className="slider-control">
-                  <input type="range" min="0" max="100" value="42" readOnly aria-label="Public open space" />
+                  <input
+                    type="range"
+                    min="0"
+                    max="100"
+                    step="0.1"
+                    value={scenarioValues.openSpace}
+                    onChange={(event) => setScenarioValues((current) => ({ ...current, openSpace: Number(event.target.value) }))}
+                    aria-label="Public open space"
+                  />
                   <div className="slider-meta">
                     <span>Proposed</span>
-                    <strong>42.0%</strong>
+                    <strong>{scenarioValues.openSpace.toFixed(1)}%</strong>
                   </div>
                 </div>
               </div>
@@ -151,13 +333,21 @@ export default function SimulationPage({
               <div className="slider-row">
                 <div className="slider-labels">
                   <label>Urban heat island effect</label>
-                  <span>Current 6.5°C</span>
+                  <span>Current {baseline ? `${baseline.heatExposure.toFixed(1)}°C` : '—'}</span>
                 </div>
                 <div className="slider-control">
-                  <input type="range" min="0" max="20" value="4.8" readOnly aria-label="Urban heat island effect" />
+                  <input
+                    type="range"
+                    min="0"
+                    max="20"
+                    step="0.1"
+                    value={scenarioValues.heat}
+                    onChange={(event) => setScenarioValues((current) => ({ ...current, heat: Number(event.target.value) }))}
+                    aria-label="Urban heat island effect"
+                  />
                   <div className="slider-meta">
                     <span>Proposed</span>
-                    <strong>4.8°C</strong>
+                    <strong>{scenarioValues.heat.toFixed(1)}°C</strong>
                   </div>
                 </div>
               </div>
@@ -168,15 +358,15 @@ export default function SimulationPage({
             </p>
 
             <div className="action-row simulation-actions">
-              <button type="button" className="button button-secondary">Reset</button>
-              <button type="button" className="button button-primary">Run Simulation</button>
+              <button type="button" className="button button-secondary" onClick={resetScenario} disabled={!baseline}>Reset</button>
+              <button type="button" className="button button-primary" onClick={runSimulation} disabled={!baseline}>Run Simulation</button>
             </div>
           </section>
 
           <section className="simulation-panel">
             <div className="results-header">
               <h2>Simulation Results</h2>
-              <span className="ready-pill">Ready</span>
+              <span className="ready-pill">{scenarioResult ? 'Ready' : 'Awaiting data'}</span>
             </div>
 
             <div className="result-cards">
@@ -185,11 +375,11 @@ export default function SimulationPage({
                   <span>Heat exposure</span>
                 </div>
                 <div className="result-card-body">
-                  <strong>High</strong>
+                  <strong>{baseline ? `${baseline.heatExposure.toFixed(1)}°C` : '—'}</strong>
                   <span className="result-arrow">→</span>
-                  <strong>Moderate</strong>
+                  <strong>{scenarioResult ? `${scenarioValues.heat.toFixed(1)}°C` : '—'}</strong>
                 </div>
-                <div className="result-status success">Improves</div>
+                <div className="result-status success">{scenarioResult ? scenarioResult.heatDirection : 'Select area'}</div>
               </article>
 
               <article className="result-card">
@@ -197,11 +387,11 @@ export default function SimulationPage({
                   <span>Tree canopy</span>
                 </div>
                 <div className="result-card-body">
-                  <strong>22.7%</strong>
+                  <strong>{baseline ? `${baseline.treeCanopy.toFixed(1)}%` : '—'}</strong>
                   <span className="result-arrow">→</span>
-                  <strong>35.0%</strong>
+                  <strong>{scenarioValues.treeCanopy.toFixed(1)}%</strong>
                 </div>
-                <div className="result-status success">+12.3 pp</div>
+                <div className="result-status success">{baseline ? `+${(scenarioValues.treeCanopy - baseline.treeCanopy).toFixed(1)} pp` : '—'}</div>
               </article>
 
               <article className="result-card">
@@ -209,11 +399,11 @@ export default function SimulationPage({
                   <span>Modelled vulnerability</span>
                 </div>
                 <div className="result-card-body">
-                  <strong>25%</strong>
+                  <strong>{baseline ? `${baseline.vulnerability.toFixed(1)}%` : '—'}</strong>
                   <span className="result-arrow">→</span>
-                  <strong>18%</strong>
+                  <strong>{scenarioResult ? `${scenarioResult.vulnerability.toFixed(1)}%` : '—'}</strong>
                 </div>
-                <div className="result-status success">Lower</div>
+                <div className="result-status success">{scenarioResult ? 'Lower' : 'Pending'}</div>
               </article>
             </div>
 
@@ -228,26 +418,26 @@ export default function SimulationPage({
 
               <div className="comparison-row">
                 <span className="comparison-label">Heat exposure</span>
-                <div className="comparison-bar baseline" style={{ width: '58%' }} />
-                <div className="comparison-bar simulated" style={{ width: '42%' }} />
+                <div className="comparison-bar baseline" style={{ width: `${baseline ? (baseline.heatExposure / 20) * 100 : 58}%` }} />
+                <div className="comparison-bar simulated" style={{ width: `${(scenarioValues.heat / 20) * 100}%` }} />
               </div>
 
               <div className="comparison-row">
                 <span className="comparison-label">Tree canopy</span>
-                <div className="comparison-bar baseline" style={{ width: '36%' }} />
-                <div className="comparison-bar simulated" style={{ width: '62%' }} />
+                <div className="comparison-bar baseline" style={{ width: `${baseline ? (baseline.treeCanopy / 100) * 100 : 36}%` }} />
+                <div className="comparison-bar simulated" style={{ width: `${(scenarioValues.treeCanopy / 100) * 100}%` }} />
               </div>
 
               <div className="comparison-row">
                 <span className="comparison-label">Public open space</span>
-                <div className="comparison-bar baseline" style={{ width: '48%' }} />
-                <div className="comparison-bar simulated" style={{ width: '68%' }} />
+                <div className="comparison-bar baseline" style={{ width: `${baseline ? (baseline.openSpace / 100) * 100 : 48}%` }} />
+                <div className="comparison-bar simulated" style={{ width: `${(scenarioValues.openSpace / 100) * 100}%` }} />
               </div>
 
               <div className="comparison-row">
                 <span className="comparison-label">Vulnerability</span>
-                <div className="comparison-bar baseline" style={{ width: '64%' }} />
-                <div className="comparison-bar simulated" style={{ width: '46%' }} />
+                <div className="comparison-bar baseline" style={{ width: `${baseline ? (baseline.vulnerability / 100) * 100 : 64}%` }} />
+                <div className="comparison-bar simulated" style={{ width: `${scenarioResult ? (scenarioResult.vulnerability / 100) * 100 : 46}%` }} />
               </div>
             </div>
 
@@ -256,12 +446,10 @@ export default function SimulationPage({
                 <h3>Model Insight</h3>
                 <span className="confidence-pill">Confidence · Medium</span>
               </div>
-              <p>
-                Increasing tree canopy and public open space while reducing heat exposure produces a lowered vulnerability estimate for this scenario.
-              </p>
+              <p>{scenarioResult ? scenarioResult.insight : 'Select a neighbourhood and run the model to update the scenario estimate.'}</p>
               <div className="projected-change">
                 <span>Projected change:</span>
-                <strong>25% → 18%</strong>
+                <strong>{scenarioResult ? scenarioResult.projectedChange : `${baseline?.vulnerability ?? 25}% → ${baseline?.vulnerability ?? 25}%`}</strong>
               </div>
             </div>
 
