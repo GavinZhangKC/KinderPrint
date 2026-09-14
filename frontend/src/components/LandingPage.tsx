@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react'
 import logo from '../assets/LogoMark.png'
 import LiquidChrome from './LiquidChrome'
+import PlaceLayersStory from './PlaceLayersStory'
 import '../styles/landing.css'
 
 interface LandingPageProps {
@@ -133,21 +134,23 @@ export default function LandingPage({ onInsight, onMap }: LandingPageProps) {
             interactive
           />
           <div className="home-hero-copy">
-            <h1 id="landing-title">Discover how neighbourhoods<br />shape childhood.</h1>
+            <p className="landing-kicker">Child health · environment · place</p>
+            <h1 id="landing-title">Where children grow<br />matters.</h1>
             <p className="landing-subheading">
-              Child development + community + environment.
+              Explore how child development, environment and health-support conditions differ across Melbourne.
             </p>
             <p className="landing-copy">
-              Explore the connections between local conditions and children’s development
-              through a clearer, more engaging evidence experience.
+              Peel back the layers of a place—from heat and nature to early-years support and observed development patterns.
             </p>
             <div className="home-hero-actions">
               <button className="button primary home-hero-button" type="button" onClick={onMap}>
-                Enter the Map <span aria-hidden="true">↗</span>
+                Explore Melbourne <span aria-hidden="true">↗</span>
               </button>
             </div>
           </div>
         </section>
+
+        <PlaceLayersStory onEnter={onMap} />
 
         <section className="home-insight" id="home-insight" aria-labelledby="home-insight-title">
           <div className="home-section-intro">
