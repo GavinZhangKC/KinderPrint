@@ -309,10 +309,11 @@ function choosePrimary(
     setProfileError(null)
 
     try {
-      const [profileResponse, priorityResponse, explanationResponse] = await Promise.all([
+      const [profileResponse, priorityResponse, explanationResponse, earlyChildhoodResponse] = await Promise.all([
         api.getProfile(id),
         api.getPriority(id),
         api.getExplanation(id),
+        api.getEarlyChildhoodContext(id),
       ])
       if (requestNumber !== profileRequestNumberRef.current) return
 
@@ -333,12 +334,14 @@ function choosePrimary(
           : null,
         explanationResponse.status === 'available' || explanationResponse.status === 'limited'
           ? explanationResponse.data : null,
+        earlyChildhoodResponse.status === 'available' || earlyChildhoodResponse.status === 'limited'
+          ? earlyChildhoodResponse.data : null,
         {
           metadata: profileResponse.metadata,
-          limitations: [profileResponse, priorityResponse, explanationResponse]
+          limitations: [profileResponse, priorityResponse, explanationResponse, earlyChildhoodResponse]
             .flatMap((response) => response.limitations)
             .map((item) => item.message),
-          notices: [profileResponse, priorityResponse, explanationResponse]
+          notices: [profileResponse, priorityResponse, explanationResponse, earlyChildhoodResponse]
             .flatMap((response) => response.notices)
             .map((item) => item.message)
             .filter((message) => message && message !== 'TBC'),

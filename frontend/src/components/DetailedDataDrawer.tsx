@@ -48,6 +48,15 @@ export default function DetailedDataDrawer({ neighbourhood, onClose, isActive, o
           <div className="drawer-metric"><span>Tree canopy</span><strong>{display(neighbourhood.treeCanopy, '%')}</strong></div>
           <div className="drawer-metric"><span>Public open space</span><strong>{display(neighbourhood.greenSpaceAccess, '%')}</strong></div>
         </section>
+        <section>
+          <h3>Early Childhood Services</h3>
+          <div className="drawer-metric"><span>Active education and care services</span><strong>{display(neighbourhood.activeEducationCareServices)}</strong></div>
+          <div className="drawer-metric"><span>Total approved places</span><strong>{display(neighbourhood.totalApprovedPlaces)}</strong></div>
+          <div className="drawer-metric"><span>Kindergarten services</span><strong>{display(neighbourhood.kindergartenServices)}</strong></div>
+          <div className="drawer-metric"><span>Long day care services</span><strong>{display(neighbourhood.longDayCareServices)}</strong></div>
+          <div className="drawer-metric"><span>Services with a current rating</span><strong>{display(neighbourhood.serviceRatingCoverage, '%')}</strong></div>
+          <small>Accepted Open G-NAF matches only. These counts do not measure accessibility or service quality.</small>
+        </section>
         <section className="drawer-info">
           <h3>Data Information</h3>
           <p>{neighbourhood.sources.join(' · ')}</p>
