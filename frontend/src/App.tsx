@@ -23,7 +23,9 @@ import { api } from './services/api'
 import { toNeighbourhood } from './services/profileAdapter'
 
 import type {
+  EnvironmentalDifference,
   NeighbourhoodComparison,
+  OutcomeComparison,
 } from './services/api'
 
 import type {
@@ -58,6 +60,8 @@ const [view, setView] =
     useState<Neighbourhood | null>(null)
   const [comparisonResult, setComparisonResult] =
     useState<NeighbourhoodComparison | null>(null)
+  const [outcomeComparison, setOutcomeComparison] = useState<OutcomeComparison | null>(null)
+  const [environmentalDifference, setEnvironmentalDifference] = useState<EnvironmentalDifference | null>(null)
   const [compareLoading, setCompareLoading] = useState(false)
   const [compareError, setCompareError] = useState<string | null>(null)
   const [comparisonLimitations, setComparisonLimitations] =
@@ -230,6 +234,8 @@ function resetComparisonState() {
     setIsMapSelectionMode(false)
     setComparison(null)
     setComparisonResult(null)
+    setOutcomeComparison(null)
+    setEnvironmentalDifference(null)
     setCompareError(null)
     setCompareLoading(false)
     setComparisonLimitations([])
@@ -398,15 +404,30 @@ function startComparison() {
     try {
       setCompareLoading(true)
       setCompareError(null)
-      const response = await api.compare(selected.id, comparison.id)
+      const [comparisonRequest, outcomeRequest, environmentRequest] = await Promise.allSettled([
+        api.compare(selected.id, comparison.id),
+        api.compareOutcomes(selected.id, comparison.id),
+        api.compareEnvironment(selected.id, comparison.id),
+      ])
       if (requestNumber !== compareRequestNumberRef.current) {
         return
       }
+      if (comparisonRequest.status === 'rejected') throw comparisonRequest.reason
+      const response = comparisonRequest.value
       if (response.status !== 'available' && response.status !== 'limited') {
         throw new Error(response.limitations[0]?.message ?? 'No approved comparison is available for these neighbourhoods.')
       }
       setComparisonResult(response.data)
-      setComparisonLimitations(response.limitations.map((item) => item.message))
+      const usable = (status: string) => status === 'available' || status === 'limited'
+      setOutcomeComparison(outcomeRequest.status === 'fulfilled' && usable(outcomeRequest.value.status)
+        ? outcomeRequest.value.data : null)
+      setEnvironmentalDifference(environmentRequest.status === 'fulfilled' && usable(environmentRequest.value.status)
+        ? environmentRequest.value.data : null)
+      setComparisonLimitations([
+        ...response.limitations,
+        ...(outcomeRequest.status === 'fulfilled' ? outcomeRequest.value.limitations : []),
+        ...(environmentRequest.status === 'fulfilled' ? environmentRequest.value.limitations : []),
+      ].map((item) => item.message).filter((message, index, messages) => messages.indexOf(message) === index))
       setView('comparison')
       window.scrollTo({ top: 0, behavior: 'smooth' })
     } catch (error) {
@@ -415,6 +436,8 @@ function startComparison() {
       }
       console.error('Failed to compare neighbourhoods:', error)
       setComparisonResult(null)
+      setOutcomeComparison(null)
+      setEnvironmentalDifference(null)
       setComparisonLimitations([])
       setCompareError(error instanceof Error ? error.message : 'Could not load this comparison.')
     } finally {
@@ -483,6 +506,8 @@ if (
 
         <DetailedComparison
           comparisonResult={comparisonResult}
+          outcomeComparison={outcomeComparison}
+          environmentalDifference={environmentalDifference}
           limitations={comparisonLimitations}
           onBack={() => handleCloseCompare('profile')}
         />
