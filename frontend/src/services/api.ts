@@ -1,6 +1,7 @@
 export type ApiStatus =
   | 'available'
   | 'missing'
+  | 'suppressed'
   | 'incompatible'
   | 'unavailable'
   | 'limited'
@@ -184,6 +185,51 @@ export interface NeighbourhoodComparison {
   match_strength: string | null
 }
 
+export interface ComparisonValue {
+  value: number | null
+  status: ApiStatus | string
+}
+
+export interface ApprovedComparisonIndicator {
+  id: string
+  name: string
+  unit: string
+  source: string
+  reference_year: string | number
+  geographic_unit: string
+  neighbourhood_a: ComparisonValue
+  neighbourhood_b: ComparisonValue
+  approved_difference: ComparisonValue
+}
+
+export interface OutcomeComparison {
+  neighbourhood_a: NeighbourhoodSearchResult
+  neighbourhood_b: NeighbourhoodSearchResult
+  outcome_indicators: ApprovedComparisonIndicator[]
+}
+
+export interface EnvironmentalDifference {
+  neighbourhood_a: NeighbourhoodSearchResult
+  neighbourhood_b: NeighbourhoodSearchResult
+  environmental_indicators: ApprovedComparisonIndicator[]
+  approved_standout_indicator_ids: string[]
+}
+
+export interface EarlyChildhoodContext {
+  neighbourhood_id: string
+  neighbourhood_name: string
+  active_education_care_services: number
+  exact_match_services: number
+  high_confidence_match_services: number
+  services_with_approved_places: number
+  total_approved_places: number
+  long_day_care_services: number
+  kindergarten_services: number
+  services_with_current_rating: number
+  rating_coverage_pct: number | null
+  status: 'aggregate_context'
+}
+
 export interface SuitableLocality {
   id: string
   name: string
@@ -331,6 +377,27 @@ export const api = {
       )}&neighbourhood_id_b=${encodeURIComponent(
         b,
       )}`,
+    ),
+  compareOutcomes: (
+    a: string,
+    b: string,
+  ) =>
+    request<OutcomeComparison>(
+      `/api/outcome-comparison?neighbourhood_id_a=${encodeURIComponent(a)}&neighbourhood_id_b=${encodeURIComponent(b)}`,
+    ),
+  compareEnvironment: (
+    a: string,
+    b: string,
+  ) =>
+    request<EnvironmentalDifference>(
+      `/api/environmental-difference?neighbourhood_id_a=${encodeURIComponent(a)}&neighbourhood_id_b=${encodeURIComponent(b)}`,
+    ),
+  getEarlyChildhoodContext: (
+    id: string,
+    signal?: AbortSignal,
+  ) =>
+    request<EarlyChildhoodContext>(
+      `/api/neighbourhoods/${encodeURIComponent(id)}/early-childhood-services`, signal,
     ),
   getSuitableLocalities: (
     criteria: string[],
