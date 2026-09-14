@@ -47,7 +47,7 @@ interface NeighbourhoodMapProps {
 
   focusId?: string | null
 
-  comparisonId?: string | null
+  comparisonIds?: string[]
 
   compareMode?: boolean
   selectionEnabled?: boolean
@@ -216,7 +216,7 @@ export default function NeighbourhoodMap({
   preference,
   selectedId,
   focusId,
-  comparisonId,
+  comparisonIds = [],
   compareMode = false,
   onSelect,
   selectionEnabled = true,
@@ -242,10 +242,10 @@ const selectedIdRef =
       string | null
     >(selectedId)
 
-  const comparisonIdRef =
+  const comparisonIdsRef =
     useRef<
-      string | null | undefined
-    >(comparisonId)
+      string[]
+    >(comparisonIds)
 
   const onSelectRef =
     useRef(onSelect)
@@ -284,8 +284,8 @@ const requestNumberRef =
   selectedIdRef.current =
     selectedId
 
-  comparisonIdRef.current =
-    comparisonId
+  comparisonIdsRef.current =
+    comparisonIds
 
   onSelectRef.current =
     onSelect
@@ -767,7 +767,7 @@ map.addSource(
 
           filter:
             selectionFilter(
-              comparisonIdRef.current,
+              comparisonIdsRef.current,
             ),
 
           paint: {
@@ -1131,12 +1131,12 @@ useEffect(() => {
         COMPARISON_LAYER_ID,
 
         selectionFilter(
-          comparisonId,
+          comparisonIds,
         ),
       )
     }
   }, [
-    comparisonId,
+    comparisonIds,
   ])
 // Focus map after search
   useEffect(() => {

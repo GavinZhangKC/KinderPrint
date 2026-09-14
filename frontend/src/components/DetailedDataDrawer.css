@@ -54,6 +54,15 @@
 .drawer-metric-provenance p { margin: 6px 0 0; line-height: 1.4; }
 .drawer-metric-provenance .evidence-limitation { color: #8a6a44; }
 .drawer-metric-provenance .evidence-notice { color: #71809a; }
+.drawer-section-state { margin: 0; padding: 12px 0; border-top: 1px solid rgba(113,137,176,.16); color: #7e8ca6; font-size: 11px; line-height: 1.5; }
+.drawer-section-intro { margin: 0 0 8px; color: #7e8ca6; font-size: 10px; line-height: 1.5; }
+.population-projection-list { border-top: 1px solid rgba(113,137,176,.16); }
+.population-projection-year { display: grid; grid-template-columns: 54px minmax(0, 1fr); gap: 12px; padding: 14px 0; border-bottom: 1px solid rgba(113,137,176,.16); }
+.population-projection-year > strong { color: #4f6690; font-size: 13px; }
+.population-projection-year dl { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px 14px; margin: 0; }
+.population-projection-year dl div { display: flex; min-width: 0; justify-content: space-between; gap: 8px; }
+.population-projection-year dt { color: #7e8ca6; font-size: 10px; }
+.population-projection-year dd { margin: 0; color: #3d567d; font-size: 11px; font-weight: 700; white-space: nowrap; }
 .drawer-info p { margin: 5px 0; font-size: 11px; color: var(--muted); }.drawer-info small { display: block; margin-top: 12px; line-height: 1.5; color: #7e8ca6; }
 
 .data-drawer.page-enter { animation: drawer-enter 360ms cubic-bezier(.22, 1, .36, 1) both; }

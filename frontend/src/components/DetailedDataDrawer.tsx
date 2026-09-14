@@ -1,6 +1,12 @@
 import { useEffect, useRef } from 'react'
 import { indicatorStatusLabel } from '../services/profileAdapter'
 import type { IndicatorProvenance, Neighbourhood } from '../types/neighbourhood'
+import ActiveLivingSection from './detailed-data/ActiveLivingSection'
+import EarlyChildhoodServicesSection from './detailed-data/EarlyChildhoodServicesSection'
+import EvidenceSection from './detailed-data/EvidenceSection'
+import IndustrialContextSection from './detailed-data/IndustrialContextSection'
+import PopulationOutlookSection from './detailed-data/PopulationOutlookSection'
+import TrafficContextSection from './detailed-data/TrafficContextSection'
 
 interface DetailedDataDrawerProps {
   neighbourhood: Neighbourhood
@@ -13,42 +19,21 @@ function display(value: number | null, suffix = '') {
   return value === null ? 'Not available' : `${value}${suffix}`
 }
 
-function isUserFacingEvidenceMessage(message: string) {
-  return !/(environment variable|file path|\.json\b|configured|configuration|backend|KINDERPRINT_)/i.test(message)
-}
-
 function IndicatorProvenanceDetails({ details }: { details?: IndicatorProvenance }) {
   if (!details) return null
 
-  const limitations = details.limitations.filter(isUserFacingEvidenceMessage)
-  const notices = details.notices.filter(isUserFacingEvidenceMessage)
-  const hasEvidence = Boolean(
-    details.status
-    || details.source
-    || details.referenceYear !== null
-    || details.geographicUnit
-    || details.dataQuality
-    || limitations.length
-    || notices.length,
-  )
-
-  if (!hasEvidence) return null
-
   return (
-    <details className="drawer-evidence">
-      <summary><span>Evidence</span></summary>
-      <div className="drawer-metric-provenance">
-        <dl>
-          {details.source && <div><dt>Source</dt><dd>{details.source}</dd></div>}
-          {details.referenceYear !== null && <div><dt>Reference year</dt><dd>{details.referenceYear}</dd></div>}
-          {details.geographicUnit && <div><dt>Geographic unit</dt><dd>{details.geographicUnit}</dd></div>}
-          {details.status && <div><dt>Data status</dt><dd>{indicatorStatusLabel(details.status)}</dd></div>}
-          {details.dataQuality && <div><dt>Data quality</dt><dd>{details.dataQuality}</dd></div>}
-        </dl>
-        {limitations.map((message) => <p className="evidence-limitation" key={message}>{message}</p>)}
-        {notices.map((message) => <p className="evidence-notice" key={message}>{message}</p>)}
-      </div>
-    </details>
+    <EvidenceSection
+      items={[
+        { label: 'Source', value: details.source },
+        { label: 'Reference year', value: details.referenceYear },
+        { label: 'Geographic unit', value: details.geographicUnit },
+        { label: 'Data status', value: details.status ? indicatorStatusLabel(details.status) : null },
+        { label: 'Data quality', value: details.dataQuality },
+      ]}
+      limitations={details.limitations}
+      notices={details.notices}
+    />
   )
 }
 
@@ -88,6 +73,11 @@ export default function DetailedDataDrawer({ neighbourhood, onClose, isActive, o
           <div className="drawer-metric"><span>Tree canopy</span><strong>{display(neighbourhood.treeCanopy, '%')}</strong><IndicatorProvenanceDetails details={neighbourhood.indicatorProvenance.env_vegetation_cover} /></div>
           <div className="drawer-metric"><span>Public open space</span><strong>{display(neighbourhood.greenSpaceAccess, '%')}</strong><IndicatorProvenanceDetails details={neighbourhood.indicatorProvenance.env_open_space_access} /></div>
         </section>
+        <ActiveLivingSection neighbourhood={neighbourhood} />
+        <TrafficContextSection neighbourhoodId={neighbourhood.id} />
+        <IndustrialContextSection neighbourhoodId={neighbourhood.id} />
+        <EarlyChildhoodServicesSection neighbourhoodId={neighbourhood.id} />
+        <PopulationOutlookSection neighbourhoodId={neighbourhood.id} />
         <section className="drawer-info">
           <h3>Data Information</h3>
           <p>{neighbourhood.sources.join(' · ')}</p>

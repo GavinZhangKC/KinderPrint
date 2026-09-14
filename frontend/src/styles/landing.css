@@ -17,6 +17,7 @@ html:has(.home-page) body::-webkit-scrollbar {
 }
 
 .landing-page {
+  --home-section-inline: clamp(28px, 7vw, 108px);
   position: relative;
   z-index: auto;
   isolation: auto;
@@ -57,7 +58,7 @@ html:has(.home-page) body::-webkit-scrollbar {
   z-index: 50;
   top: 20px;
   left: 50%;
-  width: min(1440px, calc(100vw - 48px));
+  width: calc(100vw - 48px);
   height: 76px;
   padding: 0 30px 0 20px;
   border-radius: 24px;
@@ -65,8 +66,8 @@ html:has(.home-page) body::-webkit-scrollbar {
   align-items: center;
   justify-content: space-between;
   transform: translateX(-50%);
-  background: rgba(255, 255, 255, .42);
-  box-shadow: 0 12px 36px rgba(51, 82, 140, .11);
+  background: rgba(255, 255, 255, .34);
+  box-shadow: 0 12px 36px rgba(51, 82, 140, .07);
 }
 
 .home-brand {
@@ -103,13 +104,13 @@ html:has(.home-page) body::-webkit-scrollbar {
   border: 0;
   background: transparent;
   color: inherit;
-  text-shadow: 0 1px 12px rgba(255, 255, 255, .3), 0 0 3px rgba(255, 255, 255, .16);
+  text-shadow: 0 1px 12px rgba(255, 255, 255, .2), 0 0 3px rgba(255, 255, 255, .1);
   cursor: pointer;
   transition: color .2s ease;
 }
 
 .home-brand {
-  text-shadow: 0 1px 12px rgba(255, 255, 255, .3), 0 0 3px rgba(255, 255, 255, .16);
+  text-shadow: 0 1px 12px rgba(255, 255, 255, .2), 0 0 3px rgba(255, 255, 255, .1);
 }
 
 .home-nav button:hover,
@@ -144,7 +145,7 @@ html:has(.home-page) body::-webkit-scrollbar {
 .home-insight,
 .home-about,
 .home-explore {
-  width: min(1440px, 100%);
+  width: 100%;
   margin: 0 auto;
   scroll-margin-top: 116px;
 }
@@ -152,8 +153,6 @@ html:has(.home-page) body::-webkit-scrollbar {
 .home-hero {
   position: sticky;
   top: 0;
-  z-index: 1;
-  isolation: isolate;
   overflow: hidden;
   min-height: 100svh;
   display: flex;
@@ -173,14 +172,14 @@ html:has(.home-page) body::-webkit-scrollbar {
   inset: 0;
   z-index: 1;
   background:
-    linear-gradient(90deg, rgba(239, 246, 255, .68) 0%, rgba(239, 246, 255, .56) 45%, rgba(239, 246, 255, 0) 100%),
-    linear-gradient(180deg, rgba(255, 255, 255, 0), rgba(225, 237, 255, .26));
+    linear-gradient(90deg, rgba(239, 246, 255, .58) 0%, rgba(239, 246, 255, .46) 45%, rgba(239, 246, 255, 0) 100%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0), rgba(225, 237, 255, .2));
   pointer-events: none;
 }
 
 .home-hero-copy {
   position: relative;
-  z-index: 2;
+  z-index: 4;
   max-width: 1120px;
 }
 
@@ -225,7 +224,7 @@ html:has(.home-page) body::-webkit-scrollbar {
 .home-hero h1,
 .landing-subheading,
 .landing-copy {
-  text-shadow: 0 1px 14px rgba(255, 255, 255, .5), 0 0 4px rgba(255, 255, 255, .3);
+  text-shadow: 0 1px 14px rgba(255, 255, 255, .34), 0 0 4px rgba(255, 255, 255, .18);
 }
 
 .home-hero-actions {
@@ -271,9 +270,9 @@ html:has(.home-page) body::-webkit-scrollbar {
   position: relative;
   z-index: auto;
   min-height: 105svh;
-  padding: clamp(130px, 17vh, 190px) clamp(28px, 7vw, 108px);
+  padding: clamp(130px, 17vh, 190px) var(--home-section-inline);
   border-top: 1px solid rgba(109, 120, 232, .16);
-  background: #fff;
+  background: rgba(255, 255, 255, .9);
   box-shadow: 0 -18px 44px rgba(51, 82, 140, .08);
   display: grid;
   grid-template-columns: minmax(0, 1.15fr) minmax(330px, .85fr);
@@ -376,9 +375,9 @@ html:has(.home-page) body::-webkit-scrollbar {
   position: relative;
   z-index: auto;
   min-height: 100svh;
-  padding: clamp(140px, 18vh, 210px) clamp(28px, 7vw, 108px);
+  padding: clamp(140px, 18vh, 210px) var(--home-section-inline);
   border-top: 0;
-  background: #fff;
+  background: rgba(255, 255, 255, .9);
   display: grid;
   grid-template-columns: minmax(180px, .42fr) minmax(0, 1.3fr);
   gap: clamp(60px, 10vw, 160px);
@@ -419,9 +418,9 @@ html:has(.home-page) body::-webkit-scrollbar {
   position: relative;
   z-index: auto;
   min-height: 100svh;
-  padding: clamp(140px, 18vh, 210px) clamp(28px, 7vw, 108px);
+  padding: clamp(140px, 18vh, 210px) var(--home-section-inline);
   border-top: 0;
-  background: #fff;
+  background: rgba(255, 255, 255, .9);
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -452,21 +451,21 @@ html:has(.home-page) body::-webkit-scrollbar {
   background:
     radial-gradient(circle at 18% 24%, rgba(169, 160, 255, .34), transparent 34%),
     radial-gradient(circle at 84% 54%, rgba(105, 202, 255, .3), transparent 36%),
-    linear-gradient(135deg, #e8edff 0%, #def2ff 52%, #e3eaff 100%);
+    linear-gradient(135deg, rgba(232, 237, 255, .9) 0%, rgba(222, 242, 255, .9) 52%, rgba(227, 234, 255, .9) 100%);
 }
 
 .home-about::before {
   background:
     radial-gradient(circle at 78% 24%, rgba(169, 160, 255, .33), transparent 34%),
     radial-gradient(circle at 16% 72%, rgba(105, 202, 255, .29), transparent 35%),
-    linear-gradient(145deg, #e1efff 0%, #e8ebff 50%, #dcf1ff 100%);
+    linear-gradient(145deg, rgba(225, 239, 255, .9) 0%, rgba(232, 235, 255, .9) 50%, rgba(220, 241, 255, .9) 100%);
 }
 
 .home-explore::before {
   background:
     radial-gradient(circle at 22% 70%, rgba(169, 160, 255, .31), transparent 35%),
     radial-gradient(circle at 82% 30%, rgba(105, 202, 255, .32), transparent 34%),
-    linear-gradient(135deg, #e5eaff 0%, #dcf0ff 52%, #e2e9ff 100%);
+    linear-gradient(135deg, rgba(229, 234, 255, .9) 0%, rgba(220, 240, 255, .9) 52%, rgba(226, 233, 255, .9) 100%);
 }
 
 .home-explore h2 {
@@ -559,7 +558,7 @@ html:has(.home-page) body::-webkit-scrollbar {
   top: 0;
   right: 0;
   bottom: 0;
-  left: calc(0px - max(0px, (100vw - 1440px) / 2) - clamp(28px, 7vw, 108px));
+  left: calc(-1 * var(--home-section-inline));
   z-index: 1;
   overflow: hidden;
   pointer-events: none;
@@ -589,6 +588,76 @@ html:has(.home-page) body::-webkit-scrollbar {
 .home-explore-row-veil {
   background: linear-gradient(90deg, rgba(255, 255, 255, .04), rgba(255, 255, 255, .07) 72%, rgba(255, 255, 255, .10));
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, .56), inset 0 -1px 0 rgba(255, 255, 255, .4);
+}
+
+@media (min-width: 1600px) {
+  .landing-page {
+    --home-section-inline: clamp(108px, 7vw, 176px);
+  }
+
+  .home-header {
+    top: 24px;
+    width: calc(100vw - 64px);
+    height: 82px;
+    padding-inline: 26px 38px;
+  }
+
+  .home-brand {
+    font-size: 32px;
+  }
+
+  .home-brand img {
+    width: 62px;
+    height: 62px;
+  }
+
+  .home-nav {
+    font-size: 16px;
+  }
+
+  .home-hero {
+    padding-inline: clamp(92px, 7vw, 176px);
+  }
+
+  .home-hero-copy {
+    max-width: 1280px;
+  }
+
+  .home-hero h1 {
+    max-width: 1240px;
+    font-size: clamp(108px, 6.25vw, 132px);
+  }
+
+  .landing-subheading {
+    font-size: clamp(24px, 1.3vw, 28px);
+  }
+
+  .landing-copy {
+    max-width: 780px;
+    font-size: clamp(22px, 1.2vw, 25px);
+  }
+
+  .home-section-intro h2,
+  .home-about h2 {
+    font-size: clamp(78px, 4.5vw, 96px);
+  }
+
+  .home-section-intro > p:last-child,
+  .home-about-copy > p:not(.home-section-kicker) {
+    font-size: clamp(20px, 1.15vw, 24px);
+  }
+
+  .home-insight {
+    column-gap: clamp(140px, 9vw, 220px);
+  }
+
+  .home-explore h2 {
+    font-size: clamp(86px, 4.8vw, 104px);
+  }
+
+  .home-explore-nav {
+    width: min(1080px, 68vw);
+  }
 }
 
 @media (max-width: 900px) {

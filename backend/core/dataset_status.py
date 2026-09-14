@@ -10,6 +10,7 @@ from core.data_loader import (
     EPA_STATION_YEAR_DATA_PATH_ENV,
     ENVIRONMENTAL_DIFFERENCE_DATA_PATH_ENV,
     OUTCOME_COMPARISON_DATA_PATH_ENV,
+    PATTERN_INSIGHT_DATA_PATH_ENV,
     PROFILE_DATA_PATH_ENV,
     VIF_PROJECTION_DATA_PATH_ENV,
     acecqa_context_data_path,
@@ -18,6 +19,7 @@ from core.data_loader import (
     epa_station_year_data_path,
     environmental_difference_data_path,
     outcome_comparison_data_path,
+    pattern_insight_data_path,
     profile_data_path,
     vif_projection_data_path,
 )
@@ -67,6 +69,16 @@ def dataset_statuses() -> list[dict[str, Any]]:
             "configuration_variable": ENVIRONMENTAL_DIFFERENCE_DATA_PATH_ENV,
             "user_facing": True,
             "boundary": "Only complete harmonised pairs are published; association is not causation.",
+        },
+        {
+            "id": "pattern_insights",
+            "role": "approved_pair_pattern_insight",
+            "geographic_unit": "KinderPrint reporting locality pair",
+            "interpretation_status": "approved_output_required",
+            "configured": _configured(pattern_insight_data_path()),
+            "configuration_variable": PATTERN_INSIGHT_DATA_PATH_ENV,
+            "user_facing": True,
+            "boundary": "Only explicitly approved patterns may be published; association is not causation.",
         },
         {
             "id": "declared_road_and_industrial_context",

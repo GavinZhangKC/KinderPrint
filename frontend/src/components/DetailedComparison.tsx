@@ -3,14 +3,14 @@ import type {
   ApiStatus,
   ApprovedComparisonIndicator,
   EnvironmentalDifference,
-  NeighbourhoodComparison,
+  MultiNeighbourhoodComparison,
   OutcomeComparison,
   PatternInsight,
   PatternInsightItem,
 } from '../services/api'
 
 interface DetailedComparisonProps {
-  comparisonResult: NeighbourhoodComparison
+  comparisonResult: MultiNeighbourhoodComparison
   limitations: string[]
   outcomeComparison: ApiEnvelope<OutcomeComparison> | null
   outcomeError: string | null
@@ -27,6 +27,7 @@ const statusLabels: Record<string, string> = {
   unavailable: 'Unavailable',
   missing: 'Data missing',
   incompatible: 'Incompatible',
+  suppressed: 'Suppressed',
   no_pattern: 'No pattern',
 }
 
@@ -141,7 +142,7 @@ function ApprovedComparisonSection({
   )
 }
 
-function isUserFacingPatternMessage(message: string) {
+function isUserFacingMessage(message: string) {
   return !/(environment variable|file path|\.json\b|configured|configuration|backend|KINDERPRINT_)/i.test(message)
 }
 
@@ -213,9 +214,10 @@ function PatternInsightSection({
   const limitations = (response?.limitations ?? [])
     .filter((item) => !/_dataset_(not_configured|unavailable|unreadable|invalid)$/.test(item.code))
     .map((item) => item.message)
-    .filter(isUserFacingPatternMessage)
+    .filter(isUserFacingMessage)
   const canRenderPatterns = (status === 'available' || status === 'limited') && patterns.length > 0
-  const stateMessage = error ?? (
+  const userFacingError = error && isUserFacingMessage(error) ? error : null
+  const stateMessage = userFacingError ?? (
     status === 'no_pattern'
       ? 'No supported pattern is available for this comparison.'
       : status === 'incompatible'
@@ -300,8 +302,10 @@ export default function DetailedComparison({
   patternError,
   onBack,
 }: DetailedComparisonProps) {
-  const source = comparisonResult.source_neighbourhood
-  const compared = comparisonResult.comparison_neighbourhood
+  const localities = comparisonResult.neighbourhoods
+  const source = localities[0]
+  const compared = localities[1]
+  const isPairComparison = localities.length === 2
   const outcomePairMatches = outcomeComparison?.data?.neighbourhood_a?.id === source.id
     && outcomeComparison?.data?.neighbourhood_b?.id === compared.id
   const environmentalPairMatches = environmentalDifference?.data?.neighbourhood_a?.id === source.id
@@ -315,12 +319,19 @@ export default function DetailedComparison({
         <div>
           <button className="text-back" type="button" onClick={onBack}>← Back to map</button>
           <h1>Detailed Comparison</h1>
-          <h2>{source.name} <span>vs</span> {compared.name}</h2>
+          <h2 className="comparison-locality-heading">
+            {localities.map((locality, index) => (
+              <span key={locality.id}>
+                {index > 0 && <i aria-hidden="true">vs</i>}
+                {locality.name}
+              </span>
+            ))}
+          </h2>
           <p>Approved side-by-side indicators returned by the KinderPrint comparison API.</p>
         </div>
       </div>
 
-      <section className="glass comparison-section reveal-section">
+      {isPairComparison && <section className="glass comparison-section reveal-section">
         <span className="eyebrow">COMPARISON BASIS</span>
         <h3>Social and demographic matching measures</h3>
         {comparisonResult.similarity_basis.length > 0 ? (
@@ -328,8 +339,9 @@ export default function DetailedComparison({
         ) : (
           <p className="section-copy">No approved similarity basis is available.</p>
         )}
-      </section>
+      </section>}
 
+      {isPairComparison && <>
       <ApprovedComparisonSection
         eyebrow="CHILD DEVELOPMENT"
         title="Outcome comparison"
@@ -348,8 +360,13 @@ export default function DetailedComparison({
         comparedName={compared.name}
         status={environmentalPairMatches ? environmentalDifference?.status ?? null : null}
         indicators={environmentalPairMatches ? environmentalDifference?.data.environmental_indicators ?? [] : []}
-        limitations={environmentalDifference?.limitations.map((item) => item.message) ?? []}
-        unavailableMessage={environmentalError}
+        limitations={(environmentalDifference?.limitations ?? [])
+          .filter((item) => !/_dataset_(not_configured|unavailable|unreadable|invalid)$/.test(item.code))
+          .map((item) => item.message)
+          .filter(isUserFacingMessage)}
+        unavailableMessage={environmentalError && isUserFacingMessage(environmentalError)
+          ? environmentalError
+          : null}
         standoutIds={environmentalPairMatches ? environmentalDifference?.data.approved_standout_indicator_ids ?? [] : []}
       />
 
@@ -360,23 +377,35 @@ export default function DetailedComparison({
         pairMatches={patternPairMatches}
         error={patternError}
       />
+      </>}
 
       <section className="glass comparison-section reveal-section">
         <span className="eyebrow">SIDE-BY-SIDE INDICATORS</span>
         <h3>Approved comparison values</h3>
         {comparisonResult.side_by_side.length > 0 ? (
-          <div className="environment-comparison-grid">
+          <div className="environment-comparison-grid multi-comparison-grid">
             {comparisonResult.side_by_side.map((field) => (
-              <article className="glass-subtle environmental-compare-card" key={field.id}>
+              <article className="glass-subtle environmental-compare-card multi-comparison-card" key={field.id}>
                 <h4>{field.name}</h4>
-                <div className="compare-value-row">
-                  <span>{source.name}</span>
-                  <strong>{displayValue(field.source_value, field.source_status)}</strong>
-                </div>
-                <div className="compare-value-row">
-                  <span>{compared.name}</span>
-                  <strong>{displayValue(field.comparison_value, field.comparison_status)}</strong>
-                </div>
+                {field.values.map((item) => {
+                  const locality = localities.find((candidate) => candidate.id === item.neighbourhood_id)
+                  return (
+                    <div className="compare-value-row" key={item.neighbourhood_id}>
+                      <span className="comparison-value-label">
+                        {locality?.name ?? item.neighbourhood_id}
+                        <small>{statusLabels[item.status] ?? item.status}</small>
+                      </span>
+                      <strong>{displayComparisonValue(item.value, item.status, field.unit)}</strong>
+                    </div>
+                  )
+                })}
+                {(field.source || field.reference_year !== null || field.geographic_unit) && (
+                  <p className="approved-comparison-meta">
+                    {[field.source, field.reference_year, field.geographic_unit]
+                      .filter((item) => item !== null && item !== '')
+                      .join(' · ')}
+                  </p>
+                )}
               </article>
             ))}
           </div>

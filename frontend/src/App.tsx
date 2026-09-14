@@ -25,7 +25,7 @@ import { toNeighbourhood } from './services/profileAdapter'
 import type {
   ApiEnvelope,
   EnvironmentalDifference,
-  NeighbourhoodComparison,
+  MultiNeighbourhoodComparison,
   OutcomeComparison,
   PatternInsight,
 } from './services/api'
@@ -58,10 +58,10 @@ const [view, setView] =
   const [selected, setSelected] =
     useState<Neighbourhood | null>(null)
 
-  const [comparison, setComparison] =
-    useState<Neighbourhood | null>(null)
+  const [comparisons, setComparisons] =
+    useState<Neighbourhood[]>([])
   const [comparisonResult, setComparisonResult] =
-    useState<NeighbourhoodComparison | null>(null)
+    useState<MultiNeighbourhoodComparison | null>(null)
   const [compareLoading, setCompareLoading] = useState(false)
   const [compareError, setCompareError] = useState<string | null>(null)
   const [comparisonLimitations, setComparisonLimitations] =
@@ -241,7 +241,7 @@ const [
 function resetComparisonState() {
     compareRequestNumberRef.current += 1
     setIsMapSelectionMode(false)
-    setComparison(null)
+    setComparisons([])
     setComparisonResult(null)
     setCompareError(null)
     setCompareLoading(false)
@@ -301,7 +301,7 @@ function choosePrimary(
   ) {
     setSelected(neighbourhood)
 
-    setComparison(null)
+    setComparisons([])
 
     setSearch(neighbourhood.name)
 
@@ -322,10 +322,9 @@ function choosePrimary(
     setProfileError(null)
 
     try {
-      const [profileResponse, priorityResponse, explanationResponse] = await Promise.all([
+      const [profileResponse, priorityResponse] = await Promise.all([
         api.getProfile(id),
         api.getPriority(id),
-        api.getExplanation(id),
       ])
       if (requestNumber !== profileRequestNumberRef.current) return
 
@@ -344,16 +343,15 @@ function choosePrimary(
         priorityResponse.status === 'available' || priorityResponse.status === 'limited'
           ? priorityResponse.data
           : null,
-        explanationResponse.status === 'available' || explanationResponse.status === 'limited'
-          ? explanationResponse.data : null,
+        null,
         {
           metadata: profileResponse.metadata,
           profileLimitations: profileResponse.limitations,
           profileNotices: profileResponse.notices,
-          limitations: [profileResponse, priorityResponse, explanationResponse]
+          limitations: [profileResponse, priorityResponse]
             .flatMap((response) => response.limitations)
             .map((item) => item.message),
-          notices: [profileResponse, priorityResponse, explanationResponse]
+          notices: [profileResponse, priorityResponse]
             .flatMap((response) => response.notices)
             .map((item) => item.message)
             .filter((message) => message && message !== 'TBC'),
@@ -363,9 +361,17 @@ function choosePrimary(
       )
 
       if (view === 'compare-select' && selected) {
-        if (realNeighbourhood.id !== selected.id) {
-          setComparison(realNeighbourhood)
-        }
+        setComparisons((current) => {
+          if (
+            realNeighbourhood.id === selected.id
+            || current.some((item) => item.id === realNeighbourhood.id)
+            || current.length >= 3
+          ) {
+            return current
+          }
+
+          return [...current, realNeighbourhood]
+        })
         return
       }
 
@@ -373,10 +379,14 @@ function choosePrimary(
     } catch (error) {
       if (requestNumber !== profileRequestNumberRef.current) return
       console.error('Failed to load location profile:', error)
-      setSelected(null)
-      setComparison(null)
-      setView('map')
-      setProfileError(error instanceof Error ? error.message : 'Could not load this neighbourhood. Please try again.')
+      if (view === 'compare-select' && selected) {
+        setCompareError(error instanceof Error ? error.message : 'Could not add this neighbourhood.')
+      } else {
+        setSelected(null)
+        setComparisons([])
+        setView('map')
+        setProfileError(error instanceof Error ? error.message : 'Could not load this neighbourhood. Please try again.')
+      }
     }
   }
 function startComparison() {
@@ -409,7 +419,7 @@ function startComparison() {
   async function openComparisonResult() {
     if (
       !selected ||
-      !comparison
+      comparisons.length === 0
     ) {
       return
     }
@@ -428,40 +438,46 @@ function startComparison() {
       setPatternInsight(null)
       setPatternInsightError(null)
 
-      const [comparisonRequest, outcomeRequest, environmentRequest, patternRequest] = await Promise.allSettled([
-        api.compare(selected.id, comparison.id),
-        api.getOutcomeComparison(selected.id, comparison.id),
-        api.getEnvironmentalDifference(selected.id, comparison.id),
-        api.getPatternInsight(selected.id, comparison.id),
+      const selectedIds = [selected.id, ...comparisons.map((item) => item.id)]
+      const pairedLocality = comparisons.length === 1 ? comparisons[0] : null
+      const comparisonRequest = api.compare(selectedIds)
+      const advancedRequests = pairedLocality
+        ? Promise.allSettled([
+            api.getOutcomeComparison(selected.id, pairedLocality.id),
+            api.getEnvironmentalDifference(selected.id, pairedLocality.id),
+            api.getPatternInsight(selected.id, pairedLocality.id),
+          ])
+        : Promise.resolve(null)
+      const [response, advancedResults] = await Promise.all([
+        comparisonRequest,
+        advancedRequests,
       ])
       if (requestNumber !== compareRequestNumberRef.current) {
         return
       }
 
-      if (comparisonRequest.status === 'rejected') {
-        throw comparisonRequest.reason
-      }
-
-      const response = comparisonRequest.value
       if (response.status !== 'available' && response.status !== 'limited') {
         throw new Error(response.limitations[0]?.message ?? 'No approved comparison is available for these neighbourhoods.')
       }
       setComparisonResult(response.data)
       setComparisonLimitations(response.limitations.map((item) => item.message))
-      if (outcomeRequest.status === 'fulfilled') {
-        setOutcomeComparison(outcomeRequest.value)
-      } else {
-        setOutcomeComparisonError('Child development comparison data is currently unavailable.')
-      }
-      if (environmentRequest.status === 'fulfilled') {
-        setEnvironmentalDifference(environmentRequest.value)
-      } else {
-        setEnvironmentalDifferenceError('Environmental comparison data is currently unavailable.')
-      }
-      if (patternRequest.status === 'fulfilled') {
-        setPatternInsight(patternRequest.value)
-      } else {
-        setPatternInsightError('Pattern insight is currently unavailable.')
+      if (advancedResults) {
+        const [outcomeRequest, environmentRequest, patternRequest] = advancedResults
+        if (outcomeRequest.status === 'fulfilled') {
+          setOutcomeComparison(outcomeRequest.value)
+        } else {
+          setOutcomeComparisonError('Child development comparison data is currently unavailable.')
+        }
+        if (environmentRequest.status === 'fulfilled') {
+          setEnvironmentalDifference(environmentRequest.value)
+        } else {
+          setEnvironmentalDifferenceError('Environmental comparison data is currently unavailable.')
+        }
+        if (patternRequest.status === 'fulfilled') {
+          setPatternInsight(patternRequest.value)
+        } else {
+          setPatternInsightError('Pattern insight is currently unavailable.')
+        }
       }
       setView('comparison')
       window.scrollTo({ top: 0, behavior: 'smooth' })
@@ -521,7 +537,7 @@ if (appPage === 'landing') {
 if (
     view === 'comparison' &&
     selected &&
-    comparison &&
+    comparisons.length > 0 &&
     comparisonResult
   ) {
     return (
@@ -607,7 +623,7 @@ setMapSelectedId(null)
 
                   if (selected) {
                     setSelected(null)
-                    setComparison(null)
+                    setComparisons([])
                     setView('map')
                   }
                 }}
@@ -708,18 +724,26 @@ setMapSelectedId(null)
 
             focusId={mapFocusId}
 
-            comparisonId={
-              comparison?.id ??
-              null
-            }
+            comparisonIds={comparisons.map((item) => item.id)}
 
             compareMode={view === 'compare-select'}
 
             selectionEnabled={view !== 'compare-select' || isMapSelectionMode}
 
             onSelect={(id, name) => {
-              if (view === 'compare-select' && id === selected?.id) {
-                return
+              if (view === 'compare-select') {
+                if (id === selected?.id) return
+
+                if (comparisons.some((item) => item.id === id)) {
+                  setComparisons((current) => current.filter((item) => item.id !== id))
+                  setCompareError(null)
+                  return
+                }
+
+                if (comparisons.length >= 3) {
+                  setCompareError('You can compare up to four localities.')
+                  return
+                }
               }
 
               void handleMapSelect(id, name).then(() => {
@@ -791,9 +815,7 @@ setMapSelectedId(null)
               <ComparePanel
                 source={selected}
 
-                comparison={
-                  comparison
-                }
+                comparisons={comparisons}
 
                 onSelectResult={async (item) => {
                   await handleMapSelect(item.id, item.name, false)
@@ -806,8 +828,8 @@ setMapSelectedId(null)
                   setIsMapSelectionMode((enabled) => !enabled)
                 }}
 
-                onClearComparison={() => {
-                  setComparison(null)
+                onDeselectResult={(id) => {
+                  setComparisons((current) => current.filter((item) => item.id !== id))
                   setCompareError(null)
                 }}
 
