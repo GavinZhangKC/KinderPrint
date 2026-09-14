@@ -1,13 +1,13 @@
-"""Runtime validation summary for configured backend datasets."""
+"""Core runtime-readiness checks for configured backend datasets."""
 
 from typing import Any
 
-from air_quality import load_station_year_observations
-from community_context import load_community_context
-from early_childhood import load_early_childhood_context
+from loaders.air_quality import load_station_year_observations
+from loaders.community_context import load_community_context
+from loaders.early_childhood import load_early_childhood_context
 from geography import load_boundary_features
-from geocoding_quality import load_geocoding_quality
-from population import load_population_projections
+from loaders.geocoding_quality import load_geocoding_quality
+from loaders.population import load_population_projections
 from validation import (
     load_comparison_data, load_environmental_differences, load_explanations,
     load_outcome_comparisons, load_priority_results, load_profiles,

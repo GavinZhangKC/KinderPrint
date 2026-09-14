@@ -1,11 +1,11 @@
-"""Configuration and generic approved JSON source loading."""
+"""Core configuration and generic approved JSON source loading."""
 
 import json
 import os
 from pathlib import Path
 from typing import Any
 
-from responses import limitation
+from core.responses import limitation
 
 BOUNDARY_DATA_PATH_ENV = "KINDERPRINT_BOUNDARY_DATA_PATH"
 PROFILE_DATA_PATH_ENV = "KINDERPRINT_PROFILE_DATA_PATH"

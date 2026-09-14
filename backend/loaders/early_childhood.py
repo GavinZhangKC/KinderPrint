@@ -1,4 +1,4 @@
-"""Validated locality aggregates from accepted ACECQA/Open G-NAF matches."""
+"""Load validated locality aggregates from accepted ACECQA/Open G-NAF matches."""
 
 import csv
 from functools import lru_cache
@@ -6,8 +6,8 @@ import math
 from pathlib import Path
 from typing import Any
 
-from data_loader import ACECQA_CONTEXT_DATA_PATH_ENV, acecqa_context_data_path
-from responses import limitation
+from core.data_loader import ACECQA_CONTEXT_DATA_PATH_ENV, acecqa_context_data_path
+from core.responses import limitation
 
 COUNT_FIELDS = {
     "active_education_care_services", "exact_match_services",

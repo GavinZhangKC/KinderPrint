@@ -1,4 +1,4 @@
-"""Validated access to VIF SA2 child-population projections."""
+"""Load validated VIF SA2 child-population projections."""
 
 import csv
 from functools import lru_cache
@@ -6,8 +6,8 @@ import math
 from pathlib import Path
 from typing import Any
 
-from data_loader import VIF_PROJECTION_DATA_PATH_ENV, vif_projection_data_path
-from responses import limitation
+from core.data_loader import VIF_PROJECTION_DATA_PATH_ENV, vif_projection_data_path
+from core.responses import limitation
 
 REQUIRED_FIELDS = {
     "sa2_code_2021", "sa2_name_2021", "projection_year", "sex",

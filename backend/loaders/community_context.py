@@ -1,4 +1,4 @@
-"""Validated traffic and industrial context for KinderPrint reporting localities."""
+"""Load validated traffic and industrial reporting-locality context."""
 
 import csv
 from functools import lru_cache
@@ -6,13 +6,13 @@ import math
 from pathlib import Path
 from typing import Any
 
-from data_loader import (
+from core.data_loader import (
     COMMUNITY_CONTEXT_DATA_PATH_ENV,
     COMMUNITY_IDENTITY_DATA_PATH_ENV,
     community_context_data_path,
     community_identity_data_path,
 )
-from responses import limitation
+from core.responses import limitation
 
 TRAFFIC_FIELDS = (
     "declared_road_km",

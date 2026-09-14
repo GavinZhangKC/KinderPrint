@@ -1,4 +1,4 @@
-"""Validated station-level access to published EPA historical observations."""
+"""Load validated station-level EPA historical observations."""
 
 import csv
 from functools import lru_cache
@@ -6,8 +6,8 @@ import math
 from pathlib import Path
 from typing import Any
 
-from data_loader import EPA_STATION_YEAR_DATA_PATH_ENV, epa_station_year_data_path
-from responses import limitation
+from core.data_loader import EPA_STATION_YEAR_DATA_PATH_ENV, epa_station_year_data_path
+from core.responses import limitation
 
 REQUIRED_FIELDS = {
     "year", "station_id", "station_name", "pollutant", "unit", "method_code",

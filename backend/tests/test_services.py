@@ -4,7 +4,7 @@ from pathlib import Path
 
 import pytest
 
-from data_loader import (
+from core.data_loader import (
     COMPARISON_DATA_PATH_ENV,
     ENVIRONMENTAL_DIFFERENCE_DATA_PATH_ENV,
     EXPLANATION_DATA_PATH_ENV,

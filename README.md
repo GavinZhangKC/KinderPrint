@@ -28,6 +28,18 @@ The backend listens on all network interfaces. It is available locally at
 `http://127.0.0.1:8000`, or from another device at
 `http://<this-computer-LAN-IP>:8000`.
 
+### Backend structure
+
+```text
+backend/
+├── core/          # Configuration, response envelopes and readiness checks
+├── loaders/       # Validated readers for approved runtime datasets
+├── tests/         # Backend and deployment tests
+├── main.py        # FastAPI routes and Lambda entry point
+├── geography.py   # Boundary validation and spatial filtering
+└── validation.py  # Analytical artefact validation and response projection
+```
+
 The frontend calls `/api` on its own origin and Vite proxies those requests to
 the backend, so LAN clients do not need a separate API URL or permissive CORS
 configuration. If Windows Firewall prompts for Python or Node.js access, allow

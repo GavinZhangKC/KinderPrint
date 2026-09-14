@@ -2,9 +2,9 @@ import json
 from collections import Counter
 from pathlib import Path
 
-from air_quality import _load_station_year_observations, load_station_year_observations
-from community_context import _load_community_context, _load_community_identities
-from data_loader import (
+from loaders.air_quality import _load_station_year_observations, load_station_year_observations
+from loaders.community_context import _load_community_context, _load_community_identities
+from core.data_loader import (
     ACECQA_CONTEXT_DATA_PATH_ENV,
     ACECQA_GEOCODING_DATA_PATH_ENV,
     BOUNDARY_DATA_PATH_ENV,
@@ -15,9 +15,9 @@ from data_loader import (
     SUITABILITY_DATA_PATH_ENV,
     VIF_PROJECTION_DATA_PATH_ENV,
 )
-from early_childhood import _load_early_childhood_context, load_early_childhood_context
-from geocoding_quality import _load_geocoding_quality, load_geocoding_quality
-from population import _load_population_projections, load_population_projections
+from loaders.early_childhood import _load_early_childhood_context, load_early_childhood_context
+from loaders.geocoding_quality import _load_geocoding_quality, load_geocoding_quality
+from loaders.population import _load_population_projections, load_population_projections
 from validation import (
     load_comparison_data,
     load_explanations,

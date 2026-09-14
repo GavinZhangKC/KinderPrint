@@ -4,7 +4,7 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Any
 
-from data_loader import (
+from core.data_loader import (
     COMPARISON_DATA_PATH_ENV,
     ENVIRONMENTAL_DIFFERENCE_DATA_PATH_ENV,
     EXPLANATION_DATA_PATH_ENV,
@@ -25,7 +25,8 @@ from data_loader import (
     profile_data_path,
     suitability_data_path,
 )
-from responses import INDICATOR_STATUSES, PRIORITY_DOMAINS, limitation
+from core.responses import INDICATOR_STATUSES, PRIORITY_DOMAINS, limitation
+
 
 def valid_indicator(indicator: Any, profile_unit: str) -> bool:
     """Accept only source-supplied indicators with explicit provenance and status."""

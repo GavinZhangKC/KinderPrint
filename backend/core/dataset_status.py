@@ -1,9 +1,9 @@
-"""Public readiness metadata for Iteration 2 data products."""
+"""Core public-readiness metadata for Iteration 2 data products."""
 
 from pathlib import Path
 from typing import Any
 
-from data_loader import (
+from core.data_loader import (
     ACECQA_CONTEXT_DATA_PATH_ENV,
     ACECQA_GEOCODING_DATA_PATH_ENV,
     COMMUNITY_CONTEXT_DATA_PATH_ENV,

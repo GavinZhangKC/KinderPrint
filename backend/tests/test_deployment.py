@@ -19,6 +19,13 @@ def test_every_configured_runtime_dataset_is_packaged() -> None:
         assert filename in package_script, f"{filename} is configured but not packaged"
 
 
+def test_backend_python_packages_are_packaged() -> None:
+    package_script = PACKAGE_SCRIPT_PATH.read_text(encoding="utf-8")
+
+    assert 'cp "$TASK_SCRIPT_DIR/core"/*.py "$TASK_PACKAGE_DIR/core/"' in package_script
+    assert 'cp "$TASK_SCRIPT_DIR/loaders"/*.py "$TASK_PACKAGE_DIR/loaders/"' in package_script
+
+
 def test_unvalidated_analytical_products_are_not_configured() -> None:
     configured = _configured_data_files()
 

@@ -1,4 +1,4 @@
-"""Aggregate ACECQA/G-NAF quality reporting without address disclosure."""
+"""Load aggregate ACECQA/G-NAF quality data without address disclosure."""
 
 import csv
 from collections import Counter
@@ -6,8 +6,8 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Any
 
-from data_loader import ACECQA_GEOCODING_DATA_PATH_ENV, acecqa_geocoding_data_path
-from responses import limitation
+from core.data_loader import ACECQA_GEOCODING_DATA_PATH_ENV, acecqa_geocoding_data_path
+from core.responses import limitation
 
 REQUIRED_FIELDS = {
     "service_approval_number", "match_status", "assigned_sa2",

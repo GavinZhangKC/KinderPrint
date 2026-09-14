@@ -7,7 +7,7 @@ from fastapi.testclient import TestClient
 BACKEND_DIR = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(BACKEND_DIR))
 
-from data_loader import (  # noqa: E402
+from core.data_loader import (  # noqa: E402
     ACECQA_CONTEXT_DATA_PATH_ENV,
     ACECQA_GEOCODING_DATA_PATH_ENV,
     BOUNDARY_DATA_PATH_ENV,

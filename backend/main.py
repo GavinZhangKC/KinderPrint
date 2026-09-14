@@ -10,18 +10,15 @@ from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.responses import JSONResponse
 from mangum import Mangum
 
-from data_loader import boundary_data_path
-from data_readiness import runtime_data_readiness
-from dataset_status import dataset_statuses
-from early_childhood import load_early_childhood_context
-from air_quality import load_station_year_observations, station_catalog
-from community_context import (
-    INDUSTRIAL_EVIDENCE,
-    INDUSTRIAL_METRIC_DEFINITIONS,
-    TRAFFIC_EVIDENCE,
-    TRAFFIC_METRIC_DEFINITIONS,
-    load_community_context,
-    load_community_identities,
+from core.data_loader import boundary_data_path
+from core.data_readiness import runtime_data_readiness
+from core.dataset_status import dataset_statuses
+from core.responses import (
+    AREA_LEVEL_NOTICE, ASSOCIATION_NOTICE, COMPARABLE_NOTICE, COMPARISON_AREA_NOTICE,
+    HUMAN_DECISION_NOTICE, INDUSTRIAL_EMISSIONS_CONTEXT_NOTICE,
+    INVESTIGATION_LEADS_NOTICE, MANUAL_COMPARISON_NOTICE, STATION_CONTEXT_NOTICE,
+    TRAFFIC_CONTEXT_NOTICE,
+    envelope, limitation,
 )
 from geography import (
     feature_metadata,
@@ -32,15 +29,18 @@ from geography import (
     public_boundary_feature,
     public_boundary_geometry,
 )
-from geocoding_quality import load_geocoding_quality
-from population import load_population_projections
-from responses import (
-    AREA_LEVEL_NOTICE, ASSOCIATION_NOTICE, COMPARABLE_NOTICE, COMPARISON_AREA_NOTICE,
-    HUMAN_DECISION_NOTICE, INDUSTRIAL_EMISSIONS_CONTEXT_NOTICE,
-    INVESTIGATION_LEADS_NOTICE, MANUAL_COMPARISON_NOTICE, STATION_CONTEXT_NOTICE,
-    TRAFFIC_CONTEXT_NOTICE,
-    envelope, limitation,
+from loaders.air_quality import load_station_year_observations, station_catalog
+from loaders.community_context import (
+    INDUSTRIAL_EVIDENCE,
+    INDUSTRIAL_METRIC_DEFINITIONS,
+    TRAFFIC_EVIDENCE,
+    TRAFFIC_METRIC_DEFINITIONS,
+    load_community_context,
+    load_community_identities,
 )
+from loaders.early_childhood import load_early_childhood_context
+from loaders.geocoding_quality import load_geocoding_quality
+from loaders.population import load_population_projections
 from validation import (
     aggregate_status, environmental_difference_data, environmental_difference_for_pair,
     explanation_data,

@@ -1,4 +1,4 @@
-"""Shared KinderPrint response structures and notices."""
+"""Core KinderPrint response structures and notices."""
 
 from typing import Any
 

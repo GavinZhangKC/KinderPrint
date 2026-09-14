@@ -10,9 +10,11 @@ TASK_ITERATION_2_DATA_DIR="$TASK_REPOSITORY_DIR/datascience/outputs/iteration_2"
 TASK_PROCESSED_DATA_DIR="$TASK_REPOSITORY_DIR/datascience/data/processed"
 
 rm -rf "$TASK_PACKAGE_DIR"
-mkdir -p "$TASK_PACKAGE_DIR/data"
+mkdir -p "$TASK_PACKAGE_DIR/core" "$TASK_PACKAGE_DIR/data" "$TASK_PACKAGE_DIR/loaders"
 
 cp "$TASK_SCRIPT_DIR"/*.py "$TASK_PACKAGE_DIR/"
+cp "$TASK_SCRIPT_DIR/core"/*.py "$TASK_PACKAGE_DIR/core/"
+cp "$TASK_SCRIPT_DIR/loaders"/*.py "$TASK_PACKAGE_DIR/loaders/"
 cp "$TASK_DATA_DIR/profiles.json" "$TASK_PACKAGE_DIR/data/"
 cp "$TASK_DATA_DIR/boundaries.geojson" "$TASK_PACKAGE_DIR/data/"
 cp "$TASK_DATA_DIR/priorities.json" "$TASK_PACKAGE_DIR/data/"
