@@ -165,8 +165,8 @@ export default function LandingPage({ onInsight, onMap }: LandingPageProps) {
           </dl>
 
           <blockquote className="home-insight-statement">
-            <span>Pattern to explore</span>
-            <p>Areas with lower vegetation and higher heat exposure also show higher child development vulnerability.</p>
+            <span>Evidence to explore</span>
+            <p>Compare child development, social context and environmental conditions without treating area-level association as causation.</p>
           </blockquote>
 
           <button className="button primary home-section-button" type="button" onClick={onInsight}>
