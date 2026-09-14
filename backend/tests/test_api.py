@@ -369,6 +369,41 @@ def test_industrial_emissions_context_preserves_missing_null(
     assert body["limitations"][0]["code"] == "industrial_emissions_context_missing"
 
 
+def test_map_context_returns_joinable_lightweight_collection(
+    client, monkeypatch, tmp_path
+) -> None:
+    configure_community_context(monkeypatch, tmp_path)
+
+    body = client.get("/api/map/context").json()
+
+    assert_envelope(body)
+    assert body["status"] == "available"
+    assert body["metadata"]["result_count"] == 1
+    assert body["metadata"]["join_key"] == "neighbourhood_id"
+    assert body["metadata"]["geometry_included"] is False
+    neighbourhood = body["data"]["neighbourhoods"][0]
+    assert neighbourhood["id"] == "206011106"
+    assert neighbourhood["traffic"]["metrics"]["declared_road_km"]["value"] == 11.0
+    assert neighbourhood["industrial_emissions"]["metrics"]["npi_facilities"] == {
+        "value": 0, "status": "available",
+    }
+    assert "community_id" not in str(body)
+
+
+def test_map_context_marks_incomplete_rows_without_imputation(
+    client, monkeypatch, tmp_path
+) -> None:
+    configure_community_context(monkeypatch, tmp_path, missing_traffic=True)
+
+    body = client.get("/api/map/context").json()
+
+    assert body["status"] == "limited"
+    neighbourhood = body["data"]["neighbourhoods"][0]
+    assert neighbourhood["traffic"]["status"] == "limited"
+    assert neighbourhood["traffic"]["metrics"]["declared_road_km"]["value"] is None
+    assert body["limitations"][0]["affected_fields"] == ["206011106"]
+
+
 def test_static_csv_loaders_reuse_validated_files(monkeypatch, tmp_path) -> None:
     population_path = tmp_path / "vif-cache.csv"
     population_path.write_text(

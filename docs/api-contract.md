@@ -138,6 +138,14 @@ as ambient air quality, personal exposure or health risk.
 Metadata supplies reusable metric names, units and definitions together with the source
 link, publisher, reference period, method and reporting-coverage limitation.
 
+### `GET /api/map/context`
+
+Returns traffic and industrial-emissions context for all supported map localities in one
+request. Each row exposes the same `neighbourhood_id` used by the boundary API so clients
+can join values to polygons without repeated profile requests. Geometry remains in the
+boundary endpoint and is not duplicated. Metric definitions and evidence metadata appear
+once at collection level; missing values remain `null` with a Limited state.
+
 ```json
 {
   "status": "available",

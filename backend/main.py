@@ -58,6 +58,21 @@ app.add_middleware(GZipMiddleware, minimum_size=1000)
 logger = logging.getLogger("kinderprint.api")
 
 
+def _context_metrics(values: dict[str, Any]) -> dict[str, dict[str, Any]]:
+    return {
+        identifier: {
+            "value": value,
+            "status": "available" if value is not None else "missing",
+        }
+        for identifier, value in values.items()
+    }
+
+
+def _context_status(metrics: dict[str, dict[str, Any]]) -> str:
+    return "available" if all(
+        metric["status"] == "available" for metric in metrics.values()) else "limited"
+
+
 @app.middleware("http")
 async def log_request(request: Request, call_next: Any) -> Any:
     """Log request outcomes without logging query values, data, or secrets."""
@@ -399,13 +414,7 @@ def neighbourhood_traffic_context(neighbourhood_id: str) -> dict[str, Any]:
             "No traffic context exists for this neighbourhood.",
             "neighbourhood_id",
         )], notices=notices)
-    metrics = {
-        identifier: {
-            "value": value,
-            "status": "available" if value is not None else "missing",
-        }
-        for identifier, value in result["traffic"].items()
-    }
+    metrics = _context_metrics(result["traffic"])
     missing_fields = [identifier for identifier, metric in metrics.items()
                       if metric["status"] == "missing"]
     return envelope(
@@ -438,13 +447,7 @@ def neighbourhood_industrial_emissions_context(neighbourhood_id: str) -> dict[st
             "No industrial-emissions context exists for this neighbourhood.",
             "neighbourhood_id",
         )], notices=notices)
-    metrics = {
-        identifier: {
-            "value": value,
-            "status": "available" if value is not None else "missing",
-        }
-        for identifier, value in result["industrial_emissions"].items()
-    }
+    metrics = _context_metrics(result["industrial_emissions"])
     missing_fields = [identifier for identifier, metric in metrics.items()
                       if metric["status"] == "missing"]
     return envelope(
@@ -459,6 +462,63 @@ def neighbourhood_industrial_emissions_context(neighbourhood_id: str) -> dict[st
             "One or more NPI context values are unavailable; no replacement value was created.",
             *missing_fields,
         )] if missing_fields else [],
+        notices=notices,
+    )
+
+
+@app.get("/api/map/context")
+def map_context() -> dict[str, Any]:
+    """Return lightweight traffic and industrial context for all map localities."""
+    index, limitations = load_community_context()
+    notices = [
+        AREA_LEVEL_NOTICE,
+        TRAFFIC_CONTEXT_NOTICE,
+        INDUSTRIAL_EMISSIONS_CONTEXT_NOTICE,
+    ]
+    if index is None:
+        return envelope(
+            "unavailable", {"neighbourhoods": []},
+            limitations=limitations, notices=notices)
+
+    neighbourhoods = []
+    incomplete_neighbourhood_ids = []
+    for result in index.values():
+        traffic = _context_metrics(result["traffic"])
+        industrial = _context_metrics(result["industrial_emissions"])
+        traffic_status = _context_status(traffic)
+        industrial_status = _context_status(industrial)
+        if traffic_status != "available" or industrial_status != "available":
+            incomplete_neighbourhood_ids.append(result["neighbourhood"]["id"])
+        neighbourhoods.append({
+            **result["neighbourhood"],
+            "traffic": {"status": traffic_status, "metrics": traffic},
+            "industrial_emissions": {
+                "status": industrial_status,
+                "metrics": industrial,
+            },
+        })
+
+    return envelope(
+        "limited" if incomplete_neighbourhood_ids else "available",
+        {"neighbourhoods": neighbourhoods},
+        metadata={
+            "result_count": len(neighbourhoods),
+            "join_key": "neighbourhood_id",
+            "geometry_included": False,
+            "traffic": {
+                **TRAFFIC_EVIDENCE,
+                "metric_definitions": TRAFFIC_METRIC_DEFINITIONS,
+            },
+            "industrial_emissions": {
+                **INDUSTRIAL_EVIDENCE,
+                "metric_definitions": INDUSTRIAL_METRIC_DEFINITIONS,
+            },
+        },
+        limitations=[limitation(
+            "map_context_incomplete",
+            "One or more map localities contain unavailable context values; no replacements were created.",
+            *incomplete_neighbourhood_ids,
+        )] if incomplete_neighbourhood_ids else [],
         notices=notices,
     )
 
