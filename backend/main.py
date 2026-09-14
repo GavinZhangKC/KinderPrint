@@ -15,7 +15,13 @@ from data_readiness import runtime_data_readiness
 from dataset_status import dataset_statuses
 from early_childhood import load_early_childhood_context
 from air_quality import load_station_year_observations, station_catalog
-from community_context import load_community_context
+from community_context import (
+    INDUSTRIAL_EVIDENCE,
+    INDUSTRIAL_METRIC_DEFINITIONS,
+    TRAFFIC_EVIDENCE,
+    TRAFFIC_METRIC_DEFINITIONS,
+    load_community_context,
+)
 from geography import (
     feature_metadata,
     intersects_bbox,
@@ -406,10 +412,8 @@ def neighbourhood_traffic_context(neighbourhood_id: str) -> dict[str, Any]:
         "limited" if missing_fields else "available",
         {"neighbourhood": result["neighbourhood"], "metrics": metrics},
         metadata={
-            "source": "DTP Historical Annual Average Daily Traffic Volume 2019",
-            "reference_year": "2019",
-            "geographic_unit": "KinderPrint reporting locality",
-            "data_quality": "CONTEXT_ONLY",
+            **TRAFFIC_EVIDENCE,
+            "metric_definitions": TRAFFIC_METRIC_DEFINITIONS,
         },
         limitations=[limitation(
             "traffic_context_missing",
@@ -447,10 +451,8 @@ def neighbourhood_industrial_emissions_context(neighbourhood_id: str) -> dict[st
         "limited" if missing_fields else "available",
         {"neighbourhood": result["neighbourhood"], "metrics": metrics},
         metadata={
-            "source": "National Pollutant Inventory Emissions",
-            "reference_year": "2024/2025",
-            "geographic_unit": "KinderPrint reporting locality",
-            "data_quality": "CONTEXT_ONLY",
+            **INDUSTRIAL_EVIDENCE,
+            "metric_definitions": INDUSTRIAL_METRIC_DEFINITIONS,
         },
         limitations=[limitation(
             "industrial_emissions_context_missing",

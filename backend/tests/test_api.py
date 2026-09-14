@@ -297,6 +297,10 @@ def test_traffic_context_returns_precomputed_values(client, monkeypatch, tmp_pat
         "value": 7000.0, "status": "available",
     }
     assert body["metadata"]["data_quality"] == "CONTEXT_ONLY"
+    assert body["metadata"]["metric_definitions"]["length_weighted_aadt"]["unit"] == (
+        "vehicles_per_day")
+    assert body["metadata"]["thresholds"]["high_traffic_aadt"] == 10000
+    assert body["metadata"]["source_url"].startswith("https://")
     assert body["notices"][1]["code"] == "traffic_context_only"
 
 
@@ -343,6 +347,9 @@ def test_industrial_emissions_context_preserves_real_zero(
         "value": 0, "status": "available",
     }
     assert body["metadata"]["data_quality"] == "CONTEXT_ONLY"
+    assert body["metadata"]["metric_definitions"]["nearest_npi_facility_km"]["unit"] == "km"
+    assert "straight-line" in body["metadata"]["methodology"]
+    assert body["metadata"]["source_url"].startswith("https://")
     assert body["notices"][1]["code"] == "industrial_emissions_context_only"
 
 

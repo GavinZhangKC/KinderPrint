@@ -126,6 +126,8 @@ service quality, accessibility, capacity sufficiency, or child outcomes.
 Returns precomputed 2019 declared-road context for a supported KinderPrint reporting
 locality. Missing source coverage remains `null`; it is never replaced with zero. These
 measures do not cover local roads and must not be interpreted as personal exposure.
+Metadata supplies reusable metric names, units and definitions together with the source
+link, publisher, reference year, method, coverage and declared high-traffic threshold.
 
 ### `GET /api/neighbourhoods/{neighbourhood_id}/industrial-emissions-context`
 
@@ -133,6 +135,8 @@ Returns precomputed National Pollutant Inventory facility counts and proximity c
 for a supported KinderPrint reporting locality. A zero facility count remains zero and
 missing values remain `null`. Reported emissions and proximity must not be interpreted
 as ambient air quality, personal exposure or health risk.
+Metadata supplies reusable metric names, units and definitions together with the source
+link, publisher, reference period, method and reporting-coverage limitation.
 
 ```json
 {

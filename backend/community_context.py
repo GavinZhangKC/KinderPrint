@@ -35,6 +35,82 @@ CONTEXT_FIELDS = {
     *INDUSTRIAL_COUNT_FIELDS, *INDUSTRIAL_DISTANCE_FIELDS,
 }
 IDENTITY_FIELDS = {"community_id", "community_name", "neighbourhood_id"}
+TRAFFIC_METRIC_DEFINITIONS = {
+    "declared_road_km": {
+        "name": "Declared-road length",
+        "unit": "km",
+        "definition": "Length of source-covered declared roads intersecting the reporting locality.",
+    },
+    "length_weighted_aadt": {
+        "name": "Length-weighted annual average daily traffic",
+        "unit": "vehicles_per_day",
+        "definition": "AADT averaged across covered road segments using intersecting road length as weight.",
+    },
+    "length_weighted_heavy_aadt": {
+        "name": "Length-weighted heavy-vehicle AADT",
+        "unit": "vehicles_per_day",
+        "definition": "Heavy-vehicle AADT averaged across covered road segments using intersecting road length as weight.",
+    },
+    "high_traffic_road_km": {
+        "name": "High-traffic declared-road length",
+        "unit": "km",
+        "definition": "Length of covered declared roads with AADT at or above 10,000 vehicles per day.",
+    },
+    "high_traffic_road_share_pct": {
+        "name": "High-traffic declared-road share",
+        "unit": "percent",
+        "definition": "Share of covered declared-road length with AADT at or above 10,000 vehicles per day.",
+    },
+    "actual_observation_road_share_pct": {
+        "name": "Observed-method road share",
+        "unit": "percent",
+        "definition": "Share of covered declared-road length labelled Actual rather than Estimated by the source.",
+    },
+}
+INDUSTRIAL_METRIC_DEFINITIONS = {
+    "npi_facilities": {
+        "name": "NPI reporting facilities",
+        "unit": "count",
+        "definition": "Facilities in the locality reporting to the National Pollutant Inventory in the latest complete year.",
+    },
+    "npi_respiratory_reporting_facilities": {
+        "name": "NPI facilities reporting respiratory-relevant pollutants",
+        "unit": "count",
+        "definition": "NPI reporting facilities in the locality that reported at least one respiratory-relevant pollutant.",
+    },
+    "nearest_npi_facility_km": {
+        "name": "Distance to nearest NPI reporting facility",
+        "unit": "km",
+        "definition": "Straight-line distance from the locality context point to the nearest NPI reporting facility.",
+    },
+    "nearest_npi_respiratory_reporting_facility_km": {
+        "name": "Distance to nearest respiratory-relevant NPI facility",
+        "unit": "km",
+        "definition": "Straight-line distance from the locality context point to the nearest NPI facility reporting a respiratory-relevant pollutant.",
+    },
+}
+
+TRAFFIC_EVIDENCE = {
+    "source": "DTP Historical Annual Average Daily Traffic Volume 2019",
+    "publisher": "Victorian Department of Transport and Planning",
+    "source_url": "https://opendata.transport.vic.gov.au/dataset/historical-annual-average-daily-traffic-volume",
+    "reference_year": "2019",
+    "geographic_unit": "KinderPrint reporting locality",
+    "data_quality": "CONTEXT_ONLY",
+    "methodology": "Road lines were clipped to SA2 boundaries; locality means and shares were weighted by intersecting declared-road length.",
+    "coverage": "Declared roads in the 2019 source; local roads are not covered and source values mix Actual and Estimated methods.",
+    "thresholds": {"high_traffic_aadt": 10000, "unit": "vehicles_per_day"},
+}
+INDUSTRIAL_EVIDENCE = {
+    "source": "National Pollutant Inventory Emissions",
+    "publisher": "Australian Government Department of Climate Change, Energy, the Environment and Water",
+    "source_url": "https://data.gov.au/data/dataset/npi/resource/5fc315e6-abe9-4a46-a3fc-93359369c00f",
+    "reference_year": "2024/2025",
+    "geographic_unit": "KinderPrint reporting locality",
+    "data_quality": "CONTEXT_ONLY",
+    "methodology": "Latest-year reporting facilities were counted by locality; proximity is straight-line distance and emitted masses were not combined into a score.",
+    "coverage": "NPI reporting thresholds omit smaller sources; reported emissions are not ambient concentrations.",
+}
 
 
 @lru_cache(maxsize=1)
