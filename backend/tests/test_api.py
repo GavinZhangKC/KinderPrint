@@ -258,7 +258,10 @@ def test_early_childhood_context_rejects_unreconciled_match_counts(client, monke
     assert body["limitations"][0]["code"] == "early_childhood_context_dataset_invalid"
 
 
-def configure_community_context(monkeypatch, tmp_path, *, missing_traffic: bool = False):
+def configure_community_context(
+    monkeypatch, tmp_path, *, missing_traffic: bool = False,
+    missing_industrial_distance: bool = False,
+):
     identities = tmp_path / "communities.csv"
     identities.write_text(
         "community_id,community_name,neighbourhood_id\n"
@@ -267,12 +270,13 @@ def configure_community_context(monkeypatch, tmp_path, *, missing_traffic: bool 
     )
     context = tmp_path / "community-context.csv"
     traffic = ",,,,," if missing_traffic else "11,7000,400,1,9,68"
+    distances = "," if missing_industrial_distance else "3.5,4.5"
     context.write_text(
         "community_id,declared_road_km,length_weighted_aadt,length_weighted_heavy_aadt,"
         "high_traffic_road_km,high_traffic_road_share_pct,actual_observation_road_share_pct,"
         "npi_facilities,npi_respiratory_reporting_facilities,nearest_npi_facility_km,"
         "nearest_npi_respiratory_reporting_facility_km,context_quality_flag\n"
-        f"MEL0001,{traffic},2,1,3.5,4.5,CONTEXT_ONLY\n",
+        f"MEL0001,{traffic},0,0,{distances},CONTEXT_ONLY\n",
         encoding="utf-8",
     )
     monkeypatch.setenv(COMMUNITY_CONTEXT_DATA_PATH_ENV, str(context))
@@ -323,6 +327,39 @@ def test_community_context_loader_is_cached(client, monkeypatch, tmp_path) -> No
     client.get("/api/neighbourhoods/206011106/traffic-context")
 
     assert reads == Counter({context: 1, identity: 1})
+
+
+def test_industrial_emissions_context_preserves_real_zero(
+    client, monkeypatch, tmp_path
+) -> None:
+    configure_community_context(monkeypatch, tmp_path)
+
+    body = client.get(
+        "/api/neighbourhoods/206011106/industrial-emissions-context").json()
+
+    assert_envelope(body)
+    assert body["status"] == "available"
+    assert body["data"]["metrics"]["npi_facilities"] == {
+        "value": 0, "status": "available",
+    }
+    assert body["metadata"]["data_quality"] == "CONTEXT_ONLY"
+    assert body["notices"][1]["code"] == "industrial_emissions_context_only"
+
+
+def test_industrial_emissions_context_preserves_missing_null(
+    client, monkeypatch, tmp_path
+) -> None:
+    configure_community_context(
+        monkeypatch, tmp_path, missing_industrial_distance=True)
+
+    body = client.get(
+        "/api/neighbourhoods/206011106/industrial-emissions-context").json()
+
+    assert body["status"] == "limited"
+    assert body["data"]["metrics"]["nearest_npi_facility_km"] == {
+        "value": None, "status": "missing",
+    }
+    assert body["limitations"][0]["code"] == "industrial_emissions_context_missing"
 
 
 def test_static_csv_loaders_reuse_validated_files(monkeypatch, tmp_path) -> None:

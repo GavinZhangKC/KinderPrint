@@ -29,8 +29,8 @@ from geocoding_quality import load_geocoding_quality
 from population import load_population_projections
 from responses import (
     AREA_LEVEL_NOTICE, ASSOCIATION_NOTICE, COMPARABLE_NOTICE, COMPARISON_AREA_NOTICE,
-    HUMAN_DECISION_NOTICE, INVESTIGATION_LEADS_NOTICE, STATION_CONTEXT_NOTICE,
-    TRAFFIC_CONTEXT_NOTICE,
+    HUMAN_DECISION_NOTICE, INDUSTRIAL_EMISSIONS_CONTEXT_NOTICE,
+    INVESTIGATION_LEADS_NOTICE, STATION_CONTEXT_NOTICE, TRAFFIC_CONTEXT_NOTICE,
     envelope, limitation,
 )
 from validation import (
@@ -414,6 +414,47 @@ def neighbourhood_traffic_context(neighbourhood_id: str) -> dict[str, Any]:
         limitations=[limitation(
             "traffic_context_missing",
             "The source contains no intersecting declared-road data; no replacement value was created.",
+            *missing_fields,
+        )] if missing_fields else [],
+        notices=notices,
+    )
+
+
+@app.get("/api/neighbourhoods/{neighbourhood_id}/industrial-emissions-context")
+def neighbourhood_industrial_emissions_context(neighbourhood_id: str) -> dict[str, Any]:
+    """Return precomputed NPI facility context without deriving exposure or risk."""
+    index, limitations = load_community_context()
+    notices = [AREA_LEVEL_NOTICE, INDUSTRIAL_EMISSIONS_CONTEXT_NOTICE]
+    if index is None:
+        return envelope("unavailable", None, limitations=limitations, notices=notices)
+    result = index.get(neighbourhood_id)
+    if result is None:
+        return envelope("missing", None, limitations=[limitation(
+            "industrial_emissions_context_not_found",
+            "No industrial-emissions context exists for this neighbourhood.",
+            "neighbourhood_id",
+        )], notices=notices)
+    metrics = {
+        identifier: {
+            "value": value,
+            "status": "available" if value is not None else "missing",
+        }
+        for identifier, value in result["industrial_emissions"].items()
+    }
+    missing_fields = [identifier for identifier, metric in metrics.items()
+                      if metric["status"] == "missing"]
+    return envelope(
+        "limited" if missing_fields else "available",
+        {"neighbourhood": result["neighbourhood"], "metrics": metrics},
+        metadata={
+            "source": "National Pollutant Inventory Emissions",
+            "reference_year": "2024/2025",
+            "geographic_unit": "KinderPrint reporting locality",
+            "data_quality": "CONTEXT_ONLY",
+        },
+        limitations=[limitation(
+            "industrial_emissions_context_missing",
+            "One or more NPI context values are unavailable; no replacement value was created.",
             *missing_fields,
         )] if missing_fields else [],
         notices=notices,

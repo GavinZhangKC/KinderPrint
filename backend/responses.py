@@ -38,6 +38,10 @@ TRAFFIC_CONTEXT_NOTICE = {
     "code": "traffic_context_only",
     "message": "Traffic measures describe declared-road context. They do not cover all roads or represent personal exposure.",
 }
+INDUSTRIAL_EMISSIONS_CONTEXT_NOTICE = {
+    "code": "industrial_emissions_context_only",
+    "message": "NPI reporting describes industrial-emissions context. It is not ambient air quality, personal exposure or a health-risk assessment.",
+}
 
 
 def envelope(status: str, data: Any, *, metadata: dict[str, Any] | None = None,

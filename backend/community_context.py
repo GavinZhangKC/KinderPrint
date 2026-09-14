@@ -89,7 +89,10 @@ def _load_community_context(
                         value is None for value in traffic_values.values()):
                     raise ValueError
                 counts = {field: int(row[field]) for field in INDUSTRIAL_COUNT_FIELDS}
-                distances = {field: float(row[field]) for field in INDUSTRIAL_DISTANCE_FIELDS}
+                distances = {
+                    field: float(row[field]) if row[field].strip() else None
+                    for field in INDUSTRIAL_DISTANCE_FIELDS
+                }
                 numeric_values = [
                     value for value in (*traffic_values.values(), *counts.values(), *distances.values())
                     if value is not None

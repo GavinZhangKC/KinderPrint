@@ -127,6 +127,13 @@ Returns precomputed 2019 declared-road context for a supported KinderPrint repor
 locality. Missing source coverage remains `null`; it is never replaced with zero. These
 measures do not cover local roads and must not be interpreted as personal exposure.
 
+### `GET /api/neighbourhoods/{neighbourhood_id}/industrial-emissions-context`
+
+Returns precomputed National Pollutant Inventory facility counts and proximity context
+for a supported KinderPrint reporting locality. A zero facility count remains zero and
+missing values remain `null`. Reported emissions and proximity must not be interpreted
+as ambient air quality, personal exposure or health risk.
+
 ```json
 {
   "status": "available",
