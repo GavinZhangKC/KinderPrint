@@ -123,26 +123,26 @@ sources:
     reference_period: "Collection cycles 2009, 2012, 2015, 2018, 2021, 2024"
     collection_date: "2024 cycle: 1 May – 31 July 2024"
     geography_level: "SA2"
-    asgs_edition: "Edition 3 (2021) — ASSUMED, verify against the file's notes sheet"
-    geographic_id_field: "TO_FILL — inspect file"
+    asgs_edition: "Edition 3 (2021) — verified by workbook content and code-match test"
+    geographic_id_field: "9-digit SA2 code; merged reporting areas use slash-separated SA2 codes"
     format: "xlsx"
     size_mb: 5.9
-    missing_value_repr: "TO_FILL — inspect"
-    suppression_rule: "TO_FILL — AEDC does not publish results for areas with small child counts. Read the file's notes/caveats sheet for the exact rule. DO NOT ASSUME A NUMBER."
+    missing_value_repr: "Marker encoded: #, *, and rare bounded values such as <=2 or >=90"
+    suppression_rule: "# means three or fewer children assessed; * includes fewer than 15 valid scores, fewer than two teachers, below 80% instrument coverage, and related confidentiality suppression."
     update_frequency: "Every 3 years"
-    accessed_date: "TO_FILL"
-    sha256: "TO_FILL"
-    raw_path: "data/raw/aedc/TO_FILL/sa2-2009-24.xlsx"
+    accessed_date: "2026-08-28"
+    sha256: "4ffd8d5882f8e2f35d59eb2dae4d2bd0dab0e2afe4ac118b5913a6110c6ae8f9"
+    raw_path: "data/raw/aedc/2026-08-28/sa2-2009-24.xlsx"
     transformations_required:
       - "Unpivot from wide (year × domain columns) to long."
       - "Separate percentage columns from count/denominator columns."
       - "Preserve the suppression flag as a distinct quality_flag value — never coerce to NaN and never impute."
     known_limitations:
-      - "OPEN QUESTION, blocks Epic 4: does this file publish the NUMBER OF CHILDREN per SA2? If not, confidence intervals and AEDC 'critical difference' cannot be computed, and community-vs-community comparison has no uncertainty measure."
-      - "OPEN QUESTION: is a child assigned to the SA2 of RESIDENCE or of SCHOOL? This changes the meaning of every environmental join. Confirm in the AEDC Data Dictionary before any join."
+      - "Child counts are published and retained for uncertainty calculations."
+      - "AEDC geography is residence-based; all environment joins remain aggregate ecological comparisons, not individual exposure estimates."
       - "2024 cohort was mostly born 2018–2019, so the relevant environmental exposure window is roughly 2019–2024, not 2024 alone."
-    verified: false
-    verification_note: "URL and SA2 availability verified from AEDC Additional Data page 2026-08-28. File contents NOT yet inspected."
+    verified: true
+    verification_note: "Workbook hash, structure, counts, suppression markers, and Edition 3 geography inspected; full raw refresh passed validation on 2026-09-14."
 
   # ============================================================
   # 3. SOCIOECONOMIC CONTEXT (matching backbone)
