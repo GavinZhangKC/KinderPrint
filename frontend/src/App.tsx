@@ -6,8 +6,10 @@ import AboutUsPage from './components/AboutUsPage'
 import BrandHeader from './components/BrandHeader'
 import ComparePanel from './components/ComparePanel'
 import DetailedComparison from './components/DetailedComparison'
+import DetailedComparisonWeather, { getDevelopmentWeatherState } from './components/DetailedComparisonWeather'
 import DetailedDataDrawer from './components/DetailedDataDrawer'
 import InsightPage from './components/InsightPage'
+import InteractiveAtmosphere from './components/InteractiveAtmosphere'
 import Legend from './components/Legend'
 import LandingPage from './components/LandingPage'
 import MenuPage from './components/MenuPage'
@@ -540,10 +542,15 @@ if (
     comparisons.length > 0 &&
     comparisonResult
   ) {
+    const weatherState = getDevelopmentWeatherState(selected.priority)
+
     return (
-      <div className="app-background detailed-background">
-        <div className="ambient ambient-one" />
-        <div className="ambient ambient-two" />
+      <div
+        className="app-background detailed-background detailed-comparison-scene"
+        data-state={weatherState}
+      >
+        <DetailedComparisonWeather state={weatherState} />
+        <InteractiveAtmosphere mode="compare" />
 
         <BrandHeader
           activePage="map"

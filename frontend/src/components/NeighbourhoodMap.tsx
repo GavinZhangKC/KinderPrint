@@ -268,6 +268,11 @@ const requestNumberRef =
   ] = useState(true)
 
   const [
+    initializing,
+    setInitializing,
+  ] = useState(true)
+
+  const [
     mapError,
     setMapError,
   ] = useState<
@@ -306,6 +311,7 @@ useEffect(() => {
       console.error(message)
       setMapError(message)
       setLoading(false)
+      setInitializing(false)
       return
     }
 
@@ -512,6 +518,7 @@ clearHover()
           setLoading(
             false,
           )
+          setInitializing(false)
         }
       }
     }
@@ -976,6 +983,32 @@ return () => {
     }
   }, [])
   useEffect(() => {
+    const map = mapRef.current
+
+    if (!map) {
+      return
+    }
+
+    const interactionHandlers = [
+      map.boxZoom,
+      map.scrollZoom,
+      map.dragPan,
+      map.dragRotate,
+      map.keyboard,
+      map.doubleClickZoom,
+      map.touchZoomRotate,
+      map.touchPitch,
+    ]
+
+    interactionHandlers.forEach((handler) => {
+      if (initializing) {
+        handler.disable()
+      } else {
+        handler.enable()
+      }
+    })
+  }, [initializing])
+  useEffect(() => {
     if (!selectionEnabled) {
       clearHoverRef.current()
       const map = mapRef.current
@@ -1222,6 +1255,11 @@ useEffect(() => {
           mapContainerRef
         }
         className="real-map"
+      />
+
+      <div
+        className={`map-cold-start-overlay${initializing ? ' is-active' : ''}`}
+        aria-hidden="true"
       />
 
       <div

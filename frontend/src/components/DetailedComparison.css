@@ -1,11 +1,11 @@
 .detailed-background { padding-bottom: 90px; overflow: visible; }
 .comparison-page { position: relative; z-index: 2; width: min(1312px, calc(100vw - 128px)); margin: 42px auto 0; }
-.comparison-heading-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 24px; padding: 0 8px 24px; }
-.text-back { border: 0; background: transparent; padding: 0; margin-bottom: 12px; color: #65799d; cursor: pointer; font-weight: 600; }
-.comparison-heading-row h1 { color: var(--brand); font-size: 36px; margin: 0; }.comparison-heading-row h2 { margin: 2px 0 6px; font-size: 20px; color: var(--text); }.comparison-heading-row h2 span { color: #8292ad; font-weight: 500; margin: 0 8px; }.comparison-heading-row p { margin: 0; color: var(--muted); font-size: 13px; }
+.comparison-heading-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 24px; padding: 0 8px 24px; text-shadow: 0 1px 12px rgba(255,255,255,.2), 0 0 3px rgba(255,255,255,.1); }
+.text-back { border: 0; background: transparent; padding: 0; margin-bottom: 12px; color: #294d78; cursor: pointer; font-weight: 600; text-shadow: 0 1px 10px rgba(255,255,255,.58), 0 0 4px rgba(255,255,255,.38); }
+.comparison-heading-row h1 { color: #183f76; font-size: 36px; margin: 0; }.comparison-heading-row h2 { margin: 2px 0 6px; font-size: 20px; color: #17365f; }.comparison-heading-row h2 span { color: #526985; font-weight: 500; margin: 0 8px; }.comparison-heading-row p { margin: 0; color: #365575; font-size: 13px; }
 .comparison-locality-heading { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; }
-.comparison-heading-row .comparison-locality-heading > span { margin: 0; color: var(--text); font-weight: 700; }
-.comparison-locality-heading i { margin-right: 12px; color: #8292ad; font-style: normal; font-weight: 500; }
+.comparison-heading-row .comparison-locality-heading > span { margin: 0; color: #17365f; font-weight: 700; }
+.comparison-locality-heading i { margin-right: 12px; color: #526985; font-style: normal; font-weight: 500; }
 .comparison-section { border-radius: 28px; margin-bottom: 28px; padding: 26px 28px 30px; background: rgba(255,255,255,.62); }
 .comparison-section .eyebrow, .eyebrow { color: var(--brand); font-size: 11px; letter-spacing: .06em; font-weight: 800; }.comparison-section h3 { margin: 7px 0 3px; font-size: 20px; }.section-copy { margin: 0 0 20px; color: var(--muted); font-size: 12px; }
 .hero-ring-grid { display: grid; grid-template-columns: 1fr 1.25fr; gap: 18px; margin-top: 22px; }.hero-ring-card { min-height: 228px; border-radius: 20px; padding: 20px 28px; }.hero-ring-card h4 { margin: 0 0 12px; color: #3d567d; font-size: 18px; }.hero-ring-content { display: flex; align-items: center; gap: 30px; }.hero-ring-copy { display: grid; gap: 10px; max-width: 290px; }.hero-ring-copy strong { font-size: 13px; }.hero-ring-copy p { margin: 0; color: var(--muted); font-size: 12px; line-height: 1.45; }

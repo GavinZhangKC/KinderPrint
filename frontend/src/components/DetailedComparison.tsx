@@ -327,7 +327,6 @@ export default function DetailedComparison({
               </span>
             ))}
           </h2>
-          <p>Approved side-by-side indicators returned by the KinderPrint comparison API.</p>
         </div>
       </div>
 
