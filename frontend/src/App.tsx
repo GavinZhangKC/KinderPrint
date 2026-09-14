@@ -576,6 +576,11 @@ return (
       <main className="map-shell">
         <section className="glass map-surface">
 
+          <div className="map-product-label" aria-hidden="true">
+            <span>NEIGHBOURHOOD INTELLIGENCE</span>
+            <b>Greater Melbourne</b>
+          </div>
+
           <div className="neighbourhood-search-block" ref={neighbourhoodSearchRef}>
             <label htmlFor="neighbourhood-search">
               Search Neighbourhood
