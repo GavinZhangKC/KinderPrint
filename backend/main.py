@@ -800,13 +800,7 @@ def manual_compare(
             "Select between two and four neighbourhoods for a comparison.",
             "neighbourhood_ids",
         )], notices=notices)
-    if len(selected_ids) != len(set(selected_ids)):
-        if legacy_mode:
-            return envelope("no_match", None, limitations=[limitation(
-                "same_neighbourhood_selected",
-                "Choose two different neighbourhoods for a comparison.",
-                "neighbourhood_id_a", "neighbourhood_id_b",
-            )], notices=notices)
+    if not legacy_mode and len(selected_ids) != len(set(selected_ids)):
         return envelope("no_match", None, limitations=[limitation(
             "duplicate_neighbourhood_selected",
             "Each selected neighbourhood must be different.",
@@ -848,6 +842,12 @@ def manual_compare(
             *missing_parameters,
         )], notices=notices)
     selected_profiles = [profile for profile in selected_profiles if profile is not None]
+    if legacy_mode and neighbourhood_id_a == neighbourhood_id_b:
+        return envelope("no_match", empty, limitations=[limitation(
+            "same_neighbourhood_selected",
+            "Choose two different neighbourhoods for a comparison.",
+            "neighbourhood_id_a", "neighbourhood_id_b",
+        )], notices=notices)
     geographic_units = {
         profile["neighbourhood"]["geographic_unit"] for profile in selected_profiles
     }

@@ -290,6 +290,28 @@ def test_manual_comparison_rejects_same_neighbourhood(client, monkeypatch, write
     body = client.get("/api/compare", params={"neighbourhood_id_a": "a", "neighbourhood_id_b": "a"}).json()
     assert body["status"] == "no_match"
     assert body["limitations"][0]["code"] == "same_neighbourhood_selected"
+    assert body["data"] == {
+        "source_neighbourhood": {
+            "id": "a", "name": None, "geographic_unit": None,
+        },
+        "comparison_neighbourhood": {
+            "id": "a", "name": None, "geographic_unit": None,
+        },
+        "side_by_side": [],
+        "similarity_basis": [],
+        "match_strength": None,
+    }
+
+
+def test_manual_same_neighbourhood_preserves_unconfigured_dataset_precedence(
+    client,
+) -> None:
+    body = client.get("/api/compare", params={
+        "neighbourhood_id_a": "a", "neighbourhood_id_b": "a",
+    }).json()
+
+    assert body["status"] == "unavailable"
+    assert body["limitations"][0]["code"] == "profile_dataset_not_configured"
 
 
 def test_manual_comparison_supports_three_or_four_profiles(
