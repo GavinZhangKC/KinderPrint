@@ -11,6 +11,10 @@ from fastapi.responses import JSONResponse
 from mangum import Mangum
 
 from data_loader import boundary_data_path
+from data_readiness import runtime_data_readiness
+from dataset_status import dataset_statuses
+from early_childhood import load_early_childhood_context
+from air_quality import load_station_year_observations, station_catalog
 from geography import (
     feature_metadata,
     intersects_bbox,
@@ -20,9 +24,12 @@ from geography import (
     public_boundary_feature,
     public_boundary_geometry,
 )
+from geocoding_quality import load_geocoding_quality
+from population import load_population_projections
 from responses import (
     AREA_LEVEL_NOTICE, ASSOCIATION_NOTICE, COMPARABLE_NOTICE, COMPARISON_AREA_NOTICE,
-    HUMAN_DECISION_NOTICE, INVESTIGATION_LEADS_NOTICE, envelope, limitation,
+    HUMAN_DECISION_NOTICE, INVESTIGATION_LEADS_NOTICE, STATION_CONTEXT_NOTICE,
+    envelope, limitation,
 )
 from validation import (
     aggregate_status, environmental_difference_data, explanation_data,
@@ -36,7 +43,7 @@ from validation import (
     profile_metadata, profile_status,
 )
 
-app = FastAPI(title="KinderPrint API", version="0.2.0")
+app = FastAPI(title="KinderPrint API", version="0.3.0")
 app.add_middleware(GZipMiddleware, minimum_size=1000)
 logger = logging.getLogger("kinderprint.api")
 
@@ -71,6 +78,140 @@ def root() -> dict[str, str]:
 def health() -> dict[str, str]:
     """Confirm that the FastAPI application is running."""
     return {"status": "available"}
+
+
+@app.get("/api/health/data")
+def data_health() -> dict[str, Any]:
+    """Validate configured runtime datasets and their locality-boundary alignment."""
+    checks = runtime_data_readiness()
+    ready_count = sum(check["readiness"] == "ready" for check in checks)
+    return envelope("available" if ready_count == len(checks) else "limited",
+                    {"checks": checks}, metadata={
+                        "check_count": len(checks), "ready_count": ready_count,
+                    })
+
+
+@app.get("/api/datasets/status")
+def datasets_status() -> dict[str, Any]:
+    """Return configuration readiness and interpretation boundaries for data products."""
+    datasets = dataset_statuses()
+    configured_count = sum(bool(dataset["configured"]) for dataset in datasets)
+    return envelope("available", {"datasets": datasets}, metadata={
+        "dataset_count": len(datasets),
+        "configured_count": configured_count,
+        "contract_version": "0.3",
+    })
+
+
+@app.get("/api/population-projections")
+def population_projections(
+    sa2_code: str | None = Query(None, min_length=9, max_length=9, pattern=r"^\d{9}$"),
+    year: int | None = Query(None, ge=2021, le=2036),
+    sex: str = Query("persons", pattern=r"^(persons|males|females)$"),
+    offset: int = Query(0, ge=0),
+    limit: int = Query(500, ge=1, le=1000),
+) -> dict[str, Any]:
+    """Return published VIF projections at their native ASGS Edition 3 SA2 geography."""
+    rows, limitations = load_population_projections()
+    if rows is None:
+        return envelope("unavailable", {"projections": []}, limitations=limitations,
+                        notices=[AREA_LEVEL_NOTICE])
+    selected = [row for row in rows
+                if row["sex"] == sex
+                and (sa2_code is None or row["sa2_code"] == sa2_code)
+                and (year is None or row["projection_year"] == year)]
+    total_result_count = len(selected)
+    selected = selected[offset:offset + limit]
+    status = "available" if selected else "missing"
+    if not selected:
+        limitations = [limitation(
+            "page_out_of_range" if total_result_count else "population_projection_not_found",
+            "The requested page is beyond the available results." if total_result_count else
+            "No VIF projection matches the requested SA2, year and sex.",
+            "offset" if total_result_count else "sa2_code",
+            *("year", "sex") if not total_result_count else (),
+        )]
+    return envelope(status, {"projections": selected}, metadata={
+        "source": "Victoria in Future 2023 Release 2",
+        "geographic_unit": "ASGS Edition 3 SA2",
+        "value_type": "projection",
+        "result_count": len(selected),
+        "total_result_count": total_result_count,
+        "offset": offset,
+        "limit": limit,
+        "available_years": sorted({row["projection_year"] for row in rows}),
+    }, limitations=limitations, notices=[AREA_LEVEL_NOTICE])
+
+
+@app.get("/api/air-quality/stations")
+def station_air_quality(
+    station_id: str | None = Query(None, min_length=1, max_length=50),
+    year: int | None = Query(None, ge=2018, le=2025),
+    pollutant: str | None = Query(None, pattern=r"^(PM2\.5|PM10|NO2|O3)$"),
+    offset: int = Query(0, ge=0),
+    limit: int = Query(200, ge=1, le=500),
+) -> dict[str, Any]:
+    """Return station-year summaries without deriving area-level exposure."""
+    rows, limitations = load_station_year_observations()
+    if rows is None:
+        return envelope("unavailable", {"observations": []}, limitations=limitations,
+                        notices=[STATION_CONTEXT_NOTICE])
+    selected = [row for row in rows
+                if (station_id is None or row["station_id"] == station_id)
+                and (year is None or row["year"] == year)
+                and (pollutant is None or row["pollutant"] == pollutant)]
+    total_result_count = len(selected)
+    selected = selected[offset:offset + limit]
+    status = "available" if selected else "missing"
+    if not selected:
+        limitations = [limitation(
+            "page_out_of_range" if total_result_count else "station_observation_not_found",
+            "The requested page is beyond the available results." if total_result_count else
+            "No station observation matches the requested filters.",
+            "offset" if total_result_count else "station_id",
+            *("year", "pollutant") if not total_result_count else (),
+        )]
+    return envelope(status, {"observations": selected}, metadata={
+        "source": "EPA Victoria historical hourly monitoring releases",
+        "geographic_unit": "monitoring_station",
+        "aggregation": "annual mean of published hourly observations",
+        "result_count": len(selected),
+        "total_result_count": total_result_count,
+        "offset": offset,
+        "limit": limit,
+        "sa2_exposure_status": "not_derived",
+    }, limitations=limitations, notices=[STATION_CONTEXT_NOTICE])
+
+
+@app.get("/api/air-quality/station-catalog")
+def air_quality_station_catalog() -> dict[str, Any]:
+    """List valid station-level filter dimensions without locality interpretation."""
+    rows, limitations = load_station_year_observations()
+    if rows is None:
+        return envelope("unavailable", {"stations": []}, limitations=limitations,
+                        notices=[STATION_CONTEXT_NOTICE])
+    stations = station_catalog(rows)
+    return envelope("available", {"stations": stations}, metadata={
+        "source": "EPA Victoria historical hourly monitoring releases",
+        "geographic_unit": "monitoring_station",
+        "station_identifier_count": len(stations),
+        "station_name_count": len({station["station_name"] for station in stations}),
+        "sa2_exposure_status": "not_derived",
+    }, notices=[STATION_CONTEXT_NOTICE])
+
+
+@app.get("/api/data-quality/acecqa-geocoding")
+def acecqa_geocoding_quality() -> dict[str, Any]:
+    """Return aggregate match QA while withholding service-level address records."""
+    report, limitations = load_geocoding_quality()
+    if report is None:
+        return envelope("unavailable", None, limitations=limitations)
+    return envelope("available", report, metadata={
+        "source": "ACECQA service register matched to official Open G-NAF",
+        "geographic_assignment": "ASGS Edition 3 SA2 point-in-polygon",
+        "accepted_match_statuses": ["EXACT", "HIGH_CONFIDENCE"],
+        "address_fields_exposed": False,
+    })
 
 
 @app.get("/api/priority")
@@ -162,6 +303,76 @@ def neighbourhood_profile(neighbourhood_id: str) -> dict[str, Any]:
         "neighbourhood": profile["neighbourhood"],
         "domains": profile["domains"],
     }, metadata=profile_metadata(profile), limitations=profile_limitations(profile), notices=[AREA_LEVEL_NOTICE])
+
+
+@app.get("/api/neighbourhoods/{neighbourhood_id}/child-development")
+def neighbourhood_child_development(neighbourhood_id: str) -> dict[str, Any]:
+    """Return only approved aggregate child-development indicators from the profile."""
+    profiles, limitations = load_profiles()
+    empty = {
+        "neighbourhood": {"id": neighbourhood_id, "name": None, "geographic_unit": None},
+        "indicators": [],
+    }
+    if profiles is None:
+        return envelope("unavailable", empty, limitations=limitations,
+                        notices=[AREA_LEVEL_NOTICE])
+    profile = next((item for item in profiles
+                    if item["neighbourhood"]["id"] == neighbourhood_id), None)
+    if profile is None:
+        return envelope("missing", empty, limitations=[limitation(
+            "unsupported_neighbourhood",
+            "No supported child-development profile exists for this identifier.",
+            "neighbourhood_id", "child_development",
+        )], notices=[AREA_LEVEL_NOTICE])
+    domain = next((item for item in profile["domains"]
+                   if item["id"] == "child-development"), None)
+    if domain is None:
+        return envelope("unavailable", {
+            "neighbourhood": profile["neighbourhood"], "indicators": [],
+        }, limitations=[limitation(
+            "child_development_domain_unavailable",
+            "The approved profile does not contain a child-development domain.",
+            "child_development",
+        )], notices=[AREA_LEVEL_NOTICE])
+    indicators = domain["indicators"]
+    status = aggregate_status([indicator["status"] for indicator in indicators])
+    domain_limitations = [limitation(
+        f"indicator_{indicator['status']}",
+        f"{indicator['name']} is {indicator['status']} and no value has been created.",
+        indicator["id"],
+    ) for indicator in indicators if indicator["status"] != "available"]
+    return envelope(status, {
+        "neighbourhood": profile["neighbourhood"], "indicators": indicators,
+    }, metadata={
+        "sources": sorted({str(indicator["source"]) for indicator in indicators}),
+        "reference_years": sorted({str(indicator["reference_year"]) for indicator in indicators}),
+        "geographic_unit": profile["neighbourhood"]["geographic_unit"],
+        "primary_outcome_dataset": "AEDC",
+        "result_count": len(indicators),
+    }, limitations=domain_limitations, notices=[AREA_LEVEL_NOTICE])
+
+
+@app.get("/api/neighbourhoods/{neighbourhood_id}/early-childhood-services")
+def neighbourhood_early_childhood_services(neighbourhood_id: str) -> dict[str, Any]:
+    """Return address-free service context from accepted G-NAF matches."""
+    rows, limitations = load_early_childhood_context()
+    if rows is None:
+        return envelope("unavailable", None, limitations=limitations,
+                        notices=[AREA_LEVEL_NOTICE])
+    result = next((row for row in rows if row["neighbourhood_id"] == neighbourhood_id), None)
+    if result is None:
+        return envelope("missing", None, limitations=[limitation(
+            "early_childhood_context_not_found",
+            "No aggregate early-childhood service context exists for this neighbourhood.",
+            "neighbourhood_id",
+        )], notices=[AREA_LEVEL_NOTICE])
+    return envelope("available", result, metadata={
+        "source": "ACECQA service register and Open G-NAF August 2026 GDA2020",
+        "geographic_unit": "KinderPrint reporting locality",
+        "match_policy": "EXACT or HIGH_CONFIDENCE within reporting scope",
+        "address_fields_exposed": False,
+        "interpretation": "Service availability context; not service quality or child outcome.",
+    }, notices=[AREA_LEVEL_NOTICE])
 
 
 @app.get("/api/neighbourhoods/indicators")

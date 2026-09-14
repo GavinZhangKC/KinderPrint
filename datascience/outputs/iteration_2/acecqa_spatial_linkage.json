@@ -1,0 +1,9 @@
+{
+  "acecqa_services": 5016,
+  "vicmap_victorian_child_care_points": 5084,
+  "exact_matches_statewide": 4827,
+  "exact_matches_greater_melbourne": 3570,
+  "unresolved_acecqa_statewide": 189,
+  "temporarily_closed_in_greater_melbourne": 31,
+  "spatial_match_method": "EXACT_AUTHORITY_ID"
+}

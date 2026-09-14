@@ -17,6 +17,10 @@ ENVIRONMENTAL_DIFFERENCE_DATA_PATH_ENV = "KINDERPRINT_ENVIRONMENTAL_DIFFERENCE_D
 PATTERN_INSIGHT_DATA_PATH_ENV = "KINDERPRINT_PATTERN_INSIGHT_DATA_PATH"
 PREVENTION_OPPORTUNITY_DATA_PATH_ENV = "KINDERPRINT_PREVENTION_OPPORTUNITY_DATA_PATH"
 SUITABILITY_DATA_PATH_ENV = "KINDERPRINT_SUITABILITY_DATA_PATH"
+VIF_PROJECTION_DATA_PATH_ENV = "KINDERPRINT_VIF_PROJECTION_DATA_PATH"
+EPA_STATION_YEAR_DATA_PATH_ENV = "KINDERPRINT_EPA_STATION_YEAR_DATA_PATH"
+ACECQA_GEOCODING_DATA_PATH_ENV = "KINDERPRINT_ACECQA_GEOCODING_DATA_PATH"
+ACECQA_CONTEXT_DATA_PATH_ENV = "KINDERPRINT_ACECQA_CONTEXT_DATA_PATH"
 
 
 def boundary_data_path() -> Path | None:
@@ -66,6 +70,26 @@ def prevention_opportunity_data_path() -> Path | None:
 
 def suitability_data_path() -> Path | None:
     value = os.getenv(SUITABILITY_DATA_PATH_ENV)
+    return Path(value).expanduser() if value else None
+
+
+def vif_projection_data_path() -> Path | None:
+    value = os.getenv(VIF_PROJECTION_DATA_PATH_ENV)
+    return Path(value).expanduser() if value else None
+
+
+def epa_station_year_data_path() -> Path | None:
+    value = os.getenv(EPA_STATION_YEAR_DATA_PATH_ENV)
+    return Path(value).expanduser() if value else None
+
+
+def acecqa_geocoding_data_path() -> Path | None:
+    value = os.getenv(ACECQA_GEOCODING_DATA_PATH_ENV)
+    return Path(value).expanduser() if value else None
+
+
+def acecqa_context_data_path() -> Path | None:
+    value = os.getenv(ACECQA_CONTEXT_DATA_PATH_ENV)
     return Path(value).expanduser() if value else None
 
 

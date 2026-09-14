@@ -1,0 +1,10 @@
+{
+  "source": "validated processed matched_table.csv and final_table.csv",
+  "community_rows": 346,
+  "matched_pairs": 273,
+  "no_match": 69,
+  "self_matches": 0,
+  "stable_peer_identifier": "match_community_id",
+  "full_raw_refresh_status": "SUPERSEDED_BY_SUCCESSFUL_RAW_REFRESH_2026_09_14",
+  "raw_aedc_sha256": "4ffd8d5882f8e2f35d59eb2dae4d2bd0dab0e2afe4ac118b5913a6110c6ae8f9"
+}

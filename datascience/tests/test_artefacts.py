@@ -63,6 +63,14 @@ def test_match_strength_is_a_string(comparisons):
         s = m.get("match_strength")
         assert s is None or isinstance(s, str)
 
+def test_comparison_artefact_has_no_self_matches(comparisons):
+    for match in comparisons["matches"]:
+        peer = match.get("matched_neighbourhood")
+        if peer is not None:
+            assert match["source_neighbourhood"]["id"] != peer["id"]
+    for comparison in comparisons["comparisons"]:
+        assert comparison["source_neighbourhood"]["id"] != comparison["comparison_neighbourhood"]["id"]
+
 def test_no_match_records_are_complete(comparisons):
     for m in comparisons["matches"]:
         if m["status"] == "no_match":

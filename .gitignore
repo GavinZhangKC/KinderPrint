@@ -4,6 +4,7 @@ dist/
 
 # Backend
 backend/.venv/
+.venv/
 backend/lambda_package/
 .runtime/
 .aws-sam/

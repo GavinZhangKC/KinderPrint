@@ -1,0 +1,13 @@
+{
+  "total_acecqa_services": 5016,
+  "successfully_matched": 3314,
+  "exact_matches": 3187,
+  "high_confidence_matches": 127,
+  "ambiguous_or_review": 114,
+  "unmatched": 1588,
+  "sa2_assignment_success_greater_melbourne": 2450,
+  "records_included_in_spatial_analysis": 2450,
+  "records_excluded": 2566,
+  "matching_source": "Open G-NAF August 2026 GDA2020",
+  "policy": "Only exact/high-confidence deterministic matches within reporting scope are included."
+}

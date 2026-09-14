@@ -1,10 +1,36 @@
 # KinderPrint API Contract
 
-**Version:** 0.2
+**Version:** 0.3
 
 **Status:** Working Iteration 1 contract with provisional Iteration 2 extensions
 
-**Last updated:** 12 September 2026
+**Last updated:** 14 September 2026
+
+## BE-0 — Dataset readiness service
+
+### `GET /api/health/data`
+
+Runs schema validation for configured AEDC locality profiles, VIF projections, EPA
+station observations, and ACECQA/G-NAF geocoding output. The AEDC check additionally
+verifies exact identifier and geographic-unit alignment with configured boundaries.
+It reports only readiness states, record counts, and limitation codes—not source rows,
+addresses, environment values, or filesystem paths. This is distinct from the minimal
+process-liveness endpoint at `GET /api/health`.
+
+### `GET /api/datasets/status`
+
+Returns the configured state, intended role, geographic unit, interpretation status,
+and user-facing eligibility of each Iteration 2 data product. It never returns local
+filesystem paths. A configured dataset is not automatically approved for user-facing
+interpretation: EPA observations remain station context only, PHIDU child-health
+outcomes remain research only, and ACECQA/G-NAF output remains a quality-control input.
+
+### `GET /api/data-quality/acecqa-geocoding`
+
+Returns aggregate EXACT, HIGH_CONFIDENCE, REVIEW, UNMATCHED, SA2-assignment, inclusion,
+and exclusion counts. Service names, original and normalised addresses, G-NAF identifiers,
+and coordinates are never returned. The loader rejects any REVIEW or UNMATCHED row marked
+for inclusion in spatial analysis.
 
 This document describes the agreed API shape for Iteration 1 and provisional Backend + Integration contracts for Iteration 2. It is a design contract only. It does not define implementation logic, connect datasets, or approve Data Science or AI methods. Every unresolved decision is marked `TBC`.
 
@@ -47,13 +73,53 @@ Service responses use a consistent top-level envelope:
 }
 ```
 
-Final limitation codes, notice codes, and data-quality representation are TBC.
+Notice wording is the approved scientific framing recorded in
+`datascience/outputs/iteration_1/NOTICES.md`. Limitation codes and final
+data-quality representation remain subject to their individual endpoint contracts.
 
 ## BE-1 — Neighbourhood Profile Service
+
+### `GET /api/air-quality/stations`
+
+Returns annual summaries of published EPA Victoria hourly observations. Optional
+`station_id`, `year`, and `pollutant` filters operate only on monitoring-station rows.
+The endpoint deliberately has no SA2 or locality parameter and always states that
+area-level exposure was not derived. It must not be used as a neighbourhood indicator.
+Results are paginated with `offset` and `limit`; metadata reports page and total counts.
+
+### `GET /api/air-quality/station-catalog`
+
+Lists each monitoring station with its available years, pollutants, units, and method
+codes. This allows clients to construct valid station-level queries without presenting
+the station catalogue as a neighbourhood exposure layer.
+
+### `GET /api/population-projections`
+
+Returns Victoria in Future 2023 Release 2 child-population projections at their
+native ASGS Edition 3 SA2 geography. Optional `sa2_code`, `year`, and `sex` filters
+select source rows without interpolation or geographic redistribution. Responses
+identify every value as a projection and preserve the area-level-information notice.
+Results are paginated with `offset` and `limit`; metadata reports page and total counts.
 
 ### `GET /api/neighbourhoods/{neighbourhood_id}/profile`
 
 Returns an aggregate neighbourhood profile. The final geographic identifier format, geographic unit, and indicator lists are TBC.
+
+### `GET /api/neighbourhoods/{neighbourhood_id}/child-development`
+
+Returns only the approved Child Development domain from the configured profile artefact,
+with AEDC identified as KinderPrint's primary aggregate child-development outcome source.
+Social and environmental indicators are not included. Suppressed or unavailable AEDC
+values remain `null` with their source status and a corresponding limitation; the backend
+does not impute, downscale, or replace them.
+
+### `GET /api/neighbourhoods/{neighbourhood_id}/early-childhood-services`
+
+Returns aggregate ACECQA service counts for a KinderPrint reporting locality using only
+EXACT or HIGH_CONFIDENCE Open G-NAF matches within the reporting scope. Temporarily closed
+services are excluded. The response never contains service names, addresses, coordinates,
+postcodes, or G-NAF identifiers. These counts describe service availability context, not
+service quality, accessibility, capacity sufficiency, or child outcomes.
 
 ```json
 {
@@ -438,7 +504,11 @@ Both identifiers must be validated as supported neighbourhoods. The two neighbou
 
 The service must preserve source-provided missing, suppressed, unavailable, limited, and incompatible states. A non-available numeric value or difference is `null`, never zero, an average, a neighbouring-area value, or an inferred value. If no approved outcome-comparison result exists for the pair, the service returns `unavailable` or `missing` with a clear limitation and does not derive a result from profile data.
 
-The backend must not calculate outcome differences, statistical significance, confidence, rankings, or similarity. The final child-development outcome list, units, difference direction, significance or uncertainty representation, dataset location, schema, and approved notice wording are TBC pending the Data Science output contract.
+The backend must not calculate outcome differences, statistical significance, confidence,
+rankings, or similarity. The approved Iteration 2 artefact contains AEDC vulnerability on
+one or more domains, expressed as a percentage, and an `a - b` precomputed difference.
+It preserves non-significance limitations and null unavailable values. Seven self-pairs
+found in the earlier matched-comparison output are excluded by the data pipeline.
 
 ## BE-8 — Environmental Difference Service (supports E6)
 
@@ -512,7 +582,12 @@ Both identifiers must be validated as supported neighbourhoods using the confirm
 
 Missing, suppressed, unavailable, limited, or incompatible values and differences remain `null` with their supplied status. If the approved environmental-difference output is unavailable or does not contain the selected pair, the service returns an explicit unavailable state and does not calculate a difference from profile data.
 
-The backend must not calculate environmental differences, normalise values, assign ranks, choose standout factors, infer missing values, or make causal claims. The final environmental indicator list, units, difference direction, coverage representation, standout/ranking structure, pair ordering, dataset location, schema, and notice wording are TBC pending the Data Science output contract.
+The backend must not calculate environmental differences, normalise values, assign ranks,
+choose standout factors, infer missing values, or make causal claims. The approved output
+contains tree canopy percentage, urban heat-island degrees Celsius, and public open-space
+percentage for complete matched pairs. Differences are `a - b`; one pre-ranked standout
+identifier is supplied by the data pipeline. Pairs without all three harmonised indicators
+are withheld.
 
 ## BE-9 — Pattern Insight Service (supports E7)
 
