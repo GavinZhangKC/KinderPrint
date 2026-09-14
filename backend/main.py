@@ -21,6 +21,7 @@ from community_context import (
     TRAFFIC_EVIDENCE,
     TRAFFIC_METRIC_DEFINITIONS,
     load_community_context,
+    load_community_identities,
 )
 from geography import (
     feature_metadata,
@@ -478,8 +479,8 @@ def _overview_section(response: dict[str, Any]) -> dict[str, Any]:
 
 def _population_overview_section(neighbourhood_id: str) -> dict[str, Any]:
     """Return native-SA2 projections only when the locality is exactly one SA2."""
-    context_index, identity_limitations = load_community_context()
-    if context_index is None:
+    identity_index, identity_limitations = load_community_identities()
+    if identity_index is None:
         return _overview_section(envelope(
             "unavailable", {"projections": []},
             limitations=[limitation(
@@ -488,7 +489,7 @@ def _population_overview_section(neighbourhood_id: str) -> dict[str, Any]:
                 "population_projections", "neighbourhood_id",
             ), *identity_limitations],
         ))
-    identity = context_index.get(neighbourhood_id)
+    identity = identity_index.get(neighbourhood_id)
     if identity is None:
         return _overview_section(envelope(
             "missing", {"projections": []}, limitations=[limitation(

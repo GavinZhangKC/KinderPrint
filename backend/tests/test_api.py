@@ -3,7 +3,7 @@ from collections import Counter
 from pathlib import Path
 
 from air_quality import _load_station_year_observations, load_station_year_observations
-from community_context import _load_community_context
+from community_context import _load_community_context, _load_community_identities
 from data_loader import (
     ACECQA_CONTEXT_DATA_PATH_ENV,
     ACECQA_GEOCODING_DATA_PATH_ENV,
@@ -290,6 +290,7 @@ def configure_community_context(
     monkeypatch.setenv(COMMUNITY_CONTEXT_DATA_PATH_ENV, str(context))
     monkeypatch.setenv(COMMUNITY_IDENTITY_DATA_PATH_ENV, str(identities))
     _load_community_context.cache_clear()
+    _load_community_identities.cache_clear()
     return context, identities
 
 
@@ -509,6 +510,19 @@ def test_neighbourhood_overview_withholds_population_for_merged_locality(
     assert population["metadata"]["reporting_locality_component_sa2_count"] == 2
     assert population["limitations"][0]["code"] == (
         "population_projection_incompatible_geography")
+
+
+def test_neighbourhood_overview_population_does_not_depend_on_context_metrics(
+    client, monkeypatch, tmp_path
+) -> None:
+    configure_overview_sources(monkeypatch, tmp_path)
+    monkeypatch.delenv(COMMUNITY_CONTEXT_DATA_PATH_ENV)
+
+    body = client.get("/api/neighbourhoods/206011106/overview").json()
+
+    assert body["data"]["sections"]["traffic"]["status"] == "unavailable"
+    assert body["data"]["sections"]["industrial_emissions"]["status"] == "unavailable"
+    assert body["data"]["sections"]["population_outlook"]["status"] == "available"
 
 
 def test_static_csv_loaders_reuse_validated_files(monkeypatch, tmp_path) -> None:

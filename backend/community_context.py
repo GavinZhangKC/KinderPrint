@@ -117,21 +117,21 @@ INDUSTRIAL_EVIDENCE = {
 
 
 @lru_cache(maxsize=1)
-def _load_community_context(
-    context_path: Path,
+def _load_community_identities(
     identity_path: Path,
 ) -> tuple[dict[str, dict[str, Any]] | None, tuple[dict[str, Any], ...]]:
-    """Load, validate and index static DS context without deriving new values."""
-    if not context_path.is_file() or not identity_path.is_file():
+    """Load reporting-locality identities independently of context metrics."""
+    if not identity_path.is_file():
         return None, (limitation(
-            "community_context_dataset_unavailable",
-            "A configured community context or identity dataset could not be found.",
-            "community_context",
+            "community_identity_dataset_unavailable",
+            "The configured reporting-locality identity dataset could not be found.",
+            "community_identity",
         ),)
     try:
         with identity_path.open(encoding="utf-8-sig", newline="") as source:
             identity_reader = csv.DictReader(source)
-            if not identity_reader.fieldnames or not IDENTITY_FIELDS.issubset(identity_reader.fieldnames):
+            if (not identity_reader.fieldnames
+                    or not IDENTITY_FIELDS.issubset(identity_reader.fieldnames)):
                 raise ValueError
             identities: dict[str, dict[str, Any]] = {}
             neighbourhood_ids: set[str] = set()
@@ -147,7 +147,8 @@ def _load_community_context(
                 if (not community_id or not neighbourhood_id or not name
                         or component_sa2_count < 1
                         or is_merged != (component_sa2_count > 1)
-                        or community_id in identities or neighbourhood_id in neighbourhood_ids):
+                        or community_id in identities
+                        or neighbourhood_id in neighbourhood_ids):
                     raise ValueError
                 identities[community_id] = {
                     "neighbourhood": {
@@ -159,7 +160,50 @@ def _load_community_context(
                     "is_merged": is_merged,
                 }
                 neighbourhood_ids.add(neighbourhood_id)
+    except (OSError, UnicodeError, csv.Error, TypeError, ValueError):
+        return None, (limitation(
+            "community_identity_dataset_invalid",
+            "The reporting-locality identity dataset failed schema or identity validation.",
+            "community_identity",
+        ),)
+    return identities, ()
 
+
+def load_community_identities(
+) -> tuple[dict[str, dict[str, Any]] | None, list[dict[str, Any]]]:
+    """Return validated identities indexed by public neighbourhood identifier."""
+    identity_path = community_identity_data_path()
+    if identity_path is None:
+        return None, [limitation(
+            "community_identity_dataset_not_configured",
+            f"Set {COMMUNITY_IDENTITY_DATA_PATH_ENV} to the reporting-locality identity CSV.",
+            "community_identity",
+        )]
+    identities, limitations = _load_community_identities(identity_path)
+    if identities is None:
+        return None, list(limitations)
+    return {
+        identity["neighbourhood"]["id"]: identity
+        for identity in identities.values()
+    }, []
+
+
+@lru_cache(maxsize=1)
+def _load_community_context(
+    context_path: Path,
+    identity_path: Path,
+) -> tuple[dict[str, dict[str, Any]] | None, tuple[dict[str, Any], ...]]:
+    """Load, validate and index static DS context without deriving new values."""
+    if not context_path.is_file():
+        return None, (limitation(
+            "community_context_dataset_unavailable",
+            "The configured community context dataset could not be found.",
+            "community_context",
+        ),)
+    identities, identity_limitations = _load_community_identities(identity_path)
+    if identities is None:
+        return None, identity_limitations
+    try:
         with context_path.open(encoding="utf-8-sig", newline="") as source:
             context_reader = csv.DictReader(source)
             if not context_reader.fieldnames or not CONTEXT_FIELDS.issubset(context_reader.fieldnames):
@@ -218,17 +262,17 @@ def _load_community_context(
 def load_community_context() -> tuple[dict[str, dict[str, Any]] | None, list[dict[str, Any]]]:
     context_path = community_context_data_path()
     identity_path = community_identity_data_path()
-    if context_path is None or identity_path is None:
-        missing_variables = [
-            variable for path, variable in (
-                (context_path, COMMUNITY_CONTEXT_DATA_PATH_ENV),
-                (identity_path, COMMUNITY_IDENTITY_DATA_PATH_ENV),
-            ) if path is None
-        ]
+    if context_path is None:
         return None, [limitation(
             "community_context_dataset_not_configured",
-            f"Configure the required community context datasets: {', '.join(missing_variables)}.",
+            f"Set {COMMUNITY_CONTEXT_DATA_PATH_ENV} to the community context CSV.",
             "community_context",
+        )]
+    if identity_path is None:
+        return None, [limitation(
+            "community_identity_dataset_not_configured",
+            f"Set {COMMUNITY_IDENTITY_DATA_PATH_ENV} to the reporting-locality identity CSV.",
+            "community_identity",
         )]
     index, limitations = _load_community_context(context_path, identity_path)
     return index, list(limitations)
