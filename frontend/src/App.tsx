@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 
 import './styles.css'
+import './components/SimulationPage.css'
 
 import AboutUsPage from './components/AboutUsPage'
 import BrandHeader from './components/BrandHeader'
@@ -15,6 +16,7 @@ import LocalitySuitabilityPanel from './components/LocalitySuitabilityPanel'
 import NeighbourhoodMap from './components/NeighbourhoodMap'
 import PreferencePanel from './components/PreferencePanel'
 import ProfileModal from './components/ProfileModal'
+import SimulationPage from './components/SimulationPage'
 import WaterRippleBackground from './components/WaterRippleBackground'
 
 import { useNeighbourhoodSearch } from './hooks/useNeighbourhoodSearch'
@@ -47,6 +49,7 @@ type AppPage =
   | 'insight'
   | 'map'
   | 'about'
+  | 'simulation'
 
 export default function App() {
 const [appPage, setAppPage] =
@@ -281,6 +284,13 @@ function backToLanding() {
     resetExplore()
     setAppPage('landing')
   }
+function backToMenu() {
+    resetExplore()
+    setAppPage('landing')
+    window.setTimeout(() => {
+      document.getElementById('home-explore')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }, 0)
+  }
 function openMapPage() {
     resetExplore()
     setAppPage('map')
@@ -486,6 +496,7 @@ if (appPage === 'landing') {
         <LandingPage
           onInsight={openInsightPage}
           onMap={openMapPage}
+          onSimulation={() => setAppPage('simulation')}
         />
       </div>
     )
@@ -498,6 +509,7 @@ if (appPage === 'landing') {
         <MenuPage
           onInsight={openInsightPage}
           onMap={openMapPage}
+          onSimulation={() => setAppPage('simulation')}
           onAboutUs={() => setAppPage('about')}
         />
       </div>
@@ -506,6 +518,16 @@ if (appPage === 'landing') {
 
   if (appPage === 'about') {
     return <AboutUsPage onHome={backToLanding} onInsight={openInsightPage} onMap={openMapPage} />
+  }
+
+  if (appPage === 'simulation') {
+    return (
+      <SimulationPage
+        onLogoClick={backToLanding}
+        onBackToMenu={backToMenu}
+        onExploreMap={openMapPage}
+      />
+    )
   }
 
   if (appPage === 'insight') {

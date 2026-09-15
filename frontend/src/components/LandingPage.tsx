@@ -6,6 +6,7 @@ import '../styles/landing.css'
 interface LandingPageProps {
   onInsight: () => void
   onMap: () => void
+  onSimulation: () => void
 }
 
 interface HomeHeaderProps extends LandingPageProps {
@@ -16,7 +17,8 @@ interface HomeHeaderProps extends LandingPageProps {
 const exploreItems = [
   { id: 'insight', number: '01', label: 'Insight Journey', videoSrc: '/insight-preview.mp4' },
   { id: 'map', number: '02', label: 'Interactive Map', videoSrc: '/map-preview.mp4' },
-  { id: 'about', number: '03', label: 'About Us', videoSrc: '/about-preview.mp4' },
+  { id: 'simulation', number: '03', label: 'Simulation', videoSrc: '/simulation-preview.mp4' },
+  { id: 'about', number: '04', label: 'About Us', videoSrc: '/about-preview.mp4' },
 ] as const
 
 type ExploreItemId = typeof exploreItems[number]['id']
@@ -85,7 +87,7 @@ function ExploreMenuLink({ item, onSelect }: ExploreMenuLinkProps) {
   )
 }
 
-function HomeHeader({ onHome, onInsight, onMap, onAboutUs }: HomeHeaderProps) {
+function HomeHeader({ onHome, onInsight, onMap, onSimulation, onAboutUs }: HomeHeaderProps) {
   return (
     <header className="glass home-header" data-no-ripple>
       <button className="home-brand" type="button" onClick={onHome} aria-label="Go to KinderPrint home">
@@ -96,6 +98,7 @@ function HomeHeader({ onHome, onInsight, onMap, onAboutUs }: HomeHeaderProps) {
         <button type="button" aria-current="page" onClick={onHome}>Home</button>
         <button type="button" onClick={onInsight}>Insight Journey</button>
         <button type="button" onClick={onMap}>Map</button>
+        <button type="button" onClick={onSimulation}>Simulation</button>
         <button type="button" onClick={onAboutUs}>About Us</button>
       </nav>
     </header>
@@ -106,10 +109,11 @@ function scrollToSection(id: string) {
   document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
 }
 
-export default function LandingPage({ onInsight, onMap }: LandingPageProps) {
+export default function LandingPage({ onInsight, onMap, onSimulation }: LandingPageProps) {
   const openExploreItem = (id: ExploreItemId) => {
     if (id === 'insight') onInsight()
     else if (id === 'map') onMap()
+    else if (id === 'simulation') onSimulation()
     else scrollToSection('home-about')
   }
 
@@ -119,6 +123,7 @@ export default function LandingPage({ onInsight, onMap }: LandingPageProps) {
         onHome={() => scrollToSection('home-hero')}
         onInsight={onInsight}
         onMap={onMap}
+        onSimulation={onSimulation}
         onAboutUs={() => scrollToSection('home-about')}
       />
 
