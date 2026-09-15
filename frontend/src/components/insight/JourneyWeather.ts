@@ -15,8 +15,8 @@ float noise(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.0-2.0*f);return mix(mix(
 float fbm(vec2 p){float n=0.0,a=.53;mat2 r=mat2(.87,.49,-.49,.87);for(int i=0;i<5;i++){n+=a*noise(p);p=r*p*2.03+11.7;a*=.48;}return n;}
 void main(){
  vec2 uv=vUv;
- vec3 sky=mix(vec3(.72,.86,.92),vec3(.38,.65,.83),smoothstep(.12,1.0,uv.y));
- sky=mix(sky,mix(vec3(.48,.59,.68),vec3(.25,.35,.48),uv.y),uStorm);
+ vec3 sky=mix(vec3(.69,.78,.72),vec3(.20,.43,.45),smoothstep(.12,1.0,uv.y));
+ sky=mix(sky,mix(vec3(.39,.49,.49),vec3(.13,.24,.28),uv.y),uStorm);
  vec2 sunUv=(uv-vec2(.77,.82))*vec2(uAspect,1.0);
  float sunDistance=length(sunUv);
  float sunPower=(.22+.78*uSun)*(1.0-.95*uStorm);
@@ -29,13 +29,13 @@ void main(){
  float threshold=.67-uStorm*.34+uSun*.06;
  float density=smoothstep(threshold-.065,threshold+.16,n)*smoothstep(.12,.42,uv.y);
  float edge=clamp((fbm(q+vec2(0.,.18))-n)*4.+.52,0.,1.);
- vec3 cloud=mix(vec3(.67,.76,.82),vec3(.95,.97,.98),edge);
- cloud=mix(cloud,mix(vec3(.25,.32,.43),vec3(.65,.71,.79),edge),uStorm);
+ vec3 cloud=mix(vec3(.61,.70,.67),vec3(.91,.93,.88),edge);
+ cloud=mix(cloud,mix(vec3(.18,.26,.28),vec3(.55,.63,.62),edge),uStorm);
  sky=mix(sky,cloud,density*.97);
  vec2 q2=uv*vec2(3.4,2.8)-drift*1.6+vec2(3.1,11.4);
  float nearNoise=fbm(q2+fbm(q2*.7)*.5);
  float nearDensity=smoothstep(.64-uStorm*.24,.79-uStorm*.24,nearNoise)*smoothstep(.4,.82,uv.y)*(1.-uSun*.8);
- vec3 nearCloud=mix(vec3(.84,.89,.94),vec3(.28,.36,.47),uStorm);
+ vec3 nearCloud=mix(vec3(.80,.85,.80),vec3(.22,.30,.32),uStorm);
  sky=mix(sky,nearCloud,nearDensity*.82);
  gl_FragColor=vec4(sky,1.);
 }`

@@ -5,6 +5,7 @@ import { chapters } from './insight/journey'
 import { useInsightData } from './insight/useInsightData'
 import { useJourney } from './insight/useJourney'
 import './InsightPage.css'
+import './InsightEmergentTheme.css'
 
 interface InsightPageProps {
   onLogoClick: () => void
@@ -79,7 +80,8 @@ export default function InsightPage({ onLogoClick, onAboutUs, onExploreMap }: In
       <div className="insight-scene" ref={sceneRef}>
         {chapters.map((_, index) => <span className="insight-station" data-station={index} key={index}>{String(index + 1).padStart(2, '0')}</span>)}
       </div>
-      <div className="insight-clouds" /><div className="insight-atmosphere" />
+      <div className="insight-clouds" />
+      <div className="insight-atmosphere" />
     </div>
     <BrandHeader
       activePage="insight"
