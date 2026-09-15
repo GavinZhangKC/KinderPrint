@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
 
 @font-face {
   font-family: 'Changa-Medium';
@@ -9,7 +9,7 @@
 }
 
 :root {
-  font-family: 'Manrope', 'Segoe UI', sans-serif;
+  font-family: 'Plus Jakarta Sans', 'Manrope', 'Segoe UI', sans-serif;
   color: #233a63;
   background: #edf4ff;
   font-synthesis: none;
@@ -32,7 +32,22 @@
 }
 
 * { box-sizing: border-box; }
-h2 { font-family: 'Changa-Medium', 'Manrope', 'Segoe UI', sans-serif; letter-spacing: .035em; }
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: 'Playfair Display', Georgia, serif !important;
+  font-weight: 500;
+}
+
+button,
+input,
+select,
+textarea {
+  font-family: 'Plus Jakarta Sans', 'Segoe UI', sans-serif;
+}
 html *::-webkit-scrollbar-button,
 html *::-webkit-scrollbar-button:single-button,
 html *::-webkit-scrollbar-button:vertical,

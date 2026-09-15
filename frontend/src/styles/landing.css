@@ -172,9 +172,7 @@ html:has(.home-page) body::-webkit-scrollbar {
   position: absolute;
   inset: 0;
   z-index: 1;
-  background:
-    linear-gradient(90deg, rgba(239, 246, 255, .68) 0%, rgba(239, 246, 255, .56) 45%, rgba(239, 246, 255, 0) 100%),
-    linear-gradient(180deg, rgba(255, 255, 255, 0), rgba(225, 237, 255, .26));
+  background:linear-gradient(90deg,rgba(7,31,34,.24),transparent 60%),linear-gradient(180deg,rgba(255,255,255,0),rgba(7,29,31,.18));
   pointer-events: none;
 }
 
@@ -184,6 +182,8 @@ html:has(.home-page) body::-webkit-scrollbar {
   max-width: 1120px;
 }
 
+.home-hero-story-video + .home-hero-copy{z-index:3}.home-hero:has(.home-hero-story-video) h1,.home-hero:has(.home-hero-story-video) .landing-subheading,.home-hero:has(.home-hero-story-video) .landing-copy,.home-hero:has(.home-hero-story-video) .landing-kicker{color:#f1f7f3;text-shadow:0 2px 20px rgba(2,20,21,.35)}.home-hero:has(.home-hero-story-video) .home-hero-copy{max-width:760px}.home-hero:has(.home-hero-story-video) .landing-copy{max-width:650px;color:rgba(239,247,243,.82)}.home-hero:has(.home-hero-story-video) .landing-subheading{color:rgba(239,247,243,.94)}.home-hero:has(.home-hero-story-video) .landing-kicker{color:#b7d9ca}.home-hero:has(.home-hero-story-video) .home-hero-button{background:#e7f2ed;color:#153e42;box-shadow:0 16px 40px rgba(3,28,30,.25)}
+
 .landing-kicker,
 .home-section-kicker {
   margin: 0 0 24px;
@@ -191,7 +191,7 @@ html:has(.home-page) body::-webkit-scrollbar {
   font-size: 11px;
   font-weight: 800;
   letter-spacing: .18em;
-  text-transform: uppercase;
+  text-transform: none;
 }
 
 .home-hero h1 {
@@ -744,4 +744,54 @@ html:has(.home-page) body::-webkit-scrollbar {
     scroll-behavior: auto !important;
     transition: none !important;
   }
+}
+
+/* Approved Growth Map template */
+.home-page .home-header{top:0;width:100%;height:76px;padding:0 max(7vw,28px);border:0;border-bottom:1px solid rgba(232,241,237,.13);border-radius:0;background:linear-gradient(180deg,rgba(7,35,37,.72),rgba(7,35,37,.08));box-shadow:none;color:#e8f1ed;backdrop-filter:none}.home-page .home-brand{color:#eef5f1;font-family:'Playfair Display',Georgia,serif;font-size:18px;font-weight:500;text-shadow:none}.home-page .home-brand img{width:31px;height:31px}.home-page .home-nav{gap:clamp(14px,2vw,30px);color:#b5c8c1;font-family:'Plus Jakarta Sans',sans-serif;font-size:11px;font-weight:500}.home-page .home-nav button{padding:11px 0;text-shadow:none}.home-page .home-nav button:hover,.home-page .home-nav button[aria-current='page']{color:#f2f7f4}.home-page .home-nav button[aria-current='page']::after{display:none}.home-page .home-nav .home-nav-cta{padding:10px 14px;border:1px solid rgba(223,238,232,.35);font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase}.home-page .home-hero{min-height:100svh;padding:clamp(145px,18vh,190px) max(7vw,28px) 80px}.home-page .home-hero-copy{max-width:700px}.home-page .home-hero h1{font-family:'Playfair Display','CanelaDeck-Medium-Trial',Georgia,serif;font-size:clamp(64px,7vw,104px);font-weight:400;line-height:.93;letter-spacing:-.045em}.home-page .home-hero h1 em{font-weight:400}.home-page .landing-kicker{font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:500;letter-spacing:.25em}.home-page .landing-subheading{max-width:620px;margin-top:36px;font-size:clamp(17px,1.5vw,21px);font-weight:400;line-height:1.65}.home-page .landing-copy{display:none}.home-page .home-hero-actions{margin-top:28px;gap:10px}.home-page .home-hero-button,.home-page .home-hero-secondary{min-height:48px;padding:0 20px;border-radius:0;font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:500;letter-spacing:.15em;text-transform:uppercase}.home-page .home-hero-secondary{border:1px solid rgba(229,240,235,.28);background:rgba(8,39,41,.2);color:#edf5f1}.home-page .home-hero-trust{max-width:430px;margin:34px 0 0;color:rgba(223,236,230,.58);font-size:10px;line-height:1.6}.home-page .home-hero::after{background:linear-gradient(90deg,rgba(5,31,33,.94),rgba(7,36,38,.75) 42%,rgba(7,36,38,.2) 70%,rgba(5,29,31,.16)),linear-gradient(180deg,rgba(6,31,33,.12),rgba(5,28,30,.4))}.home-page .home-hero-story-video .ambient-story-video__grade{background:transparent}
+@media(max-width:900px){.home-page .home-nav button:nth-child(2),.home-page .home-nav button:nth-child(3),.home-page .home-nav button:nth-child(4),.home-page .home-nav button:nth-child(5){display:none}}
+@media(max-width:600px){.home-page .home-header{height:66px;padding-inline:18px}.home-page .home-hero{padding:135px 24px 70px}.home-page .home-hero h1{font-size:58px}.home-page .landing-subheading{font-size:16px}.home-page .home-hero-actions{display:grid;align-items:stretch}.home-page .home-hero-button,.home-page .home-hero-secondary{width:100%}}
+
+/* Exact Emergent reference typography */
+.home-page .home-hero-copy {
+  max-width: 760px;
+}
+
+.home-page .home-hero h1 {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: clamp(2.55rem, 6.4vw, 5.9rem);
+  font-weight: 400;
+  line-height: 1.03;
+  letter-spacing: -.025em;
+  text-transform: none;
+}
+
+.home-page .home-hero h1 span {
+  color: #d6a04b;
+}
+
+@media(max-width:600px) {
+  .home-page .home-hero h1 {
+    font-size: clamp(2.55rem, 12vw, 4rem);
+  }
+}
+
+/* Keep the landing experience full-bleed on wide displays. */
+html:has(.home-page),
+html:has(.home-page) body,
+html:has(.home-page) #root,
+.entry-pages:has(.home-page),
+.home-page,
+.home-page .home-content {
+  width: 100%;
+  max-width: none;
+  margin-inline: 0;
+}
+
+.home-page .home-hero,
+.home-page .home-insight,
+.home-page .home-about,
+.home-page .home-explore {
+  width: 100%;
+  max-width: none;
+  margin-inline: 0;
 }
