@@ -1,6 +1,6 @@
-# KinderPrint Frontend — TSX/Figma implementation
+# Vkinder Frontend — TSX/Figma implementation
 
-This folder is a frontend-only React + TypeScript + Vite implementation of the current KinderPrint Figma states:
+This folder is a frontend-only React + TypeScript + Vite implementation of the current Vkinder Figma states:
 
 1. Explore / map state
 2. Neighbourhood profile state

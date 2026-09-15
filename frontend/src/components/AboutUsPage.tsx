@@ -24,10 +24,10 @@ export default function AboutUsPage({ onHome, onInsight, onMap }: AboutUsPagePro
         </div>
 
         <div className="about-us-content">
-          <p className="about-us-kicker">About KinderPrint</p>
+          <p className="about-us-kicker">About Vkinder</p>
           <h2 id="about-us-title">Evidence for thoughtful local exploration.</h2>
           <p>
-            KinderPrint brings together neighbourhood-level child development, social and
+            Vkinder brings together neighbourhood-level child development, social and
             environmental evidence to help users explore local conditions and identify areas
             for further investigation.
           </p>

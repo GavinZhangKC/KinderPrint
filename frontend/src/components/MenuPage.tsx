@@ -82,7 +82,7 @@ export default function MenuPage({ onInsight, onMap, onAboutUs }: MenuPageProps)
   return (
     <section className="menu-page" id="menu" aria-labelledby="menu-title" data-ripple-surface>
       <div className="menu-intro" data-no-ripple>
-        <p>Explore KinderPrint</p>
+        <p>Explore Vkinder</p>
         <h2 id="menu-title">Choose where to begin.</h2>
       </div>
 

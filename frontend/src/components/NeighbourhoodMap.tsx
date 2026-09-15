@@ -507,7 +507,7 @@ clearHover()
           requestNumberRef.current
         ) {
           setMapError(
-            'Could not load neighbourhood boundaries from the KinderPrint API.',
+            'Could not load neighbourhood boundaries from the Vkinder API.',
           )
         }
       } finally {

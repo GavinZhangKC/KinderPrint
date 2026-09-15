@@ -11,9 +11,9 @@ interface BrandHeaderProps {
 export default function BrandHeader({ activePage, onHome, onInsight, onMap, onAboutUs }: BrandHeaderProps) {
   return (
     <header className="glass nav-shell">
-      <button className="brand-button" type="button" onClick={onHome} aria-label="Go to KinderPrint home">
+      <button className="brand-button" type="button" onClick={onHome} aria-label="Go to Vkinder home">
         <img src={logo} alt="" className="brand-logo" />
-        <span>KinderPrint</span>
+        <span>Vkinder</span>
       </button>
       <nav className="nav-links" aria-label="Primary navigation">
         <button className={activePage === 'home' ? 'active' : undefined} aria-current={activePage === 'home' ? 'page' : undefined} type="button" onClick={onHome}>Home</button>
