@@ -98,6 +98,15 @@ const optionGroups: Array<{ title: string; summary: string; options: Suitability
     ],
   },
   {
+    title: 'Approved early-childhood education and care',
+    summary: 'ACECQA-listed supply is population-adjusted. It does not indicate vacancies, affordability, attendance, workforce or service quality.',
+    options: [
+      { id: 'approved_early_childhood_places', label: 'More approved early-childhood places per resident', description: 'Ranks localities by total approved places at successfully geocoded, active ACECQA services per 10,000 residents.', source: 'ACECQA register + G-NAF, 2026', available: true },
+      { id: 'long_day_care_availability', label: 'More long day care services per resident', description: 'Ranks localities by successfully geocoded, active ACECQA services offering long day care per 10,000 residents.', source: 'ACECQA register + G-NAF, 2026', available: true },
+      { id: 'kindergarten_availability', label: 'More preschool and kindergarten services per resident', description: 'Ranks localities by successfully geocoded, active ACECQA services offering school-based or standalone preschool or kindergarten per 10,000 residents.', source: 'ACECQA register + G-NAF, 2026', available: true },
+    ],
+  },
+  {
     title: 'Primary, early-years and urgent healthcare access',
     summary: 'Presence is not the same as capacity, waiting time, eligibility, affordability or quality.',
     options: [
