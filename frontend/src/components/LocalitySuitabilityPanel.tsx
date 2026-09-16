@@ -99,11 +99,12 @@ const optionGroups: Array<{ title: string; summary: string; options: Suitability
     summary: 'Presence is not the same as capacity, waiting time, eligibility, affordability or quality.',
     options: [
       { id: 'general_paediatrics', label: 'General paediatricians', description: 'Community or hospital doctors providing specialist care for babies, children and adolescents.', source: 'Service directory not integrated', available: false },
-      { id: 'gp', label: 'General practitioners', description: 'Primary-care practices accepting children, including opening hours and bulk-billing status.', source: 'Service directory not integrated', available: false },
+      { id: 'general_practice_access', label: 'More listed general practices per resident', description: 'Ranks localities by active HealthDirect-listed general practices per 10,000 residents. It does not indicate child eligibility, bulk billing, capacity or opening hours.', source: 'Geoscience Australia / HealthDirect, 2025', available: true },
+      { id: 'pharmacy_access', label: 'More listed pharmacies per resident', description: 'Ranks localities by active HealthDirect-listed pharmacies per 10,000 residents. It measures listed facility presence, not stock, opening hours or service quality.', source: 'Geoscience Australia / HealthDirect, 2025', available: true },
       { id: 'mch', label: 'Maternal and Child Health services', description: 'Universal and enhanced MCH centres supporting families from birth to school age.', source: 'Service locations not integrated', available: false },
       { id: 'early_parenting', label: 'Early Parenting Centres', description: 'Specialist support for sleep, settling, feeding and parenting for families with young children.', source: 'Service locations not integrated', available: false },
       { id: 'urgent_emergency', label: 'Paediatric urgent and emergency care', description: 'Child-capable urgent care, emergency departments and travel-time access.', source: 'Access model not integrated', available: false },
-      { id: 'hospital_neonatal', label: 'Children’s hospital and neonatal care', description: 'Paediatric inpatient, neonatal intensive-care and special-care nursery access.', source: 'Access model not integrated', available: false },
+      { id: 'hospital_access', label: 'More listed hospitals per resident', description: 'Ranks localities by active HealthDirect-listed hospitals per 10,000 residents. The source does not identify paediatric capability, neonatal services, capacity or travel time.', source: 'Geoscience Australia / HealthDirect, 2025', available: true },
     ],
   },
   {
@@ -163,6 +164,7 @@ const evidencePatterns = [
   { label: 'Development + canopy', criteria: ['development_on_track', 'tree_canopy'], description: 'On-track development alongside tree-canopy coverage' },
   { label: 'Vulnerability + heat', criteria: ['lower_developmental_vulnerability', 'lower_urban_heat'], description: 'Lower developmental vulnerability alongside lower urban heat' },
   { label: 'Green-space access', criteria: ['tree_canopy', 'public_open_space'], description: 'Tree canopy and public open space considered together' },
+  { label: 'Everyday healthcare availability', criteria: ['general_practice_access', 'pharmacy_access', 'hospital_access'], description: 'Population-adjusted presence of listed general practices, pharmacies and hospitals' },
   { label: 'Whole evidence view', criteria: ['development_on_track', 'lower_developmental_vulnerability', 'tree_canopy', 'public_open_space', 'lower_urban_heat', 'socioeconomic_resources'], description: 'All currently supported measures, equally weighted' },
 ]
 
