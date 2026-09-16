@@ -12,6 +12,10 @@ def suitability_scores(**overrides) -> dict:
     return {criterion: overrides.get(criterion) for criterion in SUITABILITY_CRITERIA}
 
 
+def suitability_measures(**overrides) -> dict:
+    return {criterion: overrides.get(criterion) for criterion in SUITABILITY_CRITERIA}
+
+
 def assert_envelope(response: dict) -> None:
     assert set(response) == {"status", "data", "metadata", "limitations", "notices"}
 
@@ -73,9 +77,11 @@ def test_locality_suitability_serves_precomputed_ranking(client, monkeypatch, wr
     suitability_path = write_json("suitability.json", json.dumps({
         "localities": [
             {"id": "best", "name": "Best", "geographic_unit": "SA2",
-             "scores": suitability_scores(development_on_track=80, tree_canopy=80, socioeconomic_resources=80)},
+             "scores": suitability_scores(development_on_track=80, tree_canopy=80, socioeconomic_resources=80),
+             "measures": suitability_measures(development_on_track=80, tree_canopy=18.2, socioeconomic_resources=8)},
             {"id": "worst", "name": "Worst", "geographic_unit": "SA2",
-             "scores": suitability_scores(development_on_track=20, tree_canopy=20, socioeconomic_resources=20)},
+             "scores": suitability_scores(development_on_track=20, tree_canopy=20, socioeconomic_resources=20),
+             "measures": suitability_measures(development_on_track=20, tree_canopy=4.1, socioeconomic_resources=2)},
         ],
         "metadata": {"source": "Approved profile dataset"},
     }))
@@ -89,6 +95,7 @@ def test_locality_suitability_serves_precomputed_ranking(client, monkeypatch, wr
     assert body["data"]["localities"][0]["score"] >= body["data"]["localities"][1]["score"]
     assert body["data"]["criteria"][0] == "development_on_track"
     assert body["data"]["withheld_count"] == 0
+    assert body["data"]["localities"][0]["measures"]["tree_canopy"] == 18.2
 
 
 def test_locality_suitability_requires_supported_criteria(client, monkeypatch, write_json) -> None:
@@ -111,9 +118,10 @@ def test_locality_suitability_withholds_incomplete_results(client, monkeypatch, 
     suitability_path = write_json("suitability.json", json.dumps({
         "localities": [
             {"id": "complete", "name": "Complete", "geographic_unit": "SA2",
-             "scores": suitability_scores(tree_canopy=75)},
+             "scores": suitability_scores(tree_canopy=75),
+             "measures": suitability_measures(tree_canopy=22.0)},
             {"id": "missing", "name": "Missing", "geographic_unit": "SA2",
-             "scores": suitability_scores()},
+             "scores": suitability_scores(), "measures": suitability_measures()},
         ],
         "metadata": {"source": "Approved profile dataset"},
     }))

@@ -106,6 +106,7 @@ SUITABILITY_CRITERIA = {
     "approved_early_childhood_places",
     "long_day_care_availability",
     "kindergarten_availability",
+    "primary_school_campus_availability",
 }
 
 
@@ -161,16 +162,22 @@ def load_suitability_rankings() -> tuple[
                 "localities",
             )]
         scores = locality.get("scores")
+        measures = locality.get("measures")
         if (not all(isinstance(locality.get(field), str) and locality[field].strip()
                     for field in ("id", "name", "geographic_unit"))
                 or not isinstance(scores, dict)
                 or set(scores) != SUITABILITY_CRITERIA
+                or not isinstance(measures, dict)
+                or set(measures) != SUITABILITY_CRITERIA
                 or not all(value is None or (isinstance(value, (int, float))
                                               and not isinstance(value, bool))
-                           for value in scores.values())):
+                           for value in scores.values())
+                or not all(value is None or (isinstance(value, (int, float))
+                                              and not isinstance(value, bool))
+                           for value in measures.values())):
             return None, None, [limitation(
                 "suitability_dataset_invalid",
-                "The suitability dataset contains invalid criterion scores.",
+                "The suitability dataset contains invalid criterion scores or measures.",
                 "localities",
             )]
     return localities, metadata, []

@@ -715,6 +715,7 @@ def locality_suitability(
         "approved_early_childhood_places",
         "long_day_care_availability",
         "kindergarten_availability",
+        "primary_school_campus_availability",
     }
     selected_criteria = [
         item.strip()
@@ -762,6 +763,12 @@ def locality_suitability(
             "score": round(sum(values) / len(values), 2),
             "status": "available",
             "criteria": selected_criteria,
+            "measures": {
+                item: locality.get("measures", {}).get(item) for item in selected_criteria
+            },
+            "criterion_scores": {
+                item: locality["scores"].get(item) for item in selected_criteria
+            },
             "limitations": [],
         })
     ranked = sorted(available, key=lambda item: item["score"], reverse=True)[:limit]
