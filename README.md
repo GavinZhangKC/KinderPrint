@@ -24,6 +24,13 @@ python -m pip install -r requirements.txt
 uvicorn main:app --reload --host 0.0.0.0 --port 8000
 ```
 
+For local development with approved artefacts already in this repository, you
+can use a single command that sets all required dataset paths automatically:
+
+```bash
+./backend/run_local_backend.sh
+```
+
 The backend listens on all network interfaces. It is available locally at
 `http://127.0.0.1:8000`, or from another device at
 `http://<this-computer-LAN-IP>:8000`.
