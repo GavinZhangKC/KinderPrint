@@ -46,7 +46,8 @@
 .nav-links .active { color: var(--brand); }
 .nav-links .active::after { content: ''; position: absolute; height: 3px; border-radius: 3px; background: var(--primary); left: 20%; right: 20%; bottom: 2px; }
 
-.map-page > .nav-shell {
+.map-page > .nav-shell,
+.simulation-page > .nav-shell {
   flex: 0 0 auto;
   width: 100%;
   max-width: 1440px;

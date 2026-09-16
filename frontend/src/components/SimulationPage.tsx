@@ -1,13 +1,15 @@
 import { useState } from 'react'
 
-import logo from '../assets/LogoMark.png'
+import BrandHeader from './BrandHeader'
 import { useNeighbourhoodSearch } from '../hooks/useNeighbourhoodSearch'
 import { api } from '../services/api'
 import { toNeighbourhood } from '../services/profileAdapter'
 
 interface SimulationPageProps {
-  onLogoClick: () => void
+  onHome: () => void
+  onInsight: () => void
   onExploreMap: () => void
+  onSimulation: () => void
 }
 
 interface SimulationBaseline {
@@ -343,8 +345,10 @@ function buildScenarioResult(
 }
 
 export default function SimulationPage({
-  onLogoClick,
+  onHome,
+  onInsight,
   onExploreMap,
+  onSimulation,
 }: SimulationPageProps) {
   const [selectedNeighbourhood, setSelectedNeighbourhood] = useState('')
   const [selectedNeighbourhoodId, setSelectedNeighbourhoodId] = useState<string | null>(null)
@@ -578,15 +582,19 @@ export default function SimulationPage({
   ] : []
 
   return (
-    <div className="simulation-shell">
-      <header className="simulation-topbar glass">
-        <button className="brand-button" type="button" onClick={onLogoClick} aria-label="Go to KinderPrint landing page">
-          <img src={logo} alt="" className="brand-logo" />
-          <span>KinderPrint</span>
-        </button>
-      </header>
+    <div className="app-background simulation-page">
+      <div className="ambient ambient-one" />
+      <div className="ambient ambient-two" />
 
-      <main className="simulation-main glass">
+      <BrandHeader
+        activePage="simulation"
+        onHome={onHome}
+        onInsight={onInsight}
+        onMap={onExploreMap}
+        onSimulation={onSimulation}
+      />
+
+      <main className="simulation-shell simulation-main glass">
         <div className="simulation-header-row">
           <h1>Simulation Engine</h1>
           <span className="simulation-pill">Illustrative scenario</span>

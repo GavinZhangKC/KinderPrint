@@ -3,7 +3,6 @@ import { useEffect, useRef, useState } from 'react'
 import './styles.css'
 import './components/SimulationPage.css'
 
-import AboutUsPage from './components/AboutUsPage'
 import BrandHeader from './components/BrandHeader'
 import ComparePanel from './components/ComparePanel'
 import DetailedComparison from './components/DetailedComparison'
@@ -13,7 +12,6 @@ import InsightPage from './components/InsightPage'
 import InteractiveAtmosphere from './components/InteractiveAtmosphere'
 import Legend from './components/Legend'
 import LandingPage from './components/LandingPage'
-import MenuPage from './components/MenuPage'
 import LocalitySuitabilityPanel from './components/LocalitySuitabilityPanel'
 import NeighbourhoodMap from './components/NeighbourhoodMap'
 import PreferencePanel from './components/PreferencePanel'
@@ -47,10 +45,8 @@ type View =
 
 type AppPage =
   | 'landing'
-  | 'menu'
   | 'insight'
   | 'map'
-  | 'about'
   | 'simulation'
 
 export default function App() {
@@ -297,13 +293,6 @@ function openInsightPage() {
     resetExplore()
     setAppPage('insight')
   }
-function openAboutUsSection() {
-    resetExplore()
-    setAppPage('landing')
-    window.setTimeout(() => {
-      document.getElementById('home-about')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
-    }, 0)
-  }
 function choosePrimary(
     neighbourhood: Neighbourhood,
   ) {
@@ -509,34 +498,20 @@ if (appPage === 'landing') {
         <WaterRippleBackground />
         <LandingPage
           onInsight={openInsightPage}
+          onSimulation={openSimulationPage}
           onMap={openMapPage}
         />
       </div>
     )
-  }
-
-  if (appPage === 'menu') {
-    return (
-      <div className="entry-pages">
-        <WaterRippleBackground />
-        <MenuPage
-          onInsight={openInsightPage}
-          onMap={openMapPage}
-          onAboutUs={() => setAppPage('about')}
-        />
-      </div>
-    )
-  }
-
-  if (appPage === 'about') {
-    return <AboutUsPage onHome={backToLanding} onInsight={openInsightPage} onMap={openMapPage} onSimulation={openSimulationPage} />
   }
 
   if (appPage === 'simulation') {
     return (
       <SimulationPage
-        onLogoClick={backToLanding}
+        onHome={backToLanding}
+        onInsight={openInsightPage}
         onExploreMap={openMapPage}
+        onSimulation={openSimulationPage}
       />
     )
   }
@@ -545,7 +520,6 @@ if (appPage === 'landing') {
     return (
       <InsightPage
         onLogoClick={backToLanding}
-        onAboutUs={openAboutUsSection}
         onExploreMap={openMapPage}
         onSimulation={openSimulationPage}
       />
@@ -574,7 +548,6 @@ if (
           onInsight={openInsightPage}
           onMap={resetExplore}
           onSimulation={openSimulationPage}
-          onAboutUs={openAboutUsSection}
         />
 
         <DetailedComparison
@@ -605,7 +578,6 @@ return (
           onInsight={openInsightPage}
           onMap={resetExplore}
           onSimulation={openSimulationPage}
-          onAboutUs={openAboutUsSection}
         />
 
       <main className="map-shell">

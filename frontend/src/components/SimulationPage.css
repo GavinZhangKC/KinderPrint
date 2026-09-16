@@ -1,18 +1,26 @@
+/* Keep the simulation page scrollable without showing the document scrollbar. */
+html:has(.simulation-shell),
+html:has(.simulation-shell) body {
+  scrollbar-width: none;
+}
+
+html:has(.simulation-shell)::-webkit-scrollbar,
+html:has(.simulation-shell) body::-webkit-scrollbar {
+  display: none;
+}
+
 .simulation-shell {
-  width: min(1440px, calc(100vw - 40px));
-  margin: 24px auto 40px;
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  max-width: 1400px;
+  margin: clamp(7px, 1.5dvh, 18px) auto 40px;
   padding: 0;
 }
 
-.simulation-topbar {
-  width: 100%;
-  height: 76px;
-  border-radius: 28px;
-  padding: 0 24px 0 18px;
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  margin-bottom: 20px;
+.simulation-page {
+  min-height: 100dvh;
+  padding: clamp(8px, 1.5dvh, 16px) clamp(10px, 2vw, 32px) 40px;
 }
 
 .simulation-main {

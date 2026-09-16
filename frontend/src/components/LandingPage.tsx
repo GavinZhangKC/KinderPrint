@@ -6,6 +6,7 @@ import '../styles/landing.css'
 
 interface LandingPageProps {
   onInsight: () => void
+  onSimulation: () => void
   onMap: () => void
 }
 
@@ -117,7 +118,7 @@ function ExploreMenuLink({ item, onSelect }: ExploreMenuLinkProps) {
   )
 }
 
-function HomeHeader({ onHome, onInsight, onMap }: HomeHeaderProps) {
+function HomeHeader({ onHome, onInsight, onSimulation, onMap }: HomeHeaderProps) {
   return (
     <header className="glass home-header" data-no-ripple>
       <button className="home-brand" type="button" onClick={onHome} aria-label="Go to Vkinder home">
@@ -127,6 +128,7 @@ function HomeHeader({ onHome, onInsight, onMap }: HomeHeaderProps) {
       <nav className="home-nav" aria-label="Primary navigation">
         <button type="button" aria-current="page" onClick={onHome}>Home</button>
         <button type="button" onClick={onInsight}>Insight Journey</button>
+        <button type="button" onClick={onSimulation}>Simulation</button>
       </nav>
       <button className="home-nav-cta" type="button" onClick={onMap}>Explore Map</button>
     </header>
@@ -528,7 +530,7 @@ function scrollToSection(id: string) {
   document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
 }
 
-export default function LandingPage({ onInsight, onMap }: LandingPageProps) {
+export default function LandingPage({ onInsight, onSimulation, onMap }: LandingPageProps) {
   const openExploreItem = (id: ExploreItemId) => {
     if (id === 'insight') onInsight()
     else if (id === 'map') onMap()
@@ -540,6 +542,7 @@ export default function LandingPage({ onInsight, onMap }: LandingPageProps) {
       <HomeHeader
         onHome={() => scrollToSection('home-hero')}
         onInsight={onInsight}
+        onSimulation={onSimulation}
         onMap={onMap}
       />
 
