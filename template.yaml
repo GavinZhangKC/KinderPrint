@@ -15,6 +15,14 @@ Parameters:
     Type: String
     Default: https://www.kinderprint.me
     Description: Exact HTTPS origin of the KinderPrint www domain
+  VkinderOrigin:
+    Type: String
+    Default: https://vkinder.me
+    Description: Exact HTTPS origin of the VKinder root domain
+  VkinderWwwOrigin:
+    Type: String
+    Default: https://www.vkinder.me
+    Description: Exact HTTPS origin of the VKinder www domain
   IterationOneOrigin:
     Type: String
     Default: https://iteration1.kinderprint.me
@@ -42,6 +50,8 @@ Resources:
           - !Ref VercelOrigin
           - !Ref CustomDomainOrigin
           - !Ref CustomWwwOrigin
+          - !Ref VkinderOrigin
+          - !Ref VkinderWwwOrigin
           - !Ref IterationOneOrigin
           - !Ref LocalDevelopmentOrigin
         AllowHeaders:
@@ -66,9 +76,13 @@ Resources:
           KINDERPRINT_COMPARISON_DATA_PATH: /var/task/data/comparisons.json
           KINDERPRINT_OUTCOME_COMPARISON_DATA_PATH: /var/task/data/outcome_comparisons.json
           KINDERPRINT_ENVIRONMENTAL_DIFFERENCE_DATA_PATH: /var/task/data/environmental_differences.json
-          KINDERPRINT_PATTERN_INSIGHT_DATA_PATH: /var/task/data/pattern_insights.json
-          KINDERPRINT_PREVENTION_OPPORTUNITY_DATA_PATH: /var/task/data/prevention_opportunities.json
           KINDERPRINT_SUITABILITY_DATA_PATH: /var/task/data/suitability.json
+          KINDERPRINT_VIF_PROJECTION_DATA_PATH: /var/task/data/vif_child_population_projections_sa2.csv
+          KINDERPRINT_EPA_STATION_YEAR_DATA_PATH: /var/task/data/epa_air_quality_station_year.csv
+          KINDERPRINT_ACECQA_GEOCODING_DATA_PATH: /var/task/data/acecqa_gnaf_geocoding.csv
+          KINDERPRINT_ACECQA_CONTEXT_DATA_PATH: /var/task/data/acecqa_gnaf_context_community.csv
+          KINDERPRINT_COMMUNITY_CONTEXT_DATA_PATH: /var/task/data/community_context.csv
+          KINDERPRINT_COMMUNITY_IDENTITY_DATA_PATH: /var/task/data/communities.csv
       Events:
         ApiProxy:
           Type: HttpApi

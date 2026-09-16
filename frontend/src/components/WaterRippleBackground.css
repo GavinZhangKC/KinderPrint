@@ -5,6 +5,10 @@
   overflow: hidden;
 }
 
+.entry-pages:has(.home-page) {
+  overflow: clip;
+}
+
 .water-ripple-background {
   position: fixed;
   inset: 0;
@@ -21,6 +25,18 @@
 .entry-pages > .menu-page {
   position: relative;
   z-index: 1;
+}
+
+.entry-pages:has(.home-page) > .water-ripple-background {
+  z-index: 3;
+  background-color: transparent;
+  background-image: none;
+  filter: none;
+  mix-blend-mode: normal;
+}
+
+.entry-pages:has(.home-page) > .landing-page {
+  z-index: auto;
 }
 
 @media (prefers-reduced-motion: reduce), (pointer: coarse) {

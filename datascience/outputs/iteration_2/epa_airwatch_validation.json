@@ -1,0 +1,38 @@
+{
+  "source_id": "epa_vic_airwatch_hourly_2018_2025",
+  "source_workbook_sha256": {
+    "2018": "fff83cd31937e8a8a8108157f7ab2a75ceccf319b9aac5ce095a50abc1395118",
+    "2019": "8cae9c4cbcdc8c276abd688f1ee9e9208d97751226bf7ba740c1bf3c7137382d",
+    "2020": "1a6a634221beaef4bb541db4d2ac88bfda117d5dd677fab0dd5a97e103a9867a",
+    "2021": "4862f35314a45f2400bf75910bcb5467c4d77d182c67106d735ea6e441ae8568",
+    "2022": "a4ae1a1014a7cc3de5b762a3e8978c2906f49a6ed49c38b39ce4673a5cde7c99",
+    "2023": "7c6de9697a80ba97a90e4848c346da3721ee8b07ed0c25dee6e4a6dacfefe258",
+    "2024": "354980c237b222a49d1072b15d3837fab228e4506430c905a969ba0a6e786bcd",
+    "2025": "c3981abdffcee913c4e414855350ada646a1cc9ec160981f99bab99b392c456c"
+  },
+  "years": [
+    2018,
+    2019,
+    2020,
+    2021,
+    2022,
+    2023,
+    2024,
+    2025
+  ],
+  "priority_pollutants": [
+    "NO2",
+    "O3",
+    "PM10",
+    "PM2.5"
+  ],
+  "station_names": 21,
+  "station_pollutant_year_rows": 277,
+  "daily_station_pollutant_rows": 87677,
+  "valid_hourly_observations": 2009792,
+  "negative_validated_or_published_hours_retained": 48796,
+  "exact_duplicate_source_rows_removed": 37968,
+  "conflicting_source_observations_excluded": 718,
+  "sa2_exposure_values_created": 0,
+  "product_status": "VALIDATED_MONITOR_CONTEXT_ONLY_INSUFFICIENT_FOR_LOCALITY_EXPOSURE"
+}

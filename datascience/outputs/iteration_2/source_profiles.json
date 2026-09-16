@@ -1,0 +1,129 @@
+{
+  "schema_version": "1.0",
+  "profiles": [
+    {
+      "source_id": "dtp_historical_aadt_2019",
+      "path": "data/raw/traffic/2026-09-13/yearly_aadt_volume_2019.geojson",
+      "sha256": "aa310b3f648841f1c1cb5fb4def33ec64af722551136dac24a7ee2b0783ed932",
+      "rows": 14662,
+      "geometry_types": {
+        "LineString": 14637,
+        "MultiLineString": 25
+      },
+      "duplicate_segment_direction_keys": 39,
+      "missingness_pct": {
+        "aadt": 0.0,
+        "heavy_vehicle_aadt": 0.0
+      },
+      "aadt": {
+        "count": 14662,
+        "min": 2.0,
+        "median": 4929.5,
+        "max": 118458.0
+      },
+      "methodology": {
+        "Estimated": 12178,
+        "Actual": 2484
+      },
+      "calendar_years": [
+        2019.0
+      ],
+      "geographic_join": "Clip/intersect lines with Edition 3 SA2; pre-register exposure metric and avoid double-counting directions.",
+      "decision": "candidate_after_spatial_harmonisation"
+    },
+    {
+      "source_id": "acecqa_services_vic_daily",
+      "path": "data/raw/early_childhood/2026-09-13/education_services_vic.csv",
+      "sha256": "40a55e2a9c18251b2effc8e06af9caeda1b70324a32056291b4e83a3e5d90b81",
+      "rows": 5016,
+      "columns": 98,
+      "duplicate_primary_keys": 0,
+      "missingness_pct": {
+        "approved_places": 2.23,
+        "overall_rating": 7.0,
+        "postcode": 0.0
+      },
+      "approved_places": {
+        "count": 4904,
+        "min": 10,
+        "median": 66.0,
+        "max": 400
+      },
+      "temporarily_closed": {
+        "No": 4953,
+        "Yes": 63
+      },
+      "overall_rating": {
+        "Meeting NQS": 3428,
+        "Exceeding NQS": 1049,
+        "Working Towards NQS": 179,
+        "missing": 351,
+        "Excellent": 7,
+        "Significant Improvement Required": 2
+      },
+      "geographic_join": "No coordinates or SA2. Approved geocoding is required; postcode is not an SA2.",
+      "decision": "withhold_from_product_pending_licence_and_geocoding"
+    },
+    {
+      "source_id": "victoria_school_locations_2025",
+      "path": "data/raw/education/2026-09-13/school_locations_2025.csv",
+      "sha256": "d2703eaa7569483bfe17c88d083b01efc7747306aa24e2d9db0decb924d3d939",
+      "rows": 2301,
+      "columns": 24,
+      "duplicate_primary_keys": 139,
+      "valid_victorian_coordinate_pct": 100.0,
+      "school_status": {
+        "O": 2297,
+        "C": 4
+      },
+      "geographic_join": "Point-in-polygon to Edition 3 SA2 required.",
+      "decision": "candidate_context_only_not_early_childhood"
+    },
+    {
+      "source_id": "npi_emissions_all_years",
+      "path": "data/raw/hazards/2026-09-13/npi_emissions.xlsx",
+      "sha256": "53183c60e4af5d741f3a76f24d9c983f7a88d0f571d4c8d0363f7de9c88da53b",
+      "rows": 191416,
+      "columns": 27,
+      "national_rows": 1008823,
+      "facilities_all_years": 1605,
+      "latest_year": "2024/2025",
+      "latest_year_rows": 8155,
+      "latest_year_facilities": 923,
+      "substances": 86,
+      "valid_coordinate_pct": 100.0,
+      "air_total_missing_pct": 8.35,
+      "temporal_coverage": [
+        "1998/1999",
+        "1999/2000",
+        "2000/2001",
+        "2001/2002",
+        "2002/2003",
+        "2003/2004",
+        "2004/2005",
+        "2005/2006",
+        "2006/2007",
+        "2007/2008",
+        "2008/2009",
+        "2009/2010",
+        "2010/2011",
+        "2011/2012",
+        "2012/2013",
+        "2013/2014",
+        "2014/2015",
+        "2015/2016",
+        "2016/2017",
+        "2017/2018",
+        "2018/2019",
+        "2019/2020",
+        "2020/2021",
+        "2021/2022",
+        "2022/2023",
+        "2023/2024",
+        "2024/2025"
+      ],
+      "geographic_join": "Point-in-polygon and distance/buffer to Edition 3 SA2; reported mass is not ambient exposure.",
+      "decision": "candidate_after_pollutant_specific_validation"
+    }
+  ]
+}

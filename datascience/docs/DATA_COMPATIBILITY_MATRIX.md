@@ -52,10 +52,10 @@ transformation and a recorded caveat) · **BLOCKED** (do not join).
 
 | # | Question | Blocks | How to resolve | Status |
 |---|---|---|---|---|
-| Q1 | Does the AEDC SA2 file publish child counts per SA2? | Epic 4 uncertainty; all significance testing | Inspect `sa2-2009-24.xlsx` notes + data sheets | OPEN |
-| Q2 | Is a child assigned to SA2 of **residence** or **school**? | Every environmental join's interpretation | AEDC Data Dictionary | OPEN |
-| Q3 | What is AEDC's exact suppression threshold and how is it encoded? | Missing-data handling, coverage stats | File notes sheet | OPEN |
-| Q4 | Which ASGS edition do the AEDC SA2 codes use? | The primary join | File notes sheet + code-match test | OPEN |
+| Q1 | Does the AEDC SA2 file publish child counts per SA2? | Epic 4 uncertainty; all significance testing | Counts inspected in `sa2-2009-24.xlsx`; see `reports/DS03_aedc_profile.md` | **RESOLVED — YES** |
+| Q2 | Is a child assigned to SA2 of **residence** or **school**? | Every environmental join's interpretation | Confirmed as residence-based; recorded in the integrated source register | **RESOLVED — RESIDENCE** |
+| Q3 | What is AEDC's exact suppression threshold and how is it encoded? | Missing-data handling, coverage stats | File footers inspected; `#` and `*` semantics recorded in `reports/DS03_aedc_profile.md` | **RESOLVED** |
+| Q4 | Which ASGS edition do the AEDC SA2 codes use? | The primary join | Content and code-match test confirm Edition 3 (2021) | **RESOLVED — ED. 3** |
 | Q5 | What do the AEDC Data Guidelines permit for public re-display? | Whether KinderPrint can show AEDC at all | AEDC Data Guidelines document | OPEN |
 | Q6 | Heat threshold: fixed (e.g. ≥35 °C) or relative (TX90p percentile)? | Heat indicator definition | Literature + `docs/methodology/heat_indicator.md` decision record | OPEN |
 | Q7 | Which DEA classes count as "vegetated", and Level 3 or Level 4? | Vegetation indicator definition | DEA product documentation | OPEN |

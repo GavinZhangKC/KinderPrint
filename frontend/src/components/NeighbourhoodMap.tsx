@@ -47,7 +47,7 @@ interface NeighbourhoodMapProps {
 
   focusId?: string | null
 
-  comparisonId?: string | null
+  comparisonIds?: string[]
 
   compareMode?: boolean
   selectionEnabled?: boolean
@@ -216,7 +216,7 @@ export default function NeighbourhoodMap({
   preference,
   selectedId,
   focusId,
-  comparisonId,
+  comparisonIds = [],
   compareMode = false,
   onSelect,
   selectionEnabled = true,
@@ -242,10 +242,10 @@ const selectedIdRef =
       string | null
     >(selectedId)
 
-  const comparisonIdRef =
+  const comparisonIdsRef =
     useRef<
-      string | null | undefined
-    >(comparisonId)
+      string[]
+    >(comparisonIds)
 
   const onSelectRef =
     useRef(onSelect)
@@ -268,6 +268,11 @@ const requestNumberRef =
   ] = useState(true)
 
   const [
+    initializing,
+    setInitializing,
+  ] = useState(true)
+
+  const [
     mapError,
     setMapError,
   ] = useState<
@@ -284,8 +289,8 @@ const requestNumberRef =
   selectedIdRef.current =
     selectedId
 
-  comparisonIdRef.current =
-    comparisonId
+  comparisonIdsRef.current =
+    comparisonIds
 
   onSelectRef.current =
     onSelect
@@ -306,6 +311,7 @@ useEffect(() => {
       console.error(message)
       setMapError(message)
       setLoading(false)
+      setInitializing(false)
       return
     }
 
@@ -501,7 +507,7 @@ clearHover()
           requestNumberRef.current
         ) {
           setMapError(
-            'Could not load neighbourhood boundaries from the KinderPrint API.',
+            'Could not load neighbourhood boundaries from the Vkinder API.',
           )
         }
       } finally {
@@ -512,6 +518,7 @@ clearHover()
           setLoading(
             false,
           )
+          setInitializing(false)
         }
       }
     }
@@ -767,7 +774,7 @@ map.addSource(
 
           filter:
             selectionFilter(
-              comparisonIdRef.current,
+              comparisonIdsRef.current,
             ),
 
           paint: {
@@ -976,6 +983,32 @@ return () => {
     }
   }, [])
   useEffect(() => {
+    const map = mapRef.current
+
+    if (!map) {
+      return
+    }
+
+    const interactionHandlers = [
+      map.boxZoom,
+      map.scrollZoom,
+      map.dragPan,
+      map.dragRotate,
+      map.keyboard,
+      map.doubleClickZoom,
+      map.touchZoomRotate,
+      map.touchPitch,
+    ]
+
+    interactionHandlers.forEach((handler) => {
+      if (initializing) {
+        handler.disable()
+      } else {
+        handler.enable()
+      }
+    })
+  }, [initializing])
+  useEffect(() => {
     if (!selectionEnabled) {
       clearHoverRef.current()
       const map = mapRef.current
@@ -1131,12 +1164,12 @@ useEffect(() => {
         COMPARISON_LAYER_ID,
 
         selectionFilter(
-          comparisonId,
+          comparisonIds,
         ),
       )
     }
   }, [
-    comparisonId,
+    comparisonIds,
   ])
 // Focus map after search
   useEffect(() => {
@@ -1222,6 +1255,11 @@ useEffect(() => {
           mapContainerRef
         }
         className="real-map"
+      />
+
+      <div
+        className={`map-cold-start-overlay${initializing ? ' is-active' : ''}`}
+        aria-hidden="true"
       />
 
       <div

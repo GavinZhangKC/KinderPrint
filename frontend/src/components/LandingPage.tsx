@@ -1,16 +1,50 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import type { CSSProperties } from 'react'
 import logo from '../assets/LogoMark.png'
+import InfiniteImageGallery from './InfiniteImageGallery'
 import '../styles/landing.css'
 
 interface LandingPageProps {
   onInsight: () => void
+  onSimulation: () => void
   onMap: () => void
 }
 
 interface HomeHeaderProps extends LandingPageProps {
   onHome: () => void
-  onAboutUs: () => void
 }
+
+const heroVideoSources = [
+  '/BackgroundVideo.mp4',
+  '/BackgroundVideo2.mp4',
+  '/BackgroundVideo3.mp4',
+  '/BackgroundVideo4.mp4',
+  '/BackgroundVideo5.mp4',
+] as const
+
+const heroVideoCrossfadeSeconds = 0.9
+const heroVideoPlaybackRates = [0.9, 0.9, 0.85, 0.85, 0.85] as const
+
+const homeThemeStripItems = [
+  'Child development',
+  'Community context',
+  'Heat exposure',
+  'Green space',
+  'Early years',
+  'Greater Melbourne',
+  'SA2 localities',
+] as const
+
+const homeDiscoveryPriorities = [
+  'Learning and development',
+  'Social and emotional wellbeing',
+  'Physical development and active living',
+  'Respiratory environment',
+  'Heat and outdoor comfort',
+  'Parks, playgrounds and nature',
+  'Healthcare access',
+  'Early-childhood support',
+] as const
 
 const exploreItems = [
   { id: 'insight', number: '01', label: 'Insight Journey', videoSrc: '/insight-preview.mp4' },
@@ -31,7 +65,7 @@ function ExploreMenuLink({ item, onSelect }: ExploreMenuLinkProps) {
   useEffect(() => {
     const video = videoRef.current
     if (!video) return
-    video.playbackRate = 0.85
+    video.playbackRate = item.id === 'map' ? 2 : 0.85
     video.pause()
     video.currentTime = 0
   }, [])
@@ -84,20 +118,411 @@ function ExploreMenuLink({ item, onSelect }: ExploreMenuLinkProps) {
   )
 }
 
-function HomeHeader({ onHome, onInsight, onMap, onAboutUs }: HomeHeaderProps) {
+function HomeHeader({ onHome, onInsight, onSimulation, onMap }: HomeHeaderProps) {
   return (
     <header className="glass home-header" data-no-ripple>
-      <button className="home-brand" type="button" onClick={onHome} aria-label="Go to KinderPrint home">
+      <button className="home-brand" type="button" onClick={onHome} aria-label="Go to Vkinder home">
         <img src={logo} alt="" />
-        <span>KinderPrint</span>
+        <span>Vkinder</span>
       </button>
       <nav className="home-nav" aria-label="Primary navigation">
         <button type="button" aria-current="page" onClick={onHome}>Home</button>
         <button type="button" onClick={onInsight}>Insight Journey</button>
-        <button type="button" onClick={onMap}>Map</button>
-        <button type="button" onClick={onAboutUs}>About Us</button>
+        <button type="button" onClick={onSimulation}>Simulation</button>
       </nav>
+      <button className="home-nav-cta" type="button" onClick={onMap}>Explore Map</button>
     </header>
+  )
+}
+
+function HeroBackgroundVideo() {
+  const videoARef = useRef<HTMLVideoElement>(null)
+  const videoBRef = useRef<HTMLVideoElement>(null)
+
+  useEffect(() => {
+    const videoA = videoARef.current
+    const videoB = videoBRef.current
+    if (!videoA || !videoB) return
+
+    const videos = [videoA, videoB]
+    const videoSourceIndexes = new Map<HTMLVideoElement, number>([
+      [videoA, 0],
+      [videoB, 1],
+    ])
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)')
+    let activeVideoIndex = 0
+    let activeSourceIndex = 0
+    let isCrossfading = false
+    let fadeTimer: number | undefined
+    let isDisposed = false
+
+    const configurePlayback = (video: HTMLVideoElement) => {
+      const sourceIndex = videoSourceIndexes.get(video) ?? 0
+      const playbackRate = heroVideoPlaybackRates[sourceIndex]
+      video.muted = true
+      video.defaultPlaybackRate = playbackRate
+      video.playbackRate = playbackRate
+    }
+
+    const prepareVideo = (video: HTMLVideoElement, sourceIndex: number) => {
+      video.pause()
+      video.classList.remove('is-visible')
+      videoSourceIndexes.set(video, sourceIndex)
+      video.src = heroVideoSources[sourceIndex]
+      video.load()
+      configurePlayback(video)
+    }
+
+    const beginCrossfade = () => {
+      if (isCrossfading || reducedMotion.matches || isDisposed) return
+
+      const outgoingVideo = videos[activeVideoIndex]
+      const incomingVideoIndex = activeVideoIndex === 0 ? 1 : 0
+      const incomingVideo = videos[incomingVideoIndex]
+      isCrossfading = true
+      incomingVideo.currentTime = 0
+      configurePlayback(incomingVideo)
+
+      void incomingVideo.play().then(() => {
+        if (isDisposed || reducedMotion.matches) return
+
+        incomingVideo.classList.add('is-visible')
+        outgoingVideo.classList.remove('is-visible')
+
+        fadeTimer = window.setTimeout(() => {
+          outgoingVideo.pause()
+          outgoingVideo.currentTime = 0
+
+          activeVideoIndex = incomingVideoIndex
+          activeSourceIndex = (activeSourceIndex + 1) % heroVideoSources.length
+          const nextSourceIndex = (activeSourceIndex + 1) % heroVideoSources.length
+          prepareVideo(outgoingVideo, nextSourceIndex)
+          isCrossfading = false
+        }, heroVideoCrossfadeSeconds * 1000)
+      }).catch(() => {
+        isCrossfading = false
+      })
+    }
+
+    const handlePlaybackProgress = (event: Event) => {
+      const video = event.currentTarget as HTMLVideoElement
+      if (video !== videos[activeVideoIndex] || !Number.isFinite(video.duration)) return
+
+      if (video.duration - video.currentTime <= heroVideoCrossfadeSeconds) {
+        beginCrossfade()
+      }
+    }
+
+    const handleLoadedMetadata = (event: Event) => {
+      configurePlayback(event.currentTarget as HTMLVideoElement)
+    }
+
+    const resetSequence = () => {
+      if (fadeTimer !== undefined) {
+        window.clearTimeout(fadeTimer)
+        fadeTimer = undefined
+      }
+
+      activeVideoIndex = 0
+      activeSourceIndex = 0
+      isCrossfading = false
+      prepareVideo(videoA, 0)
+      prepareVideo(videoB, 1)
+      videoA.classList.add('is-visible')
+
+      if (!reducedMotion.matches) {
+        void videoA.play().catch(() => undefined)
+      }
+    }
+
+    const handleMotionPreferenceChange = () => {
+      if (reducedMotion.matches) {
+        videos.forEach((video) => video.pause())
+        if (fadeTimer !== undefined) {
+          window.clearTimeout(fadeTimer)
+          fadeTimer = undefined
+        }
+        return
+      }
+
+      resetSequence()
+    }
+
+    videos.forEach((video) => {
+      video.addEventListener('loadedmetadata', handleLoadedMetadata)
+      video.addEventListener('timeupdate', handlePlaybackProgress)
+      video.addEventListener('ended', beginCrossfade)
+    })
+    reducedMotion.addEventListener('change', handleMotionPreferenceChange)
+    resetSequence()
+
+    return () => {
+      isDisposed = true
+      if (fadeTimer !== undefined) window.clearTimeout(fadeTimer)
+      videos.forEach((video) => {
+        video.pause()
+        video.removeEventListener('loadedmetadata', handleLoadedMetadata)
+        video.removeEventListener('timeupdate', handlePlaybackProgress)
+        video.removeEventListener('ended', beginCrossfade)
+      })
+      reducedMotion.removeEventListener('change', handleMotionPreferenceChange)
+    }
+  }, [])
+
+  return (
+    <div className="home-hero-story-video" aria-hidden="true">
+      <video
+        ref={videoARef}
+        className="home-hero-story-video__media is-visible"
+        src={heroVideoSources[0]}
+        autoPlay
+        muted
+        playsInline
+        preload="auto"
+        tabIndex={-1}
+      />
+      <video
+        ref={videoBRef}
+        className="home-hero-story-video__media"
+        src={heroVideoSources[1]}
+        autoPlay
+        muted
+        playsInline
+        preload="auto"
+        tabIndex={-1}
+      />
+    </div>
+  )
+}
+
+function HomeThemeStrip() {
+  const renderItems = (isDuplicate = false) => (
+    <ul className="home-theme-strip__list" aria-hidden={isDuplicate || undefined}>
+      {homeThemeStripItems.map((item) => <li key={item}>{item}</li>)}
+    </ul>
+  )
+
+  return (
+    <section className="home-theme-strip" aria-label="Vkinder themes">
+      <div className="home-theme-strip__track">
+        {renderItems()}
+        {renderItems(true)}
+      </div>
+    </section>
+  )
+}
+
+function HomeDiscoverySection({ onMap }: Pick<LandingPageProps, 'onMap'>) {
+  const [selectedPriority, setSelectedPriority] = useState<string | null>(null)
+  const [hasEntered, setHasEntered] = useState(false)
+  const sectionRef = useRef<HTMLElement>(null)
+
+  useEffect(() => {
+    const section = sectionRef.current
+    if (!section) return
+
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)')
+    if (reducedMotion.matches) {
+      setHasEntered(true)
+      return
+    }
+
+    const observer = new IntersectionObserver(([entry]) => {
+      if (!entry.isIntersecting) return
+      setHasEntered(true)
+      observer.disconnect()
+    }, {
+      threshold: 0.18,
+      rootMargin: '0px 0px -10% 0px',
+    })
+
+    observer.observe(section)
+    return () => observer.disconnect()
+  }, [])
+
+  return (
+    <section
+      ref={sectionRef}
+      className={`home-insight home-discovery ${hasEntered ? 'is-visible' : ''}`}
+      id="home-insight"
+      aria-labelledby="home-discovery-title"
+    >
+      <div className="home-discovery-copy">
+        <p className="home-section-kicker">Discovery</p>
+        <h2 id="home-discovery-title">What matters most<br />for your child?</h2>
+        <p>
+          Not a form to fill in—a first look at the layers behind a childhood.
+          Choose a focus, then enter the live Melbourne map.
+        </p>
+      </div>
+
+      <div className="home-discovery-tools">
+        <div className="home-discovery-priorities" role="group" aria-label="Choose an exploration focus">
+          {homeDiscoveryPriorities.map((priority, index) => (
+            <button
+              key={priority}
+              type="button"
+              style={{ '--priority-index': index } as CSSProperties}
+              aria-pressed={selectedPriority === priority}
+              onClick={() => setSelectedPriority(selectedPriority === priority ? null : priority)}
+            >
+              <span>{String(index + 1).padStart(2, '0')}</span>
+              {priority}
+            </button>
+          ))}
+        </div>
+
+        <div className="home-discovery-card-stage">
+          <InfiniteImageGallery />
+
+          <article className="home-discovery-card" aria-live="polite">
+          <div className="home-discovery-card-status">
+            <span>Locality explorer</span>
+            <small>Live data</small>
+          </div>
+          <h3>{selectedPriority ?? 'All locality layers'}</h3>
+          <p>
+            {selectedPriority
+              ? `Open the map to inspect ${selectedPriority.toLowerCase()} alongside its source, status and limitations.`
+              : 'Choose a focus above to frame your exploration, or enter the map to inspect all available layers.'}
+          </p>
+          <button
+            className="home-discovery-map-preview"
+            type="button"
+            onClick={onMap}
+            aria-label="Explore Melbourne on the interactive map"
+          >
+            <img src="/mapbox-melbourne-preview.png" alt="Mapbox map of Greater Melbourne" loading="lazy" />
+            <span className="home-discovery-map-preview__fog" aria-hidden="true" />
+            <span className="home-discovery-map-preview__prompt">
+              <strong>Let’s Explore Melbourne Now</strong>
+              <span aria-hidden="true">↗</span>
+            </span>
+          </button>
+          </article>
+        </div>
+      </div>
+    </section>
+  )
+}
+
+function HomeCompareSection({ onMap }: Pick<LandingPageProps, 'onMap'>) {
+  const [hasEntered, setHasEntered] = useState(false)
+  const sectionRef = useRef<HTMLElement>(null)
+
+  useEffect(() => {
+    const section = sectionRef.current
+    if (!section) return
+
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)')
+    if (reducedMotion.matches) {
+      setHasEntered(true)
+      return
+    }
+
+    const observer = new IntersectionObserver(([entry]) => {
+      if (!entry.isIntersecting) return
+      setHasEntered(true)
+      observer.disconnect()
+    }, {
+      threshold: 0.18,
+      rootMargin: '0px 0px -10% 0px',
+    })
+
+    observer.observe(section)
+    return () => observer.disconnect()
+  }, [])
+
+  return (
+    <section
+      ref={sectionRef}
+      className={`home-compare-story ${hasEntered ? 'is-visible' : ''}`}
+      aria-labelledby="home-compare-title"
+    >
+      <div className="home-compare-copy">
+        <p className="home-section-kicker">Compare</p>
+        <h2 id="home-compare-title">Two prints,<br />side by side.</h2>
+        <p>
+          Compare localities layer by layer—never ranked, never reduced to a single score,
+          and always with evidence status attached.
+        </p>
+        <button type="button" onClick={onMap}>
+          Open the comparison studio <span aria-hidden="true">↗</span>
+        </button>
+      </div>
+
+      <div className="home-compare-lines" aria-hidden="true">
+        <span>Child development</span><i />
+        <span>Environment</span><i />
+        <span>Early years</span><i />
+      </div>
+    </section>
+  )
+}
+
+const homeEvidencePrinciples = [
+  'Aggregate, never individual',
+  'Description, not diagnosis',
+  'Difference, not deficiency',
+  'No “best suburb” list',
+] as const
+
+function HomeEvidenceSection() {
+  const [hasEntered, setHasEntered] = useState(false)
+  const sectionRef = useRef<HTMLElement>(null)
+
+  useEffect(() => {
+    const section = sectionRef.current
+    if (!section) return
+
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)')
+    if (reducedMotion.matches) {
+      setHasEntered(true)
+      return
+    }
+
+    const observer = new IntersectionObserver(([entry]) => {
+      if (!entry.isIntersecting) return
+      setHasEntered(true)
+      observer.disconnect()
+    }, {
+      threshold: 0.18,
+      rootMargin: '0px 0px -10% 0px',
+    })
+
+    observer.observe(section)
+    return () => observer.disconnect()
+  }, [])
+
+  return (
+    <section
+      ref={sectionRef}
+      className={`home-about home-evidence ${hasEntered ? 'is-visible' : ''}`}
+      id="home-about"
+      aria-labelledby="home-evidence-title"
+    >
+      <div className="home-evidence-copy">
+        <p className="home-section-kicker">Scientific transparency</p>
+        <h2 id="home-evidence-title">
+          What this<br />evidence is—<br />and what it is<br />not.
+        </h2>
+        <p>
+          Vkinder supports serious exploration by making the boundary of every layer visible.
+        </p>
+      </div>
+
+      <ul className="home-evidence-principles">
+        {homeEvidencePrinciples.map((principle, index) => (
+          <li
+            key={principle}
+            style={{ '--evidence-index': index } as CSSProperties}
+          >
+            <span aria-hidden="true" />
+            <strong>{principle}</strong>
+          </li>
+        ))}
+      </ul>
+    </section>
   )
 }
 
@@ -105,7 +530,7 @@ function scrollToSection(id: string) {
   document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
 }
 
-export default function LandingPage({ onInsight, onMap }: LandingPageProps) {
+export default function LandingPage({ onInsight, onSimulation, onMap }: LandingPageProps) {
   const openExploreItem = (id: ExploreItemId) => {
     if (id === 'insight') onInsight()
     else if (id === 'map') onMap()
@@ -117,83 +542,49 @@ export default function LandingPage({ onInsight, onMap }: LandingPageProps) {
       <HomeHeader
         onHome={() => scrollToSection('home-hero')}
         onInsight={onInsight}
+        onSimulation={onSimulation}
         onMap={onMap}
-        onAboutUs={() => scrollToSection('home-about')}
       />
 
       <main className="home-content">
         <section className="home-hero" id="home-hero" aria-labelledby="landing-title">
-          <div className="home-hero-copy" data-no-ripple>
-            <p className="landing-kicker">Neighbourhood evidence, brought together</p>
-            <h1 id="landing-title">See the bigger picture of where children grow.</h1>
+          <HeroBackgroundVideo />
+          <div className="home-hero-copy">
+            <h1 id="landing-title">Where Children<br />Growth<br />Matter<span aria-hidden="true">.</span></h1>
+            <p className="landing-subheading">
+              Explore how child development, environment and<br />health-support conditions differ across Melbourne.
+            </p>
             <p className="landing-copy">
-              Explore child development, social, and environmental evidence across local
-              communities in one clear view.
+              Peel back the layers of a place—from heat and nature<br />to early-years support and observed development patterns.
             </p>
             <div className="home-hero-actions">
-              <button className="button primary home-hero-button" type="button" onClick={onInsight}>
-                Enter the 3D Insight Journey <span aria-hidden="true">↗</span>
+              <button className="button primary home-hero-button" type="button" onClick={onMap}>
+                Explore Melbourne <span aria-hidden="true">↗</span>
               </button>
-              <button className="home-text-link" type="button" onClick={() => scrollToSection('home-insight')}>
-                See how the evidence connects <span aria-hidden="true">↓</span>
+              <button className="button secondary home-hero-secondary" type="button" onClick={onInsight}>
+                Explore the Journey
               </button>
             </div>
           </div>
         </section>
 
-        <section className="home-insight" id="home-insight" aria-labelledby="home-insight-title">
-          <div className="home-section-intro">
-            <p className="home-section-kicker">Insight preview</p>
-            <h2 id="home-insight-title">One neighbourhood, viewed through connected evidence.</h2>
-            <p>
-              KinderPrint brings environmental conditions and child development indicators into
-              the same story, so patterns are easier to see and questions are easier to ask.
-            </p>
-          </div>
+        <HomeThemeStrip />
 
-          <dl className="home-indicators" aria-label="Insight lenses">
-            <div><dt>01</dt><dd>Child development</dd><dd className="home-indicator-note">AEDC outcomes</dd></div>
-            <div><dt>02</dt><dd>Heat exposure</dd><dd className="home-indicator-note">Urban environment</dd></div>
-            <div><dt>03</dt><dd>Green space</dd><dd className="home-indicator-note">Canopy and access</dd></div>
-          </dl>
+        <HomeDiscoverySection onMap={onMap} />
 
-          <blockquote className="home-insight-statement">
-            <span>Pattern to explore</span>
-            <p>Areas with lower vegetation and higher heat exposure also show higher child development vulnerability.</p>
-          </blockquote>
+        <HomeCompareSection onMap={onMap} />
 
-          <button className="button primary home-section-button" type="button" onClick={onInsight}>
-            Enter the 3D Insight Journey <span aria-hidden="true">↗</span>
-          </button>
-        </section>
-
-        <section className="home-about" id="home-about" aria-labelledby="home-about-title">
-          <div className="home-about-mark" aria-hidden="true"><img src={logo} alt="" /></div>
-          <div className="home-about-copy">
-            <p className="home-section-kicker">About KinderPrint</p>
-            <h2 id="home-about-title">Evidence for thoughtful local exploration.</h2>
-            <p>
-              KinderPrint brings together neighbourhood-level child development, social and
-              environmental evidence to help users explore local conditions and identify areas
-              for further investigation.
-            </p>
-            <p className="home-about-note">
-              It supports area-level exploration and comparison only. It does not assess
-              individual children or imply causal relationships.
-            </p>
-          </div>
-        </section>
+        <HomeEvidenceSection />
 
         <section
           className="home-explore"
           id="home-explore"
           aria-labelledby="home-explore-title"
-          data-no-ripple
         >
           <p className="home-section-kicker">Continue exploring</p>
-          <h2 id="home-explore-title">Explore KinderPrint</h2>
+          <h2 id="home-explore-title">Explore Vkinder</h2>
 
-          <nav className="home-explore-nav" aria-label="Explore KinderPrint">
+          <nav className="home-explore-nav" aria-label="Explore Vkinder">
             {exploreItems.map((item) => (
               <ExploreMenuLink
                 key={item.id}

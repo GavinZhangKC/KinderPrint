@@ -1,8 +1,8 @@
 .status-badge { min-width: 86px; display: inline-flex; align-items: center; justify-content: center; min-height: 30px; border-radius: 999px; padding: 5px 14px; font-size: 11px; font-weight: 800; border: 1px solid rgba(255,255,255,.72); }
 .status-badge.compact { min-width: 72px; min-height: 28px; padding: 4px 9px; font-size: 10px; }
-.status-strong { background: var(--positive-bg); color: var(--positive-text); }
-.status-moderate { background: var(--moderate-bg); color: var(--moderate-text); }
-.status-concern { background: var(--concern-bg); color: var(--concern-text); }
+.status-strong { background: #9ADBB8; color: #246B57; border-color: #BCEBD2; }
+.status-moderate { background: #F6E7A8; color: #8B6B16; border-color: #FFF3C9; }
+.status-concern { background: #F5B6A8; color: #9A4638; border-color: #FFD2C8; }
 
 .metric-ring { margin: 4px auto 10px; border-radius: 50%; display: grid; place-items: center; position: relative; background: conic-gradient(var(--ring-color) 0 var(--ring-value), rgba(127,148,184,.18) var(--ring-value) 360deg); }
 .metric-ring::before { content: ''; position: absolute; inset: 8px; border-radius: 50%; background: rgba(248,250,255,.92); }

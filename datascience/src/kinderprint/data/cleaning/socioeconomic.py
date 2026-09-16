@@ -38,11 +38,18 @@ CENSUS_SPEC = {
     "G49B": {"no_qualification": "P_Lev_Edu_NS_Total", "qual_base": "P_Tot_Total"},
 }
 
-COUNTS = {"population", "children_0_4", "one_parent_families", "total_families",
-          "unemployed", "labour_force", "no_qualification", "qual_base"}
-WEIGHTED = {"median_age", "median_hh_income_weekly", "median_rent_weekly",
-            "avg_household_size", "persons_per_bedroom", "irsd_score",
-            "irsd_min_sa1", "irsd_max_sa1"}
+# These are ordered tuples because their iteration order becomes the public
+# processed-table schema. Sets made identical rebuilds depend on Python's hash
+# seed and rewrote every CSV row with shuffled columns.
+COUNTS = (
+    "children_0_4", "no_qualification", "one_parent_families", "qual_base",
+    "unemployed", "total_families", "labour_force", "population",
+)
+WEIGHTED = (
+    "median_rent_weekly", "irsd_score", "median_hh_income_weekly",
+    "persons_per_bedroom", "irsd_max_sa1", "avg_household_size",
+    "irsd_min_sa1", "median_age",
+)
 
 
 def load_seifa(path: Path) -> tuple[pd.DataFrame, set[str]]:

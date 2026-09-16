@@ -7,7 +7,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
-from kinderprint.analytics.suitability import build_criterion_scores, rank_profiles
+from kinderprint.analytics.suitability import build_criterion_scores, build_rankings, rank_profiles
 from kinderprint.api.build_artefacts import build_suitability
 
 
@@ -105,3 +105,32 @@ def test_supplemental_facility_scores_are_added_without_estimation():
     assert result["general_practice_access"] == 75.0
     assert result["hospital_access"] == 25.0
     assert result["pharmacy_access"] == 50.0
+
+
+def test_legacy_criteria_and_combinations_remain_supported():
+    profiles = [_profile("area", 80, 10, 9, 40, 18, 70)]
+
+    result = rank_profiles(
+        profiles, ["child_development", "green_space", "low_disadvantage"]
+    )[0]
+
+    assert result["status"] == "available"
+    assert len(build_rankings(profiles)) == 127
+
+
+def test_service_demand_and_environment_context_remain_supported():
+    profile = {
+        "neighbourhood": {"id": "context", "name": "Context", "geographic_unit": "SA2"},
+        "domains": [{"indicators": [
+            _indicator("service_access_score", 80),
+            _indicator("future_demand_score", 70),
+            _indicator("environment_quality_score", 60),
+        ]}],
+    }
+
+    result = rank_profiles(
+        [profile], ["service_access", "future_demand", "environment_quality"]
+    )[0]
+
+    assert result["score"] == 70.0
+    assert result["status"] == "available"

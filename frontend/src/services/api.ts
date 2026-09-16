@@ -4,7 +4,9 @@ export type ApiStatus =
   | 'incompatible'
   | 'unavailable'
   | 'limited'
+  | 'suppressed'
   | 'no_match'
+  | 'no_pattern'
 
 export interface ApiLimitation {
   code: string
@@ -30,8 +32,6 @@ export interface NeighbourhoodSearchResult {
   name: string
   geographic_unit: string
 }
-
-
 
 export interface BoundaryProperties {
   id: string
@@ -123,6 +123,55 @@ export interface NeighbourhoodProfile {
   domains: ProfileDomain[]
 }
 
+export interface EarlyChildhoodServices {
+  neighbourhood_id: string
+  neighbourhood_name: string
+  active_education_care_services: number | null
+  exact_match_services: number | null
+  high_confidence_match_services: number | null
+  services_with_approved_places: number | null
+  total_approved_places: number | null
+  long_day_care_services: number | null
+  kindergarten_services: number | null
+  services_with_current_rating: number | null
+  rating_coverage_pct: number | null
+  status: string
+}
+
+export interface PopulationProjection {
+  sa2_code: string
+  sa2_name: string
+  projection_year: number
+  sex: string
+  population_age_0_4_projected: number | null
+  population_age_5_9_projected: number | null
+  population_age_10_14_projected: number | null
+  population_age_0_9_projected: number | null
+  population_age_0_14_projected: number | null
+  population_all_ages_projected: number | null
+  status: string
+}
+
+export interface PopulationProjectionResponse {
+  projections: PopulationProjection[]
+}
+
+export interface ContextMetric {
+  value: number | null
+  status: ApiStatus | string
+}
+
+export interface ContextMetricDefinition {
+  name: string
+  unit: string
+  definition: string
+}
+
+export interface NeighbourhoodContext {
+  neighbourhood: NeighbourhoodSearchResult
+  metrics: Record<string, ContextMetric>
+}
+
 export interface NeighbourhoodPriority {
   neighbourhood: {
     id: string
@@ -155,7 +204,10 @@ export interface NeighbourhoodExplanation {
     factors: ExplanationFactor[]
   }>
   highlighted_factor_ids: string[]
-  incomplete_inputs: string[]
+  incomplete_inputs: Array<{
+    indicator: string
+    reason: string
+  }>
 }
 
 
@@ -182,6 +234,79 @@ export interface NeighbourhoodComparison {
   side_by_side: ComparisonField[]
   similarity_basis: string[]
   match_strength: string | null
+}
+
+export interface MultiComparisonValue {
+  neighbourhood_id: string
+  value: number | string | null
+  status: ApiStatus | string
+}
+
+export interface MultiComparisonField {
+  id: string
+  name: string
+  unit: string | null
+  source: string | null
+  reference_year: string | number | null
+  geographic_unit: string | null
+  values: MultiComparisonValue[]
+}
+
+export interface MultiNeighbourhoodComparison {
+  neighbourhoods: NeighbourhoodSearchResult[]
+  side_by_side: MultiComparisonField[]
+  similarity_basis: string[]
+  match_strength: string | null
+}
+
+export interface ApprovedComparisonValue {
+  value: number | string | null
+  status: ApiStatus | string
+}
+
+export interface ApprovedComparisonIndicator {
+  id: string
+  name: string
+  unit: string | null
+  neighbourhood_a: ApprovedComparisonValue
+  neighbourhood_b: ApprovedComparisonValue
+  approved_difference: ApprovedComparisonValue
+  source: string | null
+  reference_year: string | number | null
+  geographic_unit?: string | null
+}
+
+export interface OutcomeComparison {
+  neighbourhood_a: NeighbourhoodSearchResult
+  neighbourhood_b: NeighbourhoodSearchResult
+  outcome_indicators: ApprovedComparisonIndicator[]
+}
+
+export interface EnvironmentalDifference {
+  neighbourhood_a: NeighbourhoodSearchResult
+  neighbourhood_b: NeighbourhoodSearchResult
+  environmental_indicators: ApprovedComparisonIndicator[]
+  approved_standout_indicator_ids: string[]
+}
+
+export interface PatternInsightItem {
+  id: string
+  title: string
+  description: string
+  status: ApiStatus | string
+  confidence: ApprovedComparisonValue
+  quality: ApprovedComparisonValue
+  stability: ApprovedComparisonValue
+  supporting_outcome_indicator_ids: string[]
+  supporting_environmental_indicator_ids: string[]
+}
+
+export interface PatternInsight {
+  neighbourhood_a: NeighbourhoodSearchResult
+  neighbourhood_b: NeighbourhoodSearchResult
+  patterns: PatternInsightItem[]
+  supporting_outcome_indicators: ApprovedComparisonIndicator[]
+  supporting_environmental_indicators: ApprovedComparisonIndicator[]
 }
 
 export interface SuitableLocality {
@@ -293,6 +418,52 @@ export const api = {
       )}/profile`, signal,
     ),
 
+  getEarlyChildhoodServices: (
+    id: string,
+    signal?: AbortSignal,
+  ) =>
+    request<EarlyChildhoodServices | null>(
+      `/api/neighbourhoods/${encodeURIComponent(
+        id,
+      )}/early-childhood-services`, signal,
+    ),
+
+  getPopulationProjections: (
+    sa2Code: string,
+    signal?: AbortSignal,
+  ) =>
+    request<PopulationProjectionResponse>(
+      `/api/population-projections?sa2_code=${encodeURIComponent(sa2Code)}`,
+      signal,
+    ),
+
+  getTrafficContext: (
+    id: string,
+    signal?: AbortSignal,
+  ) =>
+    request<NeighbourhoodContext | null>(
+      `/api/neighbourhoods/${encodeURIComponent(id)}/traffic-context`,
+      signal,
+    ),
+
+  getIndustrialContext: (
+    id: string,
+    signal?: AbortSignal,
+  ) =>
+    request<NeighbourhoodContext | null>(
+      `/api/neighbourhoods/${encodeURIComponent(id)}/industrial-emissions-context`,
+      signal,
+    ),
+
+  getIndustrialEmissionsContext: (
+    id: string,
+    signal?: AbortSignal,
+  ) =>
+    request<NeighbourhoodContext | null>(
+      `/api/neighbourhoods/${encodeURIComponent(id)}/industrial-emissions-context`,
+      signal,
+    ),
+
 
   getPriority: (
     id: string,
@@ -324,11 +495,40 @@ export const api = {
 
 
   compare: (
+    neighbourhoodIds: string[],
+  ) => {
+    const query = new URLSearchParams()
+    neighbourhoodIds.forEach((id) => query.append('neighbourhood_ids', id))
+    return request<MultiNeighbourhoodComparison>(`/api/compare?${query.toString()}`)
+  },
+  getOutcomeComparison: (
     a: string,
     b: string,
   ) =>
-    request<NeighbourhoodComparison>(
-      `/api/compare?neighbourhood_id_a=${encodeURIComponent(
+    request<OutcomeComparison>(
+      `/api/outcome-comparison?neighbourhood_id_a=${encodeURIComponent(
+        a,
+      )}&neighbourhood_id_b=${encodeURIComponent(
+        b,
+      )}`,
+    ),
+  getEnvironmentalDifference: (
+    a: string,
+    b: string,
+  ) =>
+    request<EnvironmentalDifference>(
+      `/api/environmental-difference?neighbourhood_id_a=${encodeURIComponent(
+        a,
+      )}&neighbourhood_id_b=${encodeURIComponent(
+        b,
+      )}`,
+    ),
+  getPatternInsight: (
+    a: string,
+    b: string,
+  ) =>
+    request<PatternInsight>(
+      `/api/pattern-insight?neighbourhood_id_a=${encodeURIComponent(
         a,
       )}&neighbourhood_id_b=${encodeURIComponent(
         b,

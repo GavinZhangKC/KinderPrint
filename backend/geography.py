@@ -7,8 +7,8 @@ import math
 from pathlib import Path
 from typing import Any
 
-from data_loader import BOUNDARY_DATA_PATH_ENV, boundary_data_path
-from responses import limitation
+from core.data_loader import BOUNDARY_DATA_PATH_ENV, boundary_data_path
+from core.responses import limitation
 
 DEFAULT_BOUNDARY_VERSION = "Not supplied"
 

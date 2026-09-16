@@ -1,11 +1,11 @@
-"""Configuration and generic approved JSON source loading."""
+"""Core configuration and generic approved JSON source loading."""
 
 import json
 import os
 from pathlib import Path
 from typing import Any
 
-from responses import limitation
+from core.responses import limitation
 
 BOUNDARY_DATA_PATH_ENV = "KINDERPRINT_BOUNDARY_DATA_PATH"
 PROFILE_DATA_PATH_ENV = "KINDERPRINT_PROFILE_DATA_PATH"
@@ -17,6 +17,12 @@ ENVIRONMENTAL_DIFFERENCE_DATA_PATH_ENV = "KINDERPRINT_ENVIRONMENTAL_DIFFERENCE_D
 PATTERN_INSIGHT_DATA_PATH_ENV = "KINDERPRINT_PATTERN_INSIGHT_DATA_PATH"
 PREVENTION_OPPORTUNITY_DATA_PATH_ENV = "KINDERPRINT_PREVENTION_OPPORTUNITY_DATA_PATH"
 SUITABILITY_DATA_PATH_ENV = "KINDERPRINT_SUITABILITY_DATA_PATH"
+VIF_PROJECTION_DATA_PATH_ENV = "KINDERPRINT_VIF_PROJECTION_DATA_PATH"
+EPA_STATION_YEAR_DATA_PATH_ENV = "KINDERPRINT_EPA_STATION_YEAR_DATA_PATH"
+ACECQA_GEOCODING_DATA_PATH_ENV = "KINDERPRINT_ACECQA_GEOCODING_DATA_PATH"
+ACECQA_CONTEXT_DATA_PATH_ENV = "KINDERPRINT_ACECQA_CONTEXT_DATA_PATH"
+COMMUNITY_CONTEXT_DATA_PATH_ENV = "KINDERPRINT_COMMUNITY_CONTEXT_DATA_PATH"
+COMMUNITY_IDENTITY_DATA_PATH_ENV = "KINDERPRINT_COMMUNITY_IDENTITY_DATA_PATH"
 
 
 def boundary_data_path() -> Path | None:
@@ -66,6 +72,36 @@ def prevention_opportunity_data_path() -> Path | None:
 
 def suitability_data_path() -> Path | None:
     value = os.getenv(SUITABILITY_DATA_PATH_ENV)
+    return Path(value).expanduser() if value else None
+
+
+def vif_projection_data_path() -> Path | None:
+    value = os.getenv(VIF_PROJECTION_DATA_PATH_ENV)
+    return Path(value).expanduser() if value else None
+
+
+def epa_station_year_data_path() -> Path | None:
+    value = os.getenv(EPA_STATION_YEAR_DATA_PATH_ENV)
+    return Path(value).expanduser() if value else None
+
+
+def acecqa_geocoding_data_path() -> Path | None:
+    value = os.getenv(ACECQA_GEOCODING_DATA_PATH_ENV)
+    return Path(value).expanduser() if value else None
+
+
+def acecqa_context_data_path() -> Path | None:
+    value = os.getenv(ACECQA_CONTEXT_DATA_PATH_ENV)
+    return Path(value).expanduser() if value else None
+
+
+def community_context_data_path() -> Path | None:
+    value = os.getenv(COMMUNITY_CONTEXT_DATA_PATH_ENV)
+    return Path(value).expanduser() if value else None
+
+
+def community_identity_data_path() -> Path | None:
+    value = os.getenv(COMMUNITY_IDENTITY_DATA_PATH_ENV)
     return Path(value).expanduser() if value else None
 
 

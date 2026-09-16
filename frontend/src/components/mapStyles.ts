@@ -52,7 +52,13 @@ export function choroplethFill(preference: PreferenceId | null) {
   ] as any
 }
 
-export function selectionFilter(id: string | null | undefined) {
+export function selectionFilter(id: string | string[] | null | undefined) {
+  if (Array.isArray(id)) {
+    return id.length > 0
+      ? ['in', ['get', 'id'], ['literal', id]] as any
+      : ['==', ['get', 'id'], '__no_neighbourhood_selected__'] as any
+  }
+
   return [
     '==',
     ['get', 'id'],

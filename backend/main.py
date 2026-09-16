@@ -10,7 +10,16 @@ from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.responses import JSONResponse
 from mangum import Mangum
 
-from data_loader import boundary_data_path
+from core.data_loader import boundary_data_path
+from core.data_readiness import runtime_data_readiness
+from core.dataset_status import dataset_statuses
+from core.responses import (
+    AREA_LEVEL_NOTICE, ASSOCIATION_NOTICE, COMPARABLE_NOTICE, COMPARISON_AREA_NOTICE,
+    HUMAN_DECISION_NOTICE, INDUSTRIAL_EMISSIONS_CONTEXT_NOTICE,
+    INVESTIGATION_LEADS_NOTICE, MANUAL_COMPARISON_NOTICE, STATION_CONTEXT_NOTICE,
+    TRAFFIC_CONTEXT_NOTICE,
+    envelope, limitation,
+)
 from geography import (
     feature_metadata,
     intersects_bbox,
@@ -20,25 +29,51 @@ from geography import (
     public_boundary_feature,
     public_boundary_geometry,
 )
-from responses import (
-    AREA_LEVEL_NOTICE, ASSOCIATION_NOTICE, COMPARABLE_NOTICE, COMPARISON_AREA_NOTICE,
-    HUMAN_DECISION_NOTICE, INVESTIGATION_LEADS_NOTICE, envelope, limitation,
+from loaders.air_quality import load_station_year_observations, station_catalog
+from loaders.community_context import (
+    INDUSTRIAL_EVIDENCE,
+    INDUSTRIAL_METRIC_DEFINITIONS,
+    TRAFFIC_EVIDENCE,
+    TRAFFIC_METRIC_DEFINITIONS,
+    load_community_context,
+    load_community_identities,
 )
+from loaders.early_childhood import load_early_childhood_context
+from loaders.geocoding_quality import load_geocoding_quality
+from loaders.population import load_population_projections
 from validation import (
-    aggregate_status, environmental_difference_data, explanation_data,
-    load_comparison_data, load_environmental_differences, load_explanations,
-    load_outcome_comparisons, load_pattern_insights, load_prevention_opportunities,
+    aggregate_status, environmental_difference_data, environmental_difference_for_pair,
+    explanation_data,
+    load_comparison_data, load_explanations, load_pattern_insights,
+    load_prevention_opportunities,
     load_priority_results, load_profiles, load_suitability_rankings,
-    map_indicator_data, match_data,
-    outcome_comparison_data, pattern_insight_data, prevention_opportunity_data,
+    map_indicator_data, match_data, multi_profile_comparison_data,
+    multi_profile_comparison_limitations,
+    outcome_comparison_data, outcome_comparison_for_pair, pattern_insight_data,
+    prevention_opportunity_data,
     priority_data, profile_boundary_limitations, profile_collection_metadata,
     profile_comparison_data, profile_comparison_limitations, profile_limitations,
     profile_metadata, profile_status,
 )
 
-app = FastAPI(title="KinderPrint API", version="0.2.0")
+app = FastAPI(title="KinderPrint API", version="0.3.0")
 app.add_middleware(GZipMiddleware, minimum_size=1000)
 logger = logging.getLogger("kinderprint.api")
+
+
+def _context_metrics(values: dict[str, Any]) -> dict[str, dict[str, Any]]:
+    return {
+        identifier: {
+            "value": value,
+            "status": "available" if value is not None else "missing",
+        }
+        for identifier, value in values.items()
+    }
+
+
+def _context_status(metrics: dict[str, dict[str, Any]]) -> str:
+    return "available" if all(
+        metric["status"] == "available" for metric in metrics.values()) else "limited"
 
 
 @app.middleware("http")
@@ -71,6 +106,140 @@ def root() -> dict[str, str]:
 def health() -> dict[str, str]:
     """Confirm that the FastAPI application is running."""
     return {"status": "available"}
+
+
+@app.get("/api/health/data")
+def data_health() -> dict[str, Any]:
+    """Validate configured runtime datasets and their locality-boundary alignment."""
+    checks = runtime_data_readiness()
+    ready_count = sum(check["readiness"] == "ready" for check in checks)
+    return envelope("available" if ready_count == len(checks) else "limited",
+                    {"checks": checks}, metadata={
+                        "check_count": len(checks), "ready_count": ready_count,
+                    })
+
+
+@app.get("/api/datasets/status")
+def datasets_status() -> dict[str, Any]:
+    """Return configuration readiness and interpretation boundaries for data products."""
+    datasets = dataset_statuses()
+    configured_count = sum(bool(dataset["configured"]) for dataset in datasets)
+    return envelope("available", {"datasets": datasets}, metadata={
+        "dataset_count": len(datasets),
+        "configured_count": configured_count,
+        "contract_version": "0.3",
+    })
+
+
+@app.get("/api/population-projections")
+def population_projections(
+    sa2_code: str | None = Query(None, min_length=9, max_length=9, pattern=r"^\d{9}$"),
+    year: int | None = Query(None, ge=2021, le=2036),
+    sex: str = Query("persons", pattern=r"^(persons|males|females)$"),
+    offset: int = Query(0, ge=0),
+    limit: int = Query(500, ge=1, le=1000),
+) -> dict[str, Any]:
+    """Return published VIF projections at their native ASGS Edition 3 SA2 geography."""
+    rows, limitations = load_population_projections()
+    if rows is None:
+        return envelope("unavailable", {"projections": []}, limitations=limitations,
+                        notices=[AREA_LEVEL_NOTICE])
+    selected = [row for row in rows
+                if row["sex"] == sex
+                and (sa2_code is None or row["sa2_code"] == sa2_code)
+                and (year is None or row["projection_year"] == year)]
+    total_result_count = len(selected)
+    selected = selected[offset:offset + limit]
+    status = "available" if selected else "missing"
+    if not selected:
+        limitations = [limitation(
+            "page_out_of_range" if total_result_count else "population_projection_not_found",
+            "The requested page is beyond the available results." if total_result_count else
+            "No VIF projection matches the requested SA2, year and sex.",
+            "offset" if total_result_count else "sa2_code",
+            *("year", "sex") if not total_result_count else (),
+        )]
+    return envelope(status, {"projections": selected}, metadata={
+        "source": "Victoria in Future 2023 Release 2",
+        "geographic_unit": "ASGS Edition 3 SA2",
+        "value_type": "projection",
+        "result_count": len(selected),
+        "total_result_count": total_result_count,
+        "offset": offset,
+        "limit": limit,
+        "available_years": sorted({row["projection_year"] for row in rows}),
+    }, limitations=limitations, notices=[AREA_LEVEL_NOTICE])
+
+
+@app.get("/api/air-quality/stations")
+def station_air_quality(
+    station_id: str | None = Query(None, min_length=1, max_length=50),
+    year: int | None = Query(None, ge=2018, le=2025),
+    pollutant: str | None = Query(None, pattern=r"^(PM2\.5|PM10|NO2|O3)$"),
+    offset: int = Query(0, ge=0),
+    limit: int = Query(200, ge=1, le=500),
+) -> dict[str, Any]:
+    """Return station-year summaries without deriving area-level exposure."""
+    rows, limitations = load_station_year_observations()
+    if rows is None:
+        return envelope("unavailable", {"observations": []}, limitations=limitations,
+                        notices=[STATION_CONTEXT_NOTICE])
+    selected = [row for row in rows
+                if (station_id is None or row["station_id"] == station_id)
+                and (year is None or row["year"] == year)
+                and (pollutant is None or row["pollutant"] == pollutant)]
+    total_result_count = len(selected)
+    selected = selected[offset:offset + limit]
+    status = "available" if selected else "missing"
+    if not selected:
+        limitations = [limitation(
+            "page_out_of_range" if total_result_count else "station_observation_not_found",
+            "The requested page is beyond the available results." if total_result_count else
+            "No station observation matches the requested filters.",
+            "offset" if total_result_count else "station_id",
+            *("year", "pollutant") if not total_result_count else (),
+        )]
+    return envelope(status, {"observations": selected}, metadata={
+        "source": "EPA Victoria historical hourly monitoring releases",
+        "geographic_unit": "monitoring_station",
+        "aggregation": "annual mean of published hourly observations",
+        "result_count": len(selected),
+        "total_result_count": total_result_count,
+        "offset": offset,
+        "limit": limit,
+        "sa2_exposure_status": "not_derived",
+    }, limitations=limitations, notices=[STATION_CONTEXT_NOTICE])
+
+
+@app.get("/api/air-quality/station-catalog")
+def air_quality_station_catalog() -> dict[str, Any]:
+    """List valid station-level filter dimensions without locality interpretation."""
+    rows, limitations = load_station_year_observations()
+    if rows is None:
+        return envelope("unavailable", {"stations": []}, limitations=limitations,
+                        notices=[STATION_CONTEXT_NOTICE])
+    stations = station_catalog(rows)
+    return envelope("available", {"stations": stations}, metadata={
+        "source": "EPA Victoria historical hourly monitoring releases",
+        "geographic_unit": "monitoring_station",
+        "station_identifier_count": len(stations),
+        "station_name_count": len({station["station_name"] for station in stations}),
+        "sa2_exposure_status": "not_derived",
+    }, notices=[STATION_CONTEXT_NOTICE])
+
+
+@app.get("/api/data-quality/acecqa-geocoding")
+def acecqa_geocoding_quality() -> dict[str, Any]:
+    """Return aggregate match QA while withholding service-level address records."""
+    report, limitations = load_geocoding_quality()
+    if report is None:
+        return envelope("unavailable", None, limitations=limitations)
+    return envelope("available", report, metadata={
+        "source": "ACECQA service register matched to official Open G-NAF",
+        "geographic_assignment": "ASGS Edition 3 SA2 point-in-polygon",
+        "accepted_match_statuses": ["EXACT", "HIGH_CONFIDENCE"],
+        "address_fields_exposed": False,
+    })
 
 
 @app.get("/api/priority")
@@ -162,6 +331,319 @@ def neighbourhood_profile(neighbourhood_id: str) -> dict[str, Any]:
         "neighbourhood": profile["neighbourhood"],
         "domains": profile["domains"],
     }, metadata=profile_metadata(profile), limitations=profile_limitations(profile), notices=[AREA_LEVEL_NOTICE])
+
+
+@app.get("/api/neighbourhoods/{neighbourhood_id}/child-development")
+def neighbourhood_child_development(neighbourhood_id: str) -> dict[str, Any]:
+    """Return only approved aggregate child-development indicators from the profile."""
+    profiles, limitations = load_profiles()
+    empty = {
+        "neighbourhood": {"id": neighbourhood_id, "name": None, "geographic_unit": None},
+        "indicators": [],
+    }
+    if profiles is None:
+        return envelope("unavailable", empty, limitations=limitations,
+                        notices=[AREA_LEVEL_NOTICE])
+    profile = next((item for item in profiles
+                    if item["neighbourhood"]["id"] == neighbourhood_id), None)
+    if profile is None:
+        return envelope("missing", empty, limitations=[limitation(
+            "unsupported_neighbourhood",
+            "No supported child-development profile exists for this identifier.",
+            "neighbourhood_id", "child_development",
+        )], notices=[AREA_LEVEL_NOTICE])
+    domain = next((item for item in profile["domains"]
+                   if item["id"] == "child-development"), None)
+    if domain is None:
+        return envelope("unavailable", {
+            "neighbourhood": profile["neighbourhood"], "indicators": [],
+        }, limitations=[limitation(
+            "child_development_domain_unavailable",
+            "The approved profile does not contain a child-development domain.",
+            "child_development",
+        )], notices=[AREA_LEVEL_NOTICE])
+    indicators = domain["indicators"]
+    status = aggregate_status([indicator["status"] for indicator in indicators])
+    domain_limitations = [limitation(
+        f"indicator_{indicator['status']}",
+        f"{indicator['name']} is {indicator['status']} and no value has been created.",
+        indicator["id"],
+    ) for indicator in indicators if indicator["status"] != "available"]
+    return envelope(status, {
+        "neighbourhood": profile["neighbourhood"], "indicators": indicators,
+    }, metadata={
+        "sources": sorted({str(indicator["source"]) for indicator in indicators}),
+        "reference_years": sorted({str(indicator["reference_year"]) for indicator in indicators}),
+        "geographic_unit": profile["neighbourhood"]["geographic_unit"],
+        "primary_outcome_dataset": "AEDC",
+        "result_count": len(indicators),
+    }, limitations=domain_limitations, notices=[AREA_LEVEL_NOTICE])
+
+
+@app.get("/api/neighbourhoods/{neighbourhood_id}/early-childhood-services")
+def neighbourhood_early_childhood_services(neighbourhood_id: str) -> dict[str, Any]:
+    """Return address-free service context from accepted G-NAF matches."""
+    rows, limitations = load_early_childhood_context()
+    if rows is None:
+        return envelope("unavailable", None, limitations=limitations,
+                        notices=[AREA_LEVEL_NOTICE])
+    result = next((row for row in rows if row["neighbourhood_id"] == neighbourhood_id), None)
+    if result is None:
+        return envelope("missing", None, limitations=[limitation(
+            "early_childhood_context_not_found",
+            "No aggregate early-childhood service context exists for this neighbourhood.",
+            "neighbourhood_id",
+        )], notices=[AREA_LEVEL_NOTICE])
+    return envelope("available", result, metadata={
+        "source": "ACECQA service register and Open G-NAF August 2026 GDA2020",
+        "geographic_unit": "KinderPrint reporting locality",
+        "match_policy": "EXACT or HIGH_CONFIDENCE within reporting scope",
+        "address_fields_exposed": False,
+        "interpretation": "Service availability context; not service quality or child outcome.",
+    }, notices=[AREA_LEVEL_NOTICE])
+
+
+@app.get("/api/neighbourhoods/{neighbourhood_id}/traffic-context")
+def neighbourhood_traffic_context(neighbourhood_id: str) -> dict[str, Any]:
+    """Return precomputed declared-road context without deriving exposure."""
+    index, limitations = load_community_context()
+    notices = [AREA_LEVEL_NOTICE, TRAFFIC_CONTEXT_NOTICE]
+    if index is None:
+        return envelope("unavailable", None, limitations=limitations, notices=notices)
+    result = index.get(neighbourhood_id)
+    if result is None:
+        return envelope("missing", None, limitations=[limitation(
+            "traffic_context_not_found",
+            "No traffic context exists for this neighbourhood.",
+            "neighbourhood_id",
+        )], notices=notices)
+    metrics = _context_metrics(result["traffic"])
+    missing_fields = [identifier for identifier, metric in metrics.items()
+                      if metric["status"] == "missing"]
+    return envelope(
+        "limited" if missing_fields else "available",
+        {"neighbourhood": result["neighbourhood"], "metrics": metrics},
+        metadata={
+            **TRAFFIC_EVIDENCE,
+            "metric_definitions": TRAFFIC_METRIC_DEFINITIONS,
+        },
+        limitations=[limitation(
+            "traffic_context_missing",
+            "The source contains no intersecting declared-road data; no replacement value was created.",
+            *missing_fields,
+        )] if missing_fields else [],
+        notices=notices,
+    )
+
+
+@app.get("/api/neighbourhoods/{neighbourhood_id}/industrial-emissions-context")
+def neighbourhood_industrial_emissions_context(neighbourhood_id: str) -> dict[str, Any]:
+    """Return precomputed NPI facility context without deriving exposure or risk."""
+    index, limitations = load_community_context()
+    notices = [AREA_LEVEL_NOTICE, INDUSTRIAL_EMISSIONS_CONTEXT_NOTICE]
+    if index is None:
+        return envelope("unavailable", None, limitations=limitations, notices=notices)
+    result = index.get(neighbourhood_id)
+    if result is None:
+        return envelope("missing", None, limitations=[limitation(
+            "industrial_emissions_context_not_found",
+            "No industrial-emissions context exists for this neighbourhood.",
+            "neighbourhood_id",
+        )], notices=notices)
+    metrics = _context_metrics(result["industrial_emissions"])
+    missing_fields = [identifier for identifier, metric in metrics.items()
+                      if metric["status"] == "missing"]
+    return envelope(
+        "limited" if missing_fields else "available",
+        {"neighbourhood": result["neighbourhood"], "metrics": metrics},
+        metadata={
+            **INDUSTRIAL_EVIDENCE,
+            "metric_definitions": INDUSTRIAL_METRIC_DEFINITIONS,
+        },
+        limitations=[limitation(
+            "industrial_emissions_context_missing",
+            "One or more NPI context values are unavailable; no replacement value was created.",
+            *missing_fields,
+        )] if missing_fields else [],
+        notices=notices,
+    )
+
+
+def _overview_section(response: dict[str, Any]) -> dict[str, Any]:
+    """Keep each existing endpoint result self-describing inside an overview."""
+    return {
+        key: response[key]
+        for key in ("status", "data", "metadata", "limitations")
+    }
+
+
+def _population_overview_section(neighbourhood_id: str) -> dict[str, Any]:
+    """Return native-SA2 projections only when the locality is exactly one SA2."""
+    identity_index, identity_limitations = load_community_identities()
+    if identity_index is None:
+        return _overview_section(envelope(
+            "unavailable", {"projections": []},
+            limitations=[limitation(
+                "population_locality_identity_unavailable",
+                "The reporting-locality identity needed to select native SA2 projections is unavailable.",
+                "population_projections", "neighbourhood_id",
+            ), *identity_limitations],
+        ))
+    identity = identity_index.get(neighbourhood_id)
+    if identity is None:
+        return _overview_section(envelope(
+            "missing", {"projections": []}, limitations=[limitation(
+                "population_locality_identity_not_found",
+                "No reporting-locality identity exists for this neighbourhood.",
+                "population_projections", "neighbourhood_id",
+            )],
+        ))
+    if identity["is_merged"]:
+        return _overview_section(envelope(
+            "incompatible", {"projections": []}, metadata={
+                "source": "Victoria in Future 2023 Release 2",
+                "geographic_unit": "ASGS Edition 3 SA2",
+                "reporting_locality_component_sa2_count": identity["component_sa2_count"],
+            }, limitations=[limitation(
+                "population_projection_incompatible_geography",
+                "This reporting locality contains multiple SA2s; a single-SA2 projection was not used as a replacement for the combined locality.",
+                "population_projections", "geographic_unit",
+            )],
+        ))
+
+    rows, limitations = load_population_projections()
+    if rows is None:
+        return _overview_section(envelope(
+            "unavailable", {"projections": []}, limitations=limitations))
+    selected = sorted(
+        (row for row in rows
+         if row["sa2_code"] == neighbourhood_id and row["sex"] == "persons"),
+        key=lambda row: row["projection_year"],
+    )
+    if not selected:
+        return _overview_section(envelope(
+            "missing", {"projections": []}, limitations=[limitation(
+                "population_projection_not_found",
+                "No persons projection exists for this locality at its native SA2 geography.",
+                "population_projections", "neighbourhood_id",
+            )],
+        ))
+    return _overview_section(envelope(
+        "available", {"projections": selected}, metadata={
+            "source": "Victoria in Future 2023 Release 2",
+            "geographic_unit": "ASGS Edition 3 SA2",
+            "value_type": "projection",
+            "sex": "persons",
+            "available_years": [row["projection_year"] for row in selected],
+            "result_count": len(selected),
+        },
+    ))
+
+
+@app.get("/api/neighbourhoods/{neighbourhood_id}/overview")
+def neighbourhood_overview(neighbourhood_id: str) -> dict[str, Any]:
+    """Aggregate existing locality evidence without deriving new values."""
+    profile_response = neighbourhood_profile(neighbourhood_id)
+    early_childhood_response = neighbourhood_early_childhood_services(neighbourhood_id)
+    traffic_response = neighbourhood_traffic_context(neighbourhood_id)
+    industrial_response = neighbourhood_industrial_emissions_context(neighbourhood_id)
+    sections = {
+        "profile": _overview_section(profile_response),
+        "early_childhood": _overview_section(early_childhood_response),
+        "traffic": _overview_section(traffic_response),
+        "industrial_emissions": _overview_section(industrial_response),
+        "population_outlook": _population_overview_section(neighbourhood_id),
+    }
+    statuses = [section["status"] for section in sections.values()]
+    neighbourhood = profile_response.get("data", {}).get("neighbourhood")
+    if not neighbourhood or neighbourhood.get("name") is None:
+        context_data = traffic_response.get("data") or industrial_response.get("data")
+        if context_data:
+            neighbourhood = context_data.get("neighbourhood")
+    if not neighbourhood:
+        neighbourhood = {
+            "id": neighbourhood_id, "name": None, "geographic_unit": None,
+        }
+    incomplete_sections = [
+        name for name, section in sections.items()
+        if section["status"] != "available"
+    ]
+    return envelope(
+        aggregate_status(statuses),
+        {"neighbourhood": neighbourhood, "sections": sections},
+        metadata={
+            "section_count": len(sections),
+            "available_section_count": len(sections) - len(incomplete_sections),
+            "geographic_unit": neighbourhood.get("geographic_unit"),
+        },
+        limitations=[limitation(
+            "overview_sections_incomplete",
+            "One or more overview sections are not fully available; no replacement values were created.",
+            *incomplete_sections,
+        )] if incomplete_sections else [],
+        notices=[
+            AREA_LEVEL_NOTICE,
+            TRAFFIC_CONTEXT_NOTICE,
+            INDUSTRIAL_EMISSIONS_CONTEXT_NOTICE,
+        ],
+    )
+
+
+@app.get("/api/map/context")
+def map_context() -> dict[str, Any]:
+    """Return lightweight traffic and industrial context for all map localities."""
+    index, limitations = load_community_context()
+    notices = [
+        AREA_LEVEL_NOTICE,
+        TRAFFIC_CONTEXT_NOTICE,
+        INDUSTRIAL_EMISSIONS_CONTEXT_NOTICE,
+    ]
+    if index is None:
+        return envelope(
+            "unavailable", {"neighbourhoods": []},
+            limitations=limitations, notices=notices)
+
+    neighbourhoods = []
+    incomplete_neighbourhood_ids = []
+    for result in index.values():
+        traffic = _context_metrics(result["traffic"])
+        industrial = _context_metrics(result["industrial_emissions"])
+        traffic_status = _context_status(traffic)
+        industrial_status = _context_status(industrial)
+        if traffic_status != "available" or industrial_status != "available":
+            incomplete_neighbourhood_ids.append(result["neighbourhood"]["id"])
+        neighbourhoods.append({
+            **result["neighbourhood"],
+            "traffic": {"status": traffic_status, "metrics": traffic},
+            "industrial_emissions": {
+                "status": industrial_status,
+                "metrics": industrial,
+            },
+        })
+
+    return envelope(
+        "limited" if incomplete_neighbourhood_ids else "available",
+        {"neighbourhoods": neighbourhoods},
+        metadata={
+            "result_count": len(neighbourhoods),
+            "join_key": "id",
+            "geometry_included": False,
+            "traffic": {
+                **TRAFFIC_EVIDENCE,
+                "metric_definitions": TRAFFIC_METRIC_DEFINITIONS,
+            },
+            "industrial_emissions": {
+                **INDUSTRIAL_EVIDENCE,
+                "metric_definitions": INDUSTRIAL_METRIC_DEFINITIONS,
+            },
+        },
+        limitations=[limitation(
+            "map_context_incomplete",
+            "One or more map localities contain unavailable context values; no replacements were created.",
+            *incomplete_neighbourhood_ids,
+        )] if incomplete_neighbourhood_ids else [],
+        notices=notices,
+    )
 
 
 @app.get("/api/neighbourhoods/indicators")
@@ -274,59 +756,130 @@ def neighbourhood_match(neighbourhood_id: str) -> dict[str, Any]:
 
 @app.get("/api/compare")
 def manual_compare(
-    neighbourhood_id_a: str = Query(..., min_length=1, max_length=100),
-    neighbourhood_id_b: str = Query(..., min_length=1, max_length=100),
+    neighbourhood_id_a: str | None = Query(None, min_length=1, max_length=100),
+    neighbourhood_id_b: str | None = Query(None, min_length=1, max_length=100),
+    neighbourhood_ids: list[str] | None = Query(None),
 ) -> dict[str, Any]:
-    """Compare profile indicators for any two supported neighbourhoods."""
-    notices = [COMPARABLE_NOTICE, COMPARISON_AREA_NOTICE]
+    """Compare profile indicators for two to four supported neighbourhoods."""
+    notices = [COMPARISON_AREA_NOTICE, MANUAL_COMPARISON_NOTICE]
+    supplied_legacy = neighbourhood_id_a is not None or neighbourhood_id_b is not None
+    supplied_multi = neighbourhood_ids is not None
+    parsed_ids = [
+        identifier.strip()
+        for value in (neighbourhood_ids or [])
+        for identifier in value.split(",")
+        if identifier.strip()
+    ]
+    legacy_mode = supplied_legacy and not supplied_multi
+
+    if supplied_legacy and supplied_multi:
+        return envelope("unavailable", None, limitations=[limitation(
+            "conflicting_comparison_parameters",
+            "Use either neighbourhood_id_a and neighbourhood_id_b or neighbourhood_ids, not both.",
+            "neighbourhood_id_a", "neighbourhood_id_b", "neighbourhood_ids",
+        )], notices=notices)
+    if not supplied_legacy and not supplied_multi:
+        return JSONResponse(status_code=422, content=envelope(
+            "unavailable", None, limitations=[limitation(
+                "invalid_request",
+                "One or more request parameters are invalid.",
+            )], notices=notices))
+    if legacy_mode and (neighbourhood_id_a is None or neighbourhood_id_b is None):
+        return JSONResponse(status_code=422, content=envelope(
+            "unavailable", None, limitations=[limitation(
+                "incomplete_comparison_parameters",
+                "Both neighbourhood_id_a and neighbourhood_id_b are required.",
+                "neighbourhood_id_a", "neighbourhood_id_b",
+            )], notices=notices))
+    selected_ids = (
+        [neighbourhood_id_a, neighbourhood_id_b]
+        if legacy_mode else parsed_ids
+    )
+    if not legacy_mode and not 2 <= len(selected_ids) <= 4:
+        return envelope("unavailable", None, limitations=[limitation(
+            "invalid_comparison_count",
+            "Select between two and four neighbourhoods for a comparison.",
+            "neighbourhood_ids",
+        )], notices=notices)
+    if not legacy_mode and len(selected_ids) != len(set(selected_ids)):
+        return envelope("no_match", None, limitations=[limitation(
+            "duplicate_neighbourhood_selected",
+            "Each selected neighbourhood must be different.",
+            "neighbourhood_ids",
+        )], notices=notices)
+
     empty = {
-        "source_neighbourhood": {"id": neighbourhood_id_a, "name": None, "geographic_unit": None},
-        "comparison_neighbourhood": {"id": neighbourhood_id_b, "name": None, "geographic_unit": None},
+        "source_neighbourhood": {
+            "id": neighbourhood_id_a, "name": None, "geographic_unit": None,
+        },
+        "comparison_neighbourhood": {
+            "id": neighbourhood_id_b, "name": None, "geographic_unit": None,
+        },
+        "side_by_side": [], "similarity_basis": [], "match_strength": None,
+    } if legacy_mode else {
+        "neighbourhoods": [
+            {"id": identifier, "name": None, "geographic_unit": None}
+            for identifier in selected_ids
+        ],
         "side_by_side": [], "similarity_basis": [], "match_strength": None,
     }
     profiles, limitations = load_profiles()
     if profiles is None:
         return envelope("unavailable", empty, limitations=limitations, notices=notices)
-    source_profile = next((profile for profile in profiles
-                           if profile["neighbourhood"]["id"] == neighbourhood_id_a), None)
-    comparison_profile = next((profile for profile in profiles
-                               if profile["neighbourhood"]["id"] == neighbourhood_id_b), None)
-    if source_profile is None or comparison_profile is None:
+    profile_index = {
+        profile["neighbourhood"]["id"]: profile for profile in profiles
+    }
+    selected_profiles = [profile_index.get(identifier) for identifier in selected_ids]
+    if any(profile is None for profile in selected_profiles):
         missing_parameters = [
-            parameter
-            for profile, parameter in (
-                (source_profile, "neighbourhood_id_a"),
-                (comparison_profile, "neighbourhood_id_b"),
-            )
+            ("neighbourhood_id_a", "neighbourhood_id_b")[index]
+            if legacy_mode else identifier
+            for index, (identifier, profile) in enumerate(zip(selected_ids, selected_profiles))
             if profile is None
         ]
         return envelope("missing", empty, limitations=[limitation(
             "unsupported_neighbourhood",
-            "One or both neighbourhood identifiers do not have a supported profile.",
+            "One or more neighbourhood identifiers do not have a supported profile.",
             *missing_parameters,
         )], notices=notices)
-    if neighbourhood_id_a == neighbourhood_id_b:
+    selected_profiles = [profile for profile in selected_profiles if profile is not None]
+    if legacy_mode and neighbourhood_id_a == neighbourhood_id_b:
         return envelope("no_match", empty, limitations=[limitation(
-            "same_neighbourhood_selected", "Choose two different neighbourhoods for a comparison.",
-            "neighbourhood_id_a", "neighbourhood_id_b")], notices=notices)
-    if (source_profile["neighbourhood"]["geographic_unit"]
-            != comparison_profile["neighbourhood"]["geographic_unit"]):
+            "same_neighbourhood_selected",
+            "Choose two different neighbourhoods for a comparison.",
+            "neighbourhood_id_a", "neighbourhood_id_b",
+        )], notices=notices)
+    geographic_units = {
+        profile["neighbourhood"]["geographic_unit"] for profile in selected_profiles
+    }
+    if len(geographic_units) != 1:
         return envelope("incompatible", empty, limitations=[limitation(
             "incompatible_geographic_unit",
             "The selected neighbourhood profiles use incompatible geographic units.",
-            "neighbourhood_id_a", "neighbourhood_id_b", "geographic_unit",
+            *("neighbourhood_id_a", "neighbourhood_id_b", "geographic_unit")
+            if legacy_mode else ("neighbourhood_ids", "geographic_unit"),
         )], notices=notices)
 
-    data = profile_comparison_data(source_profile, comparison_profile)
-    comparison_limitations = profile_comparison_limitations(source_profile, comparison_profile)
-    statuses = [
-        field[status_key]
-        for field in data["side_by_side"]
-        for status_key in ("source_status", "comparison_status")
-    ]
+    if legacy_mode:
+        data = profile_comparison_data(selected_profiles[0], selected_profiles[1])
+        comparison_limitations = profile_comparison_limitations(
+            selected_profiles[0], selected_profiles[1])
+        statuses = [
+            field[status_key]
+            for field in data["side_by_side"]
+            for status_key in ("source_status", "comparison_status")
+        ]
+    else:
+        data = multi_profile_comparison_data(selected_profiles)
+        comparison_limitations = multi_profile_comparison_limitations(selected_profiles)
+        statuses = [
+            value["status"]
+            for field in data["side_by_side"]
+            for value in field["values"]
+        ]
     return envelope(
         aggregate_status(statuses), data,
-        metadata=profile_collection_metadata([source_profile, comparison_profile]),
+        metadata=profile_collection_metadata(selected_profiles),
         limitations=comparison_limitations,
         notices=notices,
     )
@@ -387,13 +940,11 @@ def outcome_comparison(
 
     empty["neighbourhood_a"] = profile_a["neighbourhood"]
     empty["neighbourhood_b"] = profile_b["neighbourhood"]
-    comparisons, metadata, data_limitations = load_outcome_comparisons()
-    if comparisons is None:
+    comparison, metadata, data_limitations = outcome_comparison_for_pair(
+        neighbourhood_id_a, neighbourhood_id_b)
+    if data_limitations:
         return envelope(
             "unavailable", empty, limitations=data_limitations, notices=notices)
-    comparison = next((item for item in comparisons
-                       if item["neighbourhood_a"]["id"] == neighbourhood_id_a
-                       and item["neighbourhood_b"]["id"] == neighbourhood_id_b), None)
     if comparison is None:
         return envelope("unavailable", empty, metadata=metadata, limitations=[limitation(
             "outcome_comparison_unavailable",
@@ -470,13 +1021,11 @@ def environmental_difference(
 
     empty["neighbourhood_a"] = profile_a["neighbourhood"]
     empty["neighbourhood_b"] = profile_b["neighbourhood"]
-    differences, metadata, data_limitations = load_environmental_differences()
-    if differences is None:
+    result, metadata, data_limitations = environmental_difference_for_pair(
+        neighbourhood_id_a, neighbourhood_id_b)
+    if data_limitations:
         return envelope(
             "unavailable", empty, limitations=data_limitations, notices=notices)
-    result = next((item for item in differences
-                   if item["neighbourhood_a"]["id"] == neighbourhood_id_a
-                   and item["neighbourhood_b"]["id"] == neighbourhood_id_b), None)
     if result is None:
         return envelope("unavailable", empty, metadata=metadata, limitations=[limitation(
             "environmental_difference_unavailable",
@@ -716,6 +1265,13 @@ def locality_suitability(
         "long_day_care_availability",
         "kindergarten_availability",
         "primary_school_campus_availability",
+        "child_development",
+        "green_space",
+        "low_disadvantage",
+        "low_heat",
+        "service_access",
+        "future_demand",
+        "environment_quality",
     }
     selected_criteria = [
         item.strip()

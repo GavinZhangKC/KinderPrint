@@ -57,6 +57,25 @@
   outline: none;
 }
 
+.map-cold-start-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  opacity: 0;
+  pointer-events: none;
+  touch-action: none;
+  background: rgba(73, 103, 132, .34);
+  backdrop-filter: blur(11px) saturate(78%);
+  -webkit-backdrop-filter: blur(11px) saturate(78%);
+  transition: opacity .55s ease;
+}
+
+.map-cold-start-overlay.is-active {
+  opacity: 1;
+  pointer-events: auto;
+  cursor: wait;
+}
+
 .map-cursor-orb {
   position: absolute;
   left: 0;
@@ -241,6 +260,10 @@
   font-size: 11px;
 
   pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .map-cold-start-overlay { transition: none; }
 }
 
 .map-error {

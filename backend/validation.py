@@ -1,8 +1,10 @@
 """Validation and projection for approved analytical datasets."""
 
+from functools import lru_cache
+from pathlib import Path
 from typing import Any
 
-from data_loader import (
+from core.data_loader import (
     COMPARISON_DATA_PATH_ENV,
     ENVIRONMENTAL_DIFFERENCE_DATA_PATH_ENV,
     EXPLANATION_DATA_PATH_ENV,
@@ -23,7 +25,8 @@ from data_loader import (
     profile_data_path,
     suitability_data_path,
 )
-from responses import INDICATOR_STATUSES, PRIORITY_DOMAINS, limitation
+from core.responses import INDICATOR_STATUSES, PRIORITY_DOMAINS, limitation
+
 
 def valid_indicator(indicator: Any, profile_unit: str) -> bool:
     """Accept only source-supplied indicators with explicit provenance and status."""
@@ -67,6 +70,7 @@ def valid_profile(profile: Any) -> bool:
     return len(domain_ids) == len(set(domain_ids)) and len(indicator_ids) == len(set(indicator_ids))
 
 
+@lru_cache(maxsize=1)
 def load_profiles() -> tuple[list[dict[str, Any]] | None, list[dict[str, Any]]]:
     """Load profiles exactly as prepared by the approved data pipeline."""
     source, limitations = load_json_source(profile_data_path(), PROFILE_DATA_PATH_ENV, "profile")
@@ -107,6 +111,13 @@ SUITABILITY_CRITERIA = {
     "long_day_care_availability",
     "kindergarten_availability",
     "primary_school_campus_availability",
+    "child_development",
+    "green_space",
+    "low_disadvantage",
+    "low_heat",
+    "service_access",
+    "future_demand",
+    "environment_quality",
 }
 
 
@@ -136,6 +147,7 @@ def _valid_suitability_locality(locality: Any) -> bool:
     )
 
 
+@lru_cache(maxsize=1)
 def load_suitability_rankings() -> tuple[
     list[dict[str, Any]] | None,
     dict[str, Any] | None,
@@ -294,6 +306,10 @@ def profile_comparison_data(
         side_by_side.append({
             "id": identifier,
             "name": exemplar["name"],
+            "unit": exemplar.get("unit"),
+            "source": exemplar["source"],
+            "reference_year": exemplar["reference_year"],
+            "geographic_unit": exemplar["geographic_unit"],
             "source_value": source["value"] if source else None,
             "comparison_value": compared["value"] if compared else None,
             "source_status": source["status"] if source else "unavailable",
@@ -309,12 +325,51 @@ def profile_comparison_data(
     }
 
 
-def profile_comparison_limitations(
-    source_profile: dict[str, Any], comparison_profile: dict[str, Any]
+def multi_profile_comparison_data(profiles: list[dict[str, Any]]) -> dict[str, Any]:
+    """Project two to four profiles without calculating similarity or filling gaps."""
+    indicator_indexes = [{
+        indicator["id"]: indicator
+        for domain in profile["domains"]
+        for indicator in domain["indicators"]
+    } for profile in profiles]
+    indicator_ids = list(dict.fromkeys(
+        identifier
+        for index in indicator_indexes
+        for identifier in index
+    ))
+
+    side_by_side = []
+    for identifier in indicator_ids:
+        indicators = [index.get(identifier) for index in indicator_indexes]
+        exemplar = next(indicator for indicator in indicators if indicator is not None)
+        side_by_side.append({
+            "id": identifier,
+            "name": exemplar["name"],
+            "unit": exemplar.get("unit"),
+            "source": exemplar["source"],
+            "reference_year": exemplar["reference_year"],
+            "geographic_unit": exemplar["geographic_unit"],
+            "values": [{
+                "neighbourhood_id": profile["neighbourhood"]["id"],
+                "value": indicator["value"] if indicator else None,
+                "status": indicator["status"] if indicator else "unavailable",
+            } for profile, indicator in zip(profiles, indicators)],
+        })
+
+    return {
+        "neighbourhoods": [profile["neighbourhood"] for profile in profiles],
+        "side_by_side": side_by_side,
+        "similarity_basis": [],
+        "match_strength": None,
+    }
+
+
+def multi_profile_comparison_limitations(
+    profiles: list[dict[str, Any]],
 ) -> list[dict[str, Any]]:
-    """Expose profile gaps for both selected neighbourhoods without imputing values."""
+    """Expose gaps across selected profiles without imputing values."""
     limitations: list[dict[str, Any]] = []
-    for profile in (source_profile, comparison_profile):
+    for profile in profiles:
         identifier = profile["neighbourhood"]["id"]
         limitations.extend({
             **item,
@@ -323,29 +378,34 @@ def profile_comparison_limitations(
             ])),
         } for item in profile_limitations(profile))
 
-    source_ids = {
+    indicator_sets = [{
         indicator["id"]
-        for domain in source_profile["domains"]
+        for domain in profile["domains"]
         for indicator in domain["indicators"]
-    }
-    comparison_ids = {
-        indicator["id"]
-        for domain in comparison_profile["domains"]
-        for indicator in domain["indicators"]
-    }
-    for identifier in sorted(source_ids ^ comparison_ids):
-        missing_from = (
-            comparison_profile["neighbourhood"]["id"]
-            if identifier in source_ids
-            else source_profile["neighbourhood"]["id"]
-        )
-        limitations.append(limitation(
-            "indicator_unavailable_for_comparison",
-            "This indicator is not present for both selected neighbourhoods.",
-            identifier,
-            missing_from,
-        ))
+    } for profile in profiles]
+    all_indicator_ids = set().union(*indicator_sets)
+    for identifier in sorted(all_indicator_ids):
+        missing_from = [
+            profile["neighbourhood"]["id"]
+            for profile, indicator_ids in zip(profiles, indicator_sets)
+            if identifier not in indicator_ids
+        ]
+        if missing_from:
+            limitations.append(limitation(
+                "indicator_unavailable_for_comparison",
+                "This indicator is not present for every selected neighbourhood.",
+                identifier,
+                *missing_from,
+            ))
     return limitations
+
+
+def profile_comparison_limitations(
+    source_profile: dict[str, Any], comparison_profile: dict[str, Any]
+) -> list[dict[str, Any]]:
+    """Expose profile gaps for both selected neighbourhoods without imputing values."""
+    return multi_profile_comparison_limitations(
+        [source_profile, comparison_profile])
 
 
 def profile_boundary_limitations(
@@ -442,6 +502,7 @@ def numeric_string(value: str) -> bool:
     return True
 
 
+@lru_cache(maxsize=1)
 def load_priority_results() -> tuple[list[dict[str, Any]] | None, dict[str, Any] | None, list[dict[str, Any]]]:
     """Load only an explicitly approved, precomputed Data Science output."""
     source, limitations = load_json_source(priority_data_path(), PRIORITY_DATA_PATH_ENV, "priority")
@@ -531,6 +592,7 @@ def valid_explanation(explanation: Any) -> bool:
     return True
 
 
+@lru_cache(maxsize=1)
 def load_explanations() -> tuple[list[dict[str, Any]] | None, dict[str, Any] | None, list[dict[str, Any]]]:
     """Load an explicitly approved explanation output without recalculating it."""
     source, limitations = load_json_source(explanation_data_path(), EXPLANATION_DATA_PATH_ENV, "explanation")
@@ -632,6 +694,7 @@ def valid_manual_comparison(comparison: Any) -> bool:
     )
 
 
+@lru_cache(maxsize=1)
 def load_comparison_data() -> tuple[dict[str, list[dict[str, Any]]] | None, dict[str, Any] | None, list[dict[str, Any]]]:
     """Load only approved matching outputs; the API never finds or forces a match."""
     source, limitations = load_json_source(comparison_data_path(), COMPARISON_DATA_PATH_ENV, "comparison")
@@ -759,35 +822,66 @@ def valid_outcome_comparison(comparison: Any) -> bool:
     return bool(limitations)
 
 
-def load_outcome_comparisons() -> tuple[list[dict[str, Any]] | None, dict[str, Any] | None, list[dict[str, Any]]]:
+@lru_cache(maxsize=1)
+def _load_outcome_comparisons(path: Path) -> tuple[
+    tuple[dict[str, Any], ...] | None,
+    dict[str, Any] | None,
+    tuple[dict[str, Any], ...],
+    dict[tuple[str, str], dict[str, Any]],
+]:
     """Load only explicitly approved E5 outcome-comparison outputs."""
     source, limitations = load_json_source(
-        outcome_comparison_data_path(), OUTCOME_COMPARISON_DATA_PATH_ENV,
-        "outcome_comparison")
+        path, OUTCOME_COMPARISON_DATA_PATH_ENV, "outcome_comparison")
     if source is None:
-        return None, None, limitations
+        return None, None, tuple(limitations), {}
     comparisons, metadata = source.get("comparisons"), source.get("metadata")
     if (source.get("approved") is not True or not isinstance(comparisons, list)
             or not valid_priority_metadata(metadata)):
-        return None, None, [limitation(
+        return None, None, (limitation(
             "outcome_comparison_dataset_invalid",
             "The outcome-comparison dataset must be explicitly approved and contain comparisons with complete provenance metadata.",
-            "outcome_comparison")]
+            "outcome_comparison"),), {}
     if not all(valid_outcome_comparison(comparison) for comparison in comparisons):
-        return None, None, [limitation(
+        return None, None, (limitation(
             "outcome_comparison_dataset_invalid",
             "The outcome-comparison dataset contains an invalid result, value status, or non-null unavailable value.",
-            "comparisons")]
+            "comparisons"),), {}
     pair_ids = [
         (comparison["neighbourhood_a"]["id"], comparison["neighbourhood_b"]["id"])
         for comparison in comparisons
     ]
     if len(pair_ids) != len(set(pair_ids)):
-        return None, None, [limitation(
+        return None, None, (limitation(
             "outcome_comparison_dataset_invalid",
             "The outcome-comparison dataset contains duplicate ordered neighbourhood pairs.",
-            "comparisons")]
-    return comparisons, metadata, []
+            "comparisons"),), {}
+    return tuple(comparisons), metadata, (), dict(zip(pair_ids, comparisons))
+
+
+def load_outcome_comparisons() -> tuple[tuple[dict[str, Any], ...] | None, dict[str, Any] | None, list[dict[str, Any]]]:
+    path = outcome_comparison_data_path()
+    if path is None:
+        _, limitations = load_json_source(
+            None, OUTCOME_COMPARISON_DATA_PATH_ENV, "outcome_comparison")
+        return None, None, limitations
+    comparisons, metadata, limitations, _ = _load_outcome_comparisons(path)
+    return comparisons, dict(metadata) if metadata is not None else None, list(limitations)
+
+
+def outcome_comparison_for_pair(
+    neighbourhood_id_a: str,
+    neighbourhood_id_b: str,
+) -> tuple[dict[str, Any] | None, dict[str, Any] | None, list[dict[str, Any]]]:
+    """Look up one validated E5 result through its cached ordered-pair index."""
+    path = outcome_comparison_data_path()
+    if path is None:
+        _, metadata, limitations = load_outcome_comparisons()
+        return None, metadata, limitations
+    comparisons, metadata, limitations, index = _load_outcome_comparisons(path)
+    if comparisons is None:
+        return None, metadata, list(limitations)
+    return (index.get((neighbourhood_id_a, neighbourhood_id_b)),
+            dict(metadata) if metadata is not None else None, [])
 
 
 def outcome_comparison_data(comparison: dict[str, Any]) -> dict[str, Any]:
@@ -854,35 +948,66 @@ def valid_environmental_difference(result: Any) -> bool:
     return bool(limitations)
 
 
-def load_environmental_differences() -> tuple[list[dict[str, Any]] | None, dict[str, Any] | None, list[dict[str, Any]]]:
+@lru_cache(maxsize=1)
+def _load_environmental_differences(path: Path) -> tuple[
+    tuple[dict[str, Any], ...] | None,
+    dict[str, Any] | None,
+    tuple[dict[str, Any], ...],
+    dict[tuple[str, str], dict[str, Any]],
+]:
     """Load only explicitly approved E6 environmental-difference outputs."""
     source, limitations = load_json_source(
-        environmental_difference_data_path(), ENVIRONMENTAL_DIFFERENCE_DATA_PATH_ENV,
-        "environmental_difference")
+        path, ENVIRONMENTAL_DIFFERENCE_DATA_PATH_ENV, "environmental_difference")
     if source is None:
-        return None, None, limitations
+        return None, None, tuple(limitations), {}
     results, metadata = source.get("differences"), source.get("metadata")
     if (source.get("approved") is not True or not isinstance(results, list)
             or not valid_priority_metadata(metadata)):
-        return None, None, [limitation(
+        return None, None, (limitation(
             "environmental_difference_dataset_invalid",
             "The environmental-difference dataset must be explicitly approved and contain differences with complete provenance metadata.",
-            "environmental_difference")]
+            "environmental_difference"),), {}
     if not all(valid_environmental_difference(result) for result in results):
-        return None, None, [limitation(
+        return None, None, (limitation(
             "environmental_difference_dataset_invalid",
             "The environmental-difference dataset contains an invalid result, standout reference, value status, or non-null unavailable value.",
-            "differences")]
+            "differences"),), {}
     pair_ids = [
         (result["neighbourhood_a"]["id"], result["neighbourhood_b"]["id"])
         for result in results
     ]
     if len(pair_ids) != len(set(pair_ids)):
-        return None, None, [limitation(
+        return None, None, (limitation(
             "environmental_difference_dataset_invalid",
             "The environmental-difference dataset contains duplicate ordered neighbourhood pairs.",
-            "differences")]
-    return results, metadata, []
+            "differences"),), {}
+    return tuple(results), metadata, (), dict(zip(pair_ids, results))
+
+
+def load_environmental_differences() -> tuple[tuple[dict[str, Any], ...] | None, dict[str, Any] | None, list[dict[str, Any]]]:
+    path = environmental_difference_data_path()
+    if path is None:
+        _, limitations = load_json_source(
+            None, ENVIRONMENTAL_DIFFERENCE_DATA_PATH_ENV, "environmental_difference")
+        return None, None, limitations
+    results, metadata, limitations, _ = _load_environmental_differences(path)
+    return results, dict(metadata) if metadata is not None else None, list(limitations)
+
+
+def environmental_difference_for_pair(
+    neighbourhood_id_a: str,
+    neighbourhood_id_b: str,
+) -> tuple[dict[str, Any] | None, dict[str, Any] | None, list[dict[str, Any]]]:
+    """Look up one validated E6 result through its cached ordered-pair index."""
+    path = environmental_difference_data_path()
+    if path is None:
+        _, metadata, limitations = load_environmental_differences()
+        return None, metadata, limitations
+    results, metadata, limitations, index = _load_environmental_differences(path)
+    if results is None:
+        return None, metadata, list(limitations)
+    return (index.get((neighbourhood_id_a, neighbourhood_id_b)),
+            dict(metadata) if metadata is not None else None, [])
 
 
 def environmental_difference_data(result: dict[str, Any]) -> dict[str, Any]:

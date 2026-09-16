@@ -8,11 +8,11 @@ import './InsightPage.css'
 
 interface InsightPageProps {
   onLogoClick: () => void
-  onAboutUs: () => void
   onExploreMap: () => void
+  onSimulation: () => void
 }
 
-export default function InsightPage({ onLogoClick, onAboutUs, onExploreMap }: InsightPageProps) {
+export default function InsightPage({ onLogoClick, onExploreMap, onSimulation }: InsightPageProps) {
   const { rootRef, journey, chapter, reducedMotion, goToChapter } = useJourney()
   const { state, retry } = useInsightData()
   const sceneRef = useRef<HTMLDivElement>(null)
@@ -86,7 +86,7 @@ export default function InsightPage({ onLogoClick, onAboutUs, onExploreMap }: In
       onHome={onLogoClick}
       onInsight={() => goToChapter(0)}
       onMap={onExploreMap}
-      onAboutUs={onAboutUs}
+      onSimulation={onSimulation}
     />
     <button
       type="button"

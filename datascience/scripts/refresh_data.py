@@ -283,6 +283,12 @@ def main() -> int:
         from kinderprint.analytics import matching as M
         d = M.match(usable, MATCH_FEATURES)          # raises if the leakage rule is broken
         ok = (d.match_idx >= 0).values
+        d["match_community_id"] = [
+            d.loc[int(match_index), "community_id"] if match_index >= 0 else ""
+            for match_index in d.match_idx
+        ]
+        if d.loc[ok, "community_id"].eq(d.loc[ok, "match_community_id"]).any():
+            raise ValueError("A community was matched to itself")
         bal = M.balance(d, MATCH_FEATURES)
         val = M.irsd_validation(d)
         manifest["metrics"]["max_pair_smd"] = round(float(bal.pair_smd.max()), 4)
@@ -307,6 +313,13 @@ def main() -> int:
                          "ci_overlap": bool(not (hi1 < lo2 or hi2 < lo1)),
                          "ci_lo": lo1, "ci_hi": hi1, "peer_ci_lo": lo2, "peer_ci_hi": hi2})
         d = d.merge(pd.DataFrame(rows), on="community_id", how="left")
+        match_id = d.pop("match_community_id")
+        d["match_community_id"] = match_id
+        # Suppress platform-specific floating-point noise in committed tables.
+        # Twelve decimal places is far beyond the precision of every source
+        # measure while making equivalent BLAS/Python rebuilds byte-stable.
+        calculated = ["v1_z", "match_dist", "ci_lo", "ci_hi", "peer_ci_lo", "peer_ci_hi"]
+        d[calculated] = d[calculated].round(12)
         d.to_csv(PROC / "matched_table.csv", index=False)
         manifest["metrics"]["matched_pairs"] = int(ok.sum())
         manifest["metrics"]["no_match"] = int((~ok).sum())
@@ -350,7 +363,7 @@ def main() -> int:
     with Stage("09 assemble final table", manifest):
         carry = ["community_id", "v1_z", "v1_band", "v0_count", "match_idx", "match_dist",
                  "match_strength", "sig", "ci_overlap", "ci_lo", "ci_hi",
-                 "peer_ci_lo", "peer_ci_hi"]
+                 "peer_ci_lo", "peer_ci_hi", "match_community_id"]
         final = full.merge(d[[c for c in carry if c in d.columns]], on="community_id", how="left")
         final.to_csv(PROC / "final_table.csv", index=False)
         log.info("  final table %d rows x %d columns", len(final), final.shape[1])
@@ -370,6 +383,23 @@ def main() -> int:
     with Stage("11 build artefacts", manifest):
         geo = json.loads((REF / "sa2_melbourne.geojson").read_text())
         profiles = B.build_profiles(final)
+        service_context_path = PROC / "early_childhood_context_sa2.csv"
+        demand_context_path = PROC / "vif_child_population_projections_sa2.csv"
+        service_context = (
+            pd.read_csv(service_context_path, dtype={"SA2_CODE_2021": str})
+            if service_context_path.is_file()
+            else None
+        )
+        demand_context = (
+            pd.read_csv(demand_context_path, dtype={"sa2_code_2021": str})
+            if demand_context_path.is_file()
+            else None
+        )
+        profiles["profiles"] = B.build_context_scores(
+            profiles["profiles"],
+            service_context=service_context,
+            demand_context=demand_context,
+        )
         for name, obj in {"profiles.json": profiles,
                           "priorities.json": B.build_priorities(final),
                           "explanations.json": B.build_explanations(final),

@@ -46,11 +46,6 @@ PROFILE_INDICATORS = {
         ("aedc_vulnerable_two_or_more", "Developmentally vulnerable on two or more domains", "vuln2_pct", "percent"),
         ("aedc_on_track_five", "On track on all five domains", "ontrack5_pct", "percent"),
         ("aedc_children_assessed", "Children with valid AEDC scores", "n_children", "count"),
-        ("aedc_physical_on_track", "On track in physical health and wellbeing", "physical_on_track_pct", "percent"),
-        ("aedc_social_on_track", "On track in social competence", "social_on_track_pct", "percent"),
-        ("aedc_emotional_on_track", "On track in emotional maturity", "emotional_on_track_pct", "percent"),
-        ("aedc_language_on_track", "On track in language and cognitive skills", "language_on_track_pct", "percent"),
-        ("aedc_communication_on_track", "On track in communication skills and general knowledge", "communication_on_track_pct", "percent"),
     ],
     "Social": [
         ("seifa_irsd_score", "SEIFA IRSD score", "irsd_score", "index"),
@@ -119,10 +114,113 @@ def build_profiles(d: pd.DataFrame) -> dict:
     return {"profiles": profiles}
 
 
+def build_context_scores(
+    profiles: list[dict],
+    service_context: pd.DataFrame | None = None,
+    demand_context: pd.DataFrame | None = None,
+) -> list[dict]:
+    """Attach derived suitability context indicators to the approved profile payload."""
+    if service_context is not None and not service_context.empty:
+        service = service_context.copy()
+        service["SA2_CODE_2021"] = service["SA2_CODE_2021"].astype(str)
+        service = service.set_index("SA2_CODE_2021")
+    else:
+        service = None
+    demand_reference_year: int | None = None
+    if demand_context is not None and not demand_context.empty:
+        demand = demand_context.copy()
+        demand = demand[demand["sex"].eq("persons")].copy()
+        if "projection_year" in demand.columns:
+            demand["projection_year"] = pd.to_numeric(demand["projection_year"], errors="coerce")
+            if demand["projection_year"].notna().any():
+                demand_reference_year = int(demand["projection_year"].max())
+                demand = demand[demand["projection_year"].eq(demand_reference_year)].copy()
+        demand["sa2_code_2021"] = demand["sa2_code_2021"].astype(str)
+        demand = demand.drop_duplicates(subset=["sa2_code_2021"]).set_index("sa2_code_2021")
+    else:
+        demand = None
+    for profile in profiles:
+        area_id = str(profile["neighbourhood"]["id"])
+        env_domain = next((domain for domain in profile["domains"] if domain["name"] == "Environment"), None)
+        if env_domain is None:
+            continue
+
+        if service is not None and area_id in service.index:
+            row = service.loc[area_id]
+            service_count = pd.to_numeric(row.get("active_education_care_services", 0), errors="coerce")
+            places = pd.to_numeric(row.get("total_approved_places", 0), errors="coerce")
+            nearest_service = pd.to_numeric(row.get("nearest_active_service_km", np.nan), errors="coerce")
+            rating_coverage = pd.to_numeric(row.get("rating_coverage_pct", np.nan), errors="coerce")
+            items: list[float] = []
+            if pd.notna(service_count):
+                items.append(min(100.0, float(service_count) * 12.5))
+            if pd.notna(places):
+                items.append(min(100.0, float(places) / 8.0))
+            if pd.notna(nearest_service):
+                items.append(max(0.0, (1.5 - float(nearest_service)) / 1.5 * 100.0))
+            if pd.notna(rating_coverage):
+                items.append(min(100.0, float(rating_coverage)))
+            service_score = sum(items) / len(items) if items else None
+            env_domain["indicators"].append({
+                "id": "service_access_score",
+                "name": "Service access score",
+                "value": round(float(service_score), 4) if service_score is not None else None,
+                "unit": "score",
+                "status": "available" if service_score is not None else "unavailable",
+                "source": "ACECQA / Vicmap service context",
+                "geographic_unit": GEO_UNIT,
+                "reference_year": "2026",
+            })
+
+        if demand is not None and area_id in demand.index:
+            row = demand.loc[area_id]
+            if isinstance(row, pd.Series):
+                projected = row.get("population_age_0_14_projected", np.nan)
+            else:
+                projected = np.nan
+            projected_value = pd.to_numeric(projected, errors="coerce")
+            if isinstance(projected_value, pd.Series):
+                projected_value = projected_value.iloc[0] if not projected_value.empty else np.nan
+            demand_score = None if pd.isna(projected_value) else min(100.0, (float(projected_value) / 5000.0) * 100.0)
+            env_domain["indicators"].append({
+                "id": "future_demand_score",
+                "name": "Future demand score",
+                "value": round(float(demand_score), 4) if demand_score is not None else None,
+                "unit": "score",
+                "status": "available" if demand_score is not None else "unavailable",
+                "source": "Victoria in Future 2023",
+                "geographic_unit": GEO_UNIT,
+                "reference_year": str(demand_reference_year) if demand_reference_year is not None else "2021",
+            })
+
+        vegetation = next((indicator for indicator in env_domain["indicators"] if indicator["id"] == "env_vegetation_cover"), None)
+        heat = next((indicator for indicator in env_domain["indicators"] if indicator["id"] == "env_urban_heat"), None)
+        open_space = next((indicator for indicator in env_domain["indicators"] if indicator["id"] == "env_open_space_access"), None)
+        components: list[float] = []
+        if vegetation is not None and vegetation.get("status") == "available":
+            components.append(float(vegetation["value"]))
+        if heat is not None and heat.get("status") == "available":
+            components.append(max(0.0, 100.0 - float(heat["value"]) * 3.0))
+        if open_space is not None and open_space.get("status") == "available":
+            components.append(float(open_space["value"]))
+        quality_score = sum(components) / len(components) if components else None
+        env_domain["indicators"].append({
+            "id": "environment_quality_score",
+            "name": "Environment quality score",
+            "value": round(float(quality_score), 4) if quality_score is not None else None,
+            "unit": "score",
+            "status": "available" if quality_score is not None else "unavailable",
+            "source": "Derived from environmental context",
+            "geographic_unit": GEO_UNIT,
+            "reference_year": "2024",
+        })
+    return profiles
+
+
 def build_suitability(
     profiles: list[dict], supplemental_scores: pd.DataFrame | None = None
 ) -> dict:
-    """Build the provisional locality-suitability output outside the backend."""
+    """Build scalable per-criterion scores plus auditable source measures."""
     localities = build_criterion_scores(profiles)
     if supplemental_scores is not None:
         score_columns = {
@@ -167,13 +265,10 @@ def build_suitability(
     return {
         "localities": localities,
         "metadata": {
-            "source": "Approved profile dataset",
-            "reference_year": "2024",
+            "source": "Approved profile and Iteration 2 context datasets",
+            "reference_year": "2024-2026",
             "geographic_unit": GEO_UNIT,
-            "data_quality": (
-                "AEDC, environment, socioeconomic and HealthDirect facility-availability "
-                "measures. Facility scores are population-adjusted Greater Melbourne percentiles."
-            ),
+            "data_quality": "Per-criterion source measures and documented Greater Melbourne comparison scores.",
         },
     }
 
@@ -263,6 +358,9 @@ def build_explanations(d: pd.DataFrame) -> dict:
 
 def build_comparisons(d: pd.DataFrame) -> dict:
     idx = d.reset_index(drop=True)
+    if "match_community_id" not in idx.columns:
+        raise ValueError("Stable match_community_id is required to build comparison artefacts")
+    peer_lookup = idx.set_index("community_id", drop=False, verify_integrity=True)
     SIDE = [("aedc_vulnerable_one_or_more", "Developmentally vulnerable on one or more domains", "vulnerable_pct"),
             ("seifa_irsd_score", "SEIFA IRSD score", "irsd_score"),
             ("census_median_hh_income", "Median household income", "median_hh_income_weekly"),
@@ -274,14 +372,18 @@ def build_comparisons(d: pd.DataFrame) -> dict:
     matches, comparisons = [], []
     for _, r in idx.iterrows():
         src = {"id": r.neighbourhood_id, "name": r.community_name, "geographic_unit": GEO_UNIT}
-        if r.match_idx is None or pd.isna(r.match_idx) or int(r.match_idx) < 0:
+        if pd.isna(r.match_community_id) or not str(r.match_community_id).strip():
             matches.append({"source_neighbourhood": src, "matched_neighbourhood": None,
                             "match_strength": None, "similarity_basis": [], "status": "no_match",
                             "limitations": [{"code": "no_comparable_community",
                                              "message": "No community within the same region is similar enough on the matching measures to support a fair comparison.",
                                              "affected_fields": ["matched_neighbourhood"]}]})
             continue
-        p = idx.loc[int(r.match_idx)]
+        if r.match_community_id not in peer_lookup.index:
+            raise ValueError(f"Unknown matched community identifier: {r.match_community_id}")
+        p = peer_lookup.loc[r.match_community_id]
+        if p.community_id == r.community_id:
+            raise ValueError("A community cannot be its own comparison")
         tgt = {"id": p.neighbourhood_id, "name": p.community_name, "geographic_unit": GEO_UNIT}
         matches.append({"source_neighbourhood": src, "matched_neighbourhood": tgt,
                         "match_strength": str(r.match_strength), "similarity_basis": BASIS,
@@ -312,7 +414,7 @@ def build_comparisons(d: pd.DataFrame) -> dict:
                             "status": "limited" if lims else "available",
                             "limitations": lims})
     return {"approved": True, "matches": matches, "comparisons": comparisons,
-            "metadata": {"source": "KinderPrint matching model M3 (stratified Mahalanobis with caliper)",
+            "metadata": {"source": "KinderPrint matching model M4 (stratified Mahalanobis with caliper)",
                          "reference_year": "2024", "geographic_unit": GEO_UNIT,
                          "data_quality": "Matched within SA4 on socioeconomic and demographic measures only. Environmental measures deliberately excluded from matching to avoid removing the differences under investigation."}}
 

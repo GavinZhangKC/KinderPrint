@@ -1,11 +1,31 @@
 import json
+from collections import Counter
+from pathlib import Path
 
-from data_loader import (
+from loaders.air_quality import _load_station_year_observations, load_station_year_observations
+from loaders.community_context import _load_community_context, _load_community_identities
+from core.data_loader import (
+    ACECQA_CONTEXT_DATA_PATH_ENV,
+    ACECQA_GEOCODING_DATA_PATH_ENV,
     BOUNDARY_DATA_PATH_ENV,
+    COMMUNITY_CONTEXT_DATA_PATH_ENV,
+    COMMUNITY_IDENTITY_DATA_PATH_ENV,
+    EPA_STATION_YEAR_DATA_PATH_ENV,
     PROFILE_DATA_PATH_ENV,
     SUITABILITY_DATA_PATH_ENV,
+    VIF_PROJECTION_DATA_PATH_ENV,
 )
-from validation import SUITABILITY_CRITERIA
+from loaders.early_childhood import _load_early_childhood_context, load_early_childhood_context
+from loaders.geocoding_quality import _load_geocoding_quality, load_geocoding_quality
+from loaders.population import _load_population_projections, load_population_projections
+from validation import (
+    SUITABILITY_CRITERIA,
+    load_comparison_data,
+    load_explanations,
+    load_priority_results,
+    load_profiles,
+    load_suitability_rankings,
+)
 
 
 def suitability_scores(**overrides) -> dict:
@@ -14,6 +34,572 @@ def suitability_scores(**overrides) -> dict:
 
 def suitability_measures(**overrides) -> dict:
     return {criterion: overrides.get(criterion) for criterion in SUITABILITY_CRITERIA}
+
+
+def test_dataset_status_exposes_boundaries_without_local_paths(client, monkeypatch, tmp_path) -> None:
+    configured = tmp_path / "vif.csv"
+    configured.write_text("header\n", encoding="utf-8")
+    monkeypatch.setenv("KINDERPRINT_VIF_PROJECTION_DATA_PATH", str(configured))
+
+    body = client.get("/api/datasets/status").json()
+
+    assert_envelope(body)
+    assert body["status"] == "available"
+    products = {item["id"]: item for item in body["data"]["datasets"]}
+    assert products["vif_child_population_projections"]["configured"] is True
+    assert products["epa_historical_air_quality"]["interpretation_status"] == "station_context_only"
+    assert products["epa_historical_air_quality"]["user_facing"] is False
+    assert products["phidu_child_health"]["interpretation_status"] == "research_only"
+    assert products["acecqa_gnaf_geocoding"]["boundary"].startswith("Only accepted matches")
+    assert products["declared_road_and_industrial_context"]["interpretation_status"] == "context_only"
+    assert str(tmp_path) not in str(body)
+
+
+def test_population_projections_filter_native_sa2_values(client, monkeypatch, tmp_path) -> None:
+    path = tmp_path / "vif.csv"
+    path.write_text(
+        "sa2_code_2021,sa2_name_2021,projection_year,sex,population_age_0_4_projected,"
+        "population_age_5_9_projected,population_age_10_14_projected,"
+        "population_age_0_9_projected,population_age_0_14_projected,"
+        "population_all_ages_projected,source_id,value_status\n"
+        "201011001,Alfredton,2026,persons,10,20,30,30,60,100,vif2023,PROJECTED\n"
+        "201011002,Ballarat,2026,persons,11,21,31,32,63,101,vif2023,PROJECTED\n",
+        encoding="utf-8",
+    )
+    monkeypatch.setenv("KINDERPRINT_VIF_PROJECTION_DATA_PATH", str(path))
+
+    body = client.get("/api/population-projections?sa2_code=201011001&year=2026").json()
+
+    assert_envelope(body)
+    assert body["status"] == "available"
+    assert body["data"]["projections"] == [{
+        "sa2_code": "201011001", "sa2_name": "Alfredton", "projection_year": 2026,
+        "sex": "persons", "population_age_0_4_projected": 10.0,
+        "population_age_5_9_projected": 20.0, "population_age_10_14_projected": 30.0,
+        "population_age_0_9_projected": 30.0, "population_age_0_14_projected": 60.0,
+        "population_all_ages_projected": 100.0, "status": "projected",
+    }]
+    assert body["metadata"]["geographic_unit"] == "ASGS Edition 3 SA2"
+    assert body["metadata"]["value_type"] == "projection"
+
+
+def test_population_projections_reject_invalid_source(client, monkeypatch, tmp_path) -> None:
+    path = tmp_path / "invalid.csv"
+    path.write_text("sa2_code_2021\nnot-a-code\n", encoding="utf-8")
+    monkeypatch.setenv("KINDERPRINT_VIF_PROJECTION_DATA_PATH", str(path))
+
+    body = client.get("/api/population-projections").json()
+
+    assert body["status"] == "unavailable"
+    assert body["limitations"][0]["code"] == "population_projection_dataset_invalid"
+
+
+def test_population_projections_are_paginated(client, monkeypatch, tmp_path) -> None:
+    path = tmp_path / "vif-page.csv"
+    header = (
+        "sa2_code_2021,sa2_name_2021,projection_year,sex,population_age_0_4_projected,"
+        "population_age_5_9_projected,population_age_10_14_projected,"
+        "population_age_0_9_projected,population_age_0_14_projected,"
+        "population_all_ages_projected,source_id,value_status\n"
+    )
+    path.write_text(header +
+        "201011001,One,2026,persons,1,1,1,2,3,10,vif,PROJECTED\n"
+        "201011002,Two,2026,persons,1,1,1,2,3,10,vif,PROJECTED\n",
+        encoding="utf-8")
+    monkeypatch.setenv("KINDERPRINT_VIF_PROJECTION_DATA_PATH", str(path))
+
+    body = client.get("/api/population-projections?limit=1&offset=1").json()
+
+    assert [row["sa2_code"] for row in body["data"]["projections"]] == ["201011002"]
+    assert body["metadata"]["result_count"] == 1
+    assert body["metadata"]["total_result_count"] == 2
+    assert body["metadata"]["offset"] == 1
+
+
+def test_air_quality_serves_station_context_without_area_exposure(client, monkeypatch, tmp_path) -> None:
+    path = tmp_path / "epa.csv"
+    path.write_text(
+        "year,station_id,station_name,pollutant,unit,method_code,validation_status,"
+        "observed_days,valid_hours,first_observed_date,last_observed_date,"
+        "annual_mean_of_hourly_values,negative_hours_retained,monitoring_status,sa2_exposure_status\n"
+        "2022,10001,Alphington,NO2,ppb,NO2,PUBLISHED,360,8000,2022-01-01,2022-12-31,"
+        "8.5,0,STATION_OBSERVATION_CONTEXT_ONLY,NOT_DERIVED\n",
+        encoding="utf-8",
+    )
+    monkeypatch.setenv("KINDERPRINT_EPA_STATION_YEAR_DATA_PATH", str(path))
+
+    body = client.get("/api/air-quality/stations?station_id=10001&year=2022&pollutant=NO2").json()
+
+    assert_envelope(body)
+    assert body["status"] == "available"
+    assert body["data"]["observations"][0]["annual_mean_of_hourly_values"] == 8.5
+    assert body["data"]["observations"][0]["sa2_exposure_status"] == "not_derived"
+    assert body["metadata"]["geographic_unit"] == "monitoring_station"
+    assert body["notices"][0]["code"] == "station_context_only"
+
+
+def test_air_quality_catalog_exposes_available_filter_dimensions(client, monkeypatch, tmp_path) -> None:
+    path = tmp_path / "epa-catalog.csv"
+    path.write_text(
+        "year,station_id,station_name,pollutant,unit,method_code,validation_status,"
+        "observed_days,valid_hours,first_observed_date,last_observed_date,"
+        "annual_mean_of_hourly_values,negative_hours_retained,monitoring_status,sa2_exposure_status\n"
+        "2021,2,Bravo,PM2.5,ug/m3,BAM,PUBLISHED,1,1,2021-01-01,2021-01-01,5,0,STATION_OBSERVATION_CONTEXT_ONLY,NOT_DERIVED\n"
+        "2022,1,Alpha,NO2,ppb,NO2,PUBLISHED,1,1,2022-01-01,2022-01-01,4,0,STATION_OBSERVATION_CONTEXT_ONLY,NOT_DERIVED\n"
+        "2022,1,Alpha,O3,ppb,O3,PUBLISHED,1,1,2022-01-01,2022-01-01,3,0,STATION_OBSERVATION_CONTEXT_ONLY,NOT_DERIVED\n",
+        encoding="utf-8",
+    )
+    monkeypatch.setenv("KINDERPRINT_EPA_STATION_YEAR_DATA_PATH", str(path))
+
+    body = client.get("/api/air-quality/station-catalog").json()
+
+    assert body["status"] == "available"
+    assert [station["station_name"] for station in body["data"]["stations"]] == ["Alpha", "Bravo"]
+    assert body["data"]["stations"][0]["pollutants"] == ["NO2", "O3"]
+    assert body["metadata"]["station_identifier_count"] == 2
+    assert body["metadata"]["station_name_count"] == 2
+    assert body["metadata"]["sa2_exposure_status"] == "not_derived"
+
+
+def test_air_quality_rejects_claimed_sa2_exposure(client, monkeypatch, tmp_path) -> None:
+    path = tmp_path / "invalid-epa.csv"
+    path.write_text(
+        "year,station_id,station_name,pollutant,unit,method_code,validation_status,"
+        "observed_days,valid_hours,first_observed_date,last_observed_date,"
+        "annual_mean_of_hourly_values,negative_hours_retained,monitoring_status,sa2_exposure_status\n"
+        "2022,10001,Alphington,NO2,ppb,NO2,PUBLISHED,360,8000,2022-01-01,2022-12-31,"
+        "8.5,0,STATION_OBSERVATION_CONTEXT_ONLY,DERIVED\n",
+        encoding="utf-8",
+    )
+    monkeypatch.setenv("KINDERPRINT_EPA_STATION_YEAR_DATA_PATH", str(path))
+
+    body = client.get("/api/air-quality/stations").json()
+
+    assert body["status"] == "unavailable"
+    assert body["limitations"][0]["code"] == "air_quality_dataset_invalid"
+
+
+def test_new_collection_page_limits_are_validated(client) -> None:
+    population = client.get("/api/population-projections?limit=1001").json()
+    air = client.get("/api/air-quality/stations?limit=501").json()
+
+    assert population["status"] == "unavailable"
+    assert population["limitations"][0]["code"] == "invalid_request"
+    assert air["status"] == "unavailable"
+    assert air["limitations"][0]["code"] == "invalid_request"
+
+
+def test_geocoding_quality_reports_aggregates_without_addresses(client, monkeypatch, tmp_path) -> None:
+    path = tmp_path / "geocoding.csv"
+    path.write_text(
+        "service_approval_number,match_status,assigned_sa2,assigned_kinderprint_locality,"
+        "included_in_spatial_analysis,original_address\n"
+        "SE-1,EXACT,201011001,MEL001,true,Secret Street\n"
+        "SE-2,HIGH_CONFIDENCE,201011002,MEL002,true,Private Road\n"
+        "SE-3,REVIEW,,,false,Hidden Avenue\n"
+        "SE-4,UNMATCHED,,,false,Unknown Place\n",
+        encoding="utf-8",
+    )
+    monkeypatch.setenv("KINDERPRINT_ACECQA_GEOCODING_DATA_PATH", str(path))
+
+    body = client.get("/api/data-quality/acecqa-geocoding").json()
+
+    assert_envelope(body)
+    assert body["status"] == "available"
+    assert body["data"] == {
+        "total_services": 4, "exact_matches": 1, "high_confidence_matches": 1,
+        "review_matches": 1, "unmatched": 1, "sa2_assignment_success": 2,
+        "locality_assignment_success": 2, "included_in_spatial_analysis": 2,
+        "excluded_from_spatial_analysis": 2,
+    }
+    assert body["metadata"]["address_fields_exposed"] is False
+    assert "Secret Street" not in str(body)
+
+
+def test_geocoding_quality_rejects_weak_match_inclusion(client, monkeypatch, tmp_path) -> None:
+    path = tmp_path / "invalid-geocoding.csv"
+    path.write_text(
+        "service_approval_number,match_status,assigned_sa2,assigned_kinderprint_locality,"
+        "included_in_spatial_analysis\nSE-1,REVIEW,201011001,MEL001,true\n",
+        encoding="utf-8",
+    )
+    monkeypatch.setenv("KINDERPRINT_ACECQA_GEOCODING_DATA_PATH", str(path))
+
+    body = client.get("/api/data-quality/acecqa-geocoding").json()
+
+    assert body["status"] == "unavailable"
+    assert body["limitations"][0]["code"] == "geocoding_dataset_invalid"
+
+
+def test_early_childhood_context_exposes_only_locality_aggregates(client, monkeypatch, tmp_path) -> None:
+    path = tmp_path / "context.csv"
+    path.write_text(
+        "community_id,neighbourhood_id,community_name,active_education_care_services,"
+        "exact_match_services,high_confidence_match_services,services_with_approved_places,"
+        "total_approved_places,long_day_care_services,kindergarten_services,"
+        "services_with_current_rating,rating_coverage_pct,geocoding_source,match_policy,context_status\n"
+        "MEL0001,206011106,Brunswick East,4,3,1,4,249,3,1,4,100,Open G-NAF,"
+        "EXACT_OR_HIGH_CONFIDENCE_WITHIN_REPORTING_SCOPE,AGGREGATE_SERVICE_CONTEXT\n",
+        encoding="utf-8",
+    )
+    monkeypatch.setenv("KINDERPRINT_ACECQA_CONTEXT_DATA_PATH", str(path))
+
+    body = client.get("/api/neighbourhoods/206011106/early-childhood-services").json()
+
+    assert_envelope(body)
+    assert body["status"] == "available"
+    assert body["data"]["active_education_care_services"] == 4
+    assert body["data"]["high_confidence_match_services"] == 1
+    assert body["metadata"]["address_fields_exposed"] is False
+    assert "community_id" not in body["data"]
+    assert "address" not in body["data"]
+
+
+def test_early_childhood_context_rejects_unreconciled_match_counts(client, monkeypatch, tmp_path) -> None:
+    path = tmp_path / "invalid-context.csv"
+    path.write_text(
+        "community_id,neighbourhood_id,community_name,active_education_care_services,"
+        "exact_match_services,high_confidence_match_services,services_with_approved_places,"
+        "total_approved_places,long_day_care_services,kindergarten_services,"
+        "services_with_current_rating,rating_coverage_pct,geocoding_source,match_policy,context_status\n"
+        "MEL0001,206011106,Brunswick East,4,2,1,4,249,3,1,4,100,Open G-NAF,"
+        "EXACT_OR_HIGH_CONFIDENCE_WITHIN_REPORTING_SCOPE,AGGREGATE_SERVICE_CONTEXT\n",
+        encoding="utf-8",
+    )
+    monkeypatch.setenv("KINDERPRINT_ACECQA_CONTEXT_DATA_PATH", str(path))
+
+    body = client.get("/api/neighbourhoods/206011106/early-childhood-services").json()
+
+    assert body["status"] == "unavailable"
+    assert body["limitations"][0]["code"] == "early_childhood_context_dataset_invalid"
+
+
+def configure_community_context(
+    monkeypatch, tmp_path, *, missing_traffic: bool = False,
+    missing_industrial_distance: bool = False, component_sa2_count: int = 1,
+):
+    identities = tmp_path / "communities.csv"
+    identities.write_text(
+        "community_id,community_name,neighbourhood_id,n_component_sa2,is_merged\n"
+        f"MEL0001,Brunswick East,206011106,{component_sa2_count},"
+        f"{'True' if component_sa2_count > 1 else 'False'}\n",
+        encoding="utf-8",
+    )
+    context = tmp_path / "community-context.csv"
+    traffic = ",,,,," if missing_traffic else "11,7000,400,1,9,68"
+    distances = "," if missing_industrial_distance else "3.5,4.5"
+    context.write_text(
+        "community_id,declared_road_km,length_weighted_aadt,length_weighted_heavy_aadt,"
+        "high_traffic_road_km,high_traffic_road_share_pct,actual_observation_road_share_pct,"
+        "npi_facilities,npi_respiratory_reporting_facilities,nearest_npi_facility_km,"
+        "nearest_npi_respiratory_reporting_facility_km,context_quality_flag\n"
+        f"MEL0001,{traffic},0,0,{distances},CONTEXT_ONLY\n",
+        encoding="utf-8",
+    )
+    monkeypatch.setenv(COMMUNITY_CONTEXT_DATA_PATH_ENV, str(context))
+    monkeypatch.setenv(COMMUNITY_IDENTITY_DATA_PATH_ENV, str(identities))
+    _load_community_context.cache_clear()
+    _load_community_identities.cache_clear()
+    return context, identities
+
+
+def test_traffic_context_returns_precomputed_values(client, monkeypatch, tmp_path) -> None:
+    configure_community_context(monkeypatch, tmp_path)
+
+    body = client.get("/api/neighbourhoods/206011106/traffic-context").json()
+
+    assert_envelope(body)
+    assert body["status"] == "available"
+    assert body["data"]["neighbourhood"]["name"] == "Brunswick East"
+    assert body["data"]["metrics"]["length_weighted_aadt"] == {
+        "value": 7000.0, "status": "available",
+    }
+    assert body["metadata"]["data_quality"] == "CONTEXT_ONLY"
+    assert body["metadata"]["metric_definitions"]["length_weighted_aadt"]["unit"] == (
+        "vehicles_per_day")
+    assert body["metadata"]["thresholds"]["high_traffic_aadt"] == 10000
+    assert body["metadata"]["source_url"].startswith("https://")
+    assert body["notices"][1]["code"] == "traffic_context_only"
+
+
+def test_traffic_context_preserves_missing_null(client, monkeypatch, tmp_path) -> None:
+    configure_community_context(monkeypatch, tmp_path, missing_traffic=True)
+
+    body = client.get("/api/neighbourhoods/206011106/traffic-context").json()
+
+    assert body["status"] == "limited"
+    assert all(metric == {"value": None, "status": "missing"}
+               for metric in body["data"]["metrics"].values())
+    assert body["limitations"][0]["code"] == "traffic_context_missing"
+
+
+def test_community_context_loader_is_cached(client, monkeypatch, tmp_path) -> None:
+    context, identity = configure_community_context(monkeypatch, tmp_path)
+    reads: Counter[Path] = Counter()
+    original_open = Path.open
+
+    def counted_open(path, *args, **kwargs):
+        if path in {context, identity}:
+            reads[path] += 1
+        return original_open(path, *args, **kwargs)
+
+    monkeypatch.setattr(Path, "open", counted_open)
+
+    client.get("/api/neighbourhoods/206011106/traffic-context")
+    client.get("/api/neighbourhoods/206011106/traffic-context")
+
+    assert reads == Counter({context: 1, identity: 1})
+
+
+def test_industrial_emissions_context_preserves_real_zero(
+    client, monkeypatch, tmp_path
+) -> None:
+    configure_community_context(monkeypatch, tmp_path)
+
+    body = client.get(
+        "/api/neighbourhoods/206011106/industrial-emissions-context").json()
+
+    assert_envelope(body)
+    assert body["status"] == "available"
+    assert body["data"]["metrics"]["npi_facilities"] == {
+        "value": 0, "status": "available",
+    }
+    assert body["metadata"]["data_quality"] == "CONTEXT_ONLY"
+    assert body["metadata"]["metric_definitions"]["nearest_npi_facility_km"]["unit"] == "km"
+    assert "straight-line" in body["metadata"]["methodology"]
+    assert body["metadata"]["source_url"].startswith("https://")
+    assert body["notices"][1]["code"] == "industrial_emissions_context_only"
+
+
+def test_industrial_emissions_context_preserves_missing_null(
+    client, monkeypatch, tmp_path
+) -> None:
+    configure_community_context(
+        monkeypatch, tmp_path, missing_industrial_distance=True)
+
+    body = client.get(
+        "/api/neighbourhoods/206011106/industrial-emissions-context").json()
+
+    assert body["status"] == "limited"
+    assert body["data"]["metrics"]["nearest_npi_facility_km"] == {
+        "value": None, "status": "missing",
+    }
+    assert body["limitations"][0]["code"] == "industrial_emissions_context_missing"
+
+
+def test_map_context_returns_joinable_lightweight_collection(
+    client, monkeypatch, tmp_path
+) -> None:
+    configure_community_context(monkeypatch, tmp_path)
+
+    body = client.get("/api/map/context").json()
+
+    assert_envelope(body)
+    assert body["status"] == "available"
+    assert body["metadata"]["result_count"] == 1
+    assert body["metadata"]["join_key"] == "id"
+    assert body["metadata"]["geometry_included"] is False
+    neighbourhood = body["data"]["neighbourhoods"][0]
+    assert neighbourhood["id"] == "206011106"
+    assert neighbourhood["traffic"]["metrics"]["declared_road_km"]["value"] == 11.0
+    assert neighbourhood["industrial_emissions"]["metrics"]["npi_facilities"] == {
+        "value": 0, "status": "available",
+    }
+    assert "community_id" not in str(body)
+
+
+def test_map_context_marks_incomplete_rows_without_imputation(
+    client, monkeypatch, tmp_path
+) -> None:
+    configure_community_context(monkeypatch, tmp_path, missing_traffic=True)
+
+    body = client.get("/api/map/context").json()
+
+    assert body["status"] == "limited"
+    neighbourhood = body["data"]["neighbourhoods"][0]
+    assert neighbourhood["traffic"]["status"] == "limited"
+    assert neighbourhood["traffic"]["metrics"]["declared_road_km"]["value"] is None
+    assert body["limitations"][0]["affected_fields"] == ["206011106"]
+
+
+def configure_overview_sources(monkeypatch, tmp_path, *, merged: bool = False) -> None:
+    configure_community_context(
+        monkeypatch, tmp_path, component_sa2_count=2 if merged else 1)
+    profile_data = profile("206011106")
+    profile_data["neighbourhood"] = {
+        "id": "206011106",
+        "name": "Brunswick East",
+        "geographic_unit": "KinderPrint reporting locality",
+    }
+    profile_data["domains"][1]["indicators"][0].update({
+        "value": 5, "status": "available",
+    })
+    for domain in profile_data["domains"]:
+        for item in domain["indicators"]:
+            item["geographic_unit"] = "KinderPrint reporting locality"
+    profile_path = tmp_path / "overview-profiles.json"
+    profile_path.write_text(
+        json.dumps({"profiles": [profile_data]}), encoding="utf-8")
+    monkeypatch.setenv(PROFILE_DATA_PATH_ENV, str(profile_path))
+
+    early_path = tmp_path / "overview-early-childhood.csv"
+    early_path.write_text(
+        "community_id,neighbourhood_id,community_name,active_education_care_services,"
+        "exact_match_services,high_confidence_match_services,services_with_approved_places,"
+        "total_approved_places,long_day_care_services,kindergarten_services,"
+        "services_with_current_rating,rating_coverage_pct,geocoding_source,match_policy,"
+        "context_status\n"
+        "MEL0001,206011106,Brunswick East,4,3,1,4,249,3,1,4,100,Open G-NAF,"
+        "EXACT_OR_HIGH_CONFIDENCE_WITHIN_REPORTING_SCOPE,AGGREGATE_SERVICE_CONTEXT\n",
+        encoding="utf-8",
+    )
+    monkeypatch.setenv(ACECQA_CONTEXT_DATA_PATH_ENV, str(early_path))
+
+    population_path = tmp_path / "overview-population.csv"
+    population_path.write_text(
+        "sa2_code_2021,sa2_name_2021,projection_year,sex,"
+        "population_age_0_4_projected,population_age_5_9_projected,"
+        "population_age_10_14_projected,population_age_0_9_projected,"
+        "population_age_0_14_projected,population_all_ages_projected,source_id,value_status\n"
+        "206011106,Brunswick East,2026,persons,10,20,30,30,60,100,vif,PROJECTED\n"
+        "206011106,Brunswick East,2031,persons,12,22,32,34,66,110,vif,PROJECTED\n",
+        encoding="utf-8",
+    )
+    monkeypatch.setenv(VIF_PROJECTION_DATA_PATH_ENV, str(population_path))
+
+
+def test_neighbourhood_overview_aggregates_existing_evidence(
+    client, monkeypatch, tmp_path
+) -> None:
+    configure_overview_sources(monkeypatch, tmp_path)
+
+    body = client.get("/api/neighbourhoods/206011106/overview").json()
+
+    assert_envelope(body)
+    assert body["status"] == "available"
+    assert body["data"]["neighbourhood"]["name"] == "Brunswick East"
+    assert set(body["data"]["sections"]) == {
+        "profile", "early_childhood", "traffic", "industrial_emissions",
+        "population_outlook",
+    }
+    population = body["data"]["sections"]["population_outlook"]
+    assert population["status"] == "available"
+    assert [row["projection_year"] for row in population["data"]["projections"]] == [
+        2026, 2031,
+    ]
+    assert body["metadata"]["available_section_count"] == 5
+
+
+def test_neighbourhood_overview_keeps_unavailable_sections_explicit(
+    client, monkeypatch, write_json
+) -> None:
+    path = write_json("profiles.json", json.dumps({"profiles": [profile("n")]}))
+    monkeypatch.setenv(PROFILE_DATA_PATH_ENV, str(path))
+
+    body = client.get("/api/neighbourhoods/n/overview").json()
+
+    assert_envelope(body)
+    assert body["status"] == "limited"
+    assert body["data"]["sections"]["profile"]["status"] == "limited"
+    assert body["data"]["sections"]["traffic"]["status"] == "unavailable"
+    assert body["limitations"][0]["code"] == "overview_sections_incomplete"
+
+
+def test_neighbourhood_overview_withholds_population_for_merged_locality(
+    client, monkeypatch, tmp_path
+) -> None:
+    configure_overview_sources(monkeypatch, tmp_path, merged=True)
+
+    body = client.get("/api/neighbourhoods/206011106/overview").json()
+    population = body["data"]["sections"]["population_outlook"]
+
+    assert body["status"] == "limited"
+    assert population["status"] == "incompatible"
+    assert population["data"]["projections"] == []
+    assert population["metadata"]["reporting_locality_component_sa2_count"] == 2
+    assert population["limitations"][0]["code"] == (
+        "population_projection_incompatible_geography")
+
+
+def test_neighbourhood_overview_population_does_not_depend_on_context_metrics(
+    client, monkeypatch, tmp_path
+) -> None:
+    configure_overview_sources(monkeypatch, tmp_path)
+    monkeypatch.delenv(COMMUNITY_CONTEXT_DATA_PATH_ENV)
+
+    body = client.get("/api/neighbourhoods/206011106/overview").json()
+
+    assert body["data"]["sections"]["traffic"]["status"] == "unavailable"
+    assert body["data"]["sections"]["industrial_emissions"]["status"] == "unavailable"
+    assert body["data"]["sections"]["population_outlook"]["status"] == "available"
+
+
+def test_static_csv_loaders_reuse_validated_files(monkeypatch, tmp_path) -> None:
+    population_path = tmp_path / "vif-cache.csv"
+    population_path.write_text(
+        "sa2_code_2021,sa2_name_2021,projection_year,sex,population_age_0_4_projected,"
+        "population_age_5_9_projected,population_age_10_14_projected,"
+        "population_age_0_9_projected,population_age_0_14_projected,"
+        "population_all_ages_projected,source_id,value_status\n"
+        "201011001,Alfredton,2026,persons,10,20,30,30,60,100,vif,PROJECTED\n",
+        encoding="utf-8",
+    )
+    air_path = tmp_path / "epa-cache.csv"
+    air_path.write_text(
+        "year,station_id,station_name,pollutant,unit,method_code,validation_status,"
+        "observed_days,valid_hours,first_observed_date,last_observed_date,"
+        "annual_mean_of_hourly_values,negative_hours_retained,monitoring_status,sa2_exposure_status\n"
+        "2022,10001,Alphington,NO2,ppb,NO2,PUBLISHED,360,8000,2022-01-01,2022-12-31,"
+        "8.5,0,STATION_OBSERVATION_CONTEXT_ONLY,NOT_DERIVED\n",
+        encoding="utf-8",
+    )
+    geocoding_path = tmp_path / "geocoding-cache.csv"
+    geocoding_path.write_text(
+        "service_approval_number,match_status,assigned_sa2,assigned_kinderprint_locality,"
+        "included_in_spatial_analysis\nSE-1,EXACT,201011001,MEL001,true\n",
+        encoding="utf-8",
+    )
+    context_path = tmp_path / "context-cache.csv"
+    context_path.write_text(
+        "community_id,neighbourhood_id,community_name,active_education_care_services,"
+        "exact_match_services,high_confidence_match_services,services_with_approved_places,"
+        "total_approved_places,long_day_care_services,kindergarten_services,"
+        "services_with_current_rating,rating_coverage_pct,geocoding_source,match_policy,context_status\n"
+        "MEL0001,201011001,Alfredton,1,1,0,1,10,1,0,1,100,Open G-NAF,"
+        "EXACT_OR_HIGH_CONFIDENCE_WITHIN_REPORTING_SCOPE,AGGREGATE_SERVICE_CONTEXT\n",
+        encoding="utf-8",
+    )
+    configured = {
+        population_path: (VIF_PROJECTION_DATA_PATH_ENV, load_population_projections),
+        air_path: (EPA_STATION_YEAR_DATA_PATH_ENV, load_station_year_observations),
+        geocoding_path: (ACECQA_GEOCODING_DATA_PATH_ENV, load_geocoding_quality),
+        context_path: (ACECQA_CONTEXT_DATA_PATH_ENV, load_early_childhood_context),
+    }
+    for path, (variable, _) in configured.items():
+        monkeypatch.setenv(variable, str(path))
+    for cached_loader in (
+        _load_population_projections,
+        _load_station_year_observations,
+        _load_geocoding_quality,
+        _load_early_childhood_context,
+    ):
+        cached_loader.cache_clear()
+
+    reads: Counter[Path] = Counter()
+    original_open = Path.open
+
+    def counted_open(path, *args, **kwargs):
+        if path in configured:
+            reads[path] += 1
+        return original_open(path, *args, **kwargs)
+
+    monkeypatch.setattr(Path, "open", counted_open)
+
+    for _, loader in configured.values():
+        assert loader()[0] is not None
+        assert loader()[0] is not None
+
+    assert reads == Counter({path: 1 for path in configured})
 
 
 def assert_envelope(response: dict) -> None:
@@ -64,6 +650,30 @@ def test_health_is_minimal(client) -> None:
     assert response.json() == {"status": "available"}
 
 
+def test_data_health_distinguishes_process_health_from_unconfigured_data(client) -> None:
+    body = client.get("/api/health/data").json()
+
+    assert_envelope(body)
+    assert body["status"] == "limited"
+    assert body["metadata"] == {"check_count": 13, "ready_count": 0}
+    assert {check["readiness"] for check in body["data"]["checks"]} == {"not_configured"}
+    assert all(check["record_count"] is None for check in body["data"]["checks"])
+    assert {
+        "priority_for_investigation",
+        "priority_explanations",
+        "approved_neighbourhood_comparisons",
+        "locality_suitability",
+    }.issubset({check["id"] for check in body["data"]["checks"]})
+
+
+def test_scientific_notices_do_not_expose_placeholders(client) -> None:
+    profile = client.get("/api/neighbourhoods/example/profile").json()
+
+    assert profile["notices"][0]["code"] == "area_level_information"
+    assert profile["notices"][0]["message"] != "TBC"
+    assert "not individual children" in profile["notices"][0]["message"]
+
+
 def test_validation_error_uses_envelope(client) -> None:
     response = client.get("/api/compare")
     assert response.status_code == 422
@@ -77,25 +687,24 @@ def test_locality_suitability_serves_precomputed_ranking(client, monkeypatch, wr
     suitability_path = write_json("suitability.json", json.dumps({
         "localities": [
             {"id": "best", "name": "Best", "geographic_unit": "SA2",
-             "scores": suitability_scores(development_on_track=80, tree_canopy=80, socioeconomic_resources=80),
-             "measures": suitability_measures(development_on_track=80, tree_canopy=18.2, socioeconomic_resources=8)},
+             "scores": suitability_scores(child_development=80, green_space=80, low_disadvantage=80),
+             "measures": suitability_measures(child_development=80, green_space=80, low_disadvantage=8)},
             {"id": "worst", "name": "Worst", "geographic_unit": "SA2",
-             "scores": suitability_scores(development_on_track=20, tree_canopy=20, socioeconomic_resources=20),
-             "measures": suitability_measures(development_on_track=20, tree_canopy=4.1, socioeconomic_resources=2)},
+             "scores": suitability_scores(child_development=20, green_space=20, low_disadvantage=20),
+             "measures": suitability_measures(child_development=20, green_space=20, low_disadvantage=2)},
         ],
         "metadata": {"source": "Approved profile dataset"},
     }))
     monkeypatch.setenv(SUITABILITY_DATA_PATH_ENV, str(suitability_path))
 
-    body = client.get("/api/localities/suitable?criteria=development_on_track,tree_canopy,socioeconomic_resources&limit=5").json()
+    body = client.get("/api/localities/suitable?criteria=child_development,green_space,low_disadvantage&limit=5").json()
 
     assert_envelope(body)
     assert body["status"] == "available"
     assert body["data"]["localities"][0]["id"] == "best"
     assert body["data"]["localities"][0]["score"] >= body["data"]["localities"][1]["score"]
-    assert body["data"]["criteria"][0] == "development_on_track"
+    assert body["data"]["criteria"][0] == "child_development"
     assert body["data"]["withheld_count"] == 0
-    assert body["data"]["localities"][0]["measures"]["tree_canopy"] == 18.2
 
 
 def test_locality_suitability_requires_supported_criteria(client, monkeypatch, write_json) -> None:
@@ -118,8 +727,8 @@ def test_locality_suitability_withholds_incomplete_results(client, monkeypatch, 
     suitability_path = write_json("suitability.json", json.dumps({
         "localities": [
             {"id": "complete", "name": "Complete", "geographic_unit": "SA2",
-             "scores": suitability_scores(tree_canopy=75),
-             "measures": suitability_measures(tree_canopy=22.0)},
+             "scores": suitability_scores(green_space=75),
+             "measures": suitability_measures(green_space=75)},
             {"id": "missing", "name": "Missing", "geographic_unit": "SA2",
              "scores": suitability_scores(), "measures": suitability_measures()},
         ],
@@ -127,12 +736,27 @@ def test_locality_suitability_withholds_incomplete_results(client, monkeypatch, 
     }))
     monkeypatch.setenv(SUITABILITY_DATA_PATH_ENV, str(suitability_path))
 
-    body = client.get("/api/localities/suitable?criteria=tree_canopy&limit=5").json()
+    body = client.get("/api/localities/suitable?criteria=green_space&limit=5").json()
 
     assert body["status"] == "limited"
     assert [item["id"] for item in body["data"]["localities"]] == ["complete"]
     assert body["data"]["withheld_count"] == 1
     assert body["limitations"][0]["code"] == "suitability_results_withheld"
+
+
+def test_locality_suitability_composes_supported_scores_at_request_time(client, monkeypatch, write_json) -> None:
+    suitability_path = write_json("suitability.json", json.dumps({
+        "localities": [{"id": "area", "name": "Area", "geographic_unit": "SA2",
+                        "scores": suitability_scores(child_development=80, service_access=60),
+                        "measures": suitability_measures(child_development=80, service_access=60)}],
+        "metadata": {"source": "Approved profile dataset"},
+    }))
+    monkeypatch.setenv(SUITABILITY_DATA_PATH_ENV, str(suitability_path))
+
+    body = client.get("/api/localities/suitable?criteria=service_access&limit=5").json()
+
+    assert body["status"] == "available"
+    assert body["data"]["localities"][0]["score"] == 60
 
 
 def test_unconfigured_profile_is_explicit(client) -> None:
@@ -150,6 +774,74 @@ def test_unknown_profile_is_missing(client, monkeypatch, write_json) -> None:
     assert_envelope(body)
     assert body["status"] == "missing"
     assert body["data"]["neighbourhood"]["id"] == "unknown"
+
+
+def test_approved_json_loaders_are_process_cached(
+    client, monkeypatch, write_json
+) -> None:
+    path = write_json("cached-profiles.json", json.dumps({"profiles": [profile()]}))
+    monkeypatch.setenv(PROFILE_DATA_PATH_ENV, str(path))
+    reads = 0
+    original_read_text = Path.read_text
+
+    def counted_read_text(file_path, *args, **kwargs):
+        nonlocal reads
+        if file_path == path:
+            reads += 1
+        return original_read_text(file_path, *args, **kwargs)
+
+    monkeypatch.setattr(Path, "read_text", counted_read_text)
+
+    assert client.get("/api/neighbourhoods/n/profile").json()["status"] == "limited"
+    assert client.get("/api/neighbourhoods/n/profile").json()["status"] == "limited"
+    assert reads == 1
+    assert all(loader.cache_parameters() == {"maxsize": 1, "typed": False}
+               for loader in (
+                   load_profiles,
+                   load_suitability_rankings,
+                   load_priority_results,
+                   load_explanations,
+                   load_comparison_data,
+               ))
+
+
+def test_child_development_endpoint_excludes_other_profile_domains(
+    client, monkeypatch, write_json
+) -> None:
+    source_profile = profile("child-area")
+    source_profile["domains"][0]["id"] = "child-development"
+    source_profile["domains"][0]["indicators"][0].update(
+        source="AEDC 2024", reference_year="2024")
+    source_profile["domains"][1]["indicators"][0].update(
+        source="ABS Census", reference_year="2021")
+    path = write_json("profiles.json", json.dumps({"profiles": [source_profile]}))
+    monkeypatch.setenv(PROFILE_DATA_PATH_ENV, str(path))
+
+    body = client.get("/api/neighbourhoods/child-area/child-development").json()
+
+    assert_envelope(body)
+    assert body["status"] == "available"
+    assert [item["id"] for item in body["data"]["indicators"]] == ["development"]
+    assert body["metadata"]["sources"] == ["AEDC 2024"]
+    assert body["metadata"]["primary_outcome_dataset"] == "AEDC"
+    assert "social" not in str(body["data"]["indicators"])
+
+
+def test_child_development_preserves_suppressed_null(
+    client, monkeypatch, write_json
+) -> None:
+    source_profile = profile("suppressed-area")
+    source_profile["domains"][0]["id"] = "child-development"
+    source_profile["domains"][0]["indicators"][0].update(
+        status="suppressed", value=None)
+    path = write_json("profiles.json", json.dumps({"profiles": [source_profile]}))
+    monkeypatch.setenv(PROFILE_DATA_PATH_ENV, str(path))
+
+    body = client.get("/api/neighbourhoods/suppressed-area/child-development").json()
+
+    assert body["status"] == "suppressed"
+    assert body["data"]["indicators"][0]["value"] is None
+    assert body["limitations"][0]["code"] == "indicator_suppressed"
 
 
 def test_invalid_profile_dataset_is_unavailable(client, monkeypatch, write_json) -> None:

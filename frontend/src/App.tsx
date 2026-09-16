@@ -1,20 +1,22 @@
 import { useEffect, useRef, useState } from 'react'
 
 import './styles.css'
+import './components/SimulationPage.css'
 
-import AboutUsPage from './components/AboutUsPage'
 import BrandHeader from './components/BrandHeader'
 import ComparePanel from './components/ComparePanel'
 import DetailedComparison from './components/DetailedComparison'
+import DetailedComparisonWeather, { getDevelopmentWeatherState } from './components/DetailedComparisonWeather'
 import DetailedDataDrawer from './components/DetailedDataDrawer'
 import InsightPage from './components/InsightPage'
+import InteractiveAtmosphere from './components/InteractiveAtmosphere'
 import Legend from './components/Legend'
 import LandingPage from './components/LandingPage'
-import MenuPage from './components/MenuPage'
 import LocalitySuitabilityPanel from './components/LocalitySuitabilityPanel'
 import NeighbourhoodMap from './components/NeighbourhoodMap'
 import PreferencePanel from './components/PreferencePanel'
 import ProfileModal from './components/ProfileModal'
+import SimulationPage from './components/SimulationPage'
 import WaterRippleBackground from './components/WaterRippleBackground'
 
 import { useNeighbourhoodSearch } from './hooks/useNeighbourhoodSearch'
@@ -23,7 +25,11 @@ import { api } from './services/api'
 import { toNeighbourhood } from './services/profileAdapter'
 
 import type {
-  NeighbourhoodComparison,
+  ApiEnvelope,
+  EnvironmentalDifference,
+  MultiNeighbourhoodComparison,
+  OutcomeComparison,
+  PatternInsight,
 } from './services/api'
 
 import type {
@@ -39,10 +45,9 @@ type View =
 
 type AppPage =
   | 'landing'
-  | 'menu'
   | 'insight'
   | 'map'
-  | 'about'
+  | 'simulation'
 
 export default function App() {
 const [appPage, setAppPage] =
@@ -54,14 +59,23 @@ const [view, setView] =
   const [selected, setSelected] =
     useState<Neighbourhood | null>(null)
 
-  const [comparison, setComparison] =
-    useState<Neighbourhood | null>(null)
+  const [comparisons, setComparisons] =
+    useState<Neighbourhood[]>([])
   const [comparisonResult, setComparisonResult] =
-    useState<NeighbourhoodComparison | null>(null)
+    useState<MultiNeighbourhoodComparison | null>(null)
   const [compareLoading, setCompareLoading] = useState(false)
   const [compareError, setCompareError] = useState<string | null>(null)
   const [comparisonLimitations, setComparisonLimitations] =
     useState<string[]>([])
+  const [outcomeComparison, setOutcomeComparison] =
+    useState<ApiEnvelope<OutcomeComparison> | null>(null)
+  const [environmentalDifference, setEnvironmentalDifference] =
+    useState<ApiEnvelope<EnvironmentalDifference> | null>(null)
+  const [outcomeComparisonError, setOutcomeComparisonError] = useState<string | null>(null)
+  const [environmentalDifferenceError, setEnvironmentalDifferenceError] = useState<string | null>(null)
+  const [patternInsight, setPatternInsight] =
+    useState<ApiEnvelope<PatternInsight> | null>(null)
+  const [patternInsightError, setPatternInsightError] = useState<string | null>(null)
   const [isMapSelectionMode, setIsMapSelectionMode] = useState(false)
   const compareRequestNumberRef = useRef(0)
   const profileRequestNumberRef = useRef(0)
@@ -228,11 +242,17 @@ const [
 function resetComparisonState() {
     compareRequestNumberRef.current += 1
     setIsMapSelectionMode(false)
-    setComparison(null)
+    setComparisons([])
     setComparisonResult(null)
     setCompareError(null)
     setCompareLoading(false)
     setComparisonLimitations([])
+    setOutcomeComparison(null)
+    setEnvironmentalDifference(null)
+    setOutcomeComparisonError(null)
+    setEnvironmentalDifferenceError(null)
+    setPatternInsight(null)
+    setPatternInsightError(null)
   }
 function handleCloseCompare(targetView: 'profile' | 'map' = 'profile') {
     profileRequestNumberRef.current += 1
@@ -266,23 +286,19 @@ function openMapPage() {
     resetExplore()
     setAppPage('map')
   }
+function openSimulationPage() {
+    setAppPage('simulation')
+  }
 function openInsightPage() {
     resetExplore()
     setAppPage('insight')
-  }
-function openAboutUsSection() {
-    resetExplore()
-    setAppPage('landing')
-    window.setTimeout(() => {
-      document.getElementById('home-about')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
-    }, 0)
   }
 function choosePrimary(
     neighbourhood: Neighbourhood,
   ) {
     setSelected(neighbourhood)
 
-    setComparison(null)
+    setComparisons([])
 
     setSearch(neighbourhood.name)
 
@@ -303,10 +319,9 @@ function choosePrimary(
     setProfileError(null)
 
     try {
-      const [profileResponse, priorityResponse, explanationResponse] = await Promise.all([
+      const [profileResponse, priorityResponse] = await Promise.all([
         api.getProfile(id),
         api.getPriority(id),
-        api.getExplanation(id),
       ])
       if (requestNumber !== profileRequestNumberRef.current) return
 
@@ -325,14 +340,15 @@ function choosePrimary(
         priorityResponse.status === 'available' || priorityResponse.status === 'limited'
           ? priorityResponse.data
           : null,
-        explanationResponse.status === 'available' || explanationResponse.status === 'limited'
-          ? explanationResponse.data : null,
+        null,
         {
           metadata: profileResponse.metadata,
-          limitations: [profileResponse, priorityResponse, explanationResponse]
+          profileLimitations: profileResponse.limitations,
+          profileNotices: profileResponse.notices,
+          limitations: [profileResponse, priorityResponse]
             .flatMap((response) => response.limitations)
             .map((item) => item.message),
-          notices: [profileResponse, priorityResponse, explanationResponse]
+          notices: [profileResponse, priorityResponse]
             .flatMap((response) => response.notices)
             .map((item) => item.message)
             .filter((message) => message && message !== 'TBC'),
@@ -342,9 +358,17 @@ function choosePrimary(
       )
 
       if (view === 'compare-select' && selected) {
-        if (realNeighbourhood.id !== selected.id) {
-          setComparison(realNeighbourhood)
-        }
+        setComparisons((current) => {
+          if (
+            realNeighbourhood.id === selected.id
+            || current.some((item) => item.id === realNeighbourhood.id)
+            || current.length >= 3
+          ) {
+            return current
+          }
+
+          return [...current, realNeighbourhood]
+        })
         return
       }
 
@@ -352,10 +376,14 @@ function choosePrimary(
     } catch (error) {
       if (requestNumber !== profileRequestNumberRef.current) return
       console.error('Failed to load location profile:', error)
-      setSelected(null)
-      setComparison(null)
-      setView('map')
-      setProfileError(error instanceof Error ? error.message : 'Could not load this neighbourhood. Please try again.')
+      if (view === 'compare-select' && selected) {
+        setCompareError(error instanceof Error ? error.message : 'Could not add this neighbourhood.')
+      } else {
+        setSelected(null)
+        setComparisons([])
+        setView('map')
+        setProfileError(error instanceof Error ? error.message : 'Could not load this neighbourhood. Please try again.')
+      }
     }
   }
 function startComparison() {
@@ -388,7 +416,7 @@ function startComparison() {
   async function openComparisonResult() {
     if (
       !selected ||
-      !comparison
+      comparisons.length === 0
     ) {
       return
     }
@@ -398,15 +426,56 @@ function startComparison() {
     try {
       setCompareLoading(true)
       setCompareError(null)
-      const response = await api.compare(selected.id, comparison.id)
+      setComparisonResult(null)
+      setComparisonLimitations([])
+      setOutcomeComparison(null)
+      setEnvironmentalDifference(null)
+      setOutcomeComparisonError(null)
+      setEnvironmentalDifferenceError(null)
+      setPatternInsight(null)
+      setPatternInsightError(null)
+
+      const selectedIds = [selected.id, ...comparisons.map((item) => item.id)]
+      const pairedLocality = comparisons.length === 1 ? comparisons[0] : null
+      const comparisonRequest = api.compare(selectedIds)
+      const advancedRequests = pairedLocality
+        ? Promise.allSettled([
+            api.getOutcomeComparison(selected.id, pairedLocality.id),
+            api.getEnvironmentalDifference(selected.id, pairedLocality.id),
+            api.getPatternInsight(selected.id, pairedLocality.id),
+          ])
+        : Promise.resolve(null)
+      const [response, advancedResults] = await Promise.all([
+        comparisonRequest,
+        advancedRequests,
+      ])
       if (requestNumber !== compareRequestNumberRef.current) {
         return
       }
+
       if (response.status !== 'available' && response.status !== 'limited') {
         throw new Error(response.limitations[0]?.message ?? 'No approved comparison is available for these neighbourhoods.')
       }
       setComparisonResult(response.data)
       setComparisonLimitations(response.limitations.map((item) => item.message))
+      if (advancedResults) {
+        const [outcomeRequest, environmentRequest, patternRequest] = advancedResults
+        if (outcomeRequest.status === 'fulfilled') {
+          setOutcomeComparison(outcomeRequest.value)
+        } else {
+          setOutcomeComparisonError('Child development comparison data is currently unavailable.')
+        }
+        if (environmentRequest.status === 'fulfilled') {
+          setEnvironmentalDifference(environmentRequest.value)
+        } else {
+          setEnvironmentalDifferenceError('Environmental comparison data is currently unavailable.')
+        }
+        if (patternRequest.status === 'fulfilled') {
+          setPatternInsight(patternRequest.value)
+        } else {
+          setPatternInsightError('Pattern insight is currently unavailable.')
+        }
+      }
       setView('comparison')
       window.scrollTo({ top: 0, behavior: 'smooth' })
     } catch (error) {
@@ -429,35 +498,30 @@ if (appPage === 'landing') {
         <WaterRippleBackground />
         <LandingPage
           onInsight={openInsightPage}
+          onSimulation={openSimulationPage}
           onMap={openMapPage}
         />
       </div>
     )
   }
 
-  if (appPage === 'menu') {
+  if (appPage === 'simulation') {
     return (
-      <div className="entry-pages">
-        <WaterRippleBackground />
-        <MenuPage
-          onInsight={openInsightPage}
-          onMap={openMapPage}
-          onAboutUs={() => setAppPage('about')}
-        />
-      </div>
+      <SimulationPage
+        onHome={backToLanding}
+        onInsight={openInsightPage}
+        onExploreMap={openMapPage}
+        onSimulation={openSimulationPage}
+      />
     )
-  }
-
-  if (appPage === 'about') {
-    return <AboutUsPage onHome={backToLanding} onInsight={openInsightPage} onMap={openMapPage} />
   }
 
   if (appPage === 'insight') {
     return (
       <InsightPage
         onLogoClick={backToLanding}
-        onAboutUs={openAboutUsSection}
         onExploreMap={openMapPage}
+        onSimulation={openSimulationPage}
       />
     )
   }
@@ -465,25 +529,36 @@ if (appPage === 'landing') {
 if (
     view === 'comparison' &&
     selected &&
-    comparison &&
+    comparisons.length > 0 &&
     comparisonResult
   ) {
+    const weatherState = getDevelopmentWeatherState(selected.priority)
+
     return (
-      <div className="app-background detailed-background">
-        <div className="ambient ambient-one" />
-        <div className="ambient ambient-two" />
+      <div
+        className="app-background detailed-background detailed-comparison-scene"
+        data-state={weatherState}
+      >
+        <DetailedComparisonWeather state={weatherState} />
+        <InteractiveAtmosphere mode="compare" />
 
         <BrandHeader
           activePage="map"
           onHome={backToLanding}
           onInsight={openInsightPage}
           onMap={resetExplore}
-          onAboutUs={openAboutUsSection}
+          onSimulation={openSimulationPage}
         />
 
         <DetailedComparison
           comparisonResult={comparisonResult}
           limitations={comparisonLimitations}
+          outcomeComparison={outcomeComparison}
+          outcomeError={outcomeComparisonError}
+          environmentalDifference={environmentalDifference}
+          environmentalError={environmentalDifferenceError}
+          patternInsight={patternInsight}
+          patternError={patternInsightError}
           onBack={() => handleCloseCompare('profile')}
         />
       </div>
@@ -502,7 +577,7 @@ return (
           onHome={backToLanding}
           onInsight={openInsightPage}
           onMap={resetExplore}
-          onAboutUs={openAboutUsSection}
+          onSimulation={openSimulationPage}
         />
 
       <main className="map-shell">
@@ -545,7 +620,7 @@ setMapSelectedId(null)
 
                   if (selected) {
                     setSelected(null)
-                    setComparison(null)
+                    setComparisons([])
                     setView('map')
                   }
                 }}
@@ -646,18 +721,26 @@ setMapSelectedId(null)
 
             focusId={mapFocusId}
 
-            comparisonId={
-              comparison?.id ??
-              null
-            }
+            comparisonIds={comparisons.map((item) => item.id)}
 
             compareMode={view === 'compare-select'}
 
             selectionEnabled={view !== 'compare-select' || isMapSelectionMode}
 
             onSelect={(id, name) => {
-              if (view === 'compare-select' && id === selected?.id) {
-                return
+              if (view === 'compare-select') {
+                if (id === selected?.id) return
+
+                if (comparisons.some((item) => item.id === id)) {
+                  setComparisons((current) => current.filter((item) => item.id !== id))
+                  setCompareError(null)
+                  return
+                }
+
+                if (comparisons.length >= 3) {
+                  setCompareError('You can compare up to four localities.')
+                  return
+                }
               }
 
               void handleMapSelect(id, name).then(() => {
@@ -729,9 +812,7 @@ setMapSelectedId(null)
               <ComparePanel
                 source={selected}
 
-                comparison={
-                  comparison
-                }
+                comparisons={comparisons}
 
                 onSelectResult={async (item) => {
                   await handleMapSelect(item.id, item.name, false)
@@ -744,8 +825,8 @@ setMapSelectedId(null)
                   setIsMapSelectionMode((enabled) => !enabled)
                 }}
 
-                onClearComparison={() => {
-                  setComparison(null)
+                onDeselectResult={(id) => {
+                  setComparisons((current) => current.filter((item) => item.id !== id))
                   setCompareError(null)
                 }}
 

@@ -1,7 +1,7 @@
 import json
 from pathlib import Path
 
-from data_loader import BOUNDARY_DATA_PATH_ENV
+from core.data_loader import BOUNDARY_DATA_PATH_ENV
 from geography import (
     intersects_bbox,
     parse_bbox,
