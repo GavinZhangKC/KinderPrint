@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 
 import './styles.css'
+import './components/SimulationPage.css'
 
 import AboutUsPage from './components/AboutUsPage'
 import BrandHeader from './components/BrandHeader'
@@ -17,6 +18,7 @@ import LocalitySuitabilityPanel from './components/LocalitySuitabilityPanel'
 import NeighbourhoodMap from './components/NeighbourhoodMap'
 import PreferencePanel from './components/PreferencePanel'
 import ProfileModal from './components/ProfileModal'
+import SimulationPage from './components/SimulationPage'
 import WaterRippleBackground from './components/WaterRippleBackground'
 
 import { useNeighbourhoodSearch } from './hooks/useNeighbourhoodSearch'
@@ -49,6 +51,7 @@ type AppPage =
   | 'insight'
   | 'map'
   | 'about'
+  | 'simulation'
 
 export default function App() {
 const [appPage, setAppPage] =
@@ -287,6 +290,9 @@ function openMapPage() {
     resetExplore()
     setAppPage('map')
   }
+function openSimulationPage() {
+    setAppPage('simulation')
+  }
 function openInsightPage() {
     resetExplore()
     setAppPage('insight')
@@ -523,7 +529,16 @@ if (appPage === 'landing') {
   }
 
   if (appPage === 'about') {
-    return <AboutUsPage onHome={backToLanding} onInsight={openInsightPage} onMap={openMapPage} />
+    return <AboutUsPage onHome={backToLanding} onInsight={openInsightPage} onMap={openMapPage} onSimulation={openSimulationPage} />
+  }
+
+  if (appPage === 'simulation') {
+    return (
+      <SimulationPage
+        onLogoClick={backToLanding}
+        onExploreMap={openMapPage}
+      />
+    )
   }
 
   if (appPage === 'insight') {
@@ -532,6 +547,7 @@ if (appPage === 'landing') {
         onLogoClick={backToLanding}
         onAboutUs={openAboutUsSection}
         onExploreMap={openMapPage}
+        onSimulation={openSimulationPage}
       />
     )
   }
@@ -557,6 +573,7 @@ if (
           onHome={backToLanding}
           onInsight={openInsightPage}
           onMap={resetExplore}
+          onSimulation={openSimulationPage}
           onAboutUs={openAboutUsSection}
         />
 
@@ -587,6 +604,7 @@ return (
           onHome={backToLanding}
           onInsight={openInsightPage}
           onMap={resetExplore}
+          onSimulation={openSimulationPage}
           onAboutUs={openAboutUsSection}
         />
 

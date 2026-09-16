@@ -646,7 +646,7 @@ def test_data_health_distinguishes_process_health_from_unconfigured_data(client)
 
     assert_envelope(body)
     assert body["status"] == "limited"
-    assert body["metadata"] == {"check_count": 12, "ready_count": 0}
+    assert body["metadata"] == {"check_count": 13, "ready_count": 0}
     assert {check["readiness"] for check in body["data"]["checks"]} == {"not_configured"}
     assert all(check["record_count"] is None for check in body["data"]["checks"])
     assert {

@@ -6,9 +6,10 @@ interface AboutUsPageProps {
   onHome: () => void
   onInsight: () => void
   onMap: () => void
+  onSimulation: () => void
 }
 
-export default function AboutUsPage({ onHome, onInsight, onMap }: AboutUsPageProps) {
+export default function AboutUsPage({ onHome, onInsight, onMap, onSimulation }: AboutUsPageProps) {
   return (
     <section className="about-us-page" id="about-us" aria-labelledby="about-us-title">
       <BrandHeader
@@ -16,6 +17,7 @@ export default function AboutUsPage({ onHome, onInsight, onMap }: AboutUsPagePro
         onHome={onHome}
         onInsight={onInsight}
         onMap={onMap}
+        onSimulation={onSimulation}
         onAboutUs={() => document.getElementById('about-us')?.scrollIntoView({ behavior: 'smooth' })}
       />
       <article className="glass about-us-panel">
