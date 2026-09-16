@@ -1,0 +1,34 @@
+{
+  "source_id": "ga_healthdirect_facilities_2025",
+  "victorian_records_received_by_category": {
+    "general_practice": 2224,
+    "hospital": 183,
+    "pharmacy": 1298
+  },
+  "unique_victorian_category_records": 3705,
+  "unique_victorian_service_ids": 3705,
+  "greater_melbourne_facilities": 2580,
+  "greater_melbourne_by_category": {
+    "general_practice": 1546,
+    "hospital": 84,
+    "pharmacy": 950
+  },
+  "sa2_count": 361,
+  "facilities_with_sa2_assignment": 2580,
+  "duplicate_category_service_records_removed": 0,
+  "suitability_status": "available_with_limitations",
+  "supported_categories": [
+    "general_practice",
+    "hospital",
+    "pharmacy"
+  ],
+  "unsupported_inferences": [
+    "paediatric or other specialist availability",
+    "service capacity",
+    "waiting time",
+    "affordability",
+    "eligibility",
+    "service quality"
+  ],
+  "limitation": "Counts represent active listed facilities located inside each SA2. They do not measure capacity, opening hours, accessibility across SA2 boundaries, specialist staffing, waiting time, affordability, eligibility or quality."
+}
