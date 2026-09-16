@@ -26,7 +26,7 @@ type SuitabilityOption = {
 
 const optionGroups: Array<{ title: string; summary: string; options: SuitabilityOption[] }> = [
   {
-    title: 'Child development — available measures',
+    title: 'Child development: available measures',
     summary: 'AEDC population results for children in their first year of full-time school.',
     options: [
       { id: 'development_on_track', label: 'On track in all five AEDC domains', description: 'Children on track in: physical health and wellbeing; social competence; emotional maturity; language and cognitive skills; and communication skills and general knowledge.', source: 'AEDC, 2024', available: true },
@@ -34,18 +34,18 @@ const optionGroups: Array<{ title: string; summary: string; options: Suitability
     ],
   },
   {
-    title: 'AEDC domain detail — awaiting separate measures',
-    summary: 'The current SA2 file contains combined outcomes only. These cannot be ranked separately yet.',
+    title: 'Five AEDC development domains',
+    summary: 'Each domain uses its own 2024 SA2 on-track percentage from the official AEDC workbook.',
     options: [
-      { id: 'aedc_physical', label: 'Physical health and wellbeing', description: 'Physical readiness for the school day, independence and gross and fine motor skills.', source: 'Separate SA2 measure not integrated', available: false },
-      { id: 'aedc_social', label: 'Social competence', description: 'Overall social competence, responsibility and respect, approaches to learning and readiness to explore.', source: 'Separate SA2 measure not integrated', available: false },
-      { id: 'aedc_emotional', label: 'Emotional maturity', description: 'Prosocial and helping behaviour, anxious or fearful behaviour, aggression and hyperactivity or inattention.', source: 'Separate SA2 measure not integrated', available: false },
-      { id: 'aedc_language', label: 'Language and cognitive skills', description: 'Basic and advanced literacy, interest in literacy, numeracy and memory, and basic numeracy.', source: 'Separate SA2 measure not integrated', available: false },
-      { id: 'aedc_communication', label: 'Communication skills and general knowledge', description: 'Communication with adults and children, story-telling, articulation and age-appropriate general knowledge.', source: 'Separate SA2 measure not integrated', available: false },
+      { id: 'physical_health_on_track', label: 'Physical health and wellbeing', description: 'Physical readiness for the school day, independence and gross and fine motor skills.', source: 'AEDC, 2024', available: true },
+      { id: 'social_competence_on_track', label: 'Social competence', description: 'Overall social competence, responsibility and respect, approaches to learning and readiness to explore.', source: 'AEDC, 2024', available: true },
+      { id: 'emotional_maturity_on_track', label: 'Emotional maturity', description: 'Prosocial and helping behaviour, anxious or fearful behaviour, aggression and hyperactivity or inattention.', source: 'AEDC, 2024', available: true },
+      { id: 'language_cognitive_on_track', label: 'Language and cognitive skills', description: 'Basic and advanced literacy, interest in literacy, numeracy and memory, and basic numeracy.', source: 'AEDC, 2024', available: true },
+      { id: 'communication_knowledge_on_track', label: 'Communication skills and general knowledge', description: 'Communication with adults and children, story-telling, articulation and age-appropriate general knowledge.', source: 'AEDC, 2024', available: true },
     ],
   },
   {
-    title: 'Child health outcomes — respiratory, immune and chronic',
+    title: 'Child health outcomes: respiratory, immune and chronic',
     summary: 'Each condition needs a validated, geographically compatible outcome dataset before ranking.',
     options: [
       { id: 'asthma', label: 'Asthma', description: 'Prevalence, emergency presentations or hospital admissions among children.', source: 'No approved SA2 outcome data', available: false },
@@ -56,7 +56,7 @@ const optionGroups: Array<{ title: string; summary: string; options: Suitability
     ],
   },
   {
-    title: 'Child health outcomes — organ systems and serious illness',
+    title: 'Child health outcomes: organ systems and serious illness',
     summary: 'Clinical outcomes cannot be inferred from environment, disadvantage or nearby facilities.',
     options: [
       { id: 'cardiac', label: 'Heart and circulation conditions', description: 'Congenital and acquired cardiac conditions and related hospital care.', source: 'No approved SA2 outcome data', available: false },
@@ -68,7 +68,7 @@ const optionGroups: Array<{ title: string; summary: string; options: Suitability
     ],
   },
   {
-    title: 'Child health outcomes — senses, development and wellbeing',
+    title: 'Child health outcomes: senses, development and wellbeing',
     summary: 'These are distinct outcomes and must not be collapsed into a generic “child health” score.',
     options: [
       { id: 'vision', label: 'Vision and eye health', description: 'Vision impairment, screening results and diagnosed ophthalmic conditions.', source: 'No approved SA2 outcome data', available: false },
@@ -81,7 +81,7 @@ const optionGroups: Array<{ title: string; summary: string; options: Suitability
   },
   {
     title: 'Environment',
-    summary: 'Measured characteristics of the physical environment—not inferred health effects.',
+    summary: 'Measured characteristics of the physical environment. These are not inferred health effects.',
     options: [
       { id: 'tree_canopy', label: 'More tree canopy', description: 'Ranks areas using measured vegetation and canopy coverage.', source: 'Victorian environmental data', available: true },
       { id: 'public_open_space', label: 'More public open space', description: 'Ranks areas by the available public open-space indicator.', source: 'Victorian environmental data', available: true },
@@ -154,7 +154,7 @@ const optionGroups: Array<{ title: string; summary: string; options: Suitability
     title: 'Community context',
     summary: 'Area-level context that may help comparison but does not describe every household.',
     options: [
-      { id: 'socioeconomic_resources', label: 'Greater socioeconomic resources', description: 'Uses the ABS IRSD decile. Higher scores indicate fewer area-level indicators of disadvantage—not a judgement about residents.', source: 'ABS SEIFA IRSD', available: true },
+      { id: 'socioeconomic_resources', label: 'Greater socioeconomic resources', description: 'Uses the ABS IRSD decile. Higher scores indicate fewer area-level indicators of disadvantage. This is not a judgement about residents.', source: 'ABS SEIFA IRSD', available: true },
     ],
   },
 ]
@@ -217,27 +217,35 @@ export default function LocalitySuitabilityPanel({
       </div>
 
       <div className="suitability-options" aria-label="Suitability filters">
-        {optionGroups.map((group) => (
-          <fieldset key={group.title} className="suitability-group">
-            <legend>{group.title}</legend>
-            <p>{group.summary}</p>
-            {group.options.map((option) => (
-              <label key={option.id} className={`suitability-option${option.available ? '' : ' is-unavailable'}`}>
-                <input
-                  type="checkbox"
-                  checked={activeCriteria.has(option.id)}
-                  disabled={!option.available}
-                  onChange={() => onToggle(option.id)}
-                />
-                <span className="suitability-option-copy">
-                  <strong>{option.label}</strong>
-                  <small>{option.description}</small>
-                  <em>{option.available ? option.source : `${option.source} · unavailable`}</em>
-                </span>
-              </label>
-            ))}
-          </fieldset>
-        ))}
+        {optionGroups.map((group) => {
+          const availableCount = group.options.filter((option) => option.available).length
+          return (
+            <details key={group.title} className="suitability-group" open={availableCount > 0 ? true : undefined}>
+              <summary>
+                <span>{group.title}</span>
+                <small>{availableCount > 0 ? `${availableCount} available` : 'Data required'}</small>
+              </summary>
+              <div className="suitability-group-content">
+                <p>{group.summary}</p>
+                {group.options.map((option) => (
+                  <label key={option.id} className={`suitability-option${option.available ? '' : ' is-unavailable'}`}>
+                    <input
+                      type="checkbox"
+                      checked={activeCriteria.has(option.id)}
+                      disabled={!option.available}
+                      onChange={() => onToggle(option.id)}
+                    />
+                    <span className="suitability-option-copy">
+                      <strong>{option.label}</strong>
+                      <small>{option.description}</small>
+                      <em>{option.available ? option.source : `${option.source}: unavailable`}</em>
+                    </span>
+                  </label>
+                ))}
+              </div>
+            </details>
+          )
+        })}
       </div>
 
       <div className="suitability-results" aria-live="polite">
