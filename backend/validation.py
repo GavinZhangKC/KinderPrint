@@ -100,6 +100,8 @@ SUITABILITY_CRITERIA = {
     "hospital_access",
     "pharmacy_access",
     "lower_industrial_emission_source_presence",
+    "lower_declared_road_traffic",
+    "public_transport_availability",
 }
 
 

@@ -709,6 +709,8 @@ def locality_suitability(
         "hospital_access",
         "pharmacy_access",
         "lower_industrial_emission_source_presence",
+        "lower_declared_road_traffic",
+        "public_transport_availability",
     }
     selected_criteria = [
         item.strip()
