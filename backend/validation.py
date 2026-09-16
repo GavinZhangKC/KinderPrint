@@ -99,6 +99,7 @@ SUITABILITY_CRITERIA = {
     "general_practice_access",
     "hospital_access",
     "pharmacy_access",
+    "lower_industrial_emission_source_presence",
 }
 
 
