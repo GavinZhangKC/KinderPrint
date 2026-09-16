@@ -93,6 +93,7 @@ const optionGroups: Array<{ title: string; summary: string; options: Suitability
       { id: 'noise', label: 'Transport noise exposure', description: 'No approved, comparable SA2 noise-exposure surface is integrated.', source: 'Data unavailable', available: false },
       { id: 'flood_bushfire', label: 'Flood and bushfire exposure', description: 'Hazard-specific, current spatial layers and a validated scoring method are required.', source: 'Not yet integrated', available: false },
       { id: 'lower_industrial_emission_source_presence', label: 'Fewer NPI-reporting industrial air-emission facilities', description: 'Ranks areas by the number of nearby facilities reporting selected air emissions to the National Pollutant Inventory. This is source presence, not ambient exposure or health risk.', source: 'National Pollutant Inventory, 2024–25', available: true },
+      { id: 'lower_declared_road_traffic', label: 'Lower declared-road traffic intensity', description: 'Uses 2019 AADT weighted by the length of covered declared-road segments per square kilometre. This is a historical traffic proxy, not noise or air-pollution exposure.', source: 'Victorian DTP AADT, 2019', available: true },
     ],
   },
   {
@@ -157,6 +158,7 @@ const optionGroups: Array<{ title: string; summary: string; options: Suitability
     summary: 'Area-level context that may help comparison but does not describe every household.',
     options: [
       { id: 'socioeconomic_resources', label: 'Greater socioeconomic resources', description: 'Uses the ABS IRSD decile. Higher scores indicate fewer area-level indicators of disadvantage. This is not a judgement about residents.', source: 'ABS SEIFA IRSD', available: true },
+      { id: 'public_transport_availability', label: 'More public-transport stops per resident', description: 'Ranks localities by listed public-transport stops per 10,000 residents. It does not measure frequency, reliability, accessibility or travel time.', source: 'Victorian DTP public-transport stops, 2026', available: true },
     ],
   },
 ]
