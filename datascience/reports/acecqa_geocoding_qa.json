@@ -6,5 +6,6 @@
   "unmatched_addresses": 1981,
   "sa2_assignment_success": 2176,
   "records_excluded": 2859,
-  "limitations": "Deterministic G-NAF matches only; unresolved addresses are excluded. Counts measure listed supply, not vacancies, affordability, quality, opening hours or travel time. Not for mailing-list or deliverability use."
+  "denominator": "VIF2023 projected children aged 0-4 in 2026",
+  "limitations": "Deterministic G-NAF matches only; unresolved addresses are excluded. Rates use projected resident children, while services may serve families across locality boundaries. Counts measure listed supply, not vacancies, affordability, attendance, quality, workforce, opening hours or travel time. Not for mailing-list or deliverability use."
 }

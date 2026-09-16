@@ -117,7 +117,7 @@ def geocode(args: argparse.Namespace) -> tuple[pd.DataFrame, pd.DataFrame, dict]
         approved_places=("approved_places", "sum"), long_day_care_services=("is_long_day_care", "sum"),
         kindergarten_services=("is_kindergarten", "sum"), acecqa_services=("ServiceApprovalNumber", "nunique")
     ).rename(columns={"assigned_sa2": "neighbourhood_id"})
-    population = pd.read_csv(args.population)[["neighbourhood_id", "population"]]
+    population = pd.read_csv(args.population)[["neighbourhood_id", "children_0_4_2026"]]
     population.neighbourhood_id = population.neighbourhood_id.astype(str)
     agg.neighbourhood_id = agg.neighbourhood_id.astype(str)
     scores = population.merge(agg, on="neighbourhood_id", how="left").fillna({
@@ -128,8 +128,9 @@ def geocode(args: argparse.Namespace) -> tuple[pd.DataFrame, pd.DataFrame, dict]
         ("long_day_care_services", "long_day_care_availability_score"),
         ("kindergarten_services", "kindergarten_availability_score"),
     ]:
-        scores[value + "_per_10000"] = 10_000 * scores[value] / scores.population
-        scores[score] = scores[value + "_per_10000"].rank(method="average", pct=True).mul(100).round(2)
+        rate_column = value + "_per_1000_children_0_4"
+        scores[rate_column] = 1_000 * scores[value] / scores.children_0_4_2026
+        scores[score] = scores[rate_column].rank(method="average", pct=True).mul(100).round(2)
     qa = {
         "total_acecqa_services": len(points), "successfully_matched": int(points.matched_gnaf_identifier.notna().sum()),
         "exact_high_confidence_matches": int(points.match_status.eq("EXACT").sum()),
@@ -137,7 +138,8 @@ def geocode(args: argparse.Namespace) -> tuple[pd.DataFrame, pd.DataFrame, dict]
         "unmatched_addresses": int(points.match_status.eq("UNMATCHED").sum()),
         "sa2_assignment_success": int(points.assigned_sa2.notna().sum()),
         "records_excluded": int((~points.included_in_spatial_analysis).sum()),
-        "limitations": "Deterministic G-NAF matches only; unresolved addresses are excluded. Counts measure listed supply, not vacancies, affordability, quality, opening hours or travel time. Not for mailing-list or deliverability use.",
+        "denominator": "VIF2023 projected children aged 0-4 in 2026",
+        "limitations": "Deterministic G-NAF matches only; unresolved addresses are excluded. Rates use projected resident children, while services may serve families across locality boundaries. Counts measure listed supply, not vacancies, affordability, attendance, quality, workforce, opening hours or travel time. Not for mailing-list or deliverability use.",
     }
     return pd.DataFrame(points.drop(columns="geometry")), scores, qa
 
