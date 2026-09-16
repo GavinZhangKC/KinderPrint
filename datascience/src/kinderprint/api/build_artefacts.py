@@ -129,6 +129,7 @@ def build_suitability(
             "general_practice_access": "general_practice_access_score",
             "hospital_access": "hospital_access_score",
             "pharmacy_access": "pharmacy_access_score",
+            "lower_industrial_emission_source_presence": "lower_industrial_source_presence_score",
         }
         by_id = supplemental_scores.assign(
             neighbourhood_id=supplemental_scores.neighbourhood_id.astype(str)
@@ -138,7 +139,8 @@ def build_suitability(
                 continue
             row = by_id.loc[locality["id"]]
             for criterion, column in score_columns.items():
-                locality["scores"][criterion] = _num(row[column])
+                if column in row.index:
+                    locality["scores"][criterion] = _num(row[column])
     return {
         "localities": localities,
         "metadata": {

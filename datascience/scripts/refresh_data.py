@@ -380,6 +380,15 @@ def main() -> int:
         suitability_path = ITERATION_2_OUT / "suitability.json"
         service_scores_path = PROC / "health_service_suitability.csv"
         service_scores = pd.read_csv(service_scores_path) if service_scores_path.is_file() else None
+        npi_scores_path = PROC / "npi_suitability.csv"
+        if npi_scores_path.is_file():
+            npi_scores = pd.read_csv(npi_scores_path)
+            service_scores = (
+                npi_scores if service_scores is None else service_scores.merge(
+                    npi_scores[["neighbourhood_id", "lower_industrial_source_presence_score"]],
+                    on="neighbourhood_id", how="outer",
+                )
+            )
         suitability_path.write_text(json.dumps(
             B.build_suitability(profiles["profiles"], service_scores), separators=(",", ":")))
         log.info("  %-20s %6.2f MB", suitability_path.name,

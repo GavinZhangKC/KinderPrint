@@ -1,0 +1,362 @@
+sa2_code,sa2_name,npi_reporting_facility_count,lower_industrial_source_presence_score,source_id
+206011106,Brunswick East,0,100.0,npi_emissions_2024_2025
+206011107,Brunswick West,0,100.0,npi_emissions_2024_2025
+206011109,Pascoe Vale South,0,100.0,npi_emissions_2024_2025
+206011495,Brunswick - North,0,100.0,npi_emissions_2024_2025
+206011496,Brunswick - South,0,100.0,npi_emissions_2024_2025
+206011497,Coburg - East,0,100.0,npi_emissions_2024_2025
+206011498,Coburg - West,0,100.0,npi_emissions_2024_2025
+206021110,Alphington - Fairfield,0,100.0,npi_emissions_2024_2025
+206021112,Thornbury,0,100.0,npi_emissions_2024_2025
+206021499,Northcote - East,0,100.0,npi_emissions_2024_2025
+206021500,Northcote - West,0,100.0,npi_emissions_2024_2025
+206031113,Ascot Vale,0,100.0,npi_emissions_2024_2025
+206031115,Flemington,0,100.0,npi_emissions_2024_2025
+206031116,Moonee Ponds,0,100.0,npi_emissions_2024_2025
+206031501,Essendon (West) - Aberfeldie,0,100.0,npi_emissions_2024_2025
+206031502,Essendon - East,0,100.0,npi_emissions_2024_2025
+206041117,Carlton,0,100.0,npi_emissions_2024_2025
+206041118,Docklands,2,16.48,npi_emissions_2024_2025
+206041119,East Melbourne,2,16.48,npi_emissions_2024_2025
+206041120,Flemington Racecourse,0,100.0,npi_emissions_2024_2025
+206041121,Kensington (Vic.),1,28.53,npi_emissions_2024_2025
+206041124,Parkville,5,4.57,npi_emissions_2024_2025
+206041125,South Yarra - West,2,16.48,npi_emissions_2024_2025
+206041127,West Melbourne - Industrial,6,3.05,npi_emissions_2024_2025
+206041503,Melbourne CBD - East,0,100.0,npi_emissions_2024_2025
+206041504,Melbourne CBD - North,0,100.0,npi_emissions_2024_2025
+206041505,Melbourne CBD - West,1,28.53,npi_emissions_2024_2025
+206041506,North Melbourne,3,9.97,npi_emissions_2024_2025
+206041507,Royal Botanic Gardens Victoria,0,100.0,npi_emissions_2024_2025
+206041508,Southbank (West) - South Wharf,0,100.0,npi_emissions_2024_2025
+206041509,Southbank - East,0,100.0,npi_emissions_2024_2025
+206041510,West Melbourne - Residential,0,100.0,npi_emissions_2024_2025
+206051128,Albert Park,0,100.0,npi_emissions_2024_2025
+206051129,Elwood,0,100.0,npi_emissions_2024_2025
+206051130,Port Melbourne,1,28.53,npi_emissions_2024_2025
+206051134,St Kilda East,0,100.0,npi_emissions_2024_2025
+206051511,Port Melbourne Industrial,5,4.57,npi_emissions_2024_2025
+206051512,South Melbourne,0,100.0,npi_emissions_2024_2025
+206051513,St Kilda - Central,0,100.0,npi_emissions_2024_2025
+206051514,St Kilda - West,1,28.53,npi_emissions_2024_2025
+206061135,Armadale,0,100.0,npi_emissions_2024_2025
+206061136,Prahran - Windsor,0,100.0,npi_emissions_2024_2025
+206061138,Toorak,0,100.0,npi_emissions_2024_2025
+206061515,South Yarra - North,0,100.0,npi_emissions_2024_2025
+206061516,South Yarra - South,0,100.0,npi_emissions_2024_2025
+206071139,Abbotsford,1,28.53,npi_emissions_2024_2025
+206071140,Carlton North - Princes Hill,0,100.0,npi_emissions_2024_2025
+206071141,Collingwood,0,100.0,npi_emissions_2024_2025
+206071142,Fitzroy,1,28.53,npi_emissions_2024_2025
+206071143,Fitzroy North,0,100.0,npi_emissions_2024_2025
+206071145,Clifton Hill - Alphington,0,100.0,npi_emissions_2024_2025
+206071517,Richmond (South) - Cremorne,0,100.0,npi_emissions_2024_2025
+206071518,Richmond - North,2,16.48,npi_emissions_2024_2025
+207011146,Ashburton (Vic.),0,100.0,npi_emissions_2024_2025
+207011147,Balwyn,0,100.0,npi_emissions_2024_2025
+207011148,Balwyn North,0,100.0,npi_emissions_2024_2025
+207011149,Camberwell,0,100.0,npi_emissions_2024_2025
+207011150,Glen Iris - East,0,100.0,npi_emissions_2024_2025
+207011152,Hawthorn East,0,100.0,npi_emissions_2024_2025
+207011154,Kew East,0,100.0,npi_emissions_2024_2025
+207011155,Surrey Hills (West) - Canterbury,0,100.0,npi_emissions_2024_2025
+207011519,Hawthorn - North,0,100.0,npi_emissions_2024_2025
+207011520,Hawthorn - South,0,100.0,npi_emissions_2024_2025
+207011521,Kew - South,0,100.0,npi_emissions_2024_2025
+207011522,Kew - West,0,100.0,npi_emissions_2024_2025
+207021156,Bulleen,0,100.0,npi_emissions_2024_2025
+207021157,Doncaster,0,100.0,npi_emissions_2024_2025
+207021159,Templestowe,0,100.0,npi_emissions_2024_2025
+207021160,Templestowe Lower,0,100.0,npi_emissions_2024_2025
+207021424,Doncaster East - North,0,100.0,npi_emissions_2024_2025
+207021425,Doncaster East - South,0,100.0,npi_emissions_2024_2025
+207031161,Blackburn,0,100.0,npi_emissions_2024_2025
+207031162,Blackburn South,0,100.0,npi_emissions_2024_2025
+207031163,Box Hill,0,100.0,npi_emissions_2024_2025
+207031164,Box Hill North,2,16.48,npi_emissions_2024_2025
+207031165,Burwood (Vic.),0,100.0,npi_emissions_2024_2025
+207031166,Burwood East,0,100.0,npi_emissions_2024_2025
+207031167,Surrey Hills (East) - Mont Albert,0,100.0,npi_emissions_2024_2025
+208011168,Beaumaris,0,100.0,npi_emissions_2024_2025
+208011169,Brighton (Vic.),0,100.0,npi_emissions_2024_2025
+208011170,Brighton East,0,100.0,npi_emissions_2024_2025
+208011171,Highett (West) - Cheltenham,2,16.48,npi_emissions_2024_2025
+208011172,Hampton,0,100.0,npi_emissions_2024_2025
+208011173,Sandringham - Black Rock,0,100.0,npi_emissions_2024_2025
+208021174,Bentleigh - McKinnon,0,100.0,npi_emissions_2024_2025
+208021176,Carnegie,0,100.0,npi_emissions_2024_2025
+208021177,Caulfield - North,3,9.97,npi_emissions_2024_2025
+208021178,Caulfield - South,1,28.53,npi_emissions_2024_2025
+208021179,Elsternwick,0,100.0,npi_emissions_2024_2025
+208021180,Hughesdale,0,100.0,npi_emissions_2024_2025
+208021181,Murrumbeena,1,28.53,npi_emissions_2024_2025
+208021182,Ormond - Glen Huntly,0,100.0,npi_emissions_2024_2025
+208021426,Bentleigh East - North,1,28.53,npi_emissions_2024_2025
+208021427,Bentleigh East - South,0,100.0,npi_emissions_2024_2025
+208031183,Aspendale Gardens - Waterways,1,28.53,npi_emissions_2024_2025
+208031184,Braeside,6,3.05,npi_emissions_2024_2025
+208031185,Carrum - Patterson Lakes,0,100.0,npi_emissions_2024_2025
+208031186,Chelsea - Bonbeach,0,100.0,npi_emissions_2024_2025
+208031187,Chelsea Heights,0,100.0,npi_emissions_2024_2025
+208031188,Highett (East) - Cheltenham ,3,9.97,npi_emissions_2024_2025
+208031189,Edithvale - Aspendale,0,100.0,npi_emissions_2024_2025
+208031190,Mentone,0,100.0,npi_emissions_2024_2025
+208031191,Moorabbin - Heatherton,3,9.97,npi_emissions_2024_2025
+208031192,Moorabbin Airport,3,9.97,npi_emissions_2024_2025
+208031193,Mordialloc - Parkdale,0,100.0,npi_emissions_2024_2025
+208041194,Malvern - Glen Iris,1,28.53,npi_emissions_2024_2025
+208041195,Malvern East,0,100.0,npi_emissions_2024_2025
+209011196,Bundoora - East,0,100.0,npi_emissions_2024_2025
+209011197,Greensborough,0,100.0,npi_emissions_2024_2025
+209011198,Heidelberg - Rosanna,1,28.53,npi_emissions_2024_2025
+209011199,Heidelberg West,2,16.48,npi_emissions_2024_2025
+209011200,Ivanhoe,0,100.0,npi_emissions_2024_2025
+209011201,Ivanhoe East - Eaglemont,0,100.0,npi_emissions_2024_2025
+209011202,Montmorency - Briar Hill,0,100.0,npi_emissions_2024_2025
+209011203,Viewbank - Yallambie,0,100.0,npi_emissions_2024_2025
+209011204,Watsonia,0,100.0,npi_emissions_2024_2025
+209021205,Kingsbury,1,28.53,npi_emissions_2024_2025
+209021428,Preston - East,3,9.97,npi_emissions_2024_2025
+209021429,Preston - West,0,100.0,npi_emissions_2024_2025
+209021523,Reservoir - North East,0,100.0,npi_emissions_2024_2025
+209021524,Reservoir - North West,2,16.48,npi_emissions_2024_2025
+209021525,Reservoir - South East,0,100.0,npi_emissions_2024_2025
+209021526,Reservoir - South West,1,28.53,npi_emissions_2024_2025
+209031209,Eltham,0,100.0,npi_emissions_2024_2025
+209031210,Hurstbridge,0,100.0,npi_emissions_2024_2025
+209031211,Kinglake,0,100.0,npi_emissions_2024_2025
+209031212,Panton Hill - St Andrews,1,28.53,npi_emissions_2024_2025
+209031213,Plenty - Yarrambat,0,100.0,npi_emissions_2024_2025
+209031214,Research - North Warrandyte,0,100.0,npi_emissions_2024_2025
+209031215,Wattle Glen - Diamond Creek,0,100.0,npi_emissions_2024_2025
+209041216,Bundoora - North,0,100.0,npi_emissions_2024_2025
+209041217,Bundoora - West,0,100.0,npi_emissions_2024_2025
+209041220,Mill Park - North,0,100.0,npi_emissions_2024_2025
+209041221,Mill Park - South,0,100.0,npi_emissions_2024_2025
+209041223,Thomastown,7,1.8,npi_emissions_2024_2025
+209041224,Wallan,2,16.48,npi_emissions_2024_2025
+209041225,Whittlesea,3,9.97,npi_emissions_2024_2025
+209041431,Epping - East,1,28.53,npi_emissions_2024_2025
+209041432,Epping - South,5,4.57,npi_emissions_2024_2025
+209041433,Epping (Vic.) - West,0,100.0,npi_emissions_2024_2025
+209041435,South Morang - North,0,100.0,npi_emissions_2024_2025
+209041436,South Morang - South,0,100.0,npi_emissions_2024_2025
+209041437,Wollert,7,1.8,npi_emissions_2024_2025
+209041527,Doreen - North,0,100.0,npi_emissions_2024_2025
+209041528,Doreen - South,0,100.0,npi_emissions_2024_2025
+209041529,Lalor - East,0,100.0,npi_emissions_2024_2025
+209041530,Lalor - West,2,16.48,npi_emissions_2024_2025
+209041531,Mernda - North,1,28.53,npi_emissions_2024_2025
+209041532,Mernda - South,0,100.0,npi_emissions_2024_2025
+210011226,Airport West,0,100.0,npi_emissions_2024_2025
+210011227,Essendon Airport,2,16.48,npi_emissions_2024_2025
+210011228,Keilor,1,28.53,npi_emissions_2024_2025
+210011230,Niddrie - Essendon West,0,100.0,npi_emissions_2024_2025
+210011231,Strathmore,0,100.0,npi_emissions_2024_2025
+210011533,Avondale Heights,0,100.0,npi_emissions_2024_2025
+210011534,Keilor East,0,100.0,npi_emissions_2024_2025
+210021232,Gisborne,0,100.0,npi_emissions_2024_2025
+210021233,Macedon,0,100.0,npi_emissions_2024_2025
+210021234,Riddells Creek,0,100.0,npi_emissions_2024_2025
+210021235,Romsey,1,28.53,npi_emissions_2024_2025
+210031236,Coburg North,1,28.53,npi_emissions_2024_2025
+210031237,Fawkner,1,28.53,npi_emissions_2024_2025
+210031439,Gowanbrae,0,100.0,npi_emissions_2024_2025
+210031440,Hadfield,1,28.53,npi_emissions_2024_2025
+210031535,Glenroy - East,0,100.0,npi_emissions_2024_2025
+210031536,Glenroy - West,0,100.0,npi_emissions_2024_2025
+210031537,Oak Park,0,100.0,npi_emissions_2024_2025
+210031538,Pascoe Vale,0,100.0,npi_emissions_2024_2025
+210041240,Sunbury,0,100.0,npi_emissions_2024_2025
+210041539,Diggers Rest,0,100.0,npi_emissions_2024_2025
+210041540,Sunbury - South,2,16.48,npi_emissions_2024_2025
+210041541,Sunbury - West,1,28.53,npi_emissions_2024_2025
+210051242,Broadmeadows,3,9.97,npi_emissions_2024_2025
+210051243,Campbellfield - Coolaroo,11,0.55,npi_emissions_2024_2025
+210051245,Gladstone Park - Westmeadows,0,100.0,npi_emissions_2024_2025
+210051246,Greenvale - Bulla,2,16.48,npi_emissions_2024_2025
+210051247,Meadow Heights,0,100.0,npi_emissions_2024_2025
+210051248,Melbourne Airport,5,4.57,npi_emissions_2024_2025
+210051250,Tullamarine,0,100.0,npi_emissions_2024_2025
+210051441,Craigieburn - Central,0,100.0,npi_emissions_2024_2025
+210051442,Craigieburn - North,0,100.0,npi_emissions_2024_2025
+210051443,Craigieburn - South,2,16.48,npi_emissions_2024_2025
+210051445,Mickleham - Yuroke,1,28.53,npi_emissions_2024_2025
+210051542,Craigieburn - North West,0,100.0,npi_emissions_2024_2025
+210051543,Craigieburn - West,0,100.0,npi_emissions_2024_2025
+210051544,Roxburgh Park (South) - Somerton,9,0.83,npi_emissions_2024_2025
+210051545,Roxburgh Park - North,0,100.0,npi_emissions_2024_2025
+211011251,Bayswater,3,9.97,npi_emissions_2024_2025
+211011254,Knoxfield - Scoresby,3,9.97,npi_emissions_2024_2025
+211011255,Lysterfield,2,16.48,npi_emissions_2024_2025
+211011256,Rowville - Central,0,100.0,npi_emissions_2024_2025
+211011257,Rowville - North,1,28.53,npi_emissions_2024_2025
+211011258,Rowville - South,1,28.53,npi_emissions_2024_2025
+211011259,Wantirna,0,100.0,npi_emissions_2024_2025
+211011260,Wantirna South,1,28.53,npi_emissions_2024_2025
+211011446,Boronia,0,100.0,npi_emissions_2024_2025
+211011447,Ferntree Gully - North,0,100.0,npi_emissions_2024_2025
+211011448,Ferntree Gully (South) - Upper Ferntree Gully,1,28.53,npi_emissions_2024_2025
+211011449,The Basin,0,100.0,npi_emissions_2024_2025
+211021261,Donvale - Park Orchards,0,100.0,npi_emissions_2024_2025
+211021262,Warrandyte - Wonga Park,0,100.0,npi_emissions_2024_2025
+211031263,Bayswater North,6,3.05,npi_emissions_2024_2025
+211031265,Croydon Hills - Warranwood,0,100.0,npi_emissions_2024_2025
+211031266,Ringwood,1,28.53,npi_emissions_2024_2025
+211031267,Ringwood East,1,28.53,npi_emissions_2024_2025
+211031268,Ringwood North,0,100.0,npi_emissions_2024_2025
+211031450,Croydon - East,0,100.0,npi_emissions_2024_2025
+211031451,Croydon - West,0,100.0,npi_emissions_2024_2025
+211031452,Croydon South,0,100.0,npi_emissions_2024_2025
+211041269,Forest Hill,0,100.0,npi_emissions_2024_2025
+211041270,Mitcham (Vic.),0,100.0,npi_emissions_2024_2025
+211041271,Nunawading,0,100.0,npi_emissions_2024_2025
+211041272,Vermont,1,28.53,npi_emissions_2024_2025
+211041273,Vermont South,0,100.0,npi_emissions_2024_2025
+211051274,Belgrave - Selby,0,100.0,npi_emissions_2024_2025
+211051275,Chirnside Park,0,100.0,npi_emissions_2024_2025
+211051276,Healesville - Yarra Glen,3,9.97,npi_emissions_2024_2025
+211051277,Kilsyth,1,28.53,npi_emissions_2024_2025
+211051278,Lilydale - Coldstream,5,4.57,npi_emissions_2024_2025
+211051279,Monbulk - Silvan,0,100.0,npi_emissions_2024_2025
+211051280,Montrose,2,16.48,npi_emissions_2024_2025
+211051281,Mooroolbark,0,100.0,npi_emissions_2024_2025
+211051282,Mount Dandenong - Olinda,0,100.0,npi_emissions_2024_2025
+211051283,Mount Evelyn,0,100.0,npi_emissions_2024_2025
+211051284,Upwey - Tecoma,0,100.0,npi_emissions_2024_2025
+211051285,Wandin - Seville,3,9.97,npi_emissions_2024_2025
+211051286,Yarra Valley,1,28.53,npi_emissions_2024_2025
+212011289,Emerald - Cockatoo,1,28.53,npi_emissions_2024_2025
+212011546,Beaconsfield - Officer,0,100.0,npi_emissions_2024_2025
+212011547,Bunyip - Garfield,2,16.48,npi_emissions_2024_2025
+212011548,Koo Wee Rup,4,6.51,npi_emissions_2024_2025
+212011549,Pakenham - North East,1,28.53,npi_emissions_2024_2025
+212011550,Pakenham - North West,2,16.48,npi_emissions_2024_2025
+212011551,Pakenham - South East,4,6.51,npi_emissions_2024_2025
+212011552,Pakenham - South West,0,100.0,npi_emissions_2024_2025
+212021293,Berwick - North,2,16.48,npi_emissions_2024_2025
+212021295,Doveton,0,100.0,npi_emissions_2024_2025
+212021297,Hallam,2,16.48,npi_emissions_2024_2025
+212021299,Narre Warren North,0,100.0,npi_emissions_2024_2025
+212021453,Endeavour Hills - North,0,100.0,npi_emissions_2024_2025
+212021454,Endeavour Hills - South,0,100.0,npi_emissions_2024_2025
+212021455,Narre Warren - North East,0,100.0,npi_emissions_2024_2025
+212021456,Narre Warren - South West,1,28.53,npi_emissions_2024_2025
+212021553,Berwick - South East,0,100.0,npi_emissions_2024_2025
+212021554,Berwick - South West,0,100.0,npi_emissions_2024_2025
+212031300,Cranbourne,0,100.0,npi_emissions_2024_2025
+212031303,Cranbourne South,1,28.53,npi_emissions_2024_2025
+212031304,Cranbourne West,0,100.0,npi_emissions_2024_2025
+212031306,Lynbrook - Lyndhurst,1,28.53,npi_emissions_2024_2025
+212031308,Pearcedale - Tooradin,0,100.0,npi_emissions_2024_2025
+212031457,Narre Warren South - East,0,100.0,npi_emissions_2024_2025
+212031458,Narre Warren South - West,0,100.0,npi_emissions_2024_2025
+212031555,Clyde North - North,1,28.53,npi_emissions_2024_2025
+212031556,Clyde North - South,1,28.53,npi_emissions_2024_2025
+212031557,Cranbourne East - North,0,100.0,npi_emissions_2024_2025
+212031558,Cranbourne East - South,0,100.0,npi_emissions_2024_2025
+212031559,Cranbourne North - East,1,28.53,npi_emissions_2024_2025
+212031560,Cranbourne North - West,1,28.53,npi_emissions_2024_2025
+212031561,Hampton Park - East,2,16.48,npi_emissions_2024_2025
+212031562,Hampton Park - West,1,28.53,npi_emissions_2024_2025
+212041309,Clarinda - Oakleigh South,2,16.48,npi_emissions_2024_2025
+212041310,Clayton South,5,4.57,npi_emissions_2024_2025
+212041312,Dandenong North,0,100.0,npi_emissions_2024_2025
+212041313,Dingley Village,0,100.0,npi_emissions_2024_2025
+212041316,Noble Park North,0,100.0,npi_emissions_2024_2025
+212041317,Springvale,3,9.97,npi_emissions_2024_2025
+212041318,Springvale South,0,100.0,npi_emissions_2024_2025
+212041459,Noble Park - East,1,28.53,npi_emissions_2024_2025
+212041460,Noble Park - West,0,100.0,npi_emissions_2024_2025
+212041563,Dandenong - North,2,16.48,npi_emissions_2024_2025
+212041564,Dandenong - South,35,0.0,npi_emissions_2024_2025
+212041565,Keysborough - North,0,100.0,npi_emissions_2024_2025
+212041566,Keysborough - South,0,100.0,npi_emissions_2024_2025
+212051319,Ashwood - Chadstone,0,100.0,npi_emissions_2024_2025
+212051321,Glen Waverley - East,0,100.0,npi_emissions_2024_2025
+212051322,Glen Waverley - West,0,100.0,npi_emissions_2024_2025
+212051323,Mount Waverley - North,0,100.0,npi_emissions_2024_2025
+212051324,Mount Waverley - South,0,100.0,npi_emissions_2024_2025
+212051325,Mulgrave,4,6.51,npi_emissions_2024_2025
+212051326,Oakleigh - Huntingdale,2,16.48,npi_emissions_2024_2025
+212051327,Wheelers Hill,0,100.0,npi_emissions_2024_2025
+212051567,Clayton (North) - Notting Hill,3,9.97,npi_emissions_2024_2025
+212051568,Clayton - Central,2,16.48,npi_emissions_2024_2025
+213011328,Ardeer - Albion,0,100.0,npi_emissions_2024_2025
+213011329,Cairnlea,0,100.0,npi_emissions_2024_2025
+213011331,Delahey,0,100.0,npi_emissions_2024_2025
+213011332,Keilor Downs,0,100.0,npi_emissions_2024_2025
+213011333,Kings Park (Vic.),0,100.0,npi_emissions_2024_2025
+213011334,St Albans - North,0,100.0,npi_emissions_2024_2025
+213011335,St Albans - South,1,28.53,npi_emissions_2024_2025
+213011336,Sunshine,1,28.53,npi_emissions_2024_2025
+213011337,Sunshine North,1,28.53,npi_emissions_2024_2025
+213011338,Sunshine West,7,1.8,npi_emissions_2024_2025
+213011339,Sydenham,0,100.0,npi_emissions_2024_2025
+213011340,Taylors Lakes,0,100.0,npi_emissions_2024_2025
+213011569,Deer Park,4,6.51,npi_emissions_2024_2025
+213011570,Derrimut,3,9.97,npi_emissions_2024_2025
+213021341,Altona,7,1.8,npi_emissions_2024_2025
+213021342,Altona Meadows,0,100.0,npi_emissions_2024_2025
+213021343,Altona North,3,9.97,npi_emissions_2024_2025
+213021344,Newport,7,1.8,npi_emissions_2024_2025
+213021345,Seabrook,0,100.0,npi_emissions_2024_2025
+213021346,Williamstown,0,100.0,npi_emissions_2024_2025
+213031347,Braybrook,2,16.48,npi_emissions_2024_2025
+213031348,Footscray,1,28.53,npi_emissions_2024_2025
+213031349,Maribyrnong,0,100.0,npi_emissions_2024_2025
+213031350,Seddon - Kingsville,0,100.0,npi_emissions_2024_2025
+213031351,West Footscray - Tottenham,5,4.57,npi_emissions_2024_2025
+213031352,Yarraville,4,6.51,npi_emissions_2024_2025
+213041353,Bacchus Marsh,3,9.97,npi_emissions_2024_2025
+213041358,Melton West,0,100.0,npi_emissions_2024_2025
+213041359,Rockbank - Mount Cottrell,7,1.8,npi_emissions_2024_2025
+213041360,Taylors Hill,0,100.0,npi_emissions_2024_2025
+213041461,Burnside,0,100.0,npi_emissions_2024_2025
+213041462,Burnside Heights,0,100.0,npi_emissions_2024_2025
+213041463,Caroline Springs,0,100.0,npi_emissions_2024_2025
+213041571,Brookfield,0,100.0,npi_emissions_2024_2025
+213041572,Cobblebank - Strathtulloh,1,28.53,npi_emissions_2024_2025
+213041573,Eynesbury - Exford,1,28.53,npi_emissions_2024_2025
+213041574,Fraser Rise - Plumpton,3,9.97,npi_emissions_2024_2025
+213041575,Hillside,0,100.0,npi_emissions_2024_2025
+213041576,Kurunjang - Toolern Vale,1,28.53,npi_emissions_2024_2025
+213041577,Melton,0,100.0,npi_emissions_2024_2025
+213041578,Melton South - Weir Views,0,100.0,npi_emissions_2024_2025
+213051361,Hoppers Crossing - North,1,28.53,npi_emissions_2024_2025
+213051362,Hoppers Crossing - South,0,100.0,npi_emissions_2024_2025
+213051363,Laverton,23,0.28,npi_emissions_2024_2025
+213051368,Werribee - South,3,9.97,npi_emissions_2024_2025
+213051464,Point Cook - East,0,100.0,npi_emissions_2024_2025
+213051466,Point Cook - South,0,100.0,npi_emissions_2024_2025
+213051467,Werribee - East,0,100.0,npi_emissions_2024_2025
+213051468,Werribee - West,5,4.57,npi_emissions_2024_2025
+213051579,Manor Lakes - Quandong,0,100.0,npi_emissions_2024_2025
+213051580,Point Cook - North East,0,100.0,npi_emissions_2024_2025
+213051581,Point Cook - North West,0,100.0,npi_emissions_2024_2025
+213051582,Tarneit (West) - Mount Cottrell,0,100.0,npi_emissions_2024_2025
+213051583,Tarneit - Central,0,100.0,npi_emissions_2024_2025
+213051584,Tarneit - North,0,100.0,npi_emissions_2024_2025
+213051585,Tarneit - South,0,100.0,npi_emissions_2024_2025
+213051586,Truganina - North,1,28.53,npi_emissions_2024_2025
+213051587,Truganina - South East,0,100.0,npi_emissions_2024_2025
+213051588,Truganina - South West,1,28.53,npi_emissions_2024_2025
+213051589,Wyndham Vale - North,2,16.48,npi_emissions_2024_2025
+213051590,Wyndham Vale - South,0,100.0,npi_emissions_2024_2025
+214011370,Carrum Downs,1,28.53,npi_emissions_2024_2025
+214011371,Frankston,1,28.53,npi_emissions_2024_2025
+214011372,Frankston North,0,100.0,npi_emissions_2024_2025
+214011373,Frankston South,0,100.0,npi_emissions_2024_2025
+214011374,Langwarrin,0,100.0,npi_emissions_2024_2025
+214011375,Seaford (Vic.),0,100.0,npi_emissions_2024_2025
+214011376,Skye - Sandhurst,0,100.0,npi_emissions_2024_2025
+214021377,Dromana,0,100.0,npi_emissions_2024_2025
+214021378,Flinders,2,16.48,npi_emissions_2024_2025
+214021379,Hastings - Somers,4,6.51,npi_emissions_2024_2025
+214021381,Mount Eliza,0,100.0,npi_emissions_2024_2025
+214021382,Mount Martha,1,28.53,npi_emissions_2024_2025
+214021383,Point Nepean,1,28.53,npi_emissions_2024_2025
+214021384,Rosebud - McCrae,0,100.0,npi_emissions_2024_2025
+214021385,Somerville,1,28.53,npi_emissions_2024_2025
+214021591,Mornington - East,0,100.0,npi_emissions_2024_2025
+214021592,Mornington - West,0,100.0,npi_emissions_2024_2025

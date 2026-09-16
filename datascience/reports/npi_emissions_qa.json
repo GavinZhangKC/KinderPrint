@@ -1,0 +1,22 @@
+{
+  "source_id": "npi_emissions_2024_2025",
+  "report_year": "2024/2025",
+  "target_pollutants": [
+    "PM2.5",
+    "PM10",
+    "NOx",
+    "SO2",
+    "CO",
+    "VOC",
+    "benzene",
+    "formaldehyde",
+    "PAH_BaPeq"
+  ],
+  "greater_melbourne_pollutant_records": 1810,
+  "greater_melbourne_reporting_facilities": 374,
+  "sa2_with_reporting_facility": 133,
+  "sa2_without_reporting_facility": 228,
+  "limitation": "NPI data are facility-reported or estimated emissions above reporting thresholds. Facility presence and emitted mass are not ambient concentration, toxic-equivalent exposure, individual dose, compliance status or health risk. A zero means no facility in this selected extract, not zero pollution.",
+  "reporting_localities": 342,
+  "reporting_localities_with_source": 124
+}
