@@ -178,6 +178,8 @@ const evidencePatterns = [
   { label: 'Vulnerability + heat', criteria: ['lower_developmental_vulnerability', 'lower_urban_heat'], description: 'Lower developmental vulnerability alongside lower urban heat' },
   { label: 'Green-space access', criteria: ['tree_canopy', 'public_open_space'], description: 'Tree canopy and public open space considered together' },
   { label: 'Everyday healthcare availability', criteria: ['general_practice_access', 'pharmacy_access', 'hospital_access'], description: 'Population-adjusted presence of listed general practices, pharmacies and hospitals' },
+  { label: 'Early-years service availability', criteria: ['approved_early_childhood_places', 'long_day_care_availability', 'kindergarten_availability'], description: 'Population-adjusted approved places, long day care and kindergarten supply' },
+  { label: 'Lower environmental pressures', criteria: ['lower_urban_heat', 'lower_declared_road_traffic', 'lower_industrial_emission_source_presence', 'lower_bushfire_prone_share'], description: 'Measured or clearly labelled proxy indicators for heat, traffic, industrial sources and designated bushfire-prone land' },
   { label: 'Whole evidence view', criteria: ['development_on_track', 'lower_developmental_vulnerability', 'tree_canopy', 'public_open_space', 'lower_urban_heat', 'socioeconomic_resources'], description: 'All currently supported measures, equally weighted' },
 ]
 
@@ -207,7 +209,7 @@ export default function LocalitySuitabilityPanel({
         </button>
       </div>
 
-      <p className="suitability-intro">Choose the evidence that matters to your comparison. Results are relative area-level matches, not medical or personal advice.</p>
+      <p className="suitability-intro">Choose from the evidence currently supported for every reporting locality. Results are relative area-level matches, not medical or personal advice.</p>
 
       <div className="suitability-patterns" aria-label="Evidence pattern shortcuts">
         <strong>Explore a concrete evidence pattern</strong>
@@ -232,13 +234,16 @@ export default function LocalitySuitabilityPanel({
       </div>
 
       <div className="suitability-options" aria-label="Suitability filters">
-        {optionGroups.map((group) => {
-          const availableCount = group.options.filter((option) => option.available).length
+        {optionGroups.map((group) => ({
+          ...group,
+          options: group.options.filter((option) => option.available),
+        })).filter((group) => group.options.length > 0).map((group) => {
+          const availableCount = group.options.length
           return (
-            <details key={group.title} className="suitability-group" open={availableCount > 0 ? true : undefined}>
+            <details key={group.title} className="suitability-group" open>
               <summary>
                 <span>{group.title}</span>
-                <small>{availableCount > 0 ? `${availableCount} available` : 'Data required'}</small>
+                <small>{availableCount} available</small>
               </summary>
               <div className="suitability-group-content">
                 <p>{group.summary}</p>
