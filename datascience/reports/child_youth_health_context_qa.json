@@ -1,0 +1,13 @@
+{
+  "source_id": "phidu_child_youth_pha_2026",
+  "geographic_unit": "Population Health Area",
+  "greater_melbourne_pha_count": 182,
+  "indicator_group_count": 61,
+  "record_count": 34595,
+  "available_values": 28566,
+  "suppressed_values": 6029,
+  "missing_values": 0,
+  "unparsed_values": 0,
+  "suitability_status": "regional_context_only",
+  "limitation": "PHA values must not be copied to component SA2s or used to rank SA2 localities. Service use also reflects access, coding and care-seeking, not disease prevalence alone."
+}
