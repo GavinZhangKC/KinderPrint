@@ -45,8 +45,25 @@ interface ScenarioResult {
   developmentDirection: string
   projectedChange: string
   projectedDevelopmentChange: string
+  aiSummary: string
   modelContext: string
   insight: string
+}
+
+interface AiLinearModel {
+  intercept: number
+  treeCanopyWeight: number
+  openSpaceWeight: number
+  heatWeight: number
+  r2: number
+  sampleSize: number
+}
+
+interface AiSimulationModel {
+  vulnerabilityModel: AiLinearModel | null
+  developmentModel: AiLinearModel | null
+  status: 'learned' | 'fallback'
+  notes: string[]
 }
 
 const clamp = (value: number, min: number, max: number) => Math.min(Math.max(value, min), max)
@@ -78,12 +95,156 @@ function metricDirection(metric: ComparisonMetric) {
   }
 }
 
-function buildScenarioResult(baseline: SimulationBaseline, values: ScenarioValues): ScenarioResult {
+function metricNumber(indicators: Record<string, { value: number | null; status: string }>, id: string): number | null {
+  const indicator = indicators[id]
+  return indicator && indicator.status === 'available' && typeof indicator.value === 'number' && Number.isFinite(indicator.value)
+    ? indicator.value
+    : null
+}
+
+function solveLinearSystem4x4(matrix: number[][], vector: number[]): number[] | null {
+  const a = matrix.map((row, rowIndex) => [...row, vector[rowIndex]])
+  const size = 4
+  for (let pivot = 0; pivot < size; pivot += 1) {
+    let maxRow = pivot
+    for (let row = pivot + 1; row < size; row += 1) {
+      if (Math.abs(a[row][pivot]) > Math.abs(a[maxRow][pivot])) {
+        maxRow = row
+      }
+    }
+    if (Math.abs(a[maxRow][pivot]) < 1e-10) {
+      return null
+    }
+    if (maxRow !== pivot) {
+      const tmp = a[pivot]
+      a[pivot] = a[maxRow]
+      a[maxRow] = tmp
+    }
+    const pivotValue = a[pivot][pivot]
+    for (let col = pivot; col <= size; col += 1) {
+      a[pivot][col] /= pivotValue
+    }
+    for (let row = 0; row < size; row += 1) {
+      if (row === pivot) {
+        continue
+      }
+      const factor = a[row][pivot]
+      for (let col = pivot; col <= size; col += 1) {
+        a[row][col] -= factor * a[pivot][col]
+      }
+    }
+  }
+  return a.map((row) => row[size])
+}
+
+function trainAiLinearModel(samples: Array<{ treeCanopy: number; openSpace: number; heatExposure: number; target: number }>): AiLinearModel | null {
+  if (samples.length < 24) {
+    return null
+  }
+  const xTx = [
+    [0, 0, 0, 0],
+    [0, 0, 0, 0],
+    [0, 0, 0, 0],
+    [0, 0, 0, 0],
+  ]
+  const xTy = [0, 0, 0, 0]
+  const ridge = 0.08
+  for (const sample of samples) {
+    const features = [1, sample.treeCanopy, sample.openSpace, sample.heatExposure]
+    for (let row = 0; row < 4; row += 1) {
+      xTy[row] += features[row] * sample.target
+      for (let col = 0; col < 4; col += 1) {
+        xTx[row][col] += features[row] * features[col]
+      }
+    }
+  }
+  for (let idx = 1; idx < 4; idx += 1) {
+    xTx[idx][idx] += ridge
+  }
+  const coefficients = solveLinearSystem4x4(xTx, xTy)
+  if (!coefficients) {
+    return null
+  }
+  const [intercept, treeCanopyWeight, openSpaceWeight, heatWeight] = coefficients
+  const meanTarget = samples.reduce((total, sample) => total + sample.target, 0) / samples.length
+  let sse = 0
+  let sst = 0
+  for (const sample of samples) {
+    const predicted = intercept
+      + (treeCanopyWeight * sample.treeCanopy)
+      + (openSpaceWeight * sample.openSpace)
+      + (heatWeight * sample.heatExposure)
+    const residual = sample.target - predicted
+    sse += residual * residual
+    const centered = sample.target - meanTarget
+    sst += centered * centered
+  }
+  const rawR2 = sst > 0 ? 1 - (sse / sst) : 0
+  return {
+    intercept,
+    treeCanopyWeight,
+    openSpaceWeight,
+    heatWeight,
+    r2: clamp(rawR2, 0, 1),
+    sampleSize: samples.length,
+  }
+}
+
+function predictAi(model: AiLinearModel, treeCanopy: number, openSpace: number, heatExposure: number): number {
+  return model.intercept
+    + (model.treeCanopyWeight * treeCanopy)
+    + (model.openSpaceWeight * openSpace)
+    + (model.heatWeight * heatExposure)
+}
+
+function buildAiModel(indicatorRows: Array<{ indicators: Record<string, { value: number | null; status: string }> }>): AiSimulationModel {
+  const notes: string[] = []
+  const vulnerabilitySamples: Array<{ treeCanopy: number; openSpace: number; heatExposure: number; target: number }> = []
+  const developmentSamples: Array<{ treeCanopy: number; openSpace: number; heatExposure: number; target: number }> = []
+
+  for (const row of indicatorRows) {
+    const treeCanopy = metricNumber(row.indicators, 'env_vegetation_cover')
+    const openSpace = metricNumber(row.indicators, 'env_open_space_access')
+    const heatExposure = metricNumber(row.indicators, 'env_urban_heat')
+    if (treeCanopy === null || openSpace === null || heatExposure === null) {
+      continue
+    }
+    const vulnerability = metricNumber(row.indicators, 'aedc_vulnerable_one_or_more')
+    if (vulnerability !== null) {
+      vulnerabilitySamples.push({ treeCanopy, openSpace, heatExposure, target: vulnerability })
+    }
+    const development = metricNumber(row.indicators, 'aedc_on_track_five')
+    if (development !== null) {
+      developmentSamples.push({ treeCanopy, openSpace, heatExposure, target: development })
+    }
+  }
+
+  const vulnerabilityModel = trainAiLinearModel(vulnerabilitySamples)
+  const developmentModel = trainAiLinearModel(developmentSamples)
+  if (!vulnerabilityModel) {
+    notes.push('Vulnerability model fallback: insufficient or unstable samples')
+  }
+  if (!developmentModel) {
+    notes.push('Development model fallback: insufficient or unstable samples')
+  }
+  return {
+    vulnerabilityModel,
+    developmentModel,
+    status: vulnerabilityModel && developmentModel ? 'learned' : 'fallback',
+    notes,
+  }
+}
+
+function buildScenarioResult(
+  baseline: SimulationBaseline,
+  values: ScenarioValues,
+  aiModel: AiSimulationModel | null,
+): ScenarioResult {
   const treeIncrease = values.treeCanopy - baseline.treeCanopy
   const openSpaceIncrease = values.openSpace - baseline.openSpace
   const heatReduction = baseline.heatExposure - values.heat
-  const vulnerabilityAdjustment = (treeIncrease * 0.25) + (openSpaceIncrease * 0.18) + (heatReduction * 2.1)
-  const developmentAdjustment = (treeIncrease * 0.22) + (openSpaceIncrease * 0.16) + (heatReduction * 1.6)
+  const ruleVulnerabilityAdjustment = (treeIncrease * 0.25) + (openSpaceIncrease * 0.18) + (heatReduction * 2.1)
+  const ruleDevelopmentAdjustment = (treeIncrease * 0.22) + (openSpaceIncrease * 0.16) + (heatReduction * 1.6)
 
   // Higher local service capacity makes built-environment gains easier to convert into outcomes,
   // while stronger projected child demand and context pressure dampen expected effect size.
@@ -97,6 +258,40 @@ function buildScenarioResult(baseline: SimulationBaseline, values: ScenarioValue
     0.7,
     1.2,
   )
+
+  const aiVulnerabilityAdjustment = aiModel?.vulnerabilityModel
+    ? predictAi(
+      aiModel.vulnerabilityModel,
+      baseline.treeCanopy,
+      baseline.openSpace,
+      baseline.heatExposure,
+    ) - predictAi(
+      aiModel.vulnerabilityModel,
+      values.treeCanopy,
+      values.openSpace,
+      values.heat,
+    )
+    : null
+  const aiDevelopmentAdjustment = aiModel?.developmentModel
+    ? predictAi(
+      aiModel.developmentModel,
+      values.treeCanopy,
+      values.openSpace,
+      values.heat,
+    ) - predictAi(
+      aiModel.developmentModel,
+      baseline.treeCanopy,
+      baseline.openSpace,
+      baseline.heatExposure,
+    )
+    : null
+
+  const vulnerabilityAdjustment = aiVulnerabilityAdjustment === null
+    ? ruleVulnerabilityAdjustment
+    : (ruleVulnerabilityAdjustment * 0.4) + (aiVulnerabilityAdjustment * 0.6)
+  const developmentAdjustment = aiDevelopmentAdjustment === null
+    ? ruleDevelopmentAdjustment
+    : (ruleDevelopmentAdjustment * 0.4) + (aiDevelopmentAdjustment * 0.6)
 
   const effectiveVulnerabilityAdjustment = vulnerabilityAdjustment > 0
     ? vulnerabilityAdjustment * contextMultiplier
@@ -121,6 +316,9 @@ function buildScenarioResult(baseline: SimulationBaseline, values: ScenarioValue
   const heatDirection = heatReduction > 0 ? 'Improves' : 'Higher exposure'
   const vulnerabilityDirection = projectedVulnerability < baseline.vulnerability ? 'Improves' : projectedVulnerability > baseline.vulnerability ? 'Higher risk' : 'No change'
   const developmentDirection = projectedDevelopment > baseline.childDevelopment ? 'Improves' : 'Lower outlook'
+  const aiSummary = aiModel?.status === 'learned' && aiModel.vulnerabilityModel && aiModel.developmentModel
+    ? `AI learned from ${Math.min(aiModel.vulnerabilityModel.sampleSize, aiModel.developmentModel.sampleSize)} localities (R2 vulnerability ${aiModel.vulnerabilityModel.r2.toFixed(2)}, development ${aiModel.developmentModel.r2.toFixed(2)}).`
+    : 'AI fallback to rules for one or more outputs because model training data was incomplete.'
   const modelContext = `Service ${baseline.serviceAccess.toFixed(1)} · Demand ${baseline.futureDemand.toFixed(1)} · Environment ${baseline.environmentQuality.toFixed(1)} · Traffic ${baseline.trafficPressure.toFixed(1)} · Industrial ${baseline.industrialPressure.toFixed(1)} · Multiplier ${contextMultiplier.toFixed(2)}x`
   const insight = heatReduction > 0
     ? 'Reducing heat exposure while increasing canopy and green access produces a lower estimated vulnerability profile for this area, adjusted for local service access and projected demand pressure.'
@@ -139,6 +337,7 @@ function buildScenarioResult(baseline: SimulationBaseline, values: ScenarioValue
     developmentDirection,
     projectedChange: `${Number(baseline.vulnerability.toFixed(1))}% → ${Number(projectedVulnerability.toFixed(1))}%`,
     projectedDevelopmentChange: `${Number(baseline.childDevelopment.toFixed(1))} → ${Number(projectedDevelopment.toFixed(1))}`,
+    aiSummary,
     modelContext,
     insight,
   }
@@ -158,6 +357,7 @@ export default function SimulationPage({
     heat: 4.8,
   })
   const [scenarioResult, setScenarioResult] = useState<ScenarioResult | null>(null)
+  const [aiModel, setAiModel] = useState<AiSimulationModel | null>(null)
   const [scenarioLoading, setScenarioLoading] = useState(false)
 
   const {
@@ -188,12 +388,14 @@ export default function SimulationPage({
         explanationResponse,
         trafficResponse,
         industrialResponse,
+        indicatorsResponse,
       ] = await Promise.all([
         api.getProfile(id),
         api.getPriority(id),
         api.getExplanation(id),
         api.getTrafficContext(id),
         api.getIndustrialEmissionsContext(id),
+        api.getNeighbourhoodIndicators(),
       ])
 
       if (profileResponse.status !== 'available' && profileResponse.status !== 'limited') {
@@ -262,6 +464,13 @@ export default function SimulationPage({
       }
       const industrialPressure = average(industrialPressureComponents)
 
+      const nextAiModel = (
+        (indicatorsResponse.status === 'available' || indicatorsResponse.status === 'limited')
+          ? buildAiModel(indicatorsResponse.data.neighbourhoods)
+          : { vulnerabilityModel: null, developmentModel: null, status: 'fallback' as const, notes: ['Map indicators unavailable for AI training'] }
+      )
+      setAiModel(nextAiModel)
+
       const nextBaseline: SimulationBaseline = {
         id: neighbourhood.id,
         name: neighbourhood.name,
@@ -292,10 +501,11 @@ export default function SimulationPage({
         treeCanopy: nextBaseline.treeCanopy,
         openSpace: nextBaseline.openSpace,
         heat: nextBaseline.heatExposure,
-      }))
+      }, nextAiModel))
     } catch (error) {
       console.error('Failed to load simulation baseline:', error)
       setBaseline(null)
+      setAiModel(null)
       setScenarioResult(null)
     } finally {
       setScenarioLoading(false)
@@ -312,7 +522,7 @@ export default function SimulationPage({
       return
     }
 
-    setScenarioResult(buildScenarioResult(baseline, scenarioValues))
+    setScenarioResult(buildScenarioResult(baseline, scenarioValues, aiModel))
   }
 
   const resetScenario = () => {
@@ -327,7 +537,7 @@ export default function SimulationPage({
     }
 
     setScenarioValues(defaultValues)
-    setScenarioResult(buildScenarioResult(baseline, defaultValues))
+    setScenarioResult(buildScenarioResult(baseline, defaultValues, aiModel))
   }
 
   const comparisonMetrics: ComparisonMetric[] = baseline ? [
@@ -662,6 +872,10 @@ export default function SimulationPage({
               <div className="projected-change secondary">
                 <span>Model context:</span>
                 <strong>{scenarioResult ? scenarioResult.modelContext : `${baseline?.serviceAccess?.toFixed(1) ?? '50.0'} · ${baseline?.futureDemand?.toFixed(1) ?? '50.0'}`}</strong>
+              </div>
+              <div className="projected-change secondary">
+                <span>AI model:</span>
+                <strong>{scenarioResult ? scenarioResult.aiSummary : 'Awaiting training data from neighbourhood indicators.'}</strong>
               </div>
               <div className="projected-change">
                 <span>Vulnerability change:</span>
