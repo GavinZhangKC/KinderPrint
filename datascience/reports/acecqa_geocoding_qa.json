@@ -1,0 +1,10 @@
+{
+  "total_acecqa_services": 5016,
+  "successfully_matched": 3035,
+  "exact_high_confidence_matches": 3035,
+  "ambiguous_review_matches": 0,
+  "unmatched_addresses": 1981,
+  "sa2_assignment_success": 2176,
+  "records_excluded": 2859,
+  "limitations": "Deterministic G-NAF matches only; unresolved addresses are excluded. Counts measure listed supply, not vacancies, affordability, quality, opening hours or travel time. Not for mailing-list or deliverability use."
+}
