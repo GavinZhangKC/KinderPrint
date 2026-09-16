@@ -705,6 +705,9 @@ def locality_suitability(
         "public_open_space",
         "lower_urban_heat",
         "socioeconomic_resources",
+        "general_practice_access",
+        "hospital_access",
+        "pharmacy_access",
     }
     selected_criteria = [
         item.strip()
