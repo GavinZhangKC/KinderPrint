@@ -1,0 +1,12 @@
+{
+  "source_id": "casey_mch_centres_2026",
+  "records_received": 40,
+  "valid_point_geometries": 40,
+  "unique_name_address_records": 40,
+  "duplicate_name_address_records": 0,
+  "sa2_assignment_success": 40,
+  "sa2_assignment_failed": 0,
+  "coverage_scope": "City of Casey only",
+  "suitability_status": "limited",
+  "limitation": "This source cannot rank Greater Melbourne. It represents one council and does not report service capacity, waiting time, eligibility or quality."
+}
