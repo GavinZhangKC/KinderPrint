@@ -132,6 +132,7 @@ def build_suitability(
             "lower_industrial_emission_source_presence": "lower_industrial_source_presence_score",
             "lower_declared_road_traffic": "lower_declared_road_traffic_score",
             "public_transport_availability": "public_transport_availability_score",
+            "lower_bushfire_prone_share": "lower_bushfire_prone_share_score",
         }
         by_id = supplemental_scores.assign(
             neighbourhood_id=supplemental_scores.neighbourhood_id.astype(str)

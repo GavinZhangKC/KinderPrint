@@ -24,6 +24,7 @@ VALID_CRITERIA = (
     "lower_industrial_emission_source_presence",
     "lower_declared_road_traffic",
     "public_transport_availability",
+    "lower_bushfire_prone_share",
 )
 
 

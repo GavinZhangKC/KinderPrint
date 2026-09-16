@@ -401,6 +401,15 @@ def main() -> int:
                     transport_scores[transport_columns], on="neighbourhood_id", how="outer"
                 )
             )
+        bushfire_scores_path = PROC / "bushfire_suitability.csv"
+        if bushfire_scores_path.is_file():
+            bushfire_scores = pd.read_csv(bushfire_scores_path)
+            bushfire_columns = ["neighbourhood_id", "lower_bushfire_prone_share_score"]
+            service_scores = (
+                bushfire_scores if service_scores is None else service_scores.merge(
+                    bushfire_scores[bushfire_columns], on="neighbourhood_id", how="outer"
+                )
+            )
         suitability_path.write_text(json.dumps(
             B.build_suitability(profiles["profiles"], service_scores), separators=(",", ":")))
         log.info("  %-20s %6.2f MB", suitability_path.name,
