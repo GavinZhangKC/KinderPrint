@@ -7,7 +7,6 @@ import { toNeighbourhood } from '../services/profileAdapter'
 
 interface SimulationPageProps {
   onLogoClick: () => void
-  onBackToMenu: () => void
   onExploreMap: () => void
 }
 
@@ -345,7 +344,6 @@ function buildScenarioResult(
 
 export default function SimulationPage({
   onLogoClick,
-  onBackToMenu,
   onExploreMap,
 }: SimulationPageProps) {
   const [selectedNeighbourhood, setSelectedNeighbourhood] = useState('')
@@ -888,8 +886,7 @@ export default function SimulationPage({
             </div>
 
             <div className="action-row results-actions">
-              <button type="button" className="button button-secondary" onClick={onBackToMenu}>Back to Menu</button>
-              <button type="button" className="button button-primary" onClick={onExploreMap}>Explore Map</button>
+              <button type="button" className="button button-primary" onClick={onExploreMap}>Back to Map</button>
             </div>
           </section>
         </div>

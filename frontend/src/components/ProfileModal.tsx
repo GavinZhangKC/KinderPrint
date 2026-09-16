@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import MetricRing from './MetricRing'
-import { api, type NeighbourhoodExplanation } from '../services/api'
+import { api, type ApiEnvelope, type NeighbourhoodExplanation } from '../services/api'
 import { indicatorStatusLabel } from '../services/profileAdapter'
 import type { IndicatorProvenance, Neighbourhood } from '../types/neighbourhood'
 
@@ -25,27 +25,36 @@ function IndicatorMetaLine({ details }: { details?: IndicatorProvenance }) {
     : null
 }
 
-type ExplanationLoadState = 'idle' | 'loading' | 'ready' | 'missing' | 'error'
+type ExplanationLoadState = 'idle' | 'loading' | 'ready' | 'missing' | 'unavailable'
 
-function PriorityExplanationPopover({ neighbourhoodId }: { neighbourhoodId: string }) {
+function isUserFacingExplanationMessage(message: string) {
+  return !/(environment variable|file path|\.json\b|configured|configuration|backend|KINDERPRINT_)/i.test(message)
+}
+
+function PriorityExplanationPopover({
+  neighbourhoodId,
+  onLoaded,
+}: {
+  neighbourhoodId: string
+  onLoaded: (explanation: NeighbourhoodExplanation) => void
+}) {
   const [isHovered, setIsHovered] = useState(false)
   const [isFocused, setIsFocused] = useState(false)
-  const [isPinned, setIsPinned] = useState(false)
   const [loadState, setLoadState] = useState<ExplanationLoadState>('idle')
-  const [explanation, setExplanation] = useState<NeighbourhoodExplanation | null>(null)
+  const [response, setResponse] = useState<ApiEnvelope<NeighbourhoodExplanation> | null>(null)
   const requestedIdRef = useRef<string | null>(null)
   const requestVersionRef = useRef(0)
-  const isOpen = isHovered || isFocused || isPinned
   const popoverId = `priority-explanation-${neighbourhoodId}`
+  const explanation = response?.data ?? null
+  const isOpen = isHovered || isFocused
 
   useEffect(() => {
     requestVersionRef.current += 1
     requestedIdRef.current = null
     setLoadState('idle')
-    setExplanation(null)
+    setResponse(null)
     setIsHovered(false)
     setIsFocused(false)
-    setIsPinned(false)
   }, [neighbourhoodId])
 
   useEffect(() => () => {
@@ -60,21 +69,28 @@ function PriorityExplanationPopover({ neighbourhoodId }: { neighbourhoodId: stri
     setLoadState('loading')
 
     void api.getExplanation(neighbourhoodId)
-      .then((response) => {
+      .then((nextResponse) => {
         if (requestVersion !== requestVersionRef.current) return
-        if (response.status === 'available' || response.status === 'limited') {
-          setExplanation(response.data)
+        setResponse(nextResponse)
+        if (nextResponse.status === 'available' || nextResponse.status === 'limited') {
           setLoadState('ready')
+          onLoaded(nextResponse.data)
           return
         }
-        setLoadState(response.status === 'missing' ? 'missing' : 'error')
+        setLoadState(nextResponse.status === 'missing' ? 'missing' : 'unavailable')
       })
       .catch(() => {
-        if (requestVersion === requestVersionRef.current) setLoadState('error')
+        if (requestVersion === requestVersionRef.current) setLoadState('unavailable')
       })
   }
 
   const highlightedIds = new Set(explanation?.highlighted_factor_ids ?? [])
+  const limitations = (response?.limitations ?? [])
+    .map((item) => item.message)
+    .filter(isUserFacingExplanationMessage)
+  const notices = (response?.notices ?? [])
+    .map((item) => item.message)
+    .filter(isUserFacingExplanationMessage)
 
   return (
     <div
@@ -95,24 +111,16 @@ function PriorityExplanationPopover({ neighbourhoodId }: { neighbourhoodId: stri
         if (event.key === 'Escape') {
           setIsHovered(false)
           setIsFocused(false)
-          setIsPinned(false)
         }
       }}
     >
       <button
         className="priority-explanation-trigger"
         type="button"
-        aria-label="Why this priority?"
+        aria-label="Why am I seeing this?"
         aria-expanded={isOpen}
         aria-controls={popoverId}
-        onClick={() => {
-          if (window.matchMedia('(hover: none), (pointer: coarse)').matches) {
-            setIsHovered(false)
-            setIsFocused(false)
-          }
-          setIsPinned((open) => !open)
-          loadExplanation()
-        }}
+        data-tooltip="Why am I seeing this?"
       >
         ?
       </button>
@@ -121,38 +129,40 @@ function PriorityExplanationPopover({ neighbourhoodId }: { neighbourhoodId: stri
         className={`glass priority-explanation-popover${isOpen ? ' is-open' : ''}`}
         id={popoverId}
         role="dialog"
-        aria-label="Why this priority?"
+        aria-label="Why am I seeing this?"
         aria-hidden={!isOpen}
       >
-        <strong className="priority-explanation-title">Why this priority?</strong>
+        <strong className="priority-explanation-title">Why am I seeing this?</strong>
 
         {loadState === 'loading' && <span className="priority-explanation-state">Loading…</span>}
-        {loadState === 'missing' && <span className="priority-explanation-state">No explanation is available.</span>}
-        {loadState === 'error' && <span className="priority-explanation-state">Explanation unavailable.</span>}
+        {loadState === 'missing' && <span className="priority-explanation-state">No explanation is available for this locality.</span>}
+        {loadState === 'unavailable' && <span className="priority-explanation-state">This explanation is currently unavailable.</span>}
 
         {loadState === 'ready' && explanation && (
           <>
             <div className="priority-explanation-domains">
-              {explanation.factor_domains.map((domain) => {
-                const factors = domain.factors.filter((factor) => highlightedIds.has(factor.id))
-                return (
-                  <div className="priority-explanation-domain" key={domain.domain}>
-                    <strong>{domain.domain}</strong>
-                    {factors.length > 0 ? (
-                      <ul>
-                        {factors.map((factor) => <li key={factor.id}>{factor.name}</li>)}
-                      </ul>
-                    ) : (
-                      <span className="priority-explanation-empty">No highlighted factors</span>
-                    )}
-                  </div>
-                )
-              })}
+              {explanation.factor_domains.map((domain) => (
+                <div className="priority-explanation-domain" key={domain.domain}>
+                  <strong>{domain.domain}</strong>
+                  {domain.factors.length > 0 && (
+                    <ul>
+                      {domain.factors.map((factor) => (
+                        <li
+                          className={highlightedIds.has(factor.id) ? 'is-highlighted' : undefined}
+                          key={factor.id}
+                        >
+                          {factor.name}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              ))}
             </div>
 
             {explanation.incomplete_inputs.length > 0 && (
               <div className="priority-explanation-note">
-                <strong>Data note</strong>
+                <strong>Data limitations</strong>
                 {explanation.incomplete_inputs.map((item, index) => (
                   <span key={`${item.indicator}-${index}`}>
                     <b>{item.indicator}</b>: {item.reason}
@@ -160,7 +170,15 @@ function PriorityExplanationPopover({ neighbourhoodId }: { neighbourhoodId: stri
                 ))}
               </div>
             )}
+
           </>
+        )}
+
+        {(limitations.length > 0 || notices.length > 0) && (
+          <div className="priority-explanation-messages">
+            {limitations.map((message) => <p key={`limitation-${message}`}>{message}</p>)}
+            {notices.map((message) => <p key={`notice-${message}`}>{message}</p>)}
+          </div>
         )}
       </div>
     </div>
@@ -168,6 +186,20 @@ function PriorityExplanationPopover({ neighbourhoodId }: { neighbourhoodId: stri
 }
 
 export default function ProfileModal({ neighbourhood, onCompare, onExploreData, onClose, onActivate }: ProfileModalProps) {
+  const [loadedExplanation, setLoadedExplanation] = useState<NeighbourhoodExplanation | null>(null)
+
+  useEffect(() => {
+    setLoadedExplanation(null)
+  }, [neighbourhood.id])
+
+  const highlightedIds = new Set(loadedExplanation?.highlighted_factor_ids ?? [])
+  const highlightedFactors = loadedExplanation
+    ? loadedExplanation.factor_domains
+      .flatMap((domain) => domain.factors)
+      .filter((factor) => highlightedIds.has(factor.id))
+      .map((factor) => factor.name)
+    : neighbourhood.highlightedFactors
+
   return (
     <section className="glass profile-modal page-enter" aria-labelledby="profile-title" onPointerDown={onActivate}>
       <button className="icon-close" type="button" onClick={onClose} aria-label="Close profile">×</button>
@@ -179,7 +211,10 @@ export default function ProfileModal({ neighbourhood, onCompare, onExploreData, 
         <div className="priority-inline">
           Priority for Investigation
           <strong>{neighbourhood.priority ?? 'Not available'}</strong>
-          <PriorityExplanationPopover neighbourhoodId={neighbourhood.id} />
+          <PriorityExplanationPopover
+            neighbourhoodId={neighbourhood.id}
+            onLoaded={setLoadedExplanation}
+          />
         </div>
       </div>
 
@@ -209,9 +244,9 @@ export default function ProfileModal({ neighbourhood, onCompare, onExploreData, 
 
       <article className="glass-subtle key-insight-card">
         <h2>Highlighted Factors</h2>
-        {neighbourhood.highlightedFactors.length > 0 ? (
+        {highlightedFactors.length > 0 ? (
           <ul>
-            {neighbourhood.highlightedFactors.map((factor) => <li key={factor}>{factor}</li>)}
+            {highlightedFactors.map((factor) => <li key={factor}>{factor}</li>)}
           </ul>
         ) : (
           <p>No approved highlighted factors are available.</p>

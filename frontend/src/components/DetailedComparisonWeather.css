@@ -1,0 +1,188 @@
+.detailed-background.detailed-comparison-scene {
+  position: relative;
+  z-index: 0;
+  isolation: isolate;
+  min-height: 100vh;
+  overflow: hidden;
+  background: #c7dbe7;
+}
+
+.detailed-comparison-scene[data-state='good'] { background-color: #dcecf3; }
+.detailed-comparison-scene[data-state='medium'] { background-color: #aebfcb; }
+.detailed-comparison-scene[data-state='poor'] { background-color: #526b7c; }
+
+.detailed-comparison-scene > .nav-shell {
+  border: 1px solid rgba(255,255,255,.72);
+  background: rgba(237,245,252,.68);
+  box-shadow: 0 12px 36px rgba(28,55,84,.18), inset 0 1px 0 rgba(255,255,255,.5);
+  backdrop-filter: blur(22px) saturate(118%);
+  -webkit-backdrop-filter: blur(22px) saturate(118%);
+}
+
+.detailed-comparison-scene > .nav-shell .brand-button,
+.detailed-comparison-scene > .nav-shell .nav-links {
+  color: #234d82;
+  text-shadow: 0 1px 9px rgba(255,255,255,.34), 0 0 2px rgba(255,255,255,.22);
+}
+
+.detailed-comparison-scene > .nav-shell .nav-links .active,
+.detailed-comparison-scene > .nav-shell .nav-links button:hover {
+  color: #2c5eaf;
+}
+
+.detailed-comparison-scene > .interactive-atmosphere {
+  background: transparent;
+}
+
+.detailed-comparison-scene > .interactive-atmosphere > :not(.atmosphere-pulse) {
+  display: none;
+}
+
+html:has(.detailed-comparison-scene),
+html:has(.detailed-comparison-scene) body {
+  scrollbar-width: none;
+}
+
+html:has(.detailed-comparison-scene)::-webkit-scrollbar,
+html:has(.detailed-comparison-scene) body::-webkit-scrollbar {
+  display: none;
+}
+
+.weather-background,
+.weather-atmosphere,
+.weather-cloud-layer,
+.rain-glass-layer,
+.weather-vignette {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.weather-background {
+  z-index: -5;
+  inset: -2%;
+  width: 104%;
+  height: 104%;
+  opacity: 0;
+  transform: scale(1.025);
+  background-size: cover;
+  background-repeat: no-repeat;
+  transition: opacity 900ms ease, transform 8s ease;
+}
+
+.weather-background.good {
+  background-position: center 38%;
+  filter: saturate(.72) brightness(1.12) contrast(.9);
+}
+
+.weather-background.medium {
+  background-position: center 42%;
+  filter: saturate(.70) brightness(.93) contrast(.92);
+}
+
+.weather-background.poor {
+  background-position: center 42%;
+  filter: saturate(.62) brightness(.79) contrast(.95);
+}
+
+.detailed-comparison-scene[data-state='good'] .weather-background.good,
+.detailed-comparison-scene[data-state='medium'] .weather-background.medium,
+.detailed-comparison-scene[data-state='poor'] .weather-background.poor {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.weather-atmosphere {
+  z-index: -4;
+  transition: background 900ms ease;
+}
+
+.detailed-comparison-scene[data-state='good'] .weather-atmosphere {
+  background:
+    radial-gradient(ellipse at 72% 10%, rgba(255,250,224,.55), transparent 24%),
+    linear-gradient(180deg, rgba(220,238,248,.14), rgba(179,215,234,.16));
+}
+
+.detailed-comparison-scene[data-state='medium'] .weather-atmosphere {
+  background:
+    linear-gradient(180deg, rgba(212,225,235,.27), rgba(103,137,159,.22)),
+    linear-gradient(90deg, rgba(255,255,255,.08), transparent 45%, rgba(32,66,90,.08));
+}
+
+.detailed-comparison-scene[data-state='poor'] .weather-atmosphere {
+  background:
+    linear-gradient(180deg, rgba(57,86,107,.34), rgba(43,83,106,.25)),
+    radial-gradient(circle at 32% 30%, rgba(196,218,229,.14), transparent 34%);
+}
+
+.weather-cloud-layer {
+  z-index: -3;
+  opacity: 0;
+  overflow: hidden;
+  transition: opacity 900ms ease;
+}
+
+.weather-cloud-layer::before,
+.weather-cloud-layer::after {
+  content: '';
+  position: absolute;
+  width: 72vw;
+  height: 30vw;
+  border-radius: 50%;
+  filter: blur(42px);
+  background:
+    radial-gradient(ellipse at 32% 56%, rgba(238,245,249,.35), transparent 48%),
+    radial-gradient(ellipse at 68% 48%, rgba(182,202,216,.26), transparent 52%);
+  animation: comparison-cloud-drift 34s ease-in-out infinite alternate;
+}
+
+.weather-cloud-layer::before { top: -7vw; left: -12vw; }
+.weather-cloud-layer::after { right: -18vw; top: 22vh; animation-delay: -17s; }
+
+.detailed-comparison-scene[data-state='medium'] .weather-cloud-layer { opacity: .34; }
+.detailed-comparison-scene[data-state='poor'] .weather-cloud-layer { opacity: .28; }
+
+.rain-glass-layer {
+  z-index: -1;
+  opacity: 0;
+  transition: opacity 750ms ease;
+}
+
+.detailed-comparison-scene[data-state='poor'] .rain-glass-layer { opacity: .86; }
+
+.weather-vignette {
+  z-index: 0;
+  background: radial-gradient(ellipse at center, transparent 46%, rgba(26,51,70,.12) 100%);
+  opacity: .48;
+  transition: opacity 900ms ease;
+}
+
+.detailed-comparison-scene[data-state='good'] .weather-vignette { opacity: .22; }
+.detailed-comparison-scene[data-state='poor'] .weather-vignette { opacity: .62; }
+
+.detailed-comparison-scene > .comparison-page { z-index: 2; }
+
+@keyframes comparison-cloud-drift {
+  from { transform: translate3d(-1.5%, 0, 0); }
+  to { transform: translate3d(2.5%, 1%, 0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .weather-background,
+  .weather-atmosphere,
+  .weather-cloud-layer,
+  .weather-vignette {
+    transition: none;
+  }
+
+  .weather-cloud-layer::before,
+  .weather-cloud-layer::after {
+    animation: none;
+  }
+
+  .rain-glass-layer {
+    display: none;
+  }
+}

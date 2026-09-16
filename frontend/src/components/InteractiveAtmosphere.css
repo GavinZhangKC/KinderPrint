@@ -1,0 +1,278 @@
+.interactive-atmosphere {
+  --atmosphere-x: 0;
+  --atmosphere-y: 0;
+  --journey-scroll: 0;
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+  background: #dceef6;
+}
+
+.app-background:has(.interactive-atmosphere) {
+  background: transparent;
+}
+
+.atmosphere-sky {
+  position: absolute;
+  inset: -5%;
+  background: linear-gradient(180deg, #8dbfe0 0%, #cde7ef 48%, #e4f1f3 100%);
+  transform: translate(calc(var(--atmosphere-x) * -9px), calc(var(--atmosphere-y) * -7px));
+}
+
+.atmosphere-sun {
+  position: absolute;
+  top: calc(-23vw + (var(--journey-scroll) * 9vh));
+  right: -12vw;
+  width: 56vw;
+  height: 56vw;
+  border-radius: 50%;
+  background: radial-gradient(circle, #fffde9 0 5%, #fff4c98c 14%, #fff0c42b 34%, transparent 66%);
+  transform: translate(calc(var(--atmosphere-x) * 22px), calc(var(--atmosphere-y) * 15px));
+}
+
+.atmosphere-cloud {
+  position: absolute;
+  width: 70vw;
+  height: 30vw;
+  opacity: .27;
+  filter: blur(3px);
+  background: url('/insight-clouds.svg') center / contain no-repeat;
+  animation: atmosphere-drift 34s ease-in-out infinite alternate;
+}
+
+.atmosphere-cloud-a {
+  top: calc(-5vw + (var(--journey-scroll) * -5vh));
+  left: -20vw;
+  transform: translate(calc(var(--atmosphere-x) * -30px), calc(var(--atmosphere-y) * -15px));
+}
+
+.atmosphere-cloud-b {
+  top: calc(14vh + (var(--journey-scroll) * 6vh));
+  right: -24vw;
+  opacity: .16;
+  animation-delay: -14s;
+  animation-duration: 42s;
+  transform: scaleX(-1) translate(calc(var(--atmosphere-x) * 20px), calc(var(--atmosphere-y) * 11px));
+}
+
+.atmosphere-land {
+  position: absolute;
+  right: -4%;
+  bottom: -4%;
+  left: -4%;
+  transform-origin: center bottom;
+}
+
+.atmosphere-land-back {
+  height: 42vh;
+  opacity: .38;
+  background: url('/insight-landscape.svg') center bottom / cover no-repeat;
+  filter: saturate(.85) hue-rotate(-4deg);
+  transform: translate(calc(var(--atmosphere-x) * -12px), calc(var(--atmosphere-y) * -5px)) scale(calc(1.06 + (var(--journey-scroll) * .03)));
+}
+
+.atmosphere-land-front {
+  height: 22vh;
+  opacity: .2;
+  background: linear-gradient(165deg, transparent 25%, #5f9ca6 26% 48%, #447b82 49%);
+  clip-path: polygon(0 55%, 14% 31%, 30% 52%, 45% 25%, 63% 52%, 79% 19%, 100% 48%, 100% 100%, 0 100%);
+  transform: translate(calc(var(--atmosphere-x) * -24px), calc(var(--atmosphere-y) * -9px)) scale(1.05);
+}
+
+.atmosphere-grain {
+  position: absolute;
+  inset: 0;
+  opacity: .035;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.5'/%3E%3C/svg%3E");
+}
+
+.interactive-atmosphere[data-mode='compare'] .atmosphere-sky {
+  background: linear-gradient(180deg, #93b9d8, #d5e6ee 48%, #e8f0ef);
+}
+
+.interactive-atmosphere[data-mode='compare'] .atmosphere-sun {
+  right: auto;
+  left: -8vw;
+  opacity: .7;
+}
+
+.atmosphere-progress {
+  position: fixed;
+  z-index: 8;
+  top: 0;
+  left: 0;
+  width: calc(var(--journey-scroll) * 100%);
+  height: 3px;
+  background: linear-gradient(90deg, #6d78e8, #62c8dc, #f5d79d);
+  box-shadow: 0 0 16px rgba(98, 200, 220, .7);
+}
+
+.atmosphere-aurora {
+  position: absolute;
+  width: 60vw;
+  aspect-ratio: 1.8;
+  border-radius: 50%;
+  filter: blur(70px);
+  mix-blend-mode: soft-light;
+  opacity: .28;
+  animation: atmosphere-breathe 9s ease-in-out infinite alternate;
+}
+
+.atmosphere-aurora-a {
+  top: 3vh;
+  left: -18vw;
+  background: #8f8cff;
+  transform: translateX(calc(var(--atmosphere-x) * 38px)) rotate(-12deg);
+}
+
+.atmosphere-aurora-b {
+  top: 28vh;
+  right: -21vw;
+  background: #7ce0d6;
+  animation-delay: -4s;
+  transform: translateX(calc(var(--atmosphere-x) * -45px)) rotate(18deg);
+}
+
+.atmosphere-pointer-light {
+  position: absolute;
+  top: calc(50% + (var(--atmosphere-y) * 70%));
+  left: calc(50% + (var(--atmosphere-x) * 70%));
+  width: 42vw;
+  height: 42vw;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 255, 255, .3), rgba(155, 220, 235, .1) 35%, transparent 68%);
+  transform: translate(-50%, -50%);
+  mix-blend-mode: screen;
+}
+
+.atmosphere-caption {
+  position: fixed;
+  z-index: 7;
+  right: 22px;
+  bottom: 14px;
+  color: rgba(39, 73, 107, .48);
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  writing-mode: vertical-rl;
+}
+
+.atmosphere-pulse {
+  position: fixed;
+  width: 16px;
+  height: 16px;
+  margin: -8px;
+  border: 1px solid rgba(74, 127, 199, .46);
+  border-radius: 50%;
+  animation: atmosphere-pulse .75s cubic-bezier(.2, .7, .2, 1) forwards;
+}
+
+.app-background:has(.interactive-atmosphere) :is(
+  .profile-domain-card,
+  .key-insight-card,
+  .summary-card,
+  .environmental-compare-card,
+  .next-step-card
+) {
+  --surface-x: 0;
+  --surface-y: 0;
+  transform: perspective(900px) rotateX(calc(var(--surface-y) * -3deg)) rotateY(calc(var(--surface-x) * 3deg));
+  transition: transform .22s ease, box-shadow .22s ease;
+  transform-style: preserve-3d;
+}
+
+.app-background:has(.interactive-atmosphere) :is(
+  .profile-domain-card,
+  .key-insight-card,
+  .summary-card,
+  .environmental-compare-card,
+  .next-step-card
+):hover {
+  box-shadow: 0 20px 45px rgba(51, 82, 140, .16);
+}
+
+.app-background:has(.interactive-atmosphere) :is(
+  .profile-domain-card,
+  .key-insight-card,
+  .summary-card,
+  .environmental-compare-card,
+  .next-step-card
+) > * {
+  transform: translateZ(8px);
+}
+
+.app-background:has(.interactive-atmosphere) :is(
+  .button,
+  .nav-links button,
+  .brand-button,
+  .icon-close,
+  .suitability-result-button
+) {
+  --magnetic-x: 0;
+  --magnetic-y: 0;
+  transform: translate(var(--magnetic-x), var(--magnetic-y));
+  transition: transform .18s ease, box-shadow .2s ease, background .2s ease;
+}
+
+.app-background:has(.interactive-atmosphere) .nav-shell {
+  animation: journey-ui-drop .65s cubic-bezier(.22, 1, .36, 1) both;
+}
+
+.app-background:has(.interactive-atmosphere) .map-surface {
+  animation: journey-ui-rise .8s .08s cubic-bezier(.22, 1, .36, 1) both;
+}
+
+.detailed-background:has(.interactive-atmosphere) .comparison-section {
+  animation: journey-ui-rise .7s cubic-bezier(.22, 1, .36, 1) both;
+}
+
+.detailed-background:has(.interactive-atmosphere) .comparison-section:nth-of-type(2) { animation-delay: .06s; }
+.detailed-background:has(.interactive-atmosphere) .comparison-section:nth-of-type(3) { animation-delay: .12s; }
+.detailed-background:has(.interactive-atmosphere) .comparison-section:nth-of-type(4) { animation-delay: .18s; }
+.detailed-background:has(.interactive-atmosphere) .comparison-section:nth-of-type(5) { animation-delay: .24s; }
+
+@keyframes atmosphere-drift {
+  to { margin-left: 6vw; margin-top: 2vh; }
+}
+
+@keyframes atmosphere-breathe {
+  to { opacity: .42; transform: translateY(3vh) scale(1.08); }
+}
+
+@keyframes atmosphere-pulse {
+  to { opacity: 0; transform: scale(9); }
+}
+
+@keyframes journey-ui-drop {
+  from { opacity: 0; transform: translateY(-22px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes journey-ui-rise {
+  from { opacity: 0; transform: translateY(28px) scale(.985); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@media (max-width: 700px) {
+  .atmosphere-caption { display: none; }
+  .atmosphere-pointer-light { width: 80vw; height: 80vw; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .atmosphere-cloud,
+  .atmosphere-aurora,
+  .app-background:has(.interactive-atmosphere) .nav-shell,
+  .app-background:has(.interactive-atmosphere) .map-surface,
+  .detailed-background:has(.interactive-atmosphere) .comparison-section {
+    animation: none;
+  }
+
+  .interactive-atmosphere * {
+    transform: none !important;
+  }
+
+  .atmosphere-pulse { display: none; }
+}

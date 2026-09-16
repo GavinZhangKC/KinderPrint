@@ -139,7 +139,6 @@ export default function WaterRippleBackground() {
 
     const $background = $(background)
     const homepage = background.parentElement?.querySelector('.home-page')
-    const firstWhiteSection = homepage?.querySelector('.home-insight')
     let initialized = false
     let lastDropAt = 0
     let lastX: number | null = null
@@ -174,7 +173,6 @@ export default function WaterRippleBackground() {
       const target = event.target
       if (!(target instanceof Element)) return
       if (!target.closest('[data-ripple-surface]') || target.closest(EXCLUDED_ELEMENTS)) return
-      if (homepage && target.closest('.home-hero')) return
 
       const now = performance.now()
       const distance = lastX === null || lastY === null
@@ -199,14 +197,6 @@ export default function WaterRippleBackground() {
 
     const handleResize = () => {
       if (initialized) $background.ripples('updateSize')
-      updateHomepageClip()
-    }
-
-    const updateHomepageClip = () => {
-      if (!firstWhiteSection) return
-      const sectionTop = firstWhiteSection.getBoundingClientRect().top
-      const visibleTop = Math.min(window.innerHeight, Math.max(0, sectionTop))
-      background.style.setProperty('--mouse-ripple-top', `${visibleTop}px`)
     }
 
     const handleVisibilityChange = () => {
@@ -215,14 +205,11 @@ export default function WaterRippleBackground() {
     }
 
     window.addEventListener('pointermove', handlePointerMove, { passive: true })
-    window.addEventListener('scroll', updateHomepageClip, { passive: true })
     window.addEventListener('resize', handleResize)
     document.addEventListener('visibilitychange', handleVisibilityChange)
-    updateHomepageClip()
 
     return () => {
       window.removeEventListener('pointermove', handlePointerMove)
-      window.removeEventListener('scroll', updateHomepageClip)
       window.removeEventListener('resize', handleResize)
       document.removeEventListener('visibilitychange', handleVisibilityChange)
       if (initialized) $background.ripples('destroy')

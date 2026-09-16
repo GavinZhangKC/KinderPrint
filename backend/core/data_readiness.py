@@ -10,7 +10,7 @@ from loaders.geocoding_quality import load_geocoding_quality
 from loaders.population import load_population_projections
 from validation import (
     load_comparison_data, load_environmental_differences, load_explanations,
-    load_outcome_comparisons, load_priority_results, load_profiles,
+    load_outcome_comparisons, load_pattern_insights, load_priority_results, load_profiles,
     load_suitability_rankings, profile_boundary_limitations,
 )
 
@@ -45,6 +45,7 @@ def runtime_data_readiness() -> list[dict[str, Any]]:
     early_childhood, early_childhood_limitations = load_early_childhood_context()
     outcome_comparisons, _, outcome_limitations = load_outcome_comparisons()
     environmental, _, environmental_limitations = load_environmental_differences()
+    pattern_insights, _, pattern_insight_limitations = load_pattern_insights()
     community_context, community_context_limitations = load_community_context()
     priorities, _, priority_limitations = load_priority_results()
     explanations, _, explanation_limitations = load_explanations()
@@ -67,6 +68,8 @@ def runtime_data_readiness() -> list[dict[str, Any]]:
         _check("harmonised_environmental_differences", environmental,
                environmental_limitations,
                len(environmental) if environmental is not None else None),
+        _check("pattern_insights", pattern_insights, pattern_insight_limitations,
+               len(pattern_insights) if pattern_insights is not None else None),
         _check("declared_road_and_industrial_context", community_context,
                community_context_limitations,
                len(community_context) if community_context is not None else None),

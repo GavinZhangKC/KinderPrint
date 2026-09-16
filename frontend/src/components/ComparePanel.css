@@ -15,6 +15,8 @@
 .selected-neighbourhood-row { height: 62px; border-radius: 16px; padding: 0 16px; display: flex; align-items: center; justify-content: space-between; }
 .selected-neighbourhood-row strong { font-size: 14px; }
 .selected-pill { border-radius: 999px; background: #e9edff; color: #5367b8; padding: 8px 16px; font-size: 10px; font-weight: 700; }
+.selected-remove { border: 0; cursor: pointer; }
+.selected-remove:hover { background: #dfe5ff; }
 .compare-search-wrap { height: 58px; border-radius: 16px; background: rgba(255,255,255,.60); border: 1px solid rgba(255,255,255,.80); display: flex; align-items: center; padding: 0 14px; box-shadow: 0 10px 24px rgba(51,82,140,.08); }
 .compare-search-wrap input { flex: 1; min-width: 0; border: 0; background: transparent; outline: 0; }
 .search-glyph { font-size: 22px; color: #667ca5; }
@@ -30,6 +32,7 @@
 .similar-row.is-picked { outline: 2px solid rgba(109,120,232,.42); }
 .similar-row-content { min-width: 0; flex: 1; display: grid; gap: 7px; }.similar-row strong { font-size: 12px; }.similar-row small { color: var(--muted); font-size: 10px; }
 .similar-row button { flex: 0 0 auto; width: 76px; height: 32px; margin-top: 2px; border-radius: 999px; border: 1px solid rgba(109,120,232,.25); background: rgba(233,237,255,.72); color: #5367b8; font-size: 10px; font-weight: 700; cursor: pointer; }
+.similar-row button:disabled { cursor: not-allowed; opacity: .45; }
 .comparable-detail, .comparable-basis { color: var(--muted); font-size: 10px; line-height: 1.4; }
 .comparable-detail { display: grid; gap: 2px; }
 .comparable-detail > span { color: #617494; font-weight: 700; }
@@ -51,6 +54,7 @@
 .select-map-card:hover { transform: translateY(-2px); border-color: rgba(109,120,232,.55); box-shadow: 0 10px 24px rgba(57,76,137,.12); }
 .select-map-card:focus-visible { outline: 3px solid rgba(83,103,184,.28); outline-offset: 2px; }
 .select-map-card.is-active { border-color: #6d78e8; background: rgba(233,237,255,.92); box-shadow: 0 0 0 3px rgba(109,120,232,.12); }
+.select-map-card:disabled { cursor: not-allowed; opacity: .58; transform: none; box-shadow: none; }
 .select-map-card strong { display: block; font-size: 13px; }.select-map-card p { margin: 5px 0 0; color: var(--muted); font-size: 10px; line-height: 1.5; }
 .map-selection-banner { position: absolute; z-index: 24; top: 112px; left: 50%; transform: translateX(-50%); min-width: 390px; padding: 13px 16px; border-radius: 16px; display: flex; align-items: center; justify-content: space-between; gap: 24px; background: rgba(255,255,255,.9); }
 .map-selection-banner div { display: grid; gap: 3px; }

@@ -5,11 +5,11 @@ import type { Neighbourhood } from '../types/neighbourhood'
 
 interface ComparePanelProps {
   source: Neighbourhood
-  comparison: Neighbourhood | null
+  comparisons: Neighbourhood[]
   onSelectResult: (result: NeighbourhoodSearchResult) => Promise<void>
   mapSelectionEnabled: boolean
   onToggleMapSelection: () => void
-  onClearComparison: () => void
+  onDeselectResult: (id: string) => void
   onBack: () => void
   onCompare: () => Promise<void>
   compareLoading: boolean
@@ -23,7 +23,7 @@ interface ComparableState {
   limitations: string[]
 }
 
-export default function ComparePanel({ source, comparison, onSelectResult, mapSelectionEnabled, onToggleMapSelection, onClearComparison, onBack, onCompare, compareLoading, compareError }: ComparePanelProps) {
+export default function ComparePanel({ source, comparisons, onSelectResult, mapSelectionEnabled, onToggleMapSelection, onDeselectResult, onBack, onCompare, compareLoading, compareError }: ComparePanelProps) {
   const [query, setQuery] = useState('')
   const [searchResults, setSearchResults] = useState<NeighbourhoodSearchResult[]>([])
   const [searchLoading, setSearchLoading] = useState(false)
@@ -38,11 +38,13 @@ export default function ComparePanel({ source, comparison, onSelectResult, mapSe
   const currentComparable = comparable.sourceId === source.id
     ? comparable
     : { sourceId: source.id, status: 'loading' as const, match: null, limitations: [] }
+  const selectedIds = new Set([source.id, ...comparisons.map((item) => item.id)])
+  const maximumReached = comparisons.length >= 3
 
   useEffect(() => {
     const requestNumber = ++searchRequestNumberRef.current
     const normalized = query.trim()
-    if (!normalized || comparison) {
+    if (!normalized || maximumReached) {
       setSearchResults([])
       setSearchLoading(false)
       setSearchError(null)
@@ -56,7 +58,9 @@ export default function ComparePanel({ source, comparison, onSelectResult, mapSe
         const response = await api.searchNeighbourhoods(normalized)
         if (requestNumber !== searchRequestNumberRef.current) return
         setSearchResults(response.status === 'available' || response.status === 'limited'
-          ? response.data.filter((item) => item.id !== source.id).slice(0, 4)
+          ? response.data.filter((item) => (
+              item.id !== source.id && !comparisons.some((selected) => selected.id === item.id)
+            )).slice(0, 4)
           : [])
       } catch (error) {
         if (requestNumber !== searchRequestNumberRef.current) return
@@ -68,7 +72,7 @@ export default function ComparePanel({ source, comparison, onSelectResult, mapSe
       }
     }, 250)
     return () => window.clearTimeout(timer)
-  }, [comparison, query, source.id])
+  }, [comparisons, maximumReached, query, source.id])
 
   useEffect(() => {
     let active = true
@@ -100,7 +104,7 @@ export default function ComparePanel({ source, comparison, onSelectResult, mapSe
   }, [source.id])
 
   async function choose(result: NeighbourhoodSearchResult) {
-    if (result.id === source.id) {
+    if (selectedIds.has(result.id) || maximumReached) {
       return
     }
 
@@ -116,7 +120,7 @@ export default function ComparePanel({ source, comparison, onSelectResult, mapSe
     <aside className="glass compare-panel page-enter" aria-labelledby="compare-panel-title">
       <header className="compare-panel__header">
         <h1 id="compare-panel-title">Compare Neighbourhoods</h1>
-        <p className="compare-intro">Keep {source.name} as your starting point, then search for or choose a recommended second neighbourhood.</p>
+        <p className="compare-intro">Keep {source.name} as your starting point, then select up to three more neighbourhoods.</p>
       </header>
 
       <div className="compare-panel-scroll compare-panel__body">
@@ -126,24 +130,40 @@ export default function ComparePanel({ source, comparison, onSelectResult, mapSe
           <span className="selected-pill">Selected</span>
         </div>
 
-        <label className="panel-label" htmlFor="compare-search">NEIGHBOURHOOD 2</label>
-        <div className="compare-search-wrap">
+        {comparisons.map((item, index) => (
+          <div key={item.id}>
+            <label className="panel-label">NEIGHBOURHOOD {index + 2}</label>
+            <div className="glass-subtle selected-neighbourhood-row">
+              <strong>{item.name}</strong>
+              <button
+                className="selected-pill selected-remove"
+                type="button"
+                aria-label={`Remove ${item.name} from comparison`}
+                onClick={() => onDeselectResult(item.id)}
+              >
+                Remove
+              </button>
+            </div>
+          </div>
+        ))}
+
+        {!maximumReached && <label className="panel-label" htmlFor="compare-search">ADD NEIGHBOURHOOD {comparisons.length + 2}</label>}
+        {!maximumReached && <div className="compare-search-wrap">
           <input
             id="compare-search"
             type="search"
-            value={comparison ? comparison.name : query}
+            value={query}
             placeholder="Search a neighbourhood"
             onChange={(event) => {
               searchRequestNumberRef.current += 1
-              onClearComparison()
               setQuery(event.target.value)
               setSearchLoading(false)
               setSearchError(null)
             }}
           />
           <span className="search-glyph" aria-hidden="true">⌕</span>
-        </div>
-        {query && !comparison && (
+        </div>}
+        {query && !maximumReached && (
           <div className="search-popover glass-subtle">
             {searchLoading ? <span>Searching...</span> : searchError ? <span className="search-error" role="alert">{searchError}</span> : searchResults.length ? searchResults.map((item) => (
               <button type="button" key={item.id} onClick={() => { void choose(item) }}>{item.name}</button>
@@ -160,14 +180,17 @@ export default function ComparePanel({ source, comparison, onSelectResult, mapSe
         <button
           className={`glass-subtle select-map-card ${mapSelectionEnabled ? 'is-active' : ''}`}
           type="button"
+          disabled={maximumReached}
           aria-pressed={mapSelectionEnabled}
           onClick={onToggleMapSelection}
         >
           <strong>{mapSelectionEnabled ? 'Selecting on the map…' : 'Select directly on the map'}</strong>
           <p>
-            {mapSelectionEnabled
-              ? 'Click a neighbourhood on the map, or click here to cancel.'
-              : 'Click here first to enable neighbourhood selection on the map.'}
+            {maximumReached
+              ? 'Four localities are already selected.'
+              : mapSelectionEnabled
+                ? 'Click a neighbourhood on the map, or click here to cancel.'
+                : 'Click here first to enable neighbourhood selection on the map.'}
           </p>
         </button>
 
@@ -177,7 +200,7 @@ export default function ComparePanel({ source, comparison, onSelectResult, mapSe
             <div>
               <p>Suggested areas with similar social and demographic characteristics.</p>
               <div className="similar-list">
-                <article className={`glass-subtle similar-row ${comparison?.id === currentComparable.match.matched_neighbourhood.id ? 'is-picked' : ''}`}>
+                <article className={`glass-subtle similar-row ${selectedIds.has(currentComparable.match.matched_neighbourhood.id) ? 'is-picked' : ''}`}>
                   <div className="similar-row-content">
                     <strong>{currentComparable.match.matched_neighbourhood.name}</strong>
                     <div className="comparable-detail">
@@ -201,15 +224,16 @@ export default function ComparePanel({ source, comparison, onSelectResult, mapSe
                   </div>
                   <button
                     type="button"
+                    disabled={maximumReached && !selectedIds.has(currentComparable.match.matched_neighbourhood.id)}
                     onClick={() => {
-                      if (comparison?.id === currentComparable.match!.matched_neighbourhood!.id) {
-                        onClearComparison()
+                      if (selectedIds.has(currentComparable.match!.matched_neighbourhood!.id)) {
+                        onDeselectResult(currentComparable.match!.matched_neighbourhood!.id)
                       } else {
                         void choose(currentComparable.match!.matched_neighbourhood!)
                       }
                     }}
                   >
-                    {comparison?.id === currentComparable.match.matched_neighbourhood.id ? 'Selected' : 'Select'}
+                    {selectedIds.has(currentComparable.match.matched_neighbourhood.id) ? 'Selected' : 'Select'}
                   </button>
                 </article>
               </div>
@@ -236,10 +260,13 @@ export default function ComparePanel({ source, comparison, onSelectResult, mapSe
       <footer className="compare-panel__footer">
         <div className="compare-actions">
           <button className="button secondary" type="button" onClick={onBack}>Back to Profile</button>
-          <button className="button primary" type="button" disabled={!comparison || compareLoading} onClick={() => { void onCompare() }}>{compareLoading ? 'Comparing...' : 'Compare'}</button>
+          <button className="button primary" type="button" disabled={comparisons.length === 0 || compareLoading} onClick={() => { void onCompare() }}>{compareLoading ? 'Comparing...' : 'Compare'}</button>
         </div>
         {compareError && <div className="selection-hint" role="alert">{compareError}</div>}
-        {!comparison && <div className="selection-hint">Select a second neighbourhood to continue.</div>}
+        {comparisons.length === 0 && <div className="selection-hint">Select a second neighbourhood to continue.</div>}
+        {comparisons.length > 0 && !compareError && (
+          <div className="selection-hint">{comparisons.length + 1} of 4 localities selected.</div>
+        )}
       </footer>
     </aside>
   )

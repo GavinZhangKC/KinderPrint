@@ -6,9 +6,10 @@ interface AboutUsPageProps {
   onHome: () => void
   onInsight: () => void
   onMap: () => void
+  onSimulation: () => void
 }
 
-export default function AboutUsPage({ onHome, onInsight, onMap }: AboutUsPageProps) {
+export default function AboutUsPage({ onHome, onInsight, onMap, onSimulation }: AboutUsPageProps) {
   return (
     <section className="about-us-page" id="about-us" aria-labelledby="about-us-title">
       <BrandHeader
@@ -16,6 +17,7 @@ export default function AboutUsPage({ onHome, onInsight, onMap }: AboutUsPagePro
         onHome={onHome}
         onInsight={onInsight}
         onMap={onMap}
+        onSimulation={onSimulation}
         onAboutUs={() => document.getElementById('about-us')?.scrollIntoView({ behavior: 'smooth' })}
       />
       <article className="glass about-us-panel">
@@ -24,10 +26,10 @@ export default function AboutUsPage({ onHome, onInsight, onMap }: AboutUsPagePro
         </div>
 
         <div className="about-us-content">
-          <p className="about-us-kicker">About KinderPrint</p>
+          <p className="about-us-kicker">About Vkinder</p>
           <h2 id="about-us-title">Evidence for thoughtful local exploration.</h2>
           <p>
-            KinderPrint brings together neighbourhood-level child development, social and
+            Vkinder brings together neighbourhood-level child development, social and
             environmental evidence to help users explore local conditions and identify areas
             for further investigation.
           </p>
