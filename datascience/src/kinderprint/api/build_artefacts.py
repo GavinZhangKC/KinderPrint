@@ -119,15 +119,36 @@ def build_profiles(d: pd.DataFrame) -> dict:
     return {"profiles": profiles}
 
 
-def build_suitability(profiles: list[dict]) -> dict:
+def build_suitability(
+    profiles: list[dict], supplemental_scores: pd.DataFrame | None = None
+) -> dict:
     """Build the provisional locality-suitability output outside the backend."""
+    localities = build_criterion_scores(profiles)
+    if supplemental_scores is not None:
+        score_columns = {
+            "general_practice_access": "general_practice_access_score",
+            "hospital_access": "hospital_access_score",
+            "pharmacy_access": "pharmacy_access_score",
+        }
+        by_id = supplemental_scores.assign(
+            neighbourhood_id=supplemental_scores.neighbourhood_id.astype(str)
+        ).set_index("neighbourhood_id")
+        for locality in localities:
+            if locality["id"] not in by_id.index:
+                continue
+            row = by_id.loc[locality["id"]]
+            for criterion, column in score_columns.items():
+                locality["scores"][criterion] = _num(row[column])
     return {
-        "localities": build_criterion_scores(profiles),
+        "localities": localities,
         "metadata": {
             "source": "Approved profile dataset",
             "reference_year": "2024",
             "geographic_unit": GEO_UNIT,
-            "data_quality": "Provisional Iteration 2 locality-suitability prototype.",
+            "data_quality": (
+                "AEDC, environment, socioeconomic and HealthDirect facility-availability "
+                "measures. Facility scores are population-adjusted Greater Melbourne percentiles."
+            ),
         },
     }
 

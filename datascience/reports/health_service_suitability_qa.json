@@ -1,0 +1,17 @@
+{
+  "source_id": "ga_healthdirect_facilities_2025",
+  "reporting_localities": 342,
+  "localities_with_valid_population_denominator": 342,
+  "category_totals": {
+    "general_practice": 1543,
+    "hospital": 82,
+    "pharmacy": 943
+  },
+  "score_method": "Greater Melbourne percentile rank of listed facilities per 10,000 residents",
+  "missing_scores": {
+    "general_practice": 0,
+    "hospital": 0,
+    "pharmacy": 0
+  },
+  "limitation": "Rates use resident population as a transparent denominator. They do not measure facility capacity, child eligibility, opening hours, affordability, waiting time, cross-boundary travel access or quality. A zero means no listed facility is located inside the reporting locality, not that residents cannot reach a service elsewhere."
+}

@@ -8,6 +8,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
 from kinderprint.analytics.suitability import build_criterion_scores, rank_profiles
+from kinderprint.api.build_artefacts import build_suitability
 
 
 def _indicator(identifier, value):
@@ -86,3 +87,21 @@ def test_development_dimensions_remain_separate():
 
     assert on_track["score"] == 80.0
     assert lower_vulnerability["score"] == 90.0
+
+
+def test_supplemental_facility_scores_are_added_without_estimation():
+    import pandas as pd
+
+    profile = _profile("area", 80, 10, 9, 40, 18, 70)
+    supplemental = pd.DataFrame([{
+        "neighbourhood_id": "area",
+        "general_practice_access_score": 75,
+        "hospital_access_score": 25,
+        "pharmacy_access_score": 50,
+    }])
+
+    result = build_suitability([profile], supplemental)["localities"][0]["scores"]
+
+    assert result["general_practice_access"] == 75.0
+    assert result["hospital_access"] == 25.0
+    assert result["pharmacy_access"] == 50.0

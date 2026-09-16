@@ -1,0 +1,343 @@
+community_id,neighbourhood_id,community_name,population,general_practice_count,hospital_count,pharmacy_count,general_practice_per_10000,general_practice_access_score,hospital_per_10000,hospital_access_score,pharmacy_per_10000,pharmacy_access_score,source_id,interpretation
+MEL0001,206011106,Brunswick East,12738,3,0,3,2.3552,38.3,0.0,0.0,2.3552,68.71,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0002,206011107,Brunswick West,14318,4,0,4,2.7937,48.83,0.0,0.0,2.7937,78.07,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0003,206011109,Pascoe Vale South,10390,2,0,2,1.9249,26.61,0.0,0.0,1.9249,57.89,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0004,206011495,Brunswick - North,12890,7,1,2,5.4306,87.13,0.7758,92.69,1.5516,42.98,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0005,206011496,Brunswick - South,12983,8,0,6,6.1619,92.98,0.0,0.0,4.6214,93.57,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0006,206011497,Coburg - East,12535,7,0,8,5.5844,88.6,0.0,0.0,6.3821,98.83,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0007,206011498,Coburg - West,14031,2,1,1,1.4254,16.96,0.7127,92.11,0.7127,18.42,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0008,206021110,Alphington - Fairfield,8994,3,0,5,3.3356,60.53,0.0,0.0,5.5593,97.37,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0009,206021112,Thornbury,18919,6,0,5,3.1714,57.6,0.0,0.0,2.6428,76.61,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0010,206021499,Northcote - East,15068,6,0,3,3.9819,73.1,0.0,0.0,1.991,59.94,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0011,206021500,Northcote - West,10299,5,0,2,4.8548,84.5,0.0,0.0,1.9419,58.48,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0012,206031113,Ascot Vale,15191,4,0,3,2.6331,45.32,0.0,0.0,1.9749,59.36,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0013,206031115,Flemington,9065,5,0,2,5.5157,88.01,0.0,0.0,2.2063,66.37,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0014,206031116,Moonee Ponds,16224,9,0,7,5.5473,88.3,0.0,0.0,4.3146,92.4,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0015,206031501,Essendon (West) - Aberfeldie,16042,2,0,3,1.2467,14.04,0.0,0.0,1.8701,56.14,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0016,206031502,Essendon - East,12191,8,0,4,6.5622,94.74,0.0,0.0,3.2811,85.96,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0017,206041117,Carlton,16655,5,0,4,3.0021,53.51,0.0,0.0,2.4017,70.18,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0018,206041118,Docklands,15493,2,0,4,1.2909,14.91,0.0,0.0,2.5818,74.56,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0021,206041121,Kensington (Vic.),10745,4,0,1,3.7227,67.84,0.0,0.0,0.9307,25.73,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0022,206041124,Parkville,7297,5,4,4,6.8521,95.91,5.4817,100.0,5.4817,97.08,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0023,206041125,South Yarra - West,6423,3,1,5,4.6707,82.75,1.5569,97.08,7.7845,99.71,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0025,206041503,Melbourne CBD - East,9848,12,0,12,12.1852,99.42,0.0,0.0,12.1852,100.0,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0026,206041504,Melbourne CBD - North,16870,4,0,6,2.3711,38.6,0.0,0.0,3.5566,87.13,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0027,206041505,Melbourne CBD - West,15648,7,0,4,4.4734,80.7,0.0,0.0,2.5562,73.98,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0028,206041506,North Melbourne,15637,6,0,5,3.8371,70.47,0.0,0.0,3.1975,84.21,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0030,206041508,Southbank (West) - South Wharf,6463,2,0,2,3.0945,56.43,0.0,0.0,3.0945,82.75,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0031,206041509,Southbank - East,16101,2,0,1,1.2422,13.74,0.0,0.0,0.6211,15.79,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0032,206041510,West Melbourne - Residential,7446,1,0,0,1.343,15.79,0.0,0.0,0.0,0.0,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0033,206051128,Albert Park,15825,5,0,3,3.1596,57.02,0.0,0.0,1.8957,57.02,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0034,206051129,Elwood,14818,3,0,3,2.0246,29.24,0.0,0.0,2.0246,61.4,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0035,206051130_206051511,Port Melbourne/Port Melbourne Industrial,18099,7,0,3,3.8676,71.05,0.0,0.0,1.6576,47.37,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0036,206051134,St Kilda East,15813,5,0,4,3.162,57.31,0.0,0.0,2.5296,72.51,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0037,206051512,South Melbourne,11693,9,0,4,7.6969,97.37,0.0,0.0,3.4209,86.55,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0038,206051513,St Kilda - Central,11857,4,0,1,3.3735,61.7,0.0,0.0,0.8434,23.39,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0039,206051514,St Kilda - West,13858,6,0,5,4.3296,78.36,0.0,0.0,3.608,87.72,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0040,206061135,Armadale,9336,3,0,3,3.2134,58.19,0.0,0.0,3.2134,85.09,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0041,206061136,Prahran - Windsor,19119,11,2,6,5.7534,90.35,1.0461,95.61,3.1382,83.33,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0042,206061138,Toorak,12953,4,0,4,3.0881,55.85,0.0,0.0,3.0881,82.46,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0043,206061515,South Yarra - North,11192,3,0,5,2.6805,46.78,0.0,0.0,4.4675,93.27,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0044,206061516,South Yarra - South,9939,4,0,4,4.0245,74.56,0.0,0.0,4.0245,91.52,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0045,206071139,Abbotsford,9088,4,0,1,4.4014,79.53,0.0,0.0,1.1004,32.46,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0046,206071140,Carlton North - Princes Hill,8186,5,0,2,6.108,92.25,0.0,0.0,2.4432,70.76,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0047,206071141,Collingwood,9179,7,0,5,7.6261,97.08,0.0,0.0,5.4472,96.78,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0048,206071142,Fitzroy,10431,4,1,5,3.8347,70.18,0.9587,94.44,4.7934,95.03,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0049,206071143,Fitzroy North,12781,10,0,2,7.8241,97.66,0.0,0.0,1.5648,43.57,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0050,206071145,Clifton Hill - Alphington,9855,3,0,1,3.0441,54.09,0.0,0.0,1.0147,29.24,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0051,206071517,Richmond (South) - Cremorne,17671,6,0,3,3.3954,61.99,0.0,0.0,1.6977,50.0,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0052,206071518,Richmond - North,13867,8,3,6,5.7691,90.64,2.1634,97.95,4.3268,92.69,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0053,207011146,Ashburton (Vic.),7952,5,0,4,6.2877,93.57,0.0,0.0,5.0302,95.91,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0054,207011147,Balwyn,16163,7,0,6,4.3309,78.8,0.0,0.0,3.7122,88.6,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0055,207011148,Balwyn North,21123,6,0,6,2.8405,50.0,0.0,0.0,2.8405,79.24,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0056,207011149,Camberwell,21232,9,0,5,4.2389,76.61,0.0,0.0,2.3549,68.42,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0057,207011150,Glen Iris - East,16829,3,1,2,1.7826,23.98,0.5942,89.18,1.1884,34.8,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0058,207011152,Hawthorn East,15684,7,0,4,4.4631,80.12,0.0,0.0,2.5504,73.39,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0059,207011154,Kew East,6482,3,0,1,4.6282,82.16,0.0,0.0,1.5427,42.69,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0060,207011155,Surrey Hills (West) - Canterbury,15944,4,1,3,2.5088,42.11,0.6272,90.35,1.8816,56.73,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0061,207011519,Hawthorn - North,9890,5,1,4,5.0556,85.96,1.0111,95.32,4.0445,91.81,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0062,207011520,Hawthorn - South,11957,6,0,2,5.018,85.38,0.0,0.0,1.6727,48.83,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0063,207011521,Kew - South,11601,1,0,0,0.862,9.06,0.0,0.0,0.0,0.0,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0064,207011522,Kew - West,13039,3,3,2,2.3008,37.43,2.3008,98.54,1.5339,42.4,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0065,207021156,Bulleen,11289,4,0,2,3.5433,64.62,0.0,0.0,1.7716,52.34,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0066,207021157,Doncaster,24814,8,0,3,3.224,58.77,0.0,0.0,1.209,35.96,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0067,207021159,Templestowe,16966,5,0,1,2.9471,51.75,0.0,0.0,0.5894,14.62,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0068,207021160,Templestowe Lower,14191,5,0,2,3.5234,63.74,0.0,0.0,1.4093,39.18,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0069,207021424,Doncaster East - North,15672,7,0,3,4.4666,80.41,0.0,0.0,1.9142,57.6,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0070,207021425,Doncaster East - South,15454,5,1,4,3.2354,59.06,0.6471,90.94,2.5883,75.15,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0071,207031161,Blackburn,22106,8,0,4,3.6189,65.79,0.0,0.0,1.8095,54.39,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0072,207031162,Blackburn South,10939,1,0,0,0.9142,9.36,0.0,0.0,0.0,0.0,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0073,207031163,Box Hill,22841,13,2,7,5.6915,89.77,0.8756,93.57,3.0647,81.58,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0074,207031164,Box Hill North,18126,1,0,2,0.5517,7.02,0.0,0.0,1.1034,32.75,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0075,207031165,Burwood (Vic.),12336,7,0,1,5.6744,89.47,0.0,0.0,0.8106,21.93,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0076,207031166,Burwood East,10675,3,3,4,2.8103,49.12,2.8103,99.12,3.7471,89.47,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0077,207031167,Surrey Hills (East) - Mont Albert,10166,0,0,2,0.0,0.0,0.0,0.0,1.9673,59.06,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0078,208011168,Beaumaris,14021,3,0,3,2.1396,32.75,0.0,0.0,2.1396,65.2,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0079,208011169,Brighton (Vic.),22758,9,2,7,3.9547,71.93,0.8788,93.86,3.0758,81.87,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0080,208011170,Brighton East,16540,2,0,5,1.2092,13.16,0.0,0.0,3.023,80.7,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0081,208011171,Highett (West) - Cheltenham,12439,2,0,1,1.6078,21.64,0.0,0.0,0.8039,21.05,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0082,208011172,Hampton,18200,4,1,3,2.1978,33.92,0.5495,87.72,1.6484,47.08,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0083,208011173,Sandringham - Black Rock,17358,8,1,3,4.6088,81.87,0.5761,88.6,1.7283,51.75,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0084,208021174,Bentleigh - McKinnon,24896,11,0,4,4.4184,79.82,0.0,0.0,1.6067,45.32,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0085,208021176,Carnegie,18534,5,0,5,2.6977,47.66,0.0,0.0,2.6977,77.49,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0086,208021177,Caulfield - North,22362,6,1,2,2.6831,47.37,0.4472,85.67,0.8944,24.85,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0087,208021178,Caulfield - South,18075,3,1,3,1.6598,22.22,0.5533,88.01,1.6598,47.95,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0088,208021179,Elsternwick,11904,2,0,5,1.6801,22.81,0.0,0.0,4.2003,92.11,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0089,208021180,Hughesdale,7563,3,0,1,3.9667,72.22,0.0,0.0,1.3222,37.43,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0090,208021181,Murrumbeena,9369,0,0,1,0.0,0.0,0.0,0.0,1.0673,31.58,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0091,208021182,Ormond - Glen Huntly,13128,6,0,3,4.5704,81.58,0.0,0.0,2.2852,67.25,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0092,208021426,Bentleigh East - North,16583,5,1,2,3.0151,53.8,0.603,89.77,1.2061,35.67,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0093,208021427,Bentleigh East - South,14057,5,0,1,3.5569,64.91,0.0,0.0,0.7114,18.13,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0094,208031183,Aspendale Gardens - Waterways,8853,2,0,1,2.2591,36.26,0.0,0.0,1.1296,33.92,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0095,208031185,Carrum - Patterson Lakes,12032,4,0,3,3.3245,60.23,0.0,0.0,2.4934,71.64,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0096,208031186,Chelsea - Bonbeach,15204,3,0,1,1.9732,27.49,0.0,0.0,0.6577,16.67,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0097,208031187,Chelsea Heights,5393,2,0,2,3.7085,67.25,0.0,0.0,3.7085,88.3,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0098,208031188,Highett (East) - Cheltenham,24085,9,0,9,3.7368,68.13,0.0,0.0,3.7368,89.18,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0099,208031189,Edithvale - Aspendale,13563,2,0,2,1.4746,18.13,0.0,0.0,1.4746,40.94,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0100,208031190,Mentone,13197,3,0,3,2.2732,36.55,0.0,0.0,2.2732,66.96,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0101,208031191_208031192,Moorabbin - Heatherton/Moorabbin Airport,9142,4,2,4,4.3754,79.24,2.1877,98.25,4.3754,92.98,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0102,208031193_208031184,Mordialloc - Parkdale/Braeside,21230,4,0,3,1.8841,25.73,0.0,0.0,1.4131,39.47,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0103,208041194,Malvern - Glen Iris,20239,11,1,8,5.4351,87.43,0.4941,86.84,3.9528,90.64,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0104,208041195,Malvern East,21923,5,0,4,2.2807,36.84,0.0,0.0,1.8246,54.97,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0105,209011196,Bundoora - East,9831,3,0,2,3.0516,54.39,0.0,0.0,2.0344,62.28,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0106,209011197,Greensborough,20807,9,0,5,4.3255,78.07,0.0,0.0,2.403,70.47,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0107,209011198,Heidelberg - Rosanna,16039,9,1,8,5.6113,88.89,0.6235,90.06,4.9878,95.61,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0108,209011199,Heidelberg West,14852,5,1,3,3.3665,61.11,0.6733,91.52,2.0199,61.11,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0109,209011200,Ivanhoe,12458,8,0,4,6.4216,94.15,0.0,0.0,3.2108,84.8,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0110,209011201,Ivanhoe East - Eaglemont,7740,1,0,0,1.292,15.2,0.0,0.0,0.0,0.0,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0111,209011202,Montmorency - Briar Hill,16539,4,0,2,2.4185,39.77,0.0,0.0,1.2093,36.26,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0112,209011203,Viewbank - Yallambie,18733,3,0,2,1.6015,21.05,0.0,0.0,1.0676,31.87,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0113,209011204,Watsonia,9236,4,0,5,4.3309,78.8,0.0,0.0,5.4136,96.49,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0114,209021205,Kingsbury,10408,3,1,1,2.8824,50.58,0.9608,94.74,0.9608,26.9,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0115,209021428,Preston - East,20711,8,1,7,3.8627,70.76,0.4828,86.55,3.3798,86.26,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0116,209021429,Preston - West,12696,2,0,2,1.5753,20.18,0.0,0.0,1.5753,43.86,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0117,209021523,Reservoir - North East,14795,2,0,3,1.3518,16.08,0.0,0.0,2.0277,61.99,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0118,209021524,Reservoir - North West,9801,2,0,0,2.0406,29.53,0.0,0.0,0.0,0.0,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0119,209021525,Reservoir - South East,12799,7,0,2,5.4692,87.72,0.0,0.0,1.5626,43.27,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0120,209021526,Reservoir - South West,14090,4,0,4,2.8389,49.71,0.0,0.0,2.8389,78.95,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0121,209031209,Eltham,23444,5,0,4,2.1327,31.87,0.0,0.0,1.7062,50.58,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0122,209031210,Hurstbridge,3554,1,0,1,2.8137,49.42,0.0,0.0,2.8137,78.36,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0123,209031211,Kinglake,4204,2,0,1,4.7574,83.92,0.0,0.0,2.3787,69.59,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0124,209031212,Panton Hill - St Andrews,5091,0,0,0,0.0,0.0,0.0,0.0,0.0,0.0,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0125,209031213,Plenty - Yarrambat,9454,0,0,0,0.0,0.0,0.0,0.0,0.0,0.0,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0126,209031214,Research - North Warrandyte,6935,1,0,1,1.442,17.54,0.0,0.0,1.442,40.64,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0127,209031215,Wattle Glen - Diamond Creek,14417,3,0,2,2.0809,30.99,0.0,0.0,1.3873,38.6,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0128,209041216,Bundoora - North,7350,2,0,2,2.7211,47.95,0.0,0.0,2.7211,77.78,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0129,209041217,Bundoora - West,6186,3,1,2,4.8497,84.21,1.6166,97.37,3.2331,85.38,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0130,209041220,Mill Park - North,17470,10,0,6,5.7241,90.06,0.0,0.0,3.4345,86.84,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0131,209041221,Mill Park - South,11240,3,0,0,2.669,46.2,0.0,0.0,0.0,0.0,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0132,209041223,Thomastown,19998,6,0,2,3.0003,53.22,0.0,0.0,1.0001,28.65,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0133,209041224,Wallan,22627,6,0,3,2.6517,45.91,0.0,0.0,1.3258,37.72,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0134,209041225,Whittlesea,10661,4,0,2,3.752,68.71,0.0,0.0,1.876,56.43,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0135,209041431,Epping - East,13144,3,0,0,2.2824,37.13,0.0,0.0,0.0,0.0,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0136,209041432,Epping - South,8204,9,1,6,10.9703,99.12,1.2189,95.91,7.3135,99.12,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0137,209041433_209041437,Epping (Vic.) - West/Wollert,36550,7,0,2,1.9152,26.32,0.0,0.0,0.5472,13.45,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0138,209041435,South Morang - North,12595,2,0,0,1.5879,20.76,0.0,0.0,0.0,0.0,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0139,209041436,South Morang - South,12392,5,0,2,4.0349,74.85,0.0,0.0,1.6139,45.91,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0140,209041527,Doreen - North,16299,4,0,1,2.4541,40.35,0.0,0.0,0.6135,15.2,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0141,209041528,Doreen - South,10471,3,0,1,2.8651,50.29,0.0,0.0,0.955,26.61,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0142,209041529,Lalor - East,9947,5,0,3,5.0266,85.67,0.0,0.0,3.016,80.41,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0143,209041530,Lalor - West,13513,2,0,0,1.4801,18.71,0.0,0.0,0.0,0.0,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0144,209041531_209041532,Mernda - North/Mernda - South,23367,7,0,2,2.9957,52.92,0.0,0.0,0.8559,24.27,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0145,210011226_210011227,Airport West/Essendon Airport,8186,5,0,4,6.108,92.25,0.0,0.0,4.8864,95.32,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0146,210011228,Keilor,8548,3,0,2,3.5096,63.45,0.0,0.0,2.3397,68.13,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0147,210011230,Niddrie - Essendon West,7460,5,0,3,6.7024,95.32,0.0,0.0,4.0214,91.23,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0148,210011231,Strathmore,10031,1,0,0,0.9969,10.23,0.0,0.0,0.0,0.0,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0149,210011533,Avondale Heights,12388,3,0,1,2.4217,40.06,0.0,0.0,0.8072,21.64,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0150,210011534,Keilor East,15073,6,0,3,3.9806,72.81,0.0,0.0,1.9903,59.65,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0151,210021232,Gisborne,14222,6,0,3,4.2188,76.02,0.0,0.0,2.1094,64.33,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0152,210021233,Macedon,3523,0,0,0,0.0,0.0,0.0,0.0,0.0,0.0,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0153,210021234,Riddells Creek,4457,2,0,0,4.4873,80.99,0.0,0.0,0.0,0.0,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0154,210021235,Romsey,10765,7,0,2,6.5026,94.44,0.0,0.0,1.8579,55.26,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0155,210031236,Coburg North,8425,2,0,2,2.3739,38.89,0.0,0.0,2.3739,69.3,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0156,210031237,Fawkner,14002,5,0,3,3.5709,65.2,0.0,0.0,2.1426,65.5,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0157,210031440,Hadfield,6241,1,0,1,1.6023,21.35,0.0,0.0,1.6023,44.74,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0158,210031535,Glenroy - East,14783,7,0,1,4.7352,83.63,0.0,0.0,0.6765,17.54,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0159,210031536_210031439,Glenroy - West/Gowanbrae,11968,3,0,3,2.5067,41.81,0.0,0.0,2.5067,71.93,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0160,210031537,Oak Park,7898,0,0,2,0.0,0.0,0.0,0.0,2.5323,72.81,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0161,210031538,Pascoe Vale,17214,5,1,4,2.9046,51.46,0.5809,88.89,2.3237,67.84,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0162,210041240,Sunbury,13671,2,0,1,1.463,17.84,0.0,0.0,0.7315,19.01,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0163,210041539,Diggers Rest,5237,2,0,1,3.819,69.88,0.0,0.0,1.9095,57.31,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0164,210041540,Sunbury - South,14985,7,0,9,4.6713,83.04,0.0,0.0,6.006,98.54,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0165,210041541,Sunbury - West,11166,0,0,0,0.0,0.0,0.0,0.0,0.0,0.0,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0166,210051242,Broadmeadows,13859,14,1,4,10.1017,98.54,0.7216,92.4,2.8862,79.53,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0167,210051243,Campbellfield - Coolaroo,16057,11,0,6,6.8506,95.61,0.0,0.0,3.7367,88.89,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0168,210051245,Gladstone Park - Westmeadows,18024,4,0,2,2.2193,34.21,0.0,0.0,1.1096,33.33,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0169,210051246,Greenvale - Bulla,22095,4,0,1,1.8104,24.56,0.0,0.0,0.4526,11.4,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0170,210051247,Meadow Heights,14890,3,0,1,2.0148,28.65,0.0,0.0,0.6716,17.25,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0171,210051250_210051248,Tullamarine/Melbourne Airport,6702,4,0,4,5.9684,91.52,0.0,0.0,5.9684,98.25,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0172,210051441,Craigieburn - Central,8099,5,1,2,6.1736,93.27,1.2347,96.2,2.4694,71.05,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0173,210051442_210051542,Craigieburn - North/Craigieburn - North West,22151,5,0,3,2.2572,35.96,0.0,0.0,1.3543,38.3,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0174,210051443,Craigieburn - South,21673,6,0,0,2.7684,48.25,0.0,0.0,0.0,0.0,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0175,210051445,Mickleham - Yuroke,23374,3,0,1,1.2835,14.62,0.0,0.0,0.4278,10.53,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0176,210051543,Craigieburn - West,12999,4,0,4,3.0772,55.26,0.0,0.0,3.0772,82.16,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0177,210051544,Roxburgh Park (South) - Somerton,9479,2,0,2,2.1099,31.29,0.0,0.0,2.1099,64.62,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0178,210051545,Roxburgh Park - North,14658,3,0,1,2.0467,30.41,0.0,0.0,0.6822,17.84,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0179,211011251,Bayswater,12589,4,0,3,3.1774,57.89,0.0,0.0,2.383,69.88,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0180,211011254,Knoxfield - Scoresby,16601,2,0,3,1.2047,12.87,0.0,0.0,1.8071,54.09,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0181,211011255,Lysterfield,6594,0,0,0,0.0,0.0,0.0,0.0,0.0,0.0,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0182,211011256,Rowville - Central,15418,8,0,5,5.1887,86.26,0.0,0.0,3.243,85.67,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0183,211011257,Rowville - North,7905,1,0,0,1.265,14.33,0.0,0.0,0.0,0.0,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0184,211011258,Rowville - South,10375,3,0,1,2.8916,50.88,0.0,0.0,0.9639,27.19,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0185,211011259,Wantirna,14341,4,2,3,2.7892,48.54,1.3946,96.78,2.0919,64.04,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0186,211011260,Wantirna South,17942,11,0,2,6.1309,92.69,0.0,0.0,1.1147,33.63,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0187,211011446,Boronia,23560,6,1,6,2.5467,43.27,0.4244,85.09,2.5467,73.1,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0188,211011447,Ferntree Gully - North,14145,3,0,2,2.1209,31.58,0.0,0.0,1.4139,39.77,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0189,211011448,Ferntree Gully (South) - Upper Ferntree,15334,5,1,3,3.2607,59.65,0.6521,91.23,1.9564,58.77,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0190,211011449,The Basin,4345,0,0,0,0.0,0.0,0.0,0.0,0.0,0.0,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0191,211021261,Donvale - Park Orchards,16275,3,0,1,1.8433,25.15,0.0,0.0,0.6144,15.5,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0192,211021262,Warrandyte - Wonga Park,10112,2,0,1,1.9778,27.78,0.0,0.0,0.9889,28.36,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0193,211031263,Bayswater North,11871,4,0,1,3.3696,61.4,0.0,0.0,0.8424,23.1,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0194,211031265,Croydon Hills - Warranwood,18059,1,0,1,0.5537,7.31,0.0,0.0,0.5537,13.74,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0195,211031266,Ringwood,18715,8,0,6,4.2746,77.19,0.0,0.0,3.206,84.5,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0196,211031267,Ringwood East,21132,10,2,5,4.7322,83.33,0.9464,94.15,2.3661,69.01,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0197,211031268,Ringwood North,9654,2,0,1,2.0717,30.7,0.0,0.0,1.0358,30.41,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0198,211031450,Croydon - East,16109,4,0,3,2.4831,40.94,0.0,0.0,1.8623,55.56,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0199,211031451,Croydon - West,14139,5,0,4,3.5363,64.33,0.0,0.0,2.8291,78.65,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0200,211031452,Croydon South,4898,1,0,1,2.0416,29.82,0.0,0.0,2.0416,62.57,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0201,211041269,Forest Hill,10780,4,0,5,3.7106,67.54,0.0,0.0,4.6382,93.86,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0202,211041270,Mitcham (Vic.),16795,4,1,2,2.3817,39.18,0.5954,89.47,1.1908,35.09,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0203,211041271,Nunawading,12413,4,0,1,3.2224,58.48,0.0,0.0,0.8056,21.35,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0204,211041272,Vermont,10993,2,0,1,1.8193,24.85,0.0,0.0,0.9097,25.15,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0205,211041273,Vermont South,11954,4,0,2,3.3462,60.82,0.0,0.0,1.6731,49.12,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0206,211051274,Belgrave - Selby,10005,4,0,2,3.998,73.39,0.0,0.0,1.999,60.53,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0207,211051275,Chirnside Park,11779,3,0,2,2.5469,43.57,0.0,0.0,1.6979,50.29,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0208,211051276,Healesville - Yarra Glen,14065,7,1,2,4.9769,84.8,0.711,91.81,1.422,40.06,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0209,211051277,Kilsyth,9916,2,0,1,2.0169,28.95,0.0,0.0,1.0085,28.95,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0210,211051278,Lilydale - Coldstream,19599,11,1,5,5.6125,89.18,0.5102,87.43,2.5512,73.68,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0211,211051279,Monbulk - Silvan,5816,4,0,1,6.8776,96.2,0.0,0.0,1.7194,51.17,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0212,211051280,Montrose,6943,1,0,1,1.4403,17.25,0.0,0.0,1.4403,40.35,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0213,211051281,Mooroolbark,23146,4,0,1,1.7282,23.1,0.0,0.0,0.432,10.82,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0214,211051282,Mount Dandenong - Olinda,9706,1,0,1,1.0303,10.82,0.0,0.0,1.0303,30.12,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0215,211051283,Mount Evelyn,9799,1,0,1,1.0205,10.53,0.0,0.0,1.0205,29.53,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0216,211051284,Upwey - Tecoma,9777,2,0,1,2.0456,30.12,0.0,0.0,1.0228,29.82,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0217,211051285,Wandin - Seville,7902,3,0,1,3.7965,69.59,0.0,0.0,1.2655,37.13,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0218,211051286,Yarra Valley,16799,6,0,3,3.5716,65.5,0.0,0.0,1.7858,53.51,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0219,212011289,Emerald - Cockatoo,18633,4,0,3,2.1467,33.04,0.0,0.0,1.61,45.61,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0220,212011546,Beaconsfield - Officer,23632,10,0,4,4.2316,76.32,0.0,0.0,1.6926,49.71,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0221,212011547,Bunyip - Garfield,9868,4,0,2,4.0535,75.44,0.0,0.0,2.0268,61.7,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0222,212011548,Koo Wee Rup,10069,7,1,3,6.952,96.49,0.9931,95.03,2.9794,80.12,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0223,212011549,Pakenham - North East,15441,3,0,1,1.9429,27.19,0.0,0.0,0.6476,16.37,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0224,212011550,Pakenham - North West,7479,2,0,0,2.6742,46.49,0.0,0.0,0.0,0.0,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0225,212011551,Pakenham - South East,6439,3,0,2,4.6591,82.46,0.0,0.0,3.1061,83.04,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0226,212011552,Pakenham - South West,26783,6,0,5,2.2402,35.09,0.0,0.0,1.8669,55.85,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0227,212021293,Berwick - North,22963,9,2,4,3.9193,71.64,0.871,93.27,1.7419,52.05,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0228,212021295,Doveton,11889,3,0,2,2.5233,42.69,0.0,0.0,1.6822,49.42,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0229,212021297,Hallam,11472,3,0,3,2.6151,44.74,0.0,0.0,2.6151,75.44,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0230,212021299,Narre Warren North,8241,1,0,0,1.2134,13.45,0.0,0.0,0.0,0.0,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0231,212021453,Endeavour Hills - North,12086,1,0,1,0.8274,8.77,0.0,0.0,0.8274,22.22,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0232,212021454,Endeavour Hills - South,13360,3,0,2,2.2455,35.38,0.0,0.0,1.497,42.11,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0233,212021455,Narre Warren - North East,13504,2,0,0,1.481,19.01,0.0,0.0,0.0,0.0,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0234,212021456,Narre Warren - South West,14758,9,0,7,6.0984,91.81,0.0,0.0,4.7432,94.74,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0235,212021553,Berwick - South East,17760,4,0,1,2.2523,35.67,0.0,0.0,0.5631,14.04,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0236,212021554,Berwick - South West,11254,2,0,2,1.7771,23.39,0.0,0.0,1.7771,52.92,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0237,212031300,Cranbourne,21281,8,1,8,3.7592,69.01,0.4699,86.26,3.7592,89.77,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0238,212031303,Cranbourne South,17400,2,0,1,1.1494,12.28,0.0,0.0,0.5747,14.33,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0239,212031304,Cranbourne West,21535,5,0,3,2.3218,38.01,0.0,0.0,1.3931,38.89,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0240,212031306,Lynbrook - Lyndhurst,18027,3,0,2,1.6642,22.51,0.0,0.0,1.1094,33.04,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0241,212031308,Pearcedale - Tooradin,8024,2,0,2,2.4925,41.23,0.0,0.0,2.4925,71.35,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0242,212031457,Narre Warren South - East,13152,1,0,1,0.7603,8.19,0.0,0.0,0.7603,19.59,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0243,212031458,Narre Warren South - West,16713,3,0,1,1.795,24.27,0.0,0.0,0.5983,14.91,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0244,212031557_212031558,Cranbourne East - North/Cranbourne East - South,35704,9,0,3,2.5207,42.4,0.0,0.0,0.8402,22.81,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0245,212031560_212031556_212031555_212031559,Cranbourne North - West/Clyde North - South/Clyde North - North/Cranbourne North - East,50019,7,0,4,1.3995,16.37,0.0,0.0,0.7997,20.76,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0246,212031561,Hampton Park - East,12715,1,0,1,0.7865,8.48,0.0,0.0,0.7865,20.18,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0247,212031562,Hampton Park - West,13368,5,0,2,3.7403,68.42,0.0,0.0,1.4961,41.81,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0248,212041309,Clarinda - Oakleigh South,11554,3,0,1,2.5965,44.44,0.0,0.0,0.8655,24.56,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0249,212041310,Clayton South,13381,2,0,1,1.4947,19.3,0.0,0.0,0.7473,19.3,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0250,212041312,Dandenong North,22526,5,0,4,2.2197,34.5,0.0,0.0,1.7757,52.63,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0251,212041313,Dingley Village,10499,1,0,1,0.9525,9.94,0.0,0.0,0.9525,26.32,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0252,212041316,Noble Park North,7456,3,0,1,4.0236,74.27,0.0,0.0,1.3412,38.01,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0253,212041317,Springvale,22248,19,0,7,8.5401,97.95,0.0,0.0,3.1464,83.63,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0254,212041318,Springvale South,12621,2,0,2,1.5847,20.47,0.0,0.0,1.5847,44.44,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0255,212041459,Noble Park - East,12739,4,1,1,3.14,56.73,0.785,92.98,0.785,19.88,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0256,212041460,Noble Park - West,19591,5,0,4,2.5522,43.86,0.0,0.0,2.0418,62.87,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0257,212041563,Dandenong - North,21487,21,1,12,9.7734,98.25,0.4654,85.96,5.5848,97.66,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0258,212041564,Dandenong - South,9350,4,0,1,4.2781,77.49,0.0,0.0,1.0695,32.16,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0259,212041565,Keysborough - North,15096,5,0,4,3.3121,59.94,0.0,0.0,2.6497,76.9,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0260,212041566,Keysborough - South,15093,1,0,1,0.6626,7.6,0.0,0.0,0.6626,16.96,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0261,212051319,Ashwood - Chadstone,19507,5,0,5,2.5632,44.15,0.0,0.0,2.5632,74.27,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0262,212051321,Glen Waverley - East,21603,8,0,2,3.7032,66.96,0.0,0.0,0.9258,25.44,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0263,212051322,Glen Waverley - West,21036,9,0,8,4.2784,77.78,0.0,0.0,3.803,90.06,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0264,212051323,Mount Waverley - North,16073,3,0,1,1.8665,25.44,0.0,0.0,0.6222,16.08,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0265,212051324,Mount Waverley - South,19265,7,0,7,3.6335,66.08,0.0,0.0,3.6335,88.01,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0266,212051325,Mulgrave,19889,4,1,5,2.0112,28.36,0.5028,87.13,2.514,72.22,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0267,212051326,Oakleigh - Huntingdale,22928,5,0,9,2.1807,33.63,0.0,0.0,3.9253,90.35,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0268,212051327,Wheelers Hill,20652,8,0,4,3.8737,71.35,0.0,0.0,1.9369,58.19,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0269,212051567,Clayton (North) - Notting Hill,9829,3,0,3,3.0522,54.68,0.0,0.0,3.0522,81.29,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0270,212051568,Clayton - Central,12052,7,4,2,5.8082,90.94,3.319,99.71,1.6595,47.66,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0271,213011328,Ardeer - Albion,7502,0,0,0,0.0,0.0,0.0,0.0,0.0,0.0,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0272,213011329,Cairnlea,10038,3,0,2,2.9886,52.34,0.0,0.0,1.9924,60.23,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0273,213011331,Delahey,8077,0,0,0,0.0,0.0,0.0,0.0,0.0,0.0,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0274,213011332,Keilor Downs,13082,4,0,3,3.0576,54.97,0.0,0.0,2.2932,67.54,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0275,213011333,Kings Park (Vic.),13983,1,0,1,0.7152,7.89,0.0,0.0,0.7152,18.71,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0276,213011334,St Albans - North,20581,13,0,2,6.3165,93.86,0.0,0.0,0.9718,27.49,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0277,213011335,St Albans - South,17454,7,1,3,4.0105,73.68,0.5729,88.3,1.7188,50.88,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0278,213011336,Sunshine,9445,15,0,7,15.8814,100.0,0.0,0.0,7.4113,99.42,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0279,213011337,Sunshine North,12047,0,0,1,0.0,0.0,0.0,0.0,0.8301,22.51,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0280,213011338,Sunshine West,18558,3,0,3,1.6166,21.93,0.0,0.0,1.6166,46.2,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0281,213011339,Sydenham,11726,4,0,1,3.4112,62.57,0.0,0.0,0.8528,23.98,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0282,213011340,Taylors Lakes,16910,5,0,5,2.9568,52.05,0.0,0.0,2.9568,79.82,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0283,213011569,Deer Park,18004,4,0,3,2.2217,34.8,0.0,0.0,1.6663,48.25,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0284,213011570,Derrimut,8653,2,0,1,2.3113,37.72,0.0,0.0,1.1557,34.21,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0285,213021341,Altona,13556,5,0,2,3.6884,66.67,0.0,0.0,1.4754,41.23,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0286,213021342,Altona Meadows,18479,4,0,1,2.1646,33.33,0.0,0.0,0.5412,13.16,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0287,213021343,Altona North,14931,6,0,6,4.0185,73.98,0.0,0.0,4.0185,90.94,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0288,213021344,Newport,18753,4,0,2,2.133,32.16,0.0,0.0,1.0665,31.29,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0289,213021345,Seabrook,4952,2,0,0,4.0388,75.15,0.0,0.0,0.0,0.0,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0290,213021346,Williamstown,15912,3,1,2,1.8854,26.02,0.6285,90.64,1.2569,36.84,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0291,213031347,Braybrook,19068,10,0,5,5.2444,86.84,0.0,0.0,2.6222,76.02,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0292,213031348,Footscray,17131,18,3,10,10.5073,98.83,1.7512,97.66,5.8374,97.95,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0293,213031349,Maribyrnong,12573,5,0,4,3.9768,72.51,0.0,0.0,3.1814,83.92,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0294,213031350,Seddon - Kingsville,9247,1,0,2,1.0814,11.7,0.0,0.0,2.1629,66.08,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0295,213031351,West Footscray - Tottenham,11735,4,0,1,3.4086,62.28,0.0,0.0,0.8522,23.68,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0296,213031352,Yarraville,15463,3,0,4,1.9401,26.9,0.0,0.0,2.5868,74.85,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0297,213041353,Bacchus Marsh,24717,9,1,4,3.6412,66.37,0.4046,84.8,1.6183,46.49,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0298,213041358,Melton West,21208,3,0,2,1.4146,16.67,0.0,0.0,0.943,26.02,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0299,213041359_213041572,Rockbank - Mount Cottrell/Cobblebank - Strathtulloh,25151,3,0,2,1.1928,12.57,0.0,0.0,0.7952,20.47,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0300,213041360,Taylors Hill,19539,3,0,1,1.5354,19.59,0.0,0.0,0.5118,11.99,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0301,213041461,Burnside,5800,2,0,1,3.4483,62.87,0.0,0.0,1.7241,51.46,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0302,213041462,Burnside Heights,6377,0,0,0,0.0,0.0,0.0,0.0,0.0,0.0,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0303,213041463,Caroline Springs,20365,5,0,2,2.4552,40.64,0.0,0.0,0.9821,27.78,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0304,213041571,Brookfield,9829,0,0,0,0.0,0.0,0.0,0.0,0.0,0.0,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0305,213041573,Eynesbury - Exford,2990,0,0,0,0.0,0.0,0.0,0.0,0.0,0.0,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0306,213041575,Hillside,16182,5,0,2,3.0899,56.14,0.0,0.0,1.2359,36.55,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0307,213041576_213041574,Kurunjang - Toolern Vale/Fraser Rise - Plumpton,21730,0,0,0,0.0,0.0,0.0,0.0,0.0,0.0,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0308,213041577,Melton,7886,10,0,4,12.6807,99.71,0.0,0.0,5.0723,96.2,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0309,213041578,Melton South - Weir Views,16658,4,0,2,2.4012,39.47,0.0,0.0,1.2006,35.38,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0310,213051361,Hoppers Crossing - North,18446,6,0,3,3.2527,59.36,0.0,0.0,1.6264,46.78,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0311,213051362,Hoppers Crossing - South,18772,8,0,1,4.2617,76.9,0.0,0.0,0.5327,12.87,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0312,213051363,Laverton,11459,6,0,3,5.2361,86.55,0.0,0.0,2.618,75.73,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0313,213051368,Werribee - South,16810,10,4,6,5.9488,91.23,2.3795,98.83,3.5693,87.43,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0314,213051464,Point Cook - East,19274,1,0,1,0.5188,6.43,0.0,0.0,0.5188,12.28,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0315,213051466,Point Cook - South,19091,5,0,1,2.619,45.03,0.0,0.0,0.5238,12.57,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0316,213051467,Werribee - East,19010,8,0,3,4.2083,75.73,0.0,0.0,1.5781,44.15,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0317,213051468,Werribee - West,22341,3,0,1,1.3428,15.5,0.0,0.0,0.4476,11.11,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0318,213051579,Manor Lakes - Quandong,10616,1,0,0,0.942,9.65,0.0,0.0,0.0,0.0,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0319,213051580,Point Cook - North East,14167,5,0,3,3.5293,64.04,0.0,0.0,2.1176,64.91,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0320,213051581,Point Cook - North West,9565,1,0,1,1.0455,11.4,0.0,0.0,1.0455,30.7,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0321,213051582,Tarneit (West) - Mount Cottrell,10132,0,0,1,0.0,0.0,0.0,0.0,0.987,28.07,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0322,213051583,Tarneit - Central,28116,5,0,5,1.7783,23.68,0.0,0.0,1.7783,53.22,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0323,213051584,Tarneit - North,7197,0,0,0,0.0,0.0,0.0,0.0,0.0,0.0,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0324,213051585,Tarneit - South,11182,3,0,2,2.6829,47.08,0.0,0.0,1.7886,53.8,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0325,213051586,Truganina - North,9340,0,0,0,0.0,0.0,0.0,0.0,0.0,0.0,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0326,213051587,Truganina - South East,9596,1,0,2,1.0421,11.11,0.0,0.0,2.0842,63.45,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0327,213051588,Truganina - South West,19065,3,0,0,1.5736,19.88,0.0,0.0,0.0,0.0,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0328,213051589,Wyndham Vale - North,9032,1,0,0,1.1072,11.99,0.0,0.0,0.0,0.0,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0329,213051590,Wyndham Vale - South,13546,2,0,2,1.4765,18.42,0.0,0.0,1.4765,41.52,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0330,214011370,Carrum Downs,21976,10,0,4,4.5504,81.29,0.0,0.0,1.8202,54.68,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0331,214011371,Frankston,23586,17,3,11,7.2077,96.78,1.2719,96.49,4.6638,94.15,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0332,214011372,Frankston North,19453,6,0,4,3.0844,55.56,0.0,0.0,2.0562,63.16,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0333,214011373,Frankston South,18801,1,0,2,0.5319,6.73,0.0,0.0,1.0638,30.99,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0334,214011374,Langwarrin,24939,5,1,4,2.0049,28.07,0.401,84.5,1.6039,45.03,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0335,214011375,Seaford (Vic.),17215,5,0,2,2.9044,51.17,0.0,0.0,1.1618,34.5,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0336,214011376,Skye - Sandhurst,13303,0,0,0,0.0,0.0,0.0,0.0,0.0,0.0,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0337,214021377,Dromana,13366,4,0,3,2.9927,52.63,0.0,0.0,2.2445,66.67,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0338,214021378,Flinders,5995,3,0,1,5.0042,85.09,0.0,0.0,1.6681,48.54,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0339,214021379,Hastings - Somers,23970,6,0,5,2.5031,41.52,0.0,0.0,2.0859,63.74,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0340,214021381,Mount Eliza,18734,4,0,5,2.1352,32.46,0.0,0.0,2.6689,77.19,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0341,214021382,Mount Martha,19846,1,0,1,0.5039,6.14,0.0,0.0,0.5039,11.7,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0342,214021383,Point Nepean,19811,5,0,4,2.5239,42.98,0.0,0.0,2.0191,60.82,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0343,214021384,Rosebud - McCrae,22944,8,1,7,3.4868,63.16,0.4358,85.38,3.0509,80.99,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0344,214021385,Somerville,18522,7,0,4,3.7793,69.3,0.0,0.0,2.1596,65.79,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0345,214021591,Mornington - East,15175,4,0,4,2.6359,45.61,0.0,0.0,2.6359,76.32,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents
+MEL0346,214021592,Mornington - West,10581,7,3,5,6.6156,95.03,2.8353,99.42,4.7255,94.44,ga_healthdirect_facilities_2025,listed_facilities_per_10000_residents

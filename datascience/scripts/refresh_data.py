@@ -378,8 +378,10 @@ def main() -> int:
             (OUT / name).write_text(json.dumps(obj, separators=(",", ":")))
             log.info("  %-20s %6.2f MB", name, (OUT / name).stat().st_size / 1e6)
         suitability_path = ITERATION_2_OUT / "suitability.json"
+        service_scores_path = PROC / "health_service_suitability.csv"
+        service_scores = pd.read_csv(service_scores_path) if service_scores_path.is_file() else None
         suitability_path.write_text(json.dumps(
-            B.build_suitability(profiles["profiles"]), separators=(",", ":")))
+            B.build_suitability(profiles["profiles"], service_scores), separators=(",", ":")))
         log.info("  %-20s %6.2f MB", suitability_path.name,
                  suitability_path.stat().st_size / 1e6)
 
