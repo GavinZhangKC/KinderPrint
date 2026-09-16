@@ -7,10 +7,12 @@ from typing import Any
 
 
 VALID_CRITERIA = (
-    "child_development",
-    "green_space",
-    "low_disadvantage",
-    "low_heat",
+    "development_on_track",
+    "lower_developmental_vulnerability",
+    "tree_canopy",
+    "public_open_space",
+    "lower_urban_heat",
+    "socioeconomic_resources",
 )
 
 
@@ -34,33 +36,44 @@ def rank_profiles(
         weight_total = 0.0
         missing_criteria: list[str] = []
         for criterion in criteria:
-            if criterion == "child_development":
+            if criterion == "development_on_track":
                 on_track = _value_for(profile, "aedc_on_track_five")
-                vulnerability = _value_for(
-                    profile, "aedc_vulnerable_one_or_more"
-                )
-                if on_track is None or vulnerability is None:
+                if on_track is None:
                     missing_criteria.append(criterion)
                 else:
-                    subtotal += on_track * 0.6
-                    subtotal += (100.0 - vulnerability) * 0.4
+                    subtotal += on_track
                     weight_total += 1.0
-            elif criterion == "green_space":
+            elif criterion == "lower_developmental_vulnerability":
+                vulnerability = _value_for(profile, "aedc_vulnerable_one_or_more")
+                if vulnerability is None:
+                    missing_criteria.append(criterion)
+                else:
+                    subtotal += 100.0 - vulnerability
+                    weight_total += 1.0
+            elif criterion == "tree_canopy":
                 vegetation = _value_for(profile, "env_vegetation_cover")
-                open_space = _value_for(profile, "env_open_space_access")
-                if vegetation is None or open_space is None:
+                if vegetation is None:
                     missing_criteria.append(criterion)
                 else:
-                    subtotal += (vegetation + open_space) / 2.0
+                    subtotal += vegetation
                     weight_total += 1.0
-            elif criterion == "low_disadvantage":
+            elif criterion == "public_open_space":
+                open_space = _value_for(profile, "env_open_space_access")
+                if open_space is None:
+                    missing_criteria.append(criterion)
+                else:
+                    subtotal += open_space
+                    weight_total += 1.0
+            elif criterion == "socioeconomic_resources":
                 social_decile = _value_for(profile, "seifa_irsd_decile")
                 if social_decile is None:
                     missing_criteria.append(criterion)
                 else:
-                    subtotal += social_decile
+                    # IRSD is a 1-10 decile; normalise it to the same 0-100
+                    # range as the other criteria before averaging.
+                    subtotal += social_decile * 10.0
                     weight_total += 1.0
-            elif criterion == "low_heat":
+            elif criterion == "lower_urban_heat":
                 heat = _value_for(profile, "env_urban_heat")
                 if heat is None:
                     missing_criteria.append(criterion)

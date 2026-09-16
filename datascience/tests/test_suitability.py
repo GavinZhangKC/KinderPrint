@@ -40,7 +40,7 @@ def _profile(identifier, on_track, vulnerability, social, vegetation, heat, open
     }
 
 
-def test_migrated_formula_preserves_existing_ranking():
+def test_supported_criteria_are_normalised_and_ranked():
     profiles = [
         _profile("best", 80, 10, 9, 40, 18, 70),
         _profile("worst", 40, 50, 2, 10, 32, 20),
@@ -48,12 +48,12 @@ def test_migrated_formula_preserves_existing_ranking():
 
     result = rank_profiles(
         profiles,
-        ["child_development", "green_space", "low_disadvantage"],
+        ["development_on_track", "tree_canopy", "socioeconomic_resources"],
     )
 
     assert [item["id"] for item in result] == ["best", "worst"]
-    assert result[0]["score"] == 49.33
-    assert result[1]["score"] == 20.33
+    assert result[0]["score"] == 70.0
+    assert result[1]["score"] == 23.33
 
 
 def test_all_supported_criteria_combinations_are_precomputed():
@@ -61,14 +61,26 @@ def test_all_supported_criteria_combinations_are_precomputed():
 
     rankings = build_rankings(profiles)
 
-    assert len(rankings) == 15
+    assert len(rankings) == 63
 
 
 def test_missing_selected_input_withholds_score_instead_of_using_zero():
     profile = _profile("missing", 80, 10, 9, None, 18, 70)
 
-    result = rank_profiles([profile], ["green_space"])[0]
+    result = rank_profiles([profile], ["tree_canopy"])[0]
 
     assert result["score"] is None
     assert result["status"] == "limited"
     assert result["limitations"][0]["code"] == "suitability_inputs_incomplete"
+
+
+def test_development_dimensions_remain_separate():
+    profile = _profile("area", 80, 10, 9, 40, 18, 70)
+
+    on_track = rank_profiles([profile], ["development_on_track"])[0]
+    lower_vulnerability = rank_profiles(
+        [profile], ["lower_developmental_vulnerability"]
+    )[0]
+
+    assert on_track["score"] == 80.0
+    assert lower_vulnerability["score"] == 90.0
