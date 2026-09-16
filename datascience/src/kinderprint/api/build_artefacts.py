@@ -114,6 +114,103 @@ def build_profiles(d: pd.DataFrame) -> dict:
     return {"profiles": profiles}
 
 
+def build_context_scores(
+    profiles: list[dict],
+    service_context: pd.DataFrame | None = None,
+    demand_context: pd.DataFrame | None = None,
+) -> list[dict]:
+    """Attach derived suitability context indicators to the approved profile payload."""
+    if service_context is not None and not service_context.empty:
+        service = service_context.copy()
+        service["SA2_CODE_2021"] = service["SA2_CODE_2021"].astype(str)
+        service = service.set_index("SA2_CODE_2021")
+    else:
+        service = None
+    if demand_context is not None and not demand_context.empty:
+        demand = demand_context.copy()
+        demand = demand[demand["sex"].eq("persons") & demand["projection_year"].eq(2021)].copy()
+        demand["sa2_code_2021"] = demand["sa2_code_2021"].astype(str)
+        demand = demand.drop_duplicates(subset=["sa2_code_2021"]).set_index("sa2_code_2021")
+    else:
+        demand = None
+    for profile in profiles:
+        area_id = str(profile["neighbourhood"]["id"])
+        env_domain = next((domain for domain in profile["domains"] if domain["name"] == "Environment"), None)
+        if env_domain is None:
+            continue
+
+        if service is not None and area_id in service.index:
+            row = service.loc[area_id]
+            service_count = pd.to_numeric(row.get("active_education_care_services", 0), errors="coerce")
+            places = pd.to_numeric(row.get("total_approved_places", 0), errors="coerce")
+            nearest_service = pd.to_numeric(row.get("nearest_active_service_km", np.nan), errors="coerce")
+            rating_coverage = pd.to_numeric(row.get("rating_coverage_pct", np.nan), errors="coerce")
+            items: list[float] = []
+            if pd.notna(service_count):
+                items.append(min(100.0, float(service_count) * 12.5))
+            if pd.notna(places):
+                items.append(min(100.0, float(places) / 8.0))
+            if pd.notna(nearest_service):
+                items.append(max(0.0, (1.5 - float(nearest_service)) / 1.5 * 100.0))
+            if pd.notna(rating_coverage):
+                items.append(min(100.0, float(rating_coverage)))
+            service_score = sum(items) / len(items) if items else None
+            env_domain["indicators"].append({
+                "id": "service_access_score",
+                "name": "Service access score",
+                "value": round(float(service_score), 4) if service_score is not None else None,
+                "unit": "score",
+                "status": "available" if service_score is not None else "unavailable",
+                "source": "ACECQA / Vicmap service context",
+                "geographic_unit": GEO_UNIT,
+                "reference_year": "2026",
+            })
+
+        if demand is not None and area_id in demand.index:
+            row = demand.loc[area_id]
+            if isinstance(row, pd.Series):
+                projected = row.get("population_age_0_14_projected", np.nan)
+            else:
+                projected = np.nan
+            projected_value = pd.to_numeric(projected, errors="coerce")
+            if isinstance(projected_value, pd.Series):
+                projected_value = projected_value.iloc[0] if not projected_value.empty else np.nan
+            demand_score = None if pd.isna(projected_value) else min(100.0, (float(projected_value) / 5000.0) * 100.0)
+            env_domain["indicators"].append({
+                "id": "future_demand_score",
+                "name": "Future demand score",
+                "value": round(float(demand_score), 4) if demand_score is not None else None,
+                "unit": "score",
+                "status": "available" if demand_score is not None else "unavailable",
+                "source": "Victoria in Future 2023",
+                "geographic_unit": GEO_UNIT,
+                "reference_year": "2021",
+            })
+
+        vegetation = next((indicator for indicator in env_domain["indicators"] if indicator["id"] == "env_vegetation_cover"), None)
+        heat = next((indicator for indicator in env_domain["indicators"] if indicator["id"] == "env_urban_heat"), None)
+        open_space = next((indicator for indicator in env_domain["indicators"] if indicator["id"] == "env_open_space_access"), None)
+        components: list[float] = []
+        if vegetation is not None and vegetation.get("status") == "available":
+            components.append(float(vegetation["value"]))
+        if heat is not None and heat.get("status") == "available":
+            components.append(max(0.0, 100.0 - float(heat["value"]) * 3.0))
+        if open_space is not None and open_space.get("status") == "available":
+            components.append(float(open_space["value"]))
+        quality_score = sum(components) / len(components) if components else None
+        env_domain["indicators"].append({
+            "id": "environment_quality_score",
+            "name": "Environment quality score",
+            "value": round(float(quality_score), 4) if quality_score is not None else None,
+            "unit": "score",
+            "status": "available" if quality_score is not None else "unavailable",
+            "source": "Derived from environmental context",
+            "geographic_unit": GEO_UNIT,
+            "reference_year": "2024",
+        })
+    return profiles
+
+
 def build_suitability(profiles: list[dict]) -> dict:
     """Build the provisional locality-suitability output outside the backend."""
     return {

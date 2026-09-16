@@ -93,6 +93,9 @@ SUITABILITY_CRITERIA = {
     "green_space",
     "low_disadvantage",
     "low_heat",
+    "service_access",
+    "future_demand",
+    "environment_quality",
 }
 
 

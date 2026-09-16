@@ -7,6 +7,30 @@ from typing import Any
 
 from core.responses import limitation
 
+
+# def _load_local_env_files() -> None:
+#     """Load project-local env files when the server is started from a dev workspace."""
+#     candidates = [
+#         Path(__file__).resolve().parents[2] / ".env",
+#         Path(__file__).resolve().parents[2] / ".env.local",
+#         Path(__file__).resolve().parents[1] / ".env",
+#         Path(__file__).resolve().parents[1] / ".env.local",
+#     ]
+#     seen: set[Path] = set()
+#     for candidate in candidates:
+#         if candidate in seen or not candidate.is_file():
+#             continue
+#         seen.add(candidate)
+#         for raw_line in candidate.read_text(encoding="utf-8").splitlines():
+#             line = raw_line.strip()
+#             if not line or line.startswith("#") or "=" not in line:
+#                 continue
+#             key, value = line.split("=", 1)
+#             os.environ.setdefault(key.strip(), value.strip().strip('"').strip("'"))
+
+
+# _load_local_env_files()
+
 BOUNDARY_DATA_PATH_ENV = "KINDERPRINT_BOUNDARY_DATA_PATH"
 PROFILE_DATA_PATH_ENV = "KINDERPRINT_PROFILE_DATA_PATH"
 PRIORITY_DATA_PATH_ENV = "KINDERPRINT_PRIORITY_DATA_PATH"

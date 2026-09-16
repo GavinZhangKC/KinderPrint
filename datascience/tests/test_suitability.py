@@ -61,7 +61,7 @@ def test_all_supported_criteria_combinations_are_precomputed():
 
     rankings = build_rankings(profiles)
 
-    assert len(rankings) == 15
+    assert len(rankings) == 127
 
 
 def test_missing_selected_input_withholds_score_instead_of_using_zero():
@@ -72,3 +72,54 @@ def test_missing_selected_input_withholds_score_instead_of_using_zero():
     assert result["score"] is None
     assert result["status"] == "limited"
     assert result["limitations"][0]["code"] == "suitability_inputs_incomplete"
+
+
+def test_new_service_and_future_demand_criteria_are_supported():
+    profile = {
+        "neighbourhood": {
+            "id": "new-area",
+            "name": "New Area",
+            "geographic_unit": "SA2",
+        },
+        "domains": [
+            {"indicators": [
+                _indicator("service_access_score", 80),
+                _indicator("future_demand_score", 70),
+                _indicator("environment_quality_score", 60),
+            ]},
+        ],
+    }
+
+    result = rank_profiles([profile], ["service_access", "future_demand", "environment_quality"])[0]
+
+    assert result["score"] == 70.0
+    assert result["status"] == "available"
+    assert result["limitations"] == []
+
+
+def test_real_service_and_demand_inputs_are_accepted():
+    profile = {
+        "neighbourhood": {
+            "id": "area-with-context",
+            "name": "Area With Context",
+            "geographic_unit": "SA2",
+        },
+        "domains": [
+            {"indicators": [
+                _indicator("env_vegetation_cover", 40),
+                _indicator("env_urban_heat", 20),
+                _indicator("env_open_space_access", 70),
+                _indicator("active_education_care_services", 4),
+                _indicator("services_with_approved_places", 3),
+                _indicator("total_approved_places", 200),
+                _indicator("nearest_active_service_km", 0.5),
+                _indicator("population_age_0_14_projected", 3200),
+            ]},
+        ],
+    }
+
+    result = rank_profiles([profile], ["service_access", "future_demand", "environment_quality"])[0]
+
+    assert result["status"] == "available"
+    assert result["score"] is not None
+    assert result["limitations"] == []

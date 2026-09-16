@@ -20,6 +20,9 @@ const optionMeta: Record<string, { label: string; description: string }> = {
   green_space: { label: 'Green space', description: 'Parks and vegetation access' },
   low_disadvantage: { label: 'Low disadvantage', description: 'Lower social disadvantage' },
   low_heat: { label: 'Low heat', description: 'Lower heat exposure' },
+  service_access: { label: 'Service access', description: 'Early-childhood service availability and catchment access' },
+  future_demand: { label: 'Future demand', description: 'Projected child population pressure and future capacity needs' },
+  environment_quality: { label: 'Environment quality', description: 'Air quality, exposure and healthy-environment conditions' },
 }
 
 export default function LocalitySuitabilityPanel({
