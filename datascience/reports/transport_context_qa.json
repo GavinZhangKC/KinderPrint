@@ -1,0 +1,11 @@
+{
+  "source_id": "dot_aadt_2019_and_ptv_stops_2026",
+  "traffic_segments_received": 14662,
+  "traffic_clipped_parts": 12384,
+  "public_transport_stops_received": 31170,
+  "public_transport_stops_in_greater_melbourne": 23133,
+  "reporting_localities": 342,
+  "missing_traffic_scores": 0,
+  "missing_transport_scores": 0,
+  "limitation": "The traffic measure covers roads present in the 2019 AADT source and combines AADT with clipped road length per square kilometre. It is a declared-road traffic-intensity proxy, not noise, air pollution, child exposure or current traffic. Public-transport stop counts do not measure frequency, reliability, accessibility or travel time."
+}
