@@ -1,9 +1,7 @@
 """KinderPrint FastAPI application and versioned service routes."""
 
 import logging
-import sys
 import time
-from pathlib import Path
 from typing import Any
 
 from fastapi import FastAPI, Query, Request
@@ -57,12 +55,6 @@ from validation import (
     profile_comparison_data, profile_comparison_limitations, profile_limitations,
     profile_metadata, profile_status,
 )
-
-datascience_src = Path(__file__).resolve().parents[1] / "datascience" / "src"
-if str(datascience_src) not in sys.path:
-    sys.path.insert(0, str(datascience_src))
-
-from kinderprint.analytics.suitability import rank_profiles  # noqa: E402
 
 app = FastAPI(title="KinderPrint API", version="0.3.0")
 app.add_middleware(GZipMiddleware, minimum_size=1000)
@@ -1296,23 +1288,17 @@ def locality_suitability(
         item for item in rankings if set(item["criteria"]) == selected_set
     ), None)
     if ranking is None:
-        profiles, profile_limitations = load_profiles()
-        if profiles is not None:
-            rank = {
-                "criteria": selected_criteria,
-                "localities": rank_profiles(profiles, selected_criteria),
-            }
-            ranking = rank
-        else:
-            return envelope(
-                "unavailable",
-                {"localities": [], "criteria": selected_criteria, "limit": limit},
-                limitations=[limitation(
-                    "suitability_result_unavailable",
-                    "No precomputed suitability result exists for the selected criteria.",
-                    "criteria",
-                )],
-            )
+        return envelope(
+            "unavailable",
+            {"localities": [], "criteria": selected_criteria, "limit": limit,
+             "withheld_count": 0},
+            metadata=metadata,
+            limitations=[limitation(
+                "suitability_result_unavailable",
+                "No approved precomputed suitability result exists for the selected criteria.",
+                "criteria",
+            )],
+        )
 
     available = [
         item for item in ranking["localities"] if item["status"] == "available"

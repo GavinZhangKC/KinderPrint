@@ -15,7 +15,7 @@ mkdir -p "$TASK_PACKAGE_DIR/core" "$TASK_PACKAGE_DIR/data" "$TASK_PACKAGE_DIR/lo
 cp "$TASK_SCRIPT_DIR"/*.py "$TASK_PACKAGE_DIR/"
 cp "$TASK_SCRIPT_DIR/core"/*.py "$TASK_PACKAGE_DIR/core/"
 cp "$TASK_SCRIPT_DIR/loaders"/*.py "$TASK_PACKAGE_DIR/loaders/"
-cp "$TASK_DATA_DIR/profiles.json" "$TASK_PACKAGE_DIR/data/"
+cp "$TASK_ITERATION_2_DATA_DIR/profiles.json" "$TASK_PACKAGE_DIR/data/"
 cp "$TASK_DATA_DIR/boundaries.geojson" "$TASK_PACKAGE_DIR/data/"
 cp "$TASK_DATA_DIR/priorities.json" "$TASK_PACKAGE_DIR/data/"
 cp "$TASK_DATA_DIR/explanations.json" "$TASK_PACKAGE_DIR/data/"

@@ -33,18 +33,6 @@ export interface NeighbourhoodSearchResult {
   geographic_unit: string
 }
 
-export interface ContextMetric {
-  value: number | null
-  status: ApiStatus | string
-}
-
-export interface NeighbourhoodContextResponse {
-  neighbourhood: NeighbourhoodSearchResult
-  metrics: Record<string, ContextMetric>
-}
-
-
-
 export interface BoundaryProperties {
   id: string
   name: string
@@ -465,6 +453,15 @@ export const api = {
       signal,
     ),
 
+  getIndustrialEmissionsContext: (
+    id: string,
+    signal?: AbortSignal,
+  ) =>
+    request<NeighbourhoodContext | null>(
+      `/api/neighbourhoods/${encodeURIComponent(id)}/industrial-emissions-context`,
+      signal,
+    ),
+
 
   getPriority: (
     id: string,
@@ -483,24 +480,6 @@ export const api = {
       `/api/neighbourhoods/${encodeURIComponent(
         id,
       )}/explanation`,
-    ),
-
-  getTrafficContext: (
-    id: string,
-  ) =>
-    request<NeighbourhoodContextResponse>(
-      `/api/neighbourhoods/${encodeURIComponent(
-        id,
-      )}/traffic-context`,
-    ),
-
-  getIndustrialEmissionsContext: (
-    id: string,
-  ) =>
-    request<NeighbourhoodContextResponse>(
-      `/api/neighbourhoods/${encodeURIComponent(
-        id,
-      )}/industrial-emissions-context`,
     ),
 
   getMatch: (

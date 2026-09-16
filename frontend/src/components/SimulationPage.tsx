@@ -428,7 +428,7 @@ export default function SimulationPage({
         if (response.status !== 'available' && response.status !== 'limited') {
           return null
         }
-        const metric = response.data.metrics?.[key]
+        const metric = response.data?.metrics?.[key]
         return metric && metric.status === 'available' && typeof metric.value === 'number' && Number.isFinite(metric.value)
           ? metric.value
           : null

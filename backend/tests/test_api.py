@@ -744,7 +744,7 @@ def test_locality_suitability_withholds_incomplete_results(client, monkeypatch, 
     assert body["limitations"][0]["code"] == "suitability_results_withheld"
 
 
-def test_locality_suitability_falls_back_to_computing_missing_criteria(client, monkeypatch, write_json) -> None:
+def test_locality_suitability_does_not_compute_missing_precalculated_result(client, monkeypatch, write_json) -> None:
     suitability_path = write_json("suitability.json", json.dumps({
         "rankings": [{
             "criteria": ["child_development"],
@@ -756,32 +756,16 @@ def test_locality_suitability_falls_back_to_computing_missing_criteria(client, m
         }],
         "metadata": {"source": "Approved profile dataset"},
     }))
-    profile_path = write_json("profiles.json", json.dumps({
-        "profiles": [{
-            "neighbourhood": {"id": "area", "name": "Area", "geographic_unit": "SA2"},
-            "domains": [{
-                "id": "child-development",
-                "name": "Child Development",
-                "indicators": [
-                    {"id": "aedc_on_track_five", "name": "On track", "value": 80.0,
-                     "status": "available", "source": "AEDC", "geographic_unit": "SA2",
-                     "reference_year": 2024, "unit": "%"},
-                    {"id": "aedc_vulnerable_one_or_more", "name": "Vulnerable", "value": 10.0,
-                     "status": "available", "source": "AEDC", "geographic_unit": "SA2",
-                     "reference_year": 2024, "unit": "%"},
-                ],
-            }],
-            "metadata": {"data_quality": "test"},
-            "limitations": [],
-        }],
-    }))
     monkeypatch.setenv(SUITABILITY_DATA_PATH_ENV, str(suitability_path))
-    monkeypatch.setenv(PROFILE_DATA_PATH_ENV, str(profile_path))
 
-    body = client.get("/api/localities/suitable?criteria=child_development&limit=5").json()
+    body = client.get("/api/localities/suitable?criteria=service_access&limit=5").json()
 
-    assert body["status"] == "available"
-    assert body["data"]["localities"][0]["id"] == "area"
+    assert body["status"] == "unavailable"
+    assert body["data"] == {
+        "localities": [], "criteria": ["service_access"], "limit": 5,
+        "withheld_count": 0,
+    }
+    assert body["limitations"][0]["code"] == "suitability_result_unavailable"
 
 
 def test_unconfigured_profile_is_explicit(client) -> None:

@@ -21,11 +21,15 @@ cd backend
 python3 -m venv .venv
 source .venv/bin/activate
 python -m pip install -r requirements.txt
-uvicorn main:app --reload --host 0.0.0.0 --port 8000
+cd ..
+./backend/run_local_backend.sh
 ```
 
-For local development with approved artefacts already in this repository, you
-can use a single command that sets all required dataset paths automatically:
+The local backend script sets all required approved dataset paths automatically.
+Running `uvicorn main:app` directly does not configure those paths and will make
+data-backed endpoints report that their datasets are unavailable.
+
+After the environment has been created, later runs only need:
 
 ```bash
 ./backend/run_local_backend.sh
@@ -86,14 +90,17 @@ The backend is deployed as a zip-based Python 3.13 Lambda behind an API
 Gateway HTTP API. The preparation script installs Linux x86_64 wheels into the
 generated package, so Docker is not required.
 
-Prepare the approved Iteration 1 artefacts and bounded Iteration 2 runtime datasets, then build and
-deploy with AWS SAM:
+Prepare the approved runtime artefacts, including the bounded Iteration 2 profile and
+suitability datasets, then deploy the prepared package with AWS SAM:
 
 ```bash
 ./backend/prepare_lambda_package.sh
-sam build
-sam deploy --guided
+sam deploy --template-file template.yaml --guided
 ```
+
+The preparation script already assembles the deployable package with Linux x86_64
+native wheels. Do not run a local `sam build` over that package, because it can
+filter required native extension files on macOS.
 
 The template allows the production origins `https://kinderprint.vercel.app`,
 `https://kinderprint.me`, `https://www.kinderprint.me`, `https://vkinder.me`,
