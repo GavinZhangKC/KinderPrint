@@ -133,6 +133,9 @@ def build_suitability(
             "lower_declared_road_traffic": "lower_declared_road_traffic_score",
             "public_transport_availability": "public_transport_availability_score",
             "lower_bushfire_prone_share": "lower_bushfire_prone_share_score",
+            "approved_early_childhood_places": "approved_early_childhood_places_score",
+            "long_day_care_availability": "long_day_care_availability_score",
+            "kindergarten_availability": "kindergarten_availability_score",
         }
         by_id = supplemental_scores.assign(
             neighbourhood_id=supplemental_scores.neighbourhood_id.astype(str)

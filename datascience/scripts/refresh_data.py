@@ -410,6 +410,18 @@ def main() -> int:
                     bushfire_scores[bushfire_columns], on="neighbourhood_id", how="outer"
                 )
             )
+        acecqa_scores_path = PROC / "acecqa_suitability.csv"
+        if acecqa_scores_path.is_file():
+            acecqa_scores = pd.read_csv(acecqa_scores_path)
+            acecqa_columns = [
+                "neighbourhood_id", "approved_early_childhood_places_score",
+                "long_day_care_availability_score", "kindergarten_availability_score",
+            ]
+            service_scores = (
+                acecqa_scores if service_scores is None else service_scores.merge(
+                    acecqa_scores[acecqa_columns], on="neighbourhood_id", how="outer"
+                )
+            )
         suitability_path.write_text(json.dumps(
             B.build_suitability(profiles["profiles"], service_scores), separators=(",", ":")))
         log.info("  %-20s %6.2f MB", suitability_path.name,
