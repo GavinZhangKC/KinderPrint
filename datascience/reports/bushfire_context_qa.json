@@ -1,0 +1,9 @@
+{
+  "source_id": "victoria_bushfire_prone_area_2026",
+  "source_polygons": 76,
+  "source_latest_gazettal_date": "2026-06-16",
+  "reporting_localities": 346,
+  "localities_with_designated_area": 203,
+  "missing_scores": 0,
+  "limitation": "This measure is the share of land designated under Victorian bushfire-prone-area building requirements. It is not a property-level Bushfire Attack Level, forecast, probability of fire, evacuation assessment, flood measure or personal safety advice."
+}
