@@ -1,0 +1,29 @@
+{
+  "source_id": "epa_victoria_validated_hourly_air_2018_2025",
+  "workbook_count": 8,
+  "years": [
+    2018,
+    2019,
+    2020,
+    2021,
+    2022,
+    2023,
+    2024,
+    2025
+  ],
+  "pollutants": [
+    "NO2",
+    "O3",
+    "PM10",
+    "PM2.5"
+  ],
+  "station_count": 21,
+  "input_pollutant_rows": 2117623,
+  "valid_numeric_observations": 2045530,
+  "missing_or_invalid_values": 72093,
+  "negative_valid_values_retained": 48990,
+  "annual_summary_rows": 271,
+  "stations_without_coordinates": 0,
+  "suitability_status": "station_context_only",
+  "limitation": "Monitor readings describe conditions at monitoring stations. They are not assigned to nearest SA2s, interpolated, or treated as locality-wide exposure estimates. Negative validated readings are retained rather than silently truncated."
+}
