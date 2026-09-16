@@ -32,6 +32,16 @@ export interface NeighbourhoodSearchResult {
   geographic_unit: string
 }
 
+export interface ContextMetric {
+  value: number | null
+  status: ApiStatus | string
+}
+
+export interface NeighbourhoodContextResponse {
+  neighbourhood: NeighbourhoodSearchResult
+  metrics: Record<string, ContextMetric>
+}
+
 
 
 export interface BoundaryProperties {
@@ -363,6 +373,24 @@ export const api = {
       `/api/neighbourhoods/${encodeURIComponent(
         id,
       )}/explanation`,
+    ),
+
+  getTrafficContext: (
+    id: string,
+  ) =>
+    request<NeighbourhoodContextResponse>(
+      `/api/neighbourhoods/${encodeURIComponent(
+        id,
+      )}/traffic-context`,
+    ),
+
+  getIndustrialEmissionsContext: (
+    id: string,
+  ) =>
+    request<NeighbourhoodContextResponse>(
+      `/api/neighbourhoods/${encodeURIComponent(
+        id,
+      )}/industrial-emissions-context`,
     ),
 
   getMatch: (

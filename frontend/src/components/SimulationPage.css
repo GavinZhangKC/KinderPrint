@@ -461,29 +461,99 @@
 
 .comparison-row {
   display: grid;
-  grid-template-columns: 150px 1fr 1fr;
-  gap: 10px;
+  grid-template-columns: 190px minmax(250px, 1fr) minmax(180px, 1fr);
+  gap: 12px;
   align-items: center;
   margin-bottom: 12px;
 }
 
-.comparison-label {
-  color: #536c90;
-  font-size: 12px;
-  font-weight: 600;
+.comparison-empty {
+  border-radius: 12px;
+  border: 1px dashed rgba(120, 139, 181, 0.38);
+  background: rgba(255, 255, 255, 0.45);
+  padding: 12px;
+  color: #5e7698;
+  font-size: 13px;
 }
 
-.comparison-bar {
+.comparison-metric {
+  display: grid;
+  gap: 4px;
+}
+
+.comparison-label {
+  color: #536c90;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.comparison-rule {
+  color: #7087a8;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.comparison-values {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.comparison-value {
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.comparison-value.baseline {
+  color: #6a7f9f;
+}
+
+.comparison-value.simulated {
+  color: #2e5b95;
+}
+
+.comparison-delta {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 4px 8px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.comparison-delta.improves {
+  color: #1e7a52;
+  background: rgba(120, 208, 170, 0.2);
+}
+
+.comparison-delta.worsens {
+  color: #9f3d3d;
+  background: rgba(232, 133, 133, 0.18);
+}
+
+.comparison-delta.neutral {
+  color: #576f92;
+  background: rgba(154, 171, 197, 0.18);
+}
+
+.comparison-track {
+  display: grid;
+  gap: 6px;
+}
+
+.comparison-track-fill {
   display: block;
-  height: 18px;
+  height: 12px;
   border-radius: 999px;
 }
 
-.comparison-bar.baseline {
+.comparison-track-fill.baseline {
   background: rgba(145, 164, 190, 0.18);
 }
 
-.comparison-bar.simulated {
+.comparison-track-fill.simulated {
   background: linear-gradient(90deg, rgba(99, 225, 181, 0.6), rgba(99, 225, 181, 0.9));
 }
 
@@ -558,7 +628,8 @@
   }
 
   .comparison-row {
-    grid-template-columns: 125px 1fr 1fr;
+    grid-template-columns: 1fr;
+    gap: 8px;
   }
 }
 @media (max-width: 640px) {

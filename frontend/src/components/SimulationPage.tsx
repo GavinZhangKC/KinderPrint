@@ -19,6 +19,11 @@ interface SimulationBaseline {
   heatExposure: number
   vulnerability: number
   childDevelopment: number
+  serviceAccess: number
+  futureDemand: number
+  environmentQuality: number
+  trafficPressure: number
+  industrialPressure: number
 }
 
 interface ScenarioValues {
@@ -30,6 +35,7 @@ interface ScenarioValues {
 interface ScenarioResult {
   heatExposure: string
   heatDirection: string
+  vulnerabilityDirection: string
   treeCanopy: number
   baselineTreeCanopy: number
   vulnerability: number
@@ -39,38 +45,86 @@ interface ScenarioResult {
   developmentDirection: string
   projectedChange: string
   projectedDevelopmentChange: string
+  modelContext: string
   insight: string
 }
 
 const clamp = (value: number, min: number, max: number) => Math.min(Math.max(value, min), max)
 
+type ComparisonMetric = {
+  id: 'heat' | 'treeCanopy' | 'openSpace' | 'vulnerability'
+  label: string
+  unit: string
+  baseline: number
+  simulated: number
+  max: number
+  lowerIsBetter: boolean
+}
+
+function formatMetricValue(value: number, unit: string) {
+  return `${value.toFixed(1)}${unit}`
+}
+
+function metricDirection(metric: ComparisonMetric) {
+  const delta = metric.simulated - metric.baseline
+  if (Math.abs(delta) < 0.05) {
+    return { delta, label: 'No meaningful change', tone: 'neutral' as const }
+  }
+  const improves = metric.lowerIsBetter ? delta < 0 : delta > 0
+  return {
+    delta,
+    label: improves ? 'Improves' : 'Worsens',
+    tone: improves ? 'improves' as const : 'worsens' as const,
+  }
+}
+
 function buildScenarioResult(baseline: SimulationBaseline, values: ScenarioValues): ScenarioResult {
   const treeIncrease = values.treeCanopy - baseline.treeCanopy
   const openSpaceIncrease = values.openSpace - baseline.openSpace
   const heatReduction = baseline.heatExposure - values.heat
+  const vulnerabilityAdjustment = (treeIncrease * 0.25) + (openSpaceIncrease * 0.18) + (heatReduction * 2.1)
+  const developmentAdjustment = (treeIncrease * 0.22) + (openSpaceIncrease * 0.16) + (heatReduction * 1.6)
+
+  // Higher local service capacity makes built-environment gains easier to convert into outcomes,
+  // while stronger projected child demand and context pressure dampen expected effect size.
+  const serviceCapacityFactor = clamp(0.85 + (baseline.serviceAccess / 100) * 0.35, 0.85, 1.2)
+  const demandPressureFactor = clamp(1.15 - (baseline.futureDemand / 100) * 0.35, 0.8, 1.15)
+  const backgroundPressure = (baseline.trafficPressure + baseline.industrialPressure) / 2
+  const pressureDampeningFactor = clamp(1.1 - (backgroundPressure / 100) * 0.35, 0.75, 1.1)
+  const contextMultiplier = clamp((serviceCapacityFactor + demandPressureFactor + pressureDampeningFactor) / 3, 0.7, 1.2)
+
+  const effectiveVulnerabilityAdjustment = vulnerabilityAdjustment > 0
+    ? vulnerabilityAdjustment * contextMultiplier
+    : vulnerabilityAdjustment
+  const effectiveDevelopmentAdjustment = developmentAdjustment > 0
+    ? developmentAdjustment * contextMultiplier
+    : developmentAdjustment
 
   const projectedVulnerability = clamp(
-    baseline.vulnerability - (treeIncrease * 0.25) - (openSpaceIncrease * 0.18) - (heatReduction * 2.1),
+    baseline.vulnerability - effectiveVulnerabilityAdjustment,
     5,
     100,
   )
 
   const projectedDevelopment = clamp(
-    baseline.childDevelopment + (treeIncrease * 0.22) + (openSpaceIncrease * 0.16) + (heatReduction * 1.6),
+    baseline.childDevelopment + effectiveDevelopmentAdjustment,
     30,
     100,
   )
 
   const heatExposure = values.heat <= 5 ? 'Moderate' : values.heat <= 8 ? 'High' : 'Very high'
   const heatDirection = heatReduction > 0 ? 'Improves' : 'Higher exposure'
+  const vulnerabilityDirection = projectedVulnerability < baseline.vulnerability ? 'Improves' : projectedVulnerability > baseline.vulnerability ? 'Higher risk' : 'No change'
   const developmentDirection = projectedDevelopment > baseline.childDevelopment ? 'Improves' : 'Lower outlook'
+  const modelContext = `Service ${baseline.serviceAccess.toFixed(1)} · Demand ${baseline.futureDemand.toFixed(1)} · Traffic ${baseline.trafficPressure.toFixed(1)} · Industrial ${baseline.industrialPressure.toFixed(1)} · Multiplier ${contextMultiplier.toFixed(2)}x`
   const insight = heatReduction > 0
-    ? 'Reducing heat exposure while increasing canopy and green access produces a lower estimated vulnerability profile for this area.'
-    : 'This scenario increases heat pressure and reduces the expected benefit from buffering child-development outcomes.'
+    ? 'Reducing heat exposure while increasing canopy and green access produces a lower estimated vulnerability profile for this area, adjusted for local service access and projected demand pressure.'
+    : 'This scenario increases heat pressure and reduces the expected benefit from buffering child-development outcomes, even after applying local service-access and demand context.'
 
   return {
     heatExposure,
     heatDirection,
+    vulnerabilityDirection,
     treeCanopy: values.treeCanopy,
     baselineTreeCanopy: baseline.treeCanopy,
     vulnerability: Number(projectedVulnerability.toFixed(1)),
@@ -80,6 +134,7 @@ function buildScenarioResult(baseline: SimulationBaseline, values: ScenarioValue
     developmentDirection,
     projectedChange: `${Number(baseline.vulnerability.toFixed(1))}% → ${Number(projectedVulnerability.toFixed(1))}%`,
     projectedDevelopmentChange: `${Number(baseline.childDevelopment.toFixed(1))} → ${Number(projectedDevelopment.toFixed(1))}`,
+    modelContext,
     insight,
   }
 }
@@ -122,10 +177,18 @@ export default function SimulationPage({
     setScenarioLoading(true)
 
     try {
-      const [profileResponse, priorityResponse, explanationResponse] = await Promise.all([
+      const [
+        profileResponse,
+        priorityResponse,
+        explanationResponse,
+        trafficResponse,
+        industrialResponse,
+      ] = await Promise.all([
         api.getProfile(id),
         api.getPriority(id),
         api.getExplanation(id),
+        api.getTrafficContext(id),
+        api.getIndustrialEmissionsContext(id),
       ])
 
       if (profileResponse.status !== 'available' && profileResponse.status !== 'limited') {
@@ -156,6 +219,44 @@ export default function SimulationPage({
         name,
       )
 
+      const metricValue = (response: typeof trafficResponse | typeof industrialResponse, key: string): number | null => {
+        if (response.status !== 'available' && response.status !== 'limited') {
+          return null
+        }
+        const metric = response.data.metrics?.[key]
+        return metric && metric.status === 'available' && typeof metric.value === 'number' && Number.isFinite(metric.value)
+          ? metric.value
+          : null
+      }
+
+      const average = (values: number[]) => values.length ? values.reduce((total, value) => total + value, 0) / values.length : null
+
+      const trafficPressureComponents: number[] = []
+      const highTrafficShare = metricValue(trafficResponse, 'high_traffic_road_share_pct')
+      if (highTrafficShare !== null) {
+        trafficPressureComponents.push(clamp(highTrafficShare, 0, 100))
+      }
+      const weightedAadt = metricValue(trafficResponse, 'length_weighted_aadt')
+      if (weightedAadt !== null) {
+        trafficPressureComponents.push(clamp((weightedAadt / 20000) * 100, 0, 100))
+      }
+      const heavyAadt = metricValue(trafficResponse, 'length_weighted_heavy_aadt')
+      if (heavyAadt !== null) {
+        trafficPressureComponents.push(clamp((heavyAadt / 2500) * 100, 0, 100))
+      }
+      const trafficPressure = average(trafficPressureComponents)
+
+      const industrialPressureComponents: number[] = []
+      const respiratoryFacilities = metricValue(industrialResponse, 'npi_respiratory_reporting_facilities')
+      if (respiratoryFacilities !== null) {
+        industrialPressureComponents.push(clamp(respiratoryFacilities * 20, 0, 100))
+      }
+      const nearestRespiratoryFacility = metricValue(industrialResponse, 'nearest_npi_respiratory_reporting_facility_km')
+      if (nearestRespiratoryFacility !== null) {
+        industrialPressureComponents.push(clamp((5 - nearestRespiratoryFacility) / 5 * 100, 0, 100))
+      }
+      const industrialPressure = average(industrialPressureComponents)
+
       const nextBaseline: SimulationBaseline = {
         id: neighbourhood.id,
         name: neighbourhood.name,
@@ -164,6 +265,16 @@ export default function SimulationPage({
         heatExposure: clamp(neighbourhood.heatExposure ?? 6.5, 0, 20),
         vulnerability: clamp(neighbourhood.developmentalVulnerability ?? 25, 0, 100),
         childDevelopment: clamp(neighbourhood.childDevelopmentScore ?? 68, 0, 100),
+        serviceAccess: clamp(neighbourhood.serviceAccessScore ?? neighbourhood.environmentQualityScore ?? 50, 0, 100),
+        futureDemand: clamp(neighbourhood.futureDemandScore ?? 50, 0, 100),
+        environmentQuality: clamp(
+          neighbourhood.environmentQualityScore
+          ?? ((neighbourhood.treeCanopy ?? 22.7) + (neighbourhood.greenSpaceAccess ?? 31.6)) / 2,
+          0,
+          100,
+        ),
+        trafficPressure: clamp(trafficPressure ?? 50, 0, 100),
+        industrialPressure: clamp(industrialPressure ?? 50, 0, 100),
       }
 
       setBaseline(nextBaseline)
@@ -214,6 +325,45 @@ export default function SimulationPage({
     setScenarioResult(buildScenarioResult(baseline, defaultValues))
   }
 
+  const comparisonMetrics: ComparisonMetric[] = baseline ? [
+    {
+      id: 'heat',
+      label: 'Heat exposure',
+      unit: '°C',
+      baseline: baseline.heatExposure,
+      simulated: scenarioValues.heat,
+      max: 20,
+      lowerIsBetter: true,
+    },
+    {
+      id: 'treeCanopy',
+      label: 'Tree canopy',
+      unit: '%',
+      baseline: baseline.treeCanopy,
+      simulated: scenarioValues.treeCanopy,
+      max: 100,
+      lowerIsBetter: false,
+    },
+    {
+      id: 'openSpace',
+      label: 'Public open space',
+      unit: '%',
+      baseline: baseline.openSpace,
+      simulated: scenarioValues.openSpace,
+      max: 100,
+      lowerIsBetter: false,
+    },
+    {
+      id: 'vulnerability',
+      label: 'Vulnerability',
+      unit: '%',
+      baseline: baseline.vulnerability,
+      simulated: scenarioResult?.vulnerability ?? baseline.vulnerability,
+      max: 100,
+      lowerIsBetter: true,
+    },
+  ] : []
+
   return (
     <div className="simulation-shell">
       <header className="simulation-topbar glass">
@@ -243,6 +393,7 @@ export default function SimulationPage({
               <strong>Scenario formula</strong>
               <p>Estimated vulnerability = baseline vulnerability − (tree canopy gain × 0.25) − (open space gain × 0.18) − (heat reduction × 2.1)</p>
               <p>Estimated child-development outlook = baseline score + (tree canopy gain × 0.22) + (open space gain × 0.16) + (heat reduction × 1.6)</p>
+              <p>Effects are context-adjusted using local service access, projected future demand, and available traffic and industrial context indicators.</p>
               <p>Values are clamped to realistic ranges to keep the estimate stable and interpretable for planning comparisons.</p>
             </div>
           </div>
@@ -388,6 +539,8 @@ export default function SimulationPage({
               <ul>
                 <li>Tree canopy and public open space improvements lower vulnerability in the scenario model.</li>
                 <li>Lower heat exposure reduces the expected pressure on child-development outcomes.</li>
+                <li>Higher local service access amplifies expected gains, while stronger projected demand dampens gains.</li>
+                <li>Higher traffic and industrial context pressure further dampens estimated gains in the scenario output.</li>
                 <li>The output is a planning comparison, not a forecast of a future year-by-year trend.</li>
               </ul>
             </div>
@@ -438,7 +591,7 @@ export default function SimulationPage({
                   <span className="result-arrow">→</span>
                   <strong>{scenarioResult ? `${scenarioResult.vulnerability.toFixed(1)}%` : '—'}</strong>
                 </div>
-                <div className="result-status success">{scenarioResult ? scenarioResult.heatDirection : 'Pending'}</div>
+                <div className="result-status success">{scenarioResult ? scenarioResult.vulnerabilityDirection : 'Pending'}</div>
               </article>
 
               <article className="result-card">
@@ -463,29 +616,36 @@ export default function SimulationPage({
                 </div>
               </div>
 
-              <div className="comparison-row">
-                <span className="comparison-label">Heat exposure</span>
-                <div className="comparison-bar baseline" style={{ width: `${baseline ? (baseline.heatExposure / 20) * 100 : 58}%` }} />
-                <div className="comparison-bar simulated" style={{ width: `${(scenarioValues.heat / 20) * 100}%` }} />
-              </div>
+              {!baseline && (
+                <div className="comparison-empty">Select a neighbourhood to view a clear baseline vs simulated comparison.</div>
+              )}
 
-              <div className="comparison-row">
-                <span className="comparison-label">Tree canopy</span>
-                <div className="comparison-bar baseline" style={{ width: `${baseline ? (baseline.treeCanopy / 100) * 100 : 36}%` }} />
-                <div className="comparison-bar simulated" style={{ width: `${(scenarioValues.treeCanopy / 100) * 100}%` }} />
-              </div>
-
-              <div className="comparison-row">
-                <span className="comparison-label">Public open space</span>
-                <div className="comparison-bar baseline" style={{ width: `${baseline ? (baseline.openSpace / 100) * 100 : 48}%` }} />
-                <div className="comparison-bar simulated" style={{ width: `${(scenarioValues.openSpace / 100) * 100}%` }} />
-              </div>
-
-              <div className="comparison-row">
-                <span className="comparison-label">Vulnerability</span>
-                <div className="comparison-bar baseline" style={{ width: `${baseline ? (baseline.vulnerability / 100) * 100 : 64}%` }} />
-                <div className="comparison-bar simulated" style={{ width: `${scenarioResult ? (scenarioResult.vulnerability / 100) * 100 : 46}%` }} />
-              </div>
+              {baseline && comparisonMetrics.map((metric) => {
+                const direction = metricDirection(metric)
+                const baselineWidth = clamp((metric.baseline / metric.max) * 100, 0, 100)
+                const simulatedWidth = clamp((metric.simulated / metric.max) * 100, 0, 100)
+                const deltaPrefix = direction.delta > 0 ? '+' : ''
+                return (
+                  <div className="comparison-row" key={metric.id}>
+                    <div className="comparison-metric">
+                      <span className="comparison-label">{metric.label}</span>
+                      <span className="comparison-rule">{metric.lowerIsBetter ? 'Lower is better' : 'Higher is better'}</span>
+                    </div>
+                    <div className="comparison-values">
+                      <span className="comparison-value baseline">{formatMetricValue(metric.baseline, metric.unit)}</span>
+                      <span className="comparison-arrow">→</span>
+                      <span className="comparison-value simulated">{formatMetricValue(metric.simulated, metric.unit)}</span>
+                      <span className={`comparison-delta ${direction.tone}`}>
+                        {`${deltaPrefix}${direction.delta.toFixed(1)}${metric.unit} · ${direction.label}`}
+                      </span>
+                    </div>
+                    <div className="comparison-track" role="img" aria-label={`${metric.label} baseline ${formatMetricValue(metric.baseline, metric.unit)} simulated ${formatMetricValue(metric.simulated, metric.unit)}`}>
+                      <div className="comparison-track-fill baseline" style={{ width: `${baselineWidth}%` }} />
+                      <div className="comparison-track-fill simulated" style={{ width: `${simulatedWidth}%` }} />
+                    </div>
+                  </div>
+                )
+              })}
             </div>
 
             <div className="insight-box">
@@ -494,6 +654,10 @@ export default function SimulationPage({
                 <span className="confidence-pill">Confidence · Medium</span>
               </div>
               <p>{scenarioResult ? scenarioResult.insight : 'Select a neighbourhood and run the model to update the scenario estimate. This is an illustrative model output, not a future forecast.'}</p>
+              <div className="projected-change secondary">
+                <span>Model context:</span>
+                <strong>{scenarioResult ? scenarioResult.modelContext : `${baseline?.serviceAccess?.toFixed(1) ?? '50.0'} · ${baseline?.futureDemand?.toFixed(1) ?? '50.0'}`}</strong>
+              </div>
               <div className="projected-change">
                 <span>Vulnerability change:</span>
                 <strong>{scenarioResult ? scenarioResult.projectedChange : `${baseline?.vulnerability ?? 25}% → ${baseline?.vulnerability ?? 25}%`}</strong>

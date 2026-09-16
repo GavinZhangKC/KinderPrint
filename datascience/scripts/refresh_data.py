@@ -371,6 +371,23 @@ def main() -> int:
     with Stage("11 build artefacts", manifest):
         geo = json.loads((REF / "sa2_melbourne.geojson").read_text())
         profiles = B.build_profiles(final)
+        service_context_path = PROC / "early_childhood_context_sa2.csv"
+        demand_context_path = PROC / "vif_child_population_projections_sa2.csv"
+        service_context = (
+            pd.read_csv(service_context_path, dtype={"SA2_CODE_2021": str})
+            if service_context_path.is_file()
+            else None
+        )
+        demand_context = (
+            pd.read_csv(demand_context_path, dtype={"sa2_code_2021": str})
+            if demand_context_path.is_file()
+            else None
+        )
+        profiles["profiles"] = B.build_context_scores(
+            profiles["profiles"],
+            service_context=service_context,
+            demand_context=demand_context,
+        )
         for name, obj in {"profiles.json": profiles,
                           "priorities.json": B.build_priorities(final),
                           "explanations.json": B.build_explanations(final),

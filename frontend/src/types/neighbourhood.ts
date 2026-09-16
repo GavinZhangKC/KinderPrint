@@ -21,6 +21,9 @@ export interface Neighbourhood {
   heatExposure: number | null
   treeCanopy: number | null
   greenSpaceAccess: number | null
+  serviceAccessScore: number | null
+  futureDemandScore: number | null
+  environmentQualityScore: number | null
   indicatorProvenance: Record<string, IndicatorProvenance>
   priority: string | null
   highlightedFactors: string[]

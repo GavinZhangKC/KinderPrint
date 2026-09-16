@@ -126,9 +126,15 @@ def build_context_scores(
         service = service.set_index("SA2_CODE_2021")
     else:
         service = None
+    demand_reference_year: int | None = None
     if demand_context is not None and not demand_context.empty:
         demand = demand_context.copy()
-        demand = demand[demand["sex"].eq("persons") & demand["projection_year"].eq(2021)].copy()
+        demand = demand[demand["sex"].eq("persons")].copy()
+        if "projection_year" in demand.columns:
+            demand["projection_year"] = pd.to_numeric(demand["projection_year"], errors="coerce")
+            if demand["projection_year"].notna().any():
+                demand_reference_year = int(demand["projection_year"].max())
+                demand = demand[demand["projection_year"].eq(demand_reference_year)].copy()
         demand["sa2_code_2021"] = demand["sa2_code_2021"].astype(str)
         demand = demand.drop_duplicates(subset=["sa2_code_2021"]).set_index("sa2_code_2021")
     else:
@@ -184,7 +190,7 @@ def build_context_scores(
                 "status": "available" if demand_score is not None else "unavailable",
                 "source": "Victoria in Future 2023",
                 "geographic_unit": GEO_UNIT,
-                "reference_year": "2021",
+                "reference_year": str(demand_reference_year) if demand_reference_year is not None else "2021",
             })
 
         vegetation = next((indicator for indicator in env_domain["indicators"] if indicator["id"] == "env_vegetation_cover"), None)

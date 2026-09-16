@@ -68,6 +68,9 @@ export function toNeighbourhood(
   const heatExposure = numberValue(profile, 'env_urban_heat')
   const treeCanopy = numberValue(profile, 'env_vegetation_cover')
   const greenSpaceAccess = numberValue(profile, 'env_open_space_access')
+  const serviceAccessScore = numberValue(profile, 'service_access_score')
+  const futureDemandScore = numberValue(profile, 'future_demand_score')
+  const environmentQualityScore = numberValue(profile, 'environment_quality_score')
   const dataQuality = typeof context.metadata.data_quality === 'string'
     ? context.metadata.data_quality
     : null
@@ -104,6 +107,9 @@ export function toNeighbourhood(
     heatExposure: round(heatExposure),
     treeCanopy: round(treeCanopy),
     greenSpaceAccess: round(greenSpaceAccess),
+    serviceAccessScore: round(serviceAccessScore),
+    futureDemandScore: round(futureDemandScore),
+    environmentQualityScore: round(environmentQualityScore),
     indicatorProvenance,
     priority: priority?.priority_band ?? null,
     highlightedFactors,
