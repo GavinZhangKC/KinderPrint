@@ -711,6 +711,7 @@ def locality_suitability(
         "lower_industrial_emission_source_presence",
         "lower_declared_road_traffic",
         "public_transport_availability",
+        "lower_bushfire_prone_share",
     }
     selected_criteria = [
         item.strip()
