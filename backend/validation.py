@@ -103,6 +103,9 @@ SUITABILITY_CRITERIA = {
     "lower_declared_road_traffic",
     "public_transport_availability",
     "lower_bushfire_prone_share",
+    "approved_early_childhood_places",
+    "long_day_care_availability",
+    "kindergarten_availability",
 }
 
 
