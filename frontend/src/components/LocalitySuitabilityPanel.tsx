@@ -12,6 +12,7 @@ interface LocalitySuitabilityPanelProps {
   loading: boolean
   error: string | null
   notice: string | null
+  onApplyPattern: (criteria: string[]) => void
   onSelectLocality: (id: string, name: string) => void
 }
 
@@ -25,13 +26,57 @@ type SuitabilityOption = {
 
 const optionGroups: Array<{ title: string; summary: string; options: SuitabilityOption[] }> = [
   {
-    title: 'Child development',
-    summary: 'Population-level AEDC results for children in their first year of school.',
+    title: 'Child development — available measures',
+    summary: 'AEDC population results for children in their first year of full-time school.',
     options: [
-      { id: 'development_on_track', label: 'On track across all five domains', description: 'Share of assessed children developmentally on track in physical health, social competence, emotional maturity, language and cognitive skills, and communication.', source: 'AEDC, 2024', available: true },
-      { id: 'lower_developmental_vulnerability', label: 'Lower developmental vulnerability', description: 'Areas with a lower share of assessed children vulnerable on one or more AEDC domains.', source: 'AEDC, 2024', available: true },
-      { id: 'respiratory_health', label: 'Respiratory and lung health', description: 'Asthma and respiratory outcomes are not available at the approved SA2 reporting level.', source: 'Data unavailable', available: false },
-      { id: 'other_clinical_health', label: 'Other clinical child health', description: 'Locality-level liver, neurological, eye and other clinical outcomes are not available in the approved datasets.', source: 'Data unavailable', available: false },
+      { id: 'development_on_track', label: 'On track in all five AEDC domains', description: 'Children on track in: physical health and wellbeing; social competence; emotional maturity; language and cognitive skills; and communication skills and general knowledge.', source: 'AEDC, 2024', available: true },
+      { id: 'lower_developmental_vulnerability', label: 'Lower vulnerability on one or more AEDC domains', description: 'Ranks areas with a lower share of assessed children classified as developmentally vulnerable on at least one of the five domains.', source: 'AEDC, 2024', available: true },
+    ],
+  },
+  {
+    title: 'AEDC domain detail — awaiting separate measures',
+    summary: 'The current SA2 file contains combined outcomes only. These cannot be ranked separately yet.',
+    options: [
+      { id: 'aedc_physical', label: 'Physical health and wellbeing', description: 'Physical readiness for the school day, independence and gross and fine motor skills.', source: 'Separate SA2 measure not integrated', available: false },
+      { id: 'aedc_social', label: 'Social competence', description: 'Overall social competence, responsibility and respect, approaches to learning and readiness to explore.', source: 'Separate SA2 measure not integrated', available: false },
+      { id: 'aedc_emotional', label: 'Emotional maturity', description: 'Prosocial and helping behaviour, anxious or fearful behaviour, aggression and hyperactivity or inattention.', source: 'Separate SA2 measure not integrated', available: false },
+      { id: 'aedc_language', label: 'Language and cognitive skills', description: 'Basic and advanced literacy, interest in literacy, numeracy and memory, and basic numeracy.', source: 'Separate SA2 measure not integrated', available: false },
+      { id: 'aedc_communication', label: 'Communication skills and general knowledge', description: 'Communication with adults and children, story-telling, articulation and age-appropriate general knowledge.', source: 'Separate SA2 measure not integrated', available: false },
+    ],
+  },
+  {
+    title: 'Child health outcomes — respiratory, immune and chronic',
+    summary: 'Each condition needs a validated, geographically compatible outcome dataset before ranking.',
+    options: [
+      { id: 'asthma', label: 'Asthma', description: 'Prevalence, emergency presentations or hospital admissions among children.', source: 'No approved SA2 outcome data', available: false },
+      { id: 'respiratory_illness', label: 'Other respiratory illness', description: 'Bronchiolitis, pneumonia, chronic lung disease and recurrent respiratory presentations.', source: 'No approved SA2 outcome data', available: false },
+      { id: 'allergy_immunology', label: 'Allergy and immune conditions', description: 'Food allergy, anaphylaxis, eczema and immune-system conditions.', source: 'No approved SA2 outcome data', available: false },
+      { id: 'diabetes_endocrine', label: 'Diabetes and endocrine conditions', description: 'Type 1 diabetes, thyroid, growth, puberty and other hormone-related conditions.', source: 'No approved SA2 outcome data', available: false },
+      { id: 'obesity_nutrition', label: 'Healthy weight and nutrition outcomes', description: 'Validated child overweight, obesity, undernutrition or nutritional-deficiency measures.', source: 'No approved SA2 outcome data', available: false },
+    ],
+  },
+  {
+    title: 'Child health outcomes — organ systems and serious illness',
+    summary: 'Clinical outcomes cannot be inferred from environment, disadvantage or nearby facilities.',
+    options: [
+      { id: 'cardiac', label: 'Heart and circulation conditions', description: 'Congenital and acquired cardiac conditions and related hospital care.', source: 'No approved SA2 outcome data', available: false },
+      { id: 'neurological', label: 'Neurological conditions', description: 'Epilepsy, neuromuscular conditions, acquired brain injury and other neurological disorders.', source: 'No approved SA2 outcome data', available: false },
+      { id: 'gastro_liver', label: 'Digestive and liver conditions', description: 'Gastrointestinal, inflammatory bowel, coeliac and liver conditions.', source: 'No approved SA2 outcome data', available: false },
+      { id: 'kidney_urology', label: 'Kidney and urinary conditions', description: 'Renal disease, urinary-tract and bladder conditions.', source: 'No approved SA2 outcome data', available: false },
+      { id: 'cancer_blood', label: 'Cancer and blood disorders', description: 'Childhood cancers, anaemia, bleeding disorders and other haematological conditions.', source: 'No approved SA2 outcome data', available: false },
+      { id: 'musculoskeletal', label: 'Bone, joint and mobility conditions', description: 'Orthopaedic, rheumatological and mobility-related child-health outcomes.', source: 'No approved SA2 outcome data', available: false },
+    ],
+  },
+  {
+    title: 'Child health outcomes — senses, development and wellbeing',
+    summary: 'These are distinct outcomes and must not be collapsed into a generic “child health” score.',
+    options: [
+      { id: 'vision', label: 'Vision and eye health', description: 'Vision impairment, screening results and diagnosed ophthalmic conditions.', source: 'No approved SA2 outcome data', available: false },
+      { id: 'hearing', label: 'Hearing and ear health', description: 'Hearing loss, audiology outcomes and recurrent ear disease.', source: 'No approved SA2 outcome data', available: false },
+      { id: 'oral_health', label: 'Dental and oral health', description: 'Dental caries, preventable admissions and other child oral-health outcomes.', source: 'No approved SA2 outcome data', available: false },
+      { id: 'mental_health', label: 'Mental health and emotional wellbeing', description: 'Validated anxiety, depression, distress or mental-health service outcome measures.', source: 'No approved SA2 outcome data', available: false },
+      { id: 'neurodevelopmental', label: 'Neurodevelopmental conditions', description: 'Autism, ADHD, intellectual disability and related developmental diagnoses.', source: 'No approved SA2 outcome data', available: false },
+      { id: 'infectious_disease', label: 'Infectious disease', description: 'Validated childhood infection, notification or hospital-presentation measures.', source: 'No approved SA2 outcome data', available: false },
     ],
   },
   {
@@ -41,15 +86,68 @@ const optionGroups: Array<{ title: string; summary: string; options: Suitability
       { id: 'tree_canopy', label: 'More tree canopy', description: 'Ranks areas using measured vegetation and canopy coverage.', source: 'Victorian environmental data', available: true },
       { id: 'public_open_space', label: 'More public open space', description: 'Ranks areas by the available public open-space indicator.', source: 'Victorian environmental data', available: true },
       { id: 'lower_urban_heat', label: 'Lower urban heat', description: 'Ranks areas with lower measured urban heat exposure.', source: 'Victorian environmental data', available: true },
-      { id: 'air_quality', label: 'Local air quality', description: 'Monitoring-station observations cannot defensibly rank every SA2 locality.', source: 'Locality data unavailable', available: false },
+      { id: 'pm25', label: 'Fine-particle pollution (PM2.5)', description: 'Monitoring-station readings cannot be assigned to every SA2 without a validated exposure model.', source: 'Locality exposure unavailable', available: false },
+      { id: 'pm10', label: 'Particle pollution (PM10)', description: 'Requires a defensible locality-level exposure surface rather than nearest-monitor assignment.', source: 'Locality exposure unavailable', available: false },
+      { id: 'no2', label: 'Traffic-related nitrogen dioxide (NO₂)', description: 'Requires validated locality-level modelling or adequate monitoring coverage.', source: 'Locality exposure unavailable', available: false },
+      { id: 'ozone', label: 'Ground-level ozone', description: 'Station observations alone do not support an SA2 suitability ranking.', source: 'Locality exposure unavailable', available: false },
+      { id: 'noise', label: 'Transport noise exposure', description: 'No approved, comparable SA2 noise-exposure surface is integrated.', source: 'Data unavailable', available: false },
+      { id: 'flood_bushfire', label: 'Flood and bushfire exposure', description: 'Hazard-specific, current spatial layers and a validated scoring method are required.', source: 'Not yet integrated', available: false },
     ],
   },
   {
-    title: 'Healthcare access',
-    summary: 'Clinical service filters will remain off until a legitimate locality-level directory is integrated.',
+    title: 'Primary, early-years and urgent healthcare access',
+    summary: 'Presence is not the same as capacity, waiting time, eligibility, affordability or quality.',
     options: [
-      { id: 'paediatric_services', label: 'Paediatricians and child-health services', description: 'No approved SA2-level coverage or capacity dataset is currently integrated.', source: 'Planned', available: false },
-      { id: 'specialist_services', label: 'Eye, brain and other specialist clinics', description: 'Clinic presence alone would not establish quality, availability or suitability for children.', source: 'Planned', available: false },
+      { id: 'general_paediatrics', label: 'General paediatricians', description: 'Community or hospital doctors providing specialist care for babies, children and adolescents.', source: 'Service directory not integrated', available: false },
+      { id: 'gp', label: 'General practitioners', description: 'Primary-care practices accepting children, including opening hours and bulk-billing status.', source: 'Service directory not integrated', available: false },
+      { id: 'mch', label: 'Maternal and Child Health services', description: 'Universal and enhanced MCH centres supporting families from birth to school age.', source: 'Service locations not integrated', available: false },
+      { id: 'early_parenting', label: 'Early Parenting Centres', description: 'Specialist support for sleep, settling, feeding and parenting for families with young children.', source: 'Service locations not integrated', available: false },
+      { id: 'urgent_emergency', label: 'Paediatric urgent and emergency care', description: 'Child-capable urgent care, emergency departments and travel-time access.', source: 'Access model not integrated', available: false },
+      { id: 'hospital_neonatal', label: 'Children’s hospital and neonatal care', description: 'Paediatric inpatient, neonatal intensive-care and special-care nursery access.', source: 'Access model not integrated', available: false },
+    ],
+  },
+  {
+    title: 'Paediatric medical specialists',
+    summary: 'Each specialty needs verified child-specific locations plus access and capacity information.',
+    options: [
+      { id: 'developmental_paediatrics', label: 'Developmental and behavioural paediatrics', description: 'Assessment and care for developmental, learning, attention and behavioural concerns.', source: 'Service data unavailable', available: false },
+      { id: 'respiratory_clinic', label: 'Respiratory and sleep medicine', description: 'Asthma, chronic lung disease, breathing and paediatric sleep services.', source: 'Service data unavailable', available: false },
+      { id: 'cardiology_clinic', label: 'Cardiology', description: 'Congenital and acquired heart-condition assessment and treatment.', source: 'Service data unavailable', available: false },
+      { id: 'neurology_clinic', label: 'Neurology and epilepsy', description: 'Brain, nerve, neuromuscular and seizure-related specialist care.', source: 'Service data unavailable', available: false },
+      { id: 'gastro_clinic', label: 'Gastroenterology and hepatology', description: 'Digestive-system, nutrition and liver specialist care.', source: 'Service data unavailable', available: false },
+      { id: 'endocrine_clinic', label: 'Endocrinology and diabetes', description: 'Diabetes, growth, thyroid, puberty and hormone-related care.', source: 'Service data unavailable', available: false },
+      { id: 'renal_clinic', label: 'Nephrology and urology', description: 'Kidney, bladder and urinary-system specialist care.', source: 'Service data unavailable', available: false },
+      { id: 'allergy_clinic', label: 'Allergy and immunology', description: 'Food allergy, anaphylaxis, immune conditions and related testing.', source: 'Service data unavailable', available: false },
+      { id: 'oncology_clinic', label: 'Oncology and haematology', description: 'Cancer and blood-disorder diagnosis and treatment.', source: 'Service data unavailable', available: false },
+      { id: 'infectious_clinic', label: 'Infectious diseases', description: 'Specialist assessment and treatment of complex childhood infections.', source: 'Service data unavailable', available: false },
+      { id: 'adolescent_medicine', label: 'Adolescent medicine', description: 'Developmentally appropriate care for complex physical and psychosocial needs in adolescence.', source: 'Service data unavailable', available: false },
+    ],
+  },
+  {
+    title: 'Surgical, sensory and diagnostic services',
+    summary: 'A clinic listing would still require child eligibility, referral rules and travel-time validation.',
+    options: [
+      { id: 'paediatric_surgery', label: 'Paediatric surgery', description: 'General and subspecialty surgery designed for children.', source: 'Service data unavailable', available: false },
+      { id: 'orthopaedics', label: 'Orthopaedics and rheumatology', description: 'Bone, joint, spine, mobility and inflammatory-condition care.', source: 'Service data unavailable', available: false },
+      { id: 'ent', label: 'Ear, nose and throat (ENT)', description: 'ENT assessment, procedures and surgery for children.', source: 'Service data unavailable', available: false },
+      { id: 'ophthalmology', label: 'Ophthalmology and optometry', description: 'Child eye-health assessment, treatment and vision correction.', source: 'Service data unavailable', available: false },
+      { id: 'audiology', label: 'Audiology and hearing services', description: 'Hearing assessment, diagnostic audiology and hearing support.', source: 'Service data unavailable', available: false },
+      { id: 'dental', label: 'Child dental and specialist oral care', description: 'Preventive, restorative and specialist paediatric dental services.', source: 'Service data unavailable', available: false },
+      { id: 'imaging_pathology', label: 'Child-capable imaging and pathology', description: 'Diagnostic services with appropriate paediatric expertise and equipment.', source: 'Service data unavailable', available: false },
+      { id: 'genetics', label: 'Clinical genetics', description: 'Genetic assessment, counselling and diagnostic services.', source: 'Service data unavailable', available: false },
+    ],
+  },
+  {
+    title: 'Mental health, therapy and family support',
+    summary: 'Victorian community child health commonly includes several of these allied-health services.',
+    options: [
+      { id: 'child_mental_health', label: 'Child and adolescent mental-health services', description: 'Psychiatry, psychology, crisis, community and specialist mental-health care.', source: 'Service data unavailable', available: false },
+      { id: 'speech_pathology', label: 'Speech pathology', description: 'Speech, language, communication, voice, fluency and swallowing support.', source: 'Service data unavailable', available: false },
+      { id: 'occupational_therapy', label: 'Occupational therapy', description: 'Daily activities, sensory processing, participation and functional-development support.', source: 'Service data unavailable', available: false },
+      { id: 'physiotherapy', label: 'Physiotherapy', description: 'Movement, mobility, strength, coordination and physical-development support.', source: 'Service data unavailable', available: false },
+      { id: 'dietetics', label: 'Dietetics and feeding services', description: 'Nutrition, growth, feeding difficulty and therapeutic diet support.', source: 'Service data unavailable', available: false },
+      { id: 'family_counselling', label: 'Family counselling and care coordination', description: 'Family support, coordinated referrals and navigation across services.', source: 'Service data unavailable', available: false },
+      { id: 'rehabilitation', label: 'Paediatric rehabilitation and complex care', description: 'Multidisciplinary rehabilitation for disability, injury or complex health needs.', source: 'Service data unavailable', available: false },
     ],
   },
   {
@@ -61,6 +159,13 @@ const optionGroups: Array<{ title: string; summary: string; options: Suitability
   },
 ]
 
+const evidencePatterns = [
+  { label: 'Development + canopy', criteria: ['development_on_track', 'tree_canopy'], description: 'On-track development alongside tree-canopy coverage' },
+  { label: 'Vulnerability + heat', criteria: ['lower_developmental_vulnerability', 'lower_urban_heat'], description: 'Lower developmental vulnerability alongside lower urban heat' },
+  { label: 'Green-space access', criteria: ['tree_canopy', 'public_open_space'], description: 'Tree canopy and public open space considered together' },
+  { label: 'Whole evidence view', criteria: ['development_on_track', 'lower_developmental_vulnerability', 'tree_canopy', 'public_open_space', 'lower_urban_heat', 'socioeconomic_resources'], description: 'All currently supported measures, equally weighted' },
+]
+
 export default function LocalitySuitabilityPanel({
   criteria,
   onToggle,
@@ -68,6 +173,7 @@ export default function LocalitySuitabilityPanel({
   loading,
   error,
   notice,
+  onApplyPattern,
   onSelectLocality,
 }: LocalitySuitabilityPanelProps) {
   const activeCriteria = new Set(criteria)
@@ -87,6 +193,28 @@ export default function LocalitySuitabilityPanel({
       </div>
 
       <p className="suitability-intro">Choose the evidence that matters to your comparison. Results are relative area-level matches, not medical or personal advice.</p>
+
+      <div className="suitability-patterns" aria-label="Evidence pattern shortcuts">
+        <strong>Explore a concrete evidence pattern</strong>
+        <p>These shortcuts combine measured indicators; they do not claim that one causes another.</p>
+        <div>
+          {evidencePatterns.map((pattern) => {
+            const isActive = pattern.criteria.length === criteria.length
+              && pattern.criteria.every((criterion) => activeCriteria.has(criterion))
+            return (
+              <button
+                key={pattern.label}
+                type="button"
+                aria-pressed={isActive}
+                title={pattern.description}
+                onClick={() => onApplyPattern(pattern.criteria)}
+              >
+                {pattern.label}
+              </button>
+            )
+          })}
+        </div>
+      </div>
 
       <div className="suitability-options" aria-label="Suitability filters">
         {optionGroups.map((group) => (

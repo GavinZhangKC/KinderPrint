@@ -801,6 +801,7 @@ setMapSelectedId(null)
               loading={suitabilityLoading}
               error={suitabilityError}
               notice={suitabilityNotice}
+              onApplyPattern={(nextCriteria) => setSuitabilityCriteria(nextCriteria)}
               onSelectLocality={(id, name) => {
                 setIsSuitabilityModalOpen(false)
                 void handleMapSelect(id, name, true)
