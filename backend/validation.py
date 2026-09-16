@@ -85,10 +85,12 @@ def load_profiles() -> tuple[list[dict[str, Any]] | None, list[dict[str, Any]]]:
 
 
 SUITABILITY_CRITERIA = {
-    "child_development",
-    "green_space",
-    "low_disadvantage",
-    "low_heat",
+    "development_on_track",
+    "lower_developmental_vulnerability",
+    "tree_canopy",
+    "public_open_space",
+    "lower_urban_heat",
+    "socioeconomic_resources",
 }
 
 

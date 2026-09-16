@@ -685,7 +685,7 @@ def neighbourhood_boundary(neighbourhood_id: str) -> dict[str, Any]:
 
 @app.get("/api/localities/suitable")
 def locality_suitability(
-    criteria: str = Query("child_development,green_space,low_disadvantage", description="comma-separated priority factors"),
+    criteria: str = Query("development_on_track,tree_canopy", description="comma-separated evidence factors"),
     limit: int = Query(10, ge=1, le=20),
 ) -> dict[str, Any]:
     """Return a locality ranking already calculated by the Data Science pipeline."""
@@ -694,10 +694,12 @@ def locality_suitability(
         return envelope("unavailable", {"localities": [], "criteria": [], "limit": limit}, limitations=limitations)
 
     valid_criteria = {
-        "child_development",
-        "green_space",
-        "low_disadvantage",
-        "low_heat",
+        "development_on_track",
+        "lower_developmental_vulnerability",
+        "tree_canopy",
+        "public_open_space",
+        "lower_urban_heat",
+        "socioeconomic_resources",
     }
     selected_criteria = [
         item.strip()

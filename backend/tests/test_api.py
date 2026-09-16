@@ -67,27 +67,27 @@ def test_validation_error_uses_envelope(client) -> None:
 def test_locality_suitability_serves_precomputed_ranking(client, monkeypatch, write_json) -> None:
     suitability_path = write_json("suitability.json", json.dumps({
         "rankings": [{
-            "criteria": ["child_development", "green_space", "low_disadvantage"],
+            "criteria": ["development_on_track", "tree_canopy", "socioeconomic_resources"],
             "localities": [
                 {"id": "best", "name": "Best", "geographic_unit": "SA2", "score": 80.0,
                  "status": "available", "limitations": [],
-                 "criteria": ["child_development", "green_space", "low_disadvantage"]},
+                 "criteria": ["development_on_track", "tree_canopy", "socioeconomic_resources"]},
                 {"id": "worst", "name": "Worst", "geographic_unit": "SA2", "score": 20.0,
                  "status": "available", "limitations": [],
-                 "criteria": ["child_development", "green_space", "low_disadvantage"]},
+                 "criteria": ["development_on_track", "tree_canopy", "socioeconomic_resources"]},
             ],
         }],
         "metadata": {"source": "Approved profile dataset"},
     }))
     monkeypatch.setenv(SUITABILITY_DATA_PATH_ENV, str(suitability_path))
 
-    body = client.get("/api/localities/suitable?criteria=child_development,green_space,low_disadvantage&limit=5").json()
+    body = client.get("/api/localities/suitable?criteria=development_on_track,tree_canopy,socioeconomic_resources&limit=5").json()
 
     assert_envelope(body)
     assert body["status"] == "available"
     assert body["data"]["localities"][0]["id"] == "best"
     assert body["data"]["localities"][0]["score"] >= body["data"]["localities"][1]["score"]
-    assert body["data"]["criteria"][0] == "child_development"
+    assert body["data"]["criteria"][0] == "development_on_track"
     assert body["data"]["withheld_count"] == 0
 
 
@@ -110,23 +110,23 @@ def test_locality_suitability_requires_supported_criteria(client, monkeypatch, w
 def test_locality_suitability_withholds_incomplete_results(client, monkeypatch, write_json) -> None:
     suitability_path = write_json("suitability.json", json.dumps({
         "rankings": [{
-            "criteria": ["green_space"],
+            "criteria": ["tree_canopy"],
             "localities": [
                 {"id": "complete", "name": "Complete", "geographic_unit": "SA2",
-                 "score": 75.0, "status": "available", "criteria": ["green_space"],
+                 "score": 75.0, "status": "available", "criteria": ["tree_canopy"],
                  "limitations": []},
                 {"id": "missing", "name": "Missing", "geographic_unit": "SA2",
-                 "score": None, "status": "limited", "criteria": ["green_space"],
+                 "score": None, "status": "limited", "criteria": ["tree_canopy"],
                  "limitations": [{"code": "suitability_inputs_incomplete",
                                   "message": "Inputs unavailable.",
-                                  "affected_fields": ["green_space"]}]},
+                                  "affected_fields": ["tree_canopy"]}]},
             ],
         }],
         "metadata": {"source": "Approved profile dataset"},
     }))
     monkeypatch.setenv(SUITABILITY_DATA_PATH_ENV, str(suitability_path))
 
-    body = client.get("/api/localities/suitable?criteria=green_space&limit=5").json()
+    body = client.get("/api/localities/suitable?criteria=tree_canopy&limit=5").json()
 
     assert body["status"] == "limited"
     assert [item["id"] for item in body["data"]["localities"]] == ["complete"]
