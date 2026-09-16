@@ -19,7 +19,7 @@ export KINDERPRINT_EPA_STATION_YEAR_DATA_PATH="${PROJECT_ROOT}/datascience/data/
 export KINDERPRINT_ACECQA_GEOCODING_DATA_PATH="${PROJECT_ROOT}/datascience/data/processed/acecqa_gnaf_geocoding.csv"
 export KINDERPRINT_ACECQA_CONTEXT_DATA_PATH="${PROJECT_ROOT}/datascience/data/processed/acecqa_gnaf_context_community.csv"
 export KINDERPRINT_COMMUNITY_CONTEXT_DATA_PATH="${PROJECT_ROOT}/datascience/data/processed/community_context.csv"
-export KINDERPRINT_COMMUNITY_IDENTITY_DATA_PATH="${PROJECT_ROOT}/datascience/outputs/iteration_1/communities.csv"
+export KINDERPRINT_COMMUNITY_IDENTITY_DATA_PATH="${PROJECT_ROOT}/datascience/data/processed/final_table.csv"
 
 cd "${SCRIPT_DIR}"
 exec uvicorn main:app --reload --host 0.0.0.0 --port 8000

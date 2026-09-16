@@ -91,7 +91,12 @@ function buildScenarioResult(baseline: SimulationBaseline, values: ScenarioValue
   const demandPressureFactor = clamp(1.15 - (baseline.futureDemand / 100) * 0.35, 0.8, 1.15)
   const backgroundPressure = (baseline.trafficPressure + baseline.industrialPressure) / 2
   const pressureDampeningFactor = clamp(1.1 - (backgroundPressure / 100) * 0.35, 0.75, 1.1)
-  const contextMultiplier = clamp((serviceCapacityFactor + demandPressureFactor + pressureDampeningFactor) / 3, 0.7, 1.2)
+  const environmentResilienceFactor = clamp(0.9 + (baseline.environmentQuality / 100) * 0.2, 0.9, 1.1)
+  const contextMultiplier = clamp(
+    (serviceCapacityFactor + demandPressureFactor + pressureDampeningFactor + environmentResilienceFactor) / 4,
+    0.7,
+    1.2,
+  )
 
   const effectiveVulnerabilityAdjustment = vulnerabilityAdjustment > 0
     ? vulnerabilityAdjustment * contextMultiplier
@@ -116,7 +121,7 @@ function buildScenarioResult(baseline: SimulationBaseline, values: ScenarioValue
   const heatDirection = heatReduction > 0 ? 'Improves' : 'Higher exposure'
   const vulnerabilityDirection = projectedVulnerability < baseline.vulnerability ? 'Improves' : projectedVulnerability > baseline.vulnerability ? 'Higher risk' : 'No change'
   const developmentDirection = projectedDevelopment > baseline.childDevelopment ? 'Improves' : 'Lower outlook'
-  const modelContext = `Service ${baseline.serviceAccess.toFixed(1)} · Demand ${baseline.futureDemand.toFixed(1)} · Traffic ${baseline.trafficPressure.toFixed(1)} · Industrial ${baseline.industrialPressure.toFixed(1)} · Multiplier ${contextMultiplier.toFixed(2)}x`
+  const modelContext = `Service ${baseline.serviceAccess.toFixed(1)} · Demand ${baseline.futureDemand.toFixed(1)} · Environment ${baseline.environmentQuality.toFixed(1)} · Traffic ${baseline.trafficPressure.toFixed(1)} · Industrial ${baseline.industrialPressure.toFixed(1)} · Multiplier ${contextMultiplier.toFixed(2)}x`
   const insight = heatReduction > 0
     ? 'Reducing heat exposure while increasing canopy and green access produces a lower estimated vulnerability profile for this area, adjusted for local service access and projected demand pressure.'
     : 'This scenario increases heat pressure and reduces the expected benefit from buffering child-development outcomes, even after applying local service-access and demand context.'
