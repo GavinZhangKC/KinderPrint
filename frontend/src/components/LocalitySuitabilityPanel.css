@@ -104,6 +104,14 @@
   outline-offset: 1px;
 }
 .suitability-result-name { min-width: 0; }
+.suitability-result-measures {
+  display: block;
+  margin-top: 2px;
+  color: #536b8f !important;
+  font-size: 9px;
+  line-height: 1.35;
+  white-space: normal;
+}
 .suitability-results strong { display: block; color: #243b63; }
 .suitability-results small { color: #7084a7; }
 .rank { font-weight: 700; color: var(--brand); }

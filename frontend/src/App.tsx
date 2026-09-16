@@ -74,7 +74,7 @@ const [view, setView] =
   const [suitabilityCriteria, setSuitabilityCriteria] =
     useState<string[]>([])
   const [suitabilityResults, setSuitabilityResults] =
-    useState<Array<{ id: string; name: string; geographic_unit: string; score: number | null; status: string; criteria: string[] }>>([])
+    useState<Array<{ id: string; name: string; geographic_unit: string; score: number | null; status: string; criteria: string[]; measures: Record<string, number | null>; criterion_scores: Record<string, number | null> }>>([])
   const [suitabilityLoading, setSuitabilityLoading] = useState(false)
   const [suitabilityError, setSuitabilityError] = useState<string | null>(null)
   const [suitabilityNotice, setSuitabilityNotice] = useState<string | null>(null)

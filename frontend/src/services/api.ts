@@ -191,6 +191,8 @@ export interface SuitableLocality {
   score: number | null
   status: ApiStatus | string
   criteria: string[]
+  measures: Record<string, number | null>
+  criterion_scores: Record<string, number | null>
   limitations: ApiLimitation[]
 }
 

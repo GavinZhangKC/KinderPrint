@@ -8,6 +8,8 @@ interface LocalitySuitabilityPanelProps {
     score: number | null
     status: string
     criteria: string[]
+    measures: Record<string, number | null>
+    criterion_scores: Record<string, number | null>
   }>
   loading: boolean
   error: string | null
@@ -24,24 +26,56 @@ type SuitabilityOption = {
   available: boolean
 }
 
+const measureFormats: Record<string, { short: string; unit: string; digits?: number }> = {
+  development_on_track: { short: 'All 5 AEDC', unit: '%' },
+  lower_developmental_vulnerability: { short: 'AEDC vulnerable', unit: '%' },
+  physical_health_on_track: { short: 'Physical', unit: '%' },
+  social_competence_on_track: { short: 'Social', unit: '%' },
+  emotional_maturity_on_track: { short: 'Emotional', unit: '%' },
+  language_cognitive_on_track: { short: 'Language', unit: '%' },
+  communication_knowledge_on_track: { short: 'Communication', unit: '%' },
+  tree_canopy: { short: 'Vegetation', unit: '%' },
+  public_open_space: { short: 'Open space', unit: '%' },
+  lower_urban_heat: { short: 'Heat island', unit: '°C', digits: 1 },
+  socioeconomic_resources: { short: 'IRSD', unit: '/10', digits: 0 },
+  general_practice_access: { short: 'GPs', unit: '/10k', digits: 2 },
+  hospital_access: { short: 'Hospitals', unit: '/10k', digits: 2 },
+  pharmacy_access: { short: 'Pharmacies', unit: '/10k', digits: 2 },
+  lower_industrial_emission_source_presence: { short: 'NPI facilities', unit: '', digits: 0 },
+  lower_declared_road_traffic: { short: 'Traffic intensity', unit: '', digits: 0 },
+  public_transport_availability: { short: 'Transit stops', unit: '/10k', digits: 1 },
+  lower_bushfire_prone_share: { short: 'Bushfire-prone land', unit: '%', digits: 1 },
+  approved_early_childhood_places: { short: 'Approved places', unit: '/1k children', digits: 1 },
+  long_day_care_availability: { short: 'Long day care', unit: '/1k children', digits: 1 },
+  kindergarten_availability: { short: 'Kindergarten', unit: '/1k children', digits: 1 },
+  primary_school_campus_availability: { short: 'Primary campuses', unit: '/1k children', digits: 1 },
+}
+
+function formatMeasure(criterion: string, value: number | null | undefined) {
+  if (value === null || value === undefined) return null
+  const format = measureFormats[criterion]
+  if (!format) return null
+  return `${format.short}: ${value.toFixed(format.digits ?? 1)}${format.unit}`
+}
+
 const optionGroups: Array<{ title: string; summary: string; options: SuitabilityOption[] }> = [
   {
     title: 'Child development: available measures',
     summary: 'AEDC population results for children in their first year of full-time school.',
     options: [
-      { id: 'development_on_track', label: 'On track in all five AEDC domains', description: 'Children on track in: physical health and wellbeing; social competence; emotional maturity; language and cognitive skills; and communication skills and general knowledge.', source: 'AEDC, 2024', available: true },
-      { id: 'lower_developmental_vulnerability', label: 'Lower vulnerability on one or more AEDC domains', description: 'Ranks areas with a lower share of assessed children classified as developmentally vulnerable on at least one of the five domains.', source: 'AEDC, 2024', available: true },
+      { id: 'development_on_track', label: 'Children on track across all five AEDC domains (%)', description: 'Percentage of assessed children on track in physical, social, emotional, language/cognitive and communication/general-knowledge domains.', source: 'AEDC SA2, 2024', available: true },
+      { id: 'lower_developmental_vulnerability', label: 'Children vulnerable on one or more AEDC domains (%)', description: 'Percentage of assessed children classified as developmentally vulnerable on at least one domain. Ranking favours a smaller percentage.', source: 'AEDC SA2, 2024', available: true },
     ],
   },
   {
     title: 'Five AEDC development domains',
     summary: 'Each domain uses its own 2024 SA2 on-track percentage from the official AEDC workbook.',
     options: [
-      { id: 'physical_health_on_track', label: 'Physical health and wellbeing', description: 'Physical readiness for the school day, independence and gross and fine motor skills.', source: 'AEDC, 2024', available: true },
-      { id: 'social_competence_on_track', label: 'Social competence', description: 'Overall social competence, responsibility and respect, approaches to learning and readiness to explore.', source: 'AEDC, 2024', available: true },
-      { id: 'emotional_maturity_on_track', label: 'Emotional maturity', description: 'Prosocial and helping behaviour, anxious or fearful behaviour, aggression and hyperactivity or inattention.', source: 'AEDC, 2024', available: true },
-      { id: 'language_cognitive_on_track', label: 'Language and cognitive skills', description: 'Basic and advanced literacy, interest in literacy, numeracy and memory, and basic numeracy.', source: 'AEDC, 2024', available: true },
-      { id: 'communication_knowledge_on_track', label: 'Communication skills and general knowledge', description: 'Communication with adults and children, story-telling, articulation and age-appropriate general knowledge.', source: 'AEDC, 2024', available: true },
+      { id: 'physical_health_on_track', label: 'Physical health and wellbeing: on track (%)', description: 'Percentage on track for school-day readiness, independence and gross and fine motor skills.', source: 'AEDC SA2, 2024', available: true },
+      { id: 'social_competence_on_track', label: 'Social competence: on track (%)', description: 'Percentage on track for social competence, responsibility, learning approaches and readiness to explore.', source: 'AEDC SA2, 2024', available: true },
+      { id: 'emotional_maturity_on_track', label: 'Emotional maturity: on track (%)', description: 'Percentage on track for prosocial behaviour and emotional/behavioural regulation.', source: 'AEDC SA2, 2024', available: true },
+      { id: 'language_cognitive_on_track', label: 'Language and cognitive skills: on track (%)', description: 'Percentage on track for literacy, numeracy, memory and interest in learning.', source: 'AEDC SA2, 2024', available: true },
+      { id: 'communication_knowledge_on_track', label: 'Communication and general knowledge: on track (%)', description: 'Percentage on track for communication, storytelling, articulation and age-appropriate general knowledge.', source: 'AEDC SA2, 2024', available: true },
     ],
   },
   {
@@ -83,27 +117,34 @@ const optionGroups: Array<{ title: string; summary: string; options: Suitability
     title: 'Environment',
     summary: 'Measured characteristics of the physical environment. These are not inferred health effects.',
     options: [
-      { id: 'tree_canopy', label: 'More tree canopy', description: 'Ranks areas using measured vegetation and canopy coverage.', source: 'Victorian environmental data', available: true },
-      { id: 'public_open_space', label: 'More public open space', description: 'Ranks areas by the available public open-space indicator.', source: 'Victorian environmental data', available: true },
-      { id: 'lower_urban_heat', label: 'Lower urban heat', description: 'Ranks areas with lower measured urban heat exposure.', source: 'Victorian environmental data', available: true },
+      { id: 'tree_canopy', label: 'Tree and vegetation cover (%)', description: 'Area-weighted vegetation-cover percentage aggregated from Victorian mesh-block environmental data.', source: 'Cooling and Greening Melbourne, 2018', available: true },
+      { id: 'public_open_space', label: 'Public open-space land share (%)', description: 'Area-weighted percentage classified as public open space in the environmental source.', source: 'Cooling and Greening Melbourne, 2018', available: true },
+      { id: 'lower_urban_heat', label: 'Urban heat-island intensity (°C)', description: 'Area-weighted urban heat-island intensity. Ranking favours a smaller temperature difference.', source: 'Cooling and Greening Melbourne, 2018', available: true },
       { id: 'pm25', label: 'Fine-particle pollution (PM2.5)', description: 'Monitoring-station readings cannot be assigned to every SA2 without a validated exposure model.', source: 'Locality exposure unavailable', available: false },
       { id: 'pm10', label: 'Particle pollution (PM10)', description: 'Requires a defensible locality-level exposure surface rather than nearest-monitor assignment.', source: 'Locality exposure unavailable', available: false },
       { id: 'no2', label: 'Traffic-related nitrogen dioxide (NO₂)', description: 'Requires validated locality-level modelling or adequate monitoring coverage.', source: 'Locality exposure unavailable', available: false },
       { id: 'ozone', label: 'Ground-level ozone', description: 'Station observations alone do not support an SA2 suitability ranking.', source: 'Locality exposure unavailable', available: false },
       { id: 'noise', label: 'Transport noise exposure', description: 'No approved, comparable SA2 noise-exposure surface is integrated.', source: 'Data unavailable', available: false },
-      { id: 'lower_bushfire_prone_share', label: 'Less land designated bushfire-prone', description: 'Ranks localities by the share of land outside Victoria’s designated Bushfire Prone Area. This is not a property-level Bushfire Attack Level, forecast, evacuation assessment or personal safety advice.', source: 'Victorian Bushfire Prone Area, June 2026', available: true },
+      { id: 'lower_bushfire_prone_share', label: 'Land designated bushfire-prone (%)', description: 'Percentage of locality land inside Victoria’s designated Bushfire Prone Area. Ranking favours a smaller share; this is not a property BAL or forecast.', source: 'Victorian BPA, gazetted June 2026', available: true },
       { id: 'flood_exposure', label: 'Lower flood exposure', description: 'A comparable current flood-hazard layer and validated locality scoring method are not yet integrated.', source: 'Locality exposure unavailable', available: false },
-      { id: 'lower_industrial_emission_source_presence', label: 'Fewer NPI-reporting industrial air-emission facilities', description: 'Ranks areas by the number of nearby facilities reporting selected air emissions to the National Pollutant Inventory. This is source presence, not ambient exposure or health risk.', source: 'National Pollutant Inventory, 2024–25', available: true },
-      { id: 'lower_declared_road_traffic', label: 'Lower declared-road traffic intensity', description: 'Uses 2019 AADT weighted by the length of covered declared-road segments per square kilometre. This is a historical traffic proxy, not noise or air-pollution exposure.', source: 'Victorian DTP AADT, 2019', available: true },
+      { id: 'lower_industrial_emission_source_presence', label: 'NPI air-emission reporting facilities (count)', description: 'Count located inside the locality for selected reported air pollutants. Ranking favours fewer facilities; count is not ambient concentration or health risk.', source: 'National Pollutant Inventory, 2024–25', available: true },
+      { id: 'lower_declared_road_traffic', label: 'Declared-road traffic intensity (AADT-road-km/km²)', description: '2019 annual-average daily traffic multiplied by covered declared-road length per locality area. Ranking favours a smaller value; this is not noise or air exposure.', source: 'Victorian DTP AADT, 2019', available: true },
     ],
   },
   {
     title: 'Approved early-childhood education and care',
     summary: 'ACECQA-listed supply is population-adjusted. It does not indicate vacancies, affordability, attendance, workforce or service quality.',
     options: [
-      { id: 'approved_early_childhood_places', label: 'More approved early-childhood places per resident', description: 'Ranks localities by total approved places at successfully geocoded, active ACECQA services per 10,000 residents.', source: 'ACECQA register + G-NAF, 2026', available: true },
-      { id: 'long_day_care_availability', label: 'More long day care services per resident', description: 'Ranks localities by successfully geocoded, active ACECQA services offering long day care per 10,000 residents.', source: 'ACECQA register + G-NAF, 2026', available: true },
-      { id: 'kindergarten_availability', label: 'More preschool and kindergarten services per resident', description: 'Ranks localities by successfully geocoded, active ACECQA services offering school-based or standalone preschool or kindergarten per 10,000 residents.', source: 'ACECQA register + G-NAF, 2026', available: true },
+      { id: 'approved_early_childhood_places', label: 'Approved places per 1,000 projected children aged 0–4', description: 'Approved places at active, deterministically geocoded ACECQA services divided by VIF-projected resident children aged 0–4.', source: 'ACECQA + G-NAF + VIF 2026', available: true },
+      { id: 'long_day_care_availability', label: 'Long day care services per 1,000 projected children aged 0–4', description: 'Active geocoded services offering long day care divided by VIF-projected resident children aged 0–4.', source: 'ACECQA + G-NAF + VIF 2026', available: true },
+      { id: 'kindergarten_availability', label: 'Preschool/kindergarten services per 1,000 projected children aged 0–4', description: 'Active geocoded school-based or standalone preschool/kindergarten services divided by VIF-projected resident children aged 0–4.', source: 'ACECQA + G-NAF + VIF 2026', available: true },
+    ],
+  },
+  {
+    title: 'School infrastructure',
+    summary: 'Campus counts are normalised using the matching published VIF child-age band; they do not represent capacity or school quality.',
+    options: [
+      { id: 'primary_school_campus_availability', label: 'Primary-school campuses per 1,000 projected children aged 5–9', description: 'Open primary and combined primary/secondary campuses located inside the locality, divided by VIF-projected resident children aged 5–9.', source: 'Victorian School Locations 2025 + VIF 2026', available: true },
     ],
   },
   {
@@ -111,12 +152,12 @@ const optionGroups: Array<{ title: string; summary: string; options: Suitability
     summary: 'Presence is not the same as capacity, waiting time, eligibility, affordability or quality.',
     options: [
       { id: 'general_paediatrics', label: 'General paediatricians', description: 'Community or hospital doctors providing specialist care for babies, children and adolescents.', source: 'Service directory not integrated', available: false },
-      { id: 'general_practice_access', label: 'More listed general practices per resident', description: 'Ranks localities by active HealthDirect-listed general practices per 10,000 residents. It does not indicate child eligibility, bulk billing, capacity or opening hours.', source: 'Geoscience Australia / HealthDirect, 2025', available: true },
-      { id: 'pharmacy_access', label: 'More listed pharmacies per resident', description: 'Ranks localities by active HealthDirect-listed pharmacies per 10,000 residents. It measures listed facility presence, not stock, opening hours or service quality.', source: 'Geoscience Australia / HealthDirect, 2025', available: true },
+      { id: 'general_practice_access', label: 'Listed general practices per 10,000 residents', description: 'Active HealthDirect-listed practices located inside the locality divided by resident population. It does not measure bulk billing, capacity or opening hours.', source: 'HealthDirect facilities, 2025', available: true },
+      { id: 'pharmacy_access', label: 'Listed pharmacies per 10,000 residents', description: 'Active HealthDirect-listed pharmacies located inside the locality divided by resident population. It does not measure stock, hours or service quality.', source: 'HealthDirect facilities, 2025', available: true },
       { id: 'mch', label: 'Maternal and Child Health services', description: 'Universal and enhanced MCH centres supporting families from birth to school age.', source: 'Service locations not integrated', available: false },
       { id: 'early_parenting', label: 'Early Parenting Centres', description: 'Specialist support for sleep, settling, feeding and parenting for families with young children.', source: 'Service locations not integrated', available: false },
       { id: 'urgent_emergency', label: 'Paediatric urgent and emergency care', description: 'Child-capable urgent care, emergency departments and travel-time access.', source: 'Access model not integrated', available: false },
-      { id: 'hospital_access', label: 'More listed hospitals per resident', description: 'Ranks localities by active HealthDirect-listed hospitals per 10,000 residents. The source does not identify paediatric capability, neonatal services, capacity or travel time.', source: 'Geoscience Australia / HealthDirect, 2025', available: true },
+      { id: 'hospital_access', label: 'Listed hospitals per 10,000 residents', description: 'Active HealthDirect-listed hospitals located inside the locality divided by resident population. It does not identify paediatric capability, capacity or travel time.', source: 'HealthDirect facilities, 2025', available: true },
     ],
   },
   {
@@ -167,8 +208,8 @@ const optionGroups: Array<{ title: string; summary: string; options: Suitability
     title: 'Community context',
     summary: 'Area-level context that may help comparison but does not describe every household.',
     options: [
-      { id: 'socioeconomic_resources', label: 'Greater socioeconomic resources', description: 'Uses the ABS IRSD decile. Higher scores indicate fewer area-level indicators of disadvantage. This is not a judgement about residents.', source: 'ABS SEIFA IRSD', available: true },
-      { id: 'public_transport_availability', label: 'More public-transport stops per resident', description: 'Ranks localities by listed public-transport stops per 10,000 residents. It does not measure frequency, reliability, accessibility or travel time.', source: 'Victorian DTP public-transport stops, 2026', available: true },
+      { id: 'socioeconomic_resources', label: 'Index of Relative Socio-economic Disadvantage (decile 1–10)', description: 'ABS IRSD area decile; 10 indicates relatively fewer disadvantage characteristics. It does not describe every resident.', source: 'ABS SEIFA IRSD, 2021', available: true },
+      { id: 'public_transport_availability', label: 'Public-transport stops per 10,000 residents', description: 'Mapped stops located inside the locality divided by resident population. It does not measure frequency, reliability, accessibility or travel time.', source: 'Victorian DTP stops, 2026', available: true },
     ],
   },
 ]
@@ -179,6 +220,7 @@ const evidencePatterns = [
   { label: 'Green-space access', criteria: ['tree_canopy', 'public_open_space'], description: 'Tree canopy and public open space considered together' },
   { label: 'Everyday healthcare availability', criteria: ['general_practice_access', 'pharmacy_access', 'hospital_access'], description: 'Population-adjusted presence of listed general practices, pharmacies and hospitals' },
   { label: 'Early-years service availability', criteria: ['approved_early_childhood_places', 'long_day_care_availability', 'kindergarten_availability'], description: 'Population-adjusted approved places, long day care and kindergarten supply' },
+  { label: 'Early learning to primary school', criteria: ['approved_early_childhood_places', 'kindergarten_availability', 'primary_school_campus_availability'], description: 'Age-normalised early-childhood places, kindergarten services and primary-school campuses' },
   { label: 'Lower environmental pressures', criteria: ['lower_urban_heat', 'lower_declared_road_traffic', 'lower_industrial_emission_source_presence', 'lower_bushfire_prone_share'], description: 'Measured or clearly labelled proxy indicators for heat, traffic, industrial sources and designated bushfire-prone land' },
   { label: 'Whole evidence view', criteria: ['development_on_track', 'lower_developmental_vulnerability', 'tree_canopy', 'public_open_space', 'lower_urban_heat', 'socioeconomic_resources'], description: 'All currently supported measures, equally weighted' },
 ]
@@ -290,6 +332,9 @@ export default function LocalitySuitabilityPanel({
                     <span className="suitability-result-name">
                       <strong>{locality.name}</strong>
                       <small>{locality.geographic_unit}</small>
+                      <small className="suitability-result-measures">
+                        {locality.criteria.map((criterion) => formatMeasure(criterion, locality.measures[criterion])).filter(Boolean).join(' · ')}
+                      </small>
                     </span>
                     <span className="score">{locality.score === null ? 'N/A' : <>{locality.score.toFixed(0)}<small>/100</small></>}</span>
                   </button>
