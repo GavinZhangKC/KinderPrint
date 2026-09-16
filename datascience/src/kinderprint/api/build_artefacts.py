@@ -17,7 +17,7 @@ from pathlib import Path
 import pandas as pd
 import numpy as np
 
-from kinderprint.analytics.suitability import build_rankings
+from kinderprint.analytics.suitability import build_criterion_scores
 
 DOMAINS = ["Child Development", "Social", "Environment"]
 GEO_UNIT = "SA2 (ASGS Edition 3, 2021)"
@@ -46,6 +46,11 @@ PROFILE_INDICATORS = {
         ("aedc_vulnerable_two_or_more", "Developmentally vulnerable on two or more domains", "vuln2_pct", "percent"),
         ("aedc_on_track_five", "On track on all five domains", "ontrack5_pct", "percent"),
         ("aedc_children_assessed", "Children with valid AEDC scores", "n_children", "count"),
+        ("aedc_physical_on_track", "On track in physical health and wellbeing", "physical_on_track_pct", "percent"),
+        ("aedc_social_on_track", "On track in social competence", "social_on_track_pct", "percent"),
+        ("aedc_emotional_on_track", "On track in emotional maturity", "emotional_on_track_pct", "percent"),
+        ("aedc_language_on_track", "On track in language and cognitive skills", "language_on_track_pct", "percent"),
+        ("aedc_communication_on_track", "On track in communication skills and general knowledge", "communication_on_track_pct", "percent"),
     ],
     "Social": [
         ("seifa_irsd_score", "SEIFA IRSD score", "irsd_score", "index"),
@@ -117,7 +122,7 @@ def build_profiles(d: pd.DataFrame) -> dict:
 def build_suitability(profiles: list[dict]) -> dict:
     """Build the provisional locality-suitability output outside the backend."""
     return {
-        "rankings": build_rankings(profiles),
+        "localities": build_criterion_scores(profiles),
         "metadata": {
             "source": "Approved profile dataset",
             "reference_year": "2024",

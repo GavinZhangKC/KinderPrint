@@ -7,7 +7,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
-from kinderprint.analytics.suitability import build_rankings, rank_profiles
+from kinderprint.analytics.suitability import build_criterion_scores, rank_profiles
 
 
 def _indicator(identifier, value):
@@ -56,12 +56,14 @@ def test_supported_criteria_are_normalised_and_ranked():
     assert result[1]["score"] == 23.33
 
 
-def test_all_supported_criteria_combinations_are_precomputed():
+def test_all_supported_criteria_scores_are_materialised():
     profiles = [_profile("area", 80, 10, 9, 40, 18, 70)]
 
-    rankings = build_rankings(profiles)
+    scores = build_criterion_scores(profiles)
 
-    assert len(rankings) == 63
+    assert len(scores) == 1
+    assert scores[0]["scores"]["development_on_track"] == 80.0
+    assert scores[0]["scores"]["physical_health_on_track"] is None
 
 
 def test_missing_selected_input_withholds_score_instead_of_using_zero():

@@ -10,12 +10,17 @@ KinderPrint only enables a locality-ranking checkbox when the repository contain
 |---|---|---|
 | Child development | On track in all five AEDC domains | AEDC aggregate SA2 outcome, 2024 |
 | Child development | Lower vulnerability on one or more AEDC domains | AEDC aggregate SA2 outcome, 2024 |
+| Child development | Physical health and wellbeing on track | AEDC domain-specific SA2 outcome, 2024 |
+| Child development | Social competence on track | AEDC domain-specific SA2 outcome, 2024 |
+| Child development | Emotional maturity on track | AEDC domain-specific SA2 outcome, 2024 |
+| Child development | Language and cognitive skills on track | AEDC domain-specific SA2 outcome, 2024 |
+| Child development | Communication skills and general knowledge on track | AEDC domain-specific SA2 outcome, 2024 |
 | Environment | Tree canopy | Integrated Victorian environmental indicator |
 | Environment | Public open space | Integrated Victorian environmental indicator |
 | Environment | Lower urban heat | Integrated Victorian environmental indicator |
 | Community context | Greater socioeconomic resources | ABS SEIFA IRSD decile, normalised to the common 0–100 comparison scale |
 
-The five AEDC domains are named in full in the interface: physical health and wellbeing; social competence; emotional maturity; language and cognitive skills (school-based); and communication skills and general knowledge. The current approved file contains the combined outcomes above, not five independently rankable domain measures.
+The five AEDC domains are named in full in the interface: physical health and wellbeing; social competence; emotional maturity; language and cognitive skills (school-based); and communication skills and general knowledge. The official workbook and processed table contain independently rankable 2024 on-track percentages for every domain. These measures were previously present in the processed data but omitted from the API profile artefact; that omission is now corrected.
 
 ## Named but withheld
 

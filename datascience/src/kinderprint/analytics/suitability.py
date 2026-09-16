@@ -9,6 +9,11 @@ from typing import Any
 VALID_CRITERIA = (
     "development_on_track",
     "lower_developmental_vulnerability",
+    "physical_health_on_track",
+    "social_competence_on_track",
+    "emotional_maturity_on_track",
+    "language_cognitive_on_track",
+    "communication_knowledge_on_track",
     "tree_canopy",
     "public_open_space",
     "lower_urban_heat",
@@ -49,6 +54,26 @@ def rank_profiles(
                     missing_criteria.append(criterion)
                 else:
                     subtotal += 100.0 - vulnerability
+                    weight_total += 1.0
+            elif criterion in {
+                "physical_health_on_track",
+                "social_competence_on_track",
+                "emotional_maturity_on_track",
+                "language_cognitive_on_track",
+                "communication_knowledge_on_track",
+            }:
+                indicator_id = {
+                    "physical_health_on_track": "aedc_physical_on_track",
+                    "social_competence_on_track": "aedc_social_on_track",
+                    "emotional_maturity_on_track": "aedc_emotional_on_track",
+                    "language_cognitive_on_track": "aedc_language_on_track",
+                    "communication_knowledge_on_track": "aedc_communication_on_track",
+                }[criterion]
+                value = _value_for(profile, indicator_id)
+                if value is None:
+                    missing_criteria.append(criterion)
+                else:
+                    subtotal += value
                     weight_total += 1.0
             elif criterion == "tree_canopy":
                 vegetation = _value_for(profile, "env_vegetation_cover")
@@ -126,3 +151,20 @@ def build_rankings(
                 "localities": rank_profiles(profiles, selected),
             })
     return rankings
+
+
+def build_criterion_scores(profiles: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Store one source-derived score per criterion for scalable API composition."""
+    rows = []
+    for profile in profiles:
+        scores = {}
+        for criterion in VALID_CRITERIA:
+            result = rank_profiles([profile], [criterion])[0]
+            scores[criterion] = result["score"]
+        rows.append({
+            "id": profile["neighbourhood"]["id"],
+            "name": profile["neighbourhood"]["name"],
+            "geographic_unit": profile["neighbourhood"]["geographic_unit"],
+            "scores": scores,
+        })
+    return rows

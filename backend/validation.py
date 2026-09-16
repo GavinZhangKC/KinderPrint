@@ -87,6 +87,11 @@ def load_profiles() -> tuple[list[dict[str, Any]] | None, list[dict[str, Any]]]:
 SUITABILITY_CRITERIA = {
     "development_on_track",
     "lower_developmental_vulnerability",
+    "physical_health_on_track",
+    "social_competence_on_track",
+    "emotional_maturity_on_track",
+    "language_cognitive_on_track",
+    "communication_knowledge_on_track",
     "tree_canopy",
     "public_open_space",
     "lower_urban_heat",
@@ -125,50 +130,40 @@ def load_suitability_rankings() -> tuple[
     dict[str, Any] | None,
     list[dict[str, Any]],
 ]:
-    """Load locality rankings already calculated by the Data Science pipeline."""
+    """Load per-criterion locality scores calculated by the Data Science pipeline."""
     source, limitations = load_json_source(
         suitability_data_path(), SUITABILITY_DATA_PATH_ENV, "suitability"
     )
     if source is None:
         return None, None, limitations
-    rankings, metadata = source.get("rankings"), source.get("metadata")
-    if not isinstance(rankings, list) or not isinstance(metadata, dict):
+    localities, metadata = source.get("localities"), source.get("metadata")
+    if not isinstance(localities, list) or not isinstance(metadata, dict):
         return None, None, [limitation(
             "suitability_dataset_invalid",
-            "The suitability dataset must contain rankings and metadata.",
+            "The suitability dataset must contain localities and metadata.",
             "suitability",
         )]
-    for ranking in rankings:
-        if not isinstance(ranking, dict):
+    for locality in localities:
+        if not isinstance(locality, dict):
             return None, None, [limitation(
                 "suitability_dataset_invalid",
-                "The suitability dataset contains an invalid ranking.",
-                "rankings",
-            )]
-        criteria, localities = ranking.get("criteria"), ranking.get("localities")
-        if (
-            not isinstance(criteria, list)
-            or not criteria
-            or len(criteria) != len(set(criteria))
-            or not all(item in SUITABILITY_CRITERIA for item in criteria)
-            or not isinstance(localities, list)
-            or not all(_valid_suitability_locality(item) for item in localities)
-        ):
-            return None, None, [limitation(
-                "suitability_dataset_invalid",
-                "The suitability dataset contains an invalid ranking.",
-                "rankings",
-            )]
-        available_scores = [
-            item["score"] for item in localities if item["status"] == "available"
-        ]
-        if available_scores != sorted(available_scores, reverse=True):
-            return None, None, [limitation(
-                "suitability_dataset_invalid",
-                "Available suitability results must be precomputed in descending order.",
+                "The suitability dataset contains an invalid locality.",
                 "localities",
             )]
-    return rankings, metadata, []
+        scores = locality.get("scores")
+        if (not all(isinstance(locality.get(field), str) and locality[field].strip()
+                    for field in ("id", "name", "geographic_unit"))
+                or not isinstance(scores, dict)
+                or set(scores) != SUITABILITY_CRITERIA
+                or not all(value is None or (isinstance(value, (int, float))
+                                              and not isinstance(value, bool))
+                           for value in scores.values())):
+            return None, None, [limitation(
+                "suitability_dataset_invalid",
+                "The suitability dataset contains invalid criterion scores.",
+                "localities",
+            )]
+    return localities, metadata, []
 
 
 def profile_status(profile: dict[str, Any]) -> str:

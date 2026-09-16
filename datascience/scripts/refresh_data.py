@@ -211,6 +211,17 @@ def main() -> int:
                       child.indicator.isin(["vulnerable_pct", "on_track_pct"])]
         piv = extra.pivot_table(index="community_id", columns="domain", values="value", aggfunc="first")
         piv.columns = ["ontrack5_pct", "vuln2_pct"]
+        domains = child[(child.reference_year == 2024) &
+                        (child.domain_type == "domain") &
+                        (child.indicator == "on_track_pct")].pivot_table(
+                            index="community_id", columns="domain", values="value", aggfunc="first")
+        domains = domains.rename(columns={
+            "Physical health and wellbeing": "physical_on_track_pct",
+            "Social competence": "social_on_track_pct",
+            "Emotional maturity": "emotional_on_track_pct",
+            "Language and cognitive skills": "language_on_track_pct",
+            "Communication skills and general knowledge": "communication_on_track_pct",
+        })
 
         keep_env = [c for c in ["vegetation_pct", "uhi_degc", "open_space_pct",
                                 "env_coverage_pct", "env_quality_flag"] if c in env.columns]
@@ -220,6 +231,7 @@ def main() -> int:
         full = (comm.merge(w.reset_index(), on="community_id", how="left")
                     .merge(wide.drop(columns=dupes), on="community_id", how="left")
                     .merge(piv.reset_index(), on="community_id", how="left")
+                    .merge(domains.reset_index(), on="community_id", how="left")
                     .merge(env[["community_id"] + keep_env], on="community_id", how="left"))
         full["aedc_flag"] = full["aedc_flag"].fillna("SUPPRESSED_RULE")
 

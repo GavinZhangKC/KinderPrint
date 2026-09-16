@@ -5,6 +5,11 @@ from data_loader import (
     PROFILE_DATA_PATH_ENV,
     SUITABILITY_DATA_PATH_ENV,
 )
+from validation import SUITABILITY_CRITERIA
+
+
+def suitability_scores(**overrides) -> dict:
+    return {criterion: overrides.get(criterion) for criterion in SUITABILITY_CRITERIA}
 
 
 def assert_envelope(response: dict) -> None:
@@ -66,17 +71,12 @@ def test_validation_error_uses_envelope(client) -> None:
 
 def test_locality_suitability_serves_precomputed_ranking(client, monkeypatch, write_json) -> None:
     suitability_path = write_json("suitability.json", json.dumps({
-        "rankings": [{
-            "criteria": ["development_on_track", "tree_canopy", "socioeconomic_resources"],
-            "localities": [
-                {"id": "best", "name": "Best", "geographic_unit": "SA2", "score": 80.0,
-                 "status": "available", "limitations": [],
-                 "criteria": ["development_on_track", "tree_canopy", "socioeconomic_resources"]},
-                {"id": "worst", "name": "Worst", "geographic_unit": "SA2", "score": 20.0,
-                 "status": "available", "limitations": [],
-                 "criteria": ["development_on_track", "tree_canopy", "socioeconomic_resources"]},
-            ],
-        }],
+        "localities": [
+            {"id": "best", "name": "Best", "geographic_unit": "SA2",
+             "scores": suitability_scores(development_on_track=80, tree_canopy=80, socioeconomic_resources=80)},
+            {"id": "worst", "name": "Worst", "geographic_unit": "SA2",
+             "scores": suitability_scores(development_on_track=20, tree_canopy=20, socioeconomic_resources=20)},
+        ],
         "metadata": {"source": "Approved profile dataset"},
     }))
     monkeypatch.setenv(SUITABILITY_DATA_PATH_ENV, str(suitability_path))
@@ -93,7 +93,7 @@ def test_locality_suitability_serves_precomputed_ranking(client, monkeypatch, wr
 
 def test_locality_suitability_requires_supported_criteria(client, monkeypatch, write_json) -> None:
     suitability_path = write_json("suitability.json", json.dumps({
-        "rankings": [],
+        "localities": [],
         "metadata": {"source": "Approved profile dataset"},
     }))
     monkeypatch.setenv(SUITABILITY_DATA_PATH_ENV, str(suitability_path))
@@ -109,19 +109,12 @@ def test_locality_suitability_requires_supported_criteria(client, monkeypatch, w
 
 def test_locality_suitability_withholds_incomplete_results(client, monkeypatch, write_json) -> None:
     suitability_path = write_json("suitability.json", json.dumps({
-        "rankings": [{
-            "criteria": ["tree_canopy"],
-            "localities": [
-                {"id": "complete", "name": "Complete", "geographic_unit": "SA2",
-                 "score": 75.0, "status": "available", "criteria": ["tree_canopy"],
-                 "limitations": []},
-                {"id": "missing", "name": "Missing", "geographic_unit": "SA2",
-                 "score": None, "status": "limited", "criteria": ["tree_canopy"],
-                 "limitations": [{"code": "suitability_inputs_incomplete",
-                                  "message": "Inputs unavailable.",
-                                  "affected_fields": ["tree_canopy"]}]},
-            ],
-        }],
+        "localities": [
+            {"id": "complete", "name": "Complete", "geographic_unit": "SA2",
+             "scores": suitability_scores(tree_canopy=75)},
+            {"id": "missing", "name": "Missing", "geographic_unit": "SA2",
+             "scores": suitability_scores()},
+        ],
         "metadata": {"source": "Approved profile dataset"},
     }))
     monkeypatch.setenv(SUITABILITY_DATA_PATH_ENV, str(suitability_path))

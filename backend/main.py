@@ -696,6 +696,11 @@ def locality_suitability(
     valid_criteria = {
         "development_on_track",
         "lower_developmental_vulnerability",
+        "physical_health_on_track",
+        "social_competence_on_track",
+        "emotional_maturity_on_track",
+        "language_cognitive_on_track",
+        "communication_knowledge_on_track",
         "tree_canopy",
         "public_open_space",
         "lower_urban_heat",
@@ -733,26 +738,23 @@ def locality_suitability(
             )],
         )
 
-    selected_set = set(selected_criteria)
-    ranking = next((
-        item for item in rankings if set(item["criteria"]) == selected_set
-    ), None)
-    if ranking is None:
-        return envelope(
-            "unavailable",
-            {"localities": [], "criteria": selected_criteria, "limit": limit},
-            limitations=[limitation(
-                "suitability_result_unavailable",
-                "No precomputed suitability result exists for the selected criteria.",
-                "criteria",
-            )],
-        )
-
-    available = [
-        item for item in ranking["localities"] if item["status"] == "available"
-    ]
-    withheld_count = len(ranking["localities"]) - len(available)
-    ranked = available[:limit]
+    available = []
+    withheld_count = 0
+    for locality in rankings:
+        values = [locality["scores"].get(item) for item in selected_criteria]
+        if any(value is None for value in values):
+            withheld_count += 1
+            continue
+        available.append({
+            "id": locality["id"],
+            "name": locality["name"],
+            "geographic_unit": locality["geographic_unit"],
+            "score": round(sum(values) / len(values), 2),
+            "status": "available",
+            "criteria": selected_criteria,
+            "limitations": [],
+        })
+    ranked = sorted(available, key=lambda item: item["score"], reverse=True)[:limit]
     response_limitations = []
     if withheld_count:
         response_limitations.append(limitation(
