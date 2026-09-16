@@ -92,6 +92,7 @@ const optionGroups: Array<{ title: string; summary: string; options: Suitability
       { id: 'ozone', label: 'Ground-level ozone', description: 'Station observations alone do not support an SA2 suitability ranking.', source: 'Locality exposure unavailable', available: false },
       { id: 'noise', label: 'Transport noise exposure', description: 'No approved, comparable SA2 noise-exposure surface is integrated.', source: 'Data unavailable', available: false },
       { id: 'flood_bushfire', label: 'Flood and bushfire exposure', description: 'Hazard-specific, current spatial layers and a validated scoring method are required.', source: 'Not yet integrated', available: false },
+      { id: 'lower_industrial_emission_source_presence', label: 'Fewer NPI-reporting industrial air-emission facilities', description: 'Ranks areas by the number of nearby facilities reporting selected air emissions to the National Pollutant Inventory. This is source presence, not ambient exposure or health risk.', source: 'National Pollutant Inventory, 2024–25', available: true },
     ],
   },
   {
