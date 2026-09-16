@@ -28,6 +28,7 @@ VALID_CRITERIA = (
     "approved_early_childhood_places",
     "long_day_care_availability",
     "kindergarten_availability",
+    "primary_school_campus_availability",
 )
 
 
@@ -168,6 +169,19 @@ def build_criterion_scores(profiles: list[dict[str, Any]]) -> list[dict[str, Any
     rows = []
     for profile in profiles:
         scores = {}
+        measures = {
+            "development_on_track": _value_for(profile, "aedc_on_track_five"),
+            "lower_developmental_vulnerability": _value_for(profile, "aedc_vulnerable_one_or_more"),
+            "physical_health_on_track": _value_for(profile, "aedc_physical_on_track"),
+            "social_competence_on_track": _value_for(profile, "aedc_social_on_track"),
+            "emotional_maturity_on_track": _value_for(profile, "aedc_emotional_on_track"),
+            "language_cognitive_on_track": _value_for(profile, "aedc_language_on_track"),
+            "communication_knowledge_on_track": _value_for(profile, "aedc_communication_on_track"),
+            "tree_canopy": _value_for(profile, "env_vegetation_cover"),
+            "public_open_space": _value_for(profile, "env_open_space_access"),
+            "lower_urban_heat": _value_for(profile, "env_urban_heat"),
+            "socioeconomic_resources": _value_for(profile, "seifa_irsd_decile"),
+        }
         for criterion in VALID_CRITERIA:
             result = rank_profiles([profile], [criterion])[0]
             scores[criterion] = result["score"]
@@ -176,5 +190,6 @@ def build_criterion_scores(profiles: list[dict[str, Any]]) -> list[dict[str, Any
             "name": profile["neighbourhood"]["name"],
             "geographic_unit": profile["neighbourhood"]["geographic_unit"],
             "scores": scores,
+            "measures": measures,
         })
     return rows

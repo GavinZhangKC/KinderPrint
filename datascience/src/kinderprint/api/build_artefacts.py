@@ -136,6 +136,20 @@ def build_suitability(
             "approved_early_childhood_places": "approved_early_childhood_places_score",
             "long_day_care_availability": "long_day_care_availability_score",
             "kindergarten_availability": "kindergarten_availability_score",
+            "primary_school_campus_availability": "primary_school_campus_availability_score",
+        }
+        measure_columns = {
+            "general_practice_access": "general_practice_per_10000",
+            "hospital_access": "hospital_per_10000",
+            "pharmacy_access": "pharmacy_per_10000",
+            "lower_industrial_emission_source_presence": "npi_reporting_facility_count",
+            "lower_declared_road_traffic": "declared_road_traffic_intensity",
+            "public_transport_availability": "public_transport_stops_per_10000",
+            "lower_bushfire_prone_share": "bushfire_prone_pct",
+            "approved_early_childhood_places": "approved_places_per_1000_children_0_4",
+            "long_day_care_availability": "long_day_care_services_per_1000_children_0_4",
+            "kindergarten_availability": "kindergarten_services_per_1000_children_0_4",
+            "primary_school_campus_availability": "primary_school_campuses_per_1000_children_5_9",
         }
         by_id = supplemental_scores.assign(
             neighbourhood_id=supplemental_scores.neighbourhood_id.astype(str)
@@ -147,6 +161,9 @@ def build_suitability(
             for criterion, column in score_columns.items():
                 if column in row.index:
                     locality["scores"][criterion] = _num(row[column])
+            for criterion, column in measure_columns.items():
+                if column in row.index:
+                    locality["measures"][criterion] = _num(row[column])
     return {
         "localities": localities,
         "metadata": {

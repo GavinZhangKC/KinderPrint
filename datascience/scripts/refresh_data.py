@@ -385,7 +385,7 @@ def main() -> int:
             npi_scores = pd.read_csv(npi_scores_path)
             service_scores = (
                 npi_scores if service_scores is None else service_scores.merge(
-                    npi_scores[["neighbourhood_id", "lower_industrial_source_presence_score"]],
+                    npi_scores[["neighbourhood_id", "npi_reporting_facility_count", "lower_industrial_source_presence_score"]],
                     on="neighbourhood_id", how="outer",
                 )
             )
@@ -394,7 +394,8 @@ def main() -> int:
             transport_scores = pd.read_csv(transport_scores_path)
             transport_columns = [
                 "neighbourhood_id", "lower_declared_road_traffic_score",
-                "public_transport_availability_score",
+                "public_transport_availability_score", "declared_road_traffic_intensity",
+                "public_transport_stops_per_10000",
             ]
             service_scores = (
                 transport_scores if service_scores is None else service_scores.merge(
@@ -404,7 +405,7 @@ def main() -> int:
         bushfire_scores_path = PROC / "bushfire_suitability.csv"
         if bushfire_scores_path.is_file():
             bushfire_scores = pd.read_csv(bushfire_scores_path)
-            bushfire_columns = ["neighbourhood_id", "lower_bushfire_prone_share_score"]
+            bushfire_columns = ["neighbourhood_id", "bushfire_prone_pct", "lower_bushfire_prone_share_score"]
             service_scores = (
                 bushfire_scores if service_scores is None else service_scores.merge(
                     bushfire_scores[bushfire_columns], on="neighbourhood_id", how="outer"
@@ -416,10 +417,25 @@ def main() -> int:
             acecqa_columns = [
                 "neighbourhood_id", "approved_early_childhood_places_score",
                 "long_day_care_availability_score", "kindergarten_availability_score",
+                "approved_places_per_1000_children_0_4",
+                "long_day_care_services_per_1000_children_0_4",
+                "kindergarten_services_per_1000_children_0_4",
             ]
             service_scores = (
                 acecqa_scores if service_scores is None else service_scores.merge(
                     acecqa_scores[acecqa_columns], on="neighbourhood_id", how="outer"
+                )
+            )
+        school_scores_path = PROC / "school_child_population_suitability.csv"
+        if school_scores_path.is_file():
+            school_scores = pd.read_csv(school_scores_path)
+            school_columns = [
+                "neighbourhood_id", "primary_school_campuses_per_1000_children_5_9",
+                "primary_school_campus_availability_score",
+            ]
+            service_scores = (
+                school_scores if service_scores is None else service_scores.merge(
+                    school_scores[school_columns], on="neighbourhood_id", how="outer"
                 )
             )
         suitability_path.write_text(json.dumps(
