@@ -1,0 +1,11 @@
+{
+  "school_records_received": 2301,
+  "open_schools": 2297,
+  "open_schools_in_greater_melbourne": 1387,
+  "primary_or_combined_campuses_in_greater_melbourne": 1087,
+  "reporting_localities": 346,
+  "missing_child_population": 0,
+  "missing_scores": 0,
+  "score_method": "Greater Melbourne percentile of primary or combined campuses located in the locality per 1,000 VIF-projected children aged 5-9 in 2026",
+  "limitations": "Campus presence does not measure enrolment capacity, school quality, eligibility, zone access, travel time, disability accessibility or family preference. Children aged 5-9 are a published five-year denominator, not the full compulsory-primary-school age range."
+}
