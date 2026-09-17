@@ -34,7 +34,10 @@ function formattedValue(value: number | string | null, status: ApiStatus | strin
   if (!isAvailable(status) || value === null) return statusLabels[status] ?? 'Unavailable'
   const shown = typeof value === 'number' ? numberFormat.format(value) : value
   if (!unit) return String(shown)
-  return unit === '%' ? `${shown}%` : `${shown} ${unit}`
+  const normalisedUnit = unit.toLowerCase()
+  if (normalisedUnit === '%' || normalisedUnit === 'percent' || normalisedUnit === 'percentage') return `${shown}%`
+  if (normalisedUnit === 'count' || normalisedUnit === 'number') return String(shown)
+  return `${shown} ${unit}`
 }
 
 function differenceLabel(indicator: ApprovedComparisonIndicator) {
@@ -58,8 +61,8 @@ function provenance(indicator: ApprovedComparisonIndicator) {
     .filter((value) => value !== null && value !== undefined && value !== '').join(' · ')
 }
 
-function DumbbellChart({ indicators, sourceName, comparedName }: {
-  indicators: ApprovedComparisonIndicator[]; sourceName: string; comparedName: string
+function DumbbellChart({ indicators, sourceName, comparedName, showDifference = true }: {
+  indicators: ApprovedComparisonIndicator[]; sourceName: string; comparedName: string; showDifference?: boolean
 }) {
   return <div className="dc-dumbbell-chart">
     <div className="dc-legend"><span><i className="dc-dot dc-dot-a" />{sourceName}</span><span><i className="dc-dot dc-dot-b" />{comparedName}</span></div>
@@ -67,7 +70,7 @@ function DumbbellChart({ indicators, sourceName, comparedName }: {
       const a = numericValue(indicator.neighbourhood_a.value, indicator.neighbourhood_a.status)
       const b = numericValue(indicator.neighbourhood_b.value, indicator.neighbourhood_b.status)
       const positions = pairPositions(a, b)
-      return <div className="dc-dumbbell-row" key={indicator.id}>
+      return <div className={`dc-dumbbell-row${showDifference ? '' : ' dc-dumbbell-no-difference'}`} key={indicator.id}>
         <div className="dc-chart-label"><strong>{indicator.name}</strong><small>{provenance(indicator)}</small></div>
         <span className="dc-value dc-value-a">{formattedValue(indicator.neighbourhood_a.value, indicator.neighbourhood_a.status, indicator.unit)}</span>
         <div className="dc-dumbbell-track" aria-label={`${indicator.name} comparison`}>
@@ -75,7 +78,7 @@ function DumbbellChart({ indicators, sourceName, comparedName }: {
           <span className="dc-point dc-point-a" style={{ left: `${positions.a}%` }} /><span className="dc-point dc-point-b" style={{ left: `${positions.b}%` }} />
         </div>
         <span className="dc-value dc-value-b">{formattedValue(indicator.neighbourhood_b.value, indicator.neighbourhood_b.status, indicator.unit)}</span>
-        <strong className="dc-difference">{differenceLabel(indicator)}</strong>
+        {showDifference && <strong className="dc-difference">{differenceLabel(indicator)}</strong>}
       </div>
     })}
   </div>
@@ -148,6 +151,29 @@ function availabilityMessage(status: ApiStatus | null, error: string | null, fal
   return fallback
 }
 
+function fieldToIndicator(field: MultiComparisonField): ApprovedComparisonIndicator {
+  const a = field.values[0] ?? { value: null, status: 'unavailable' }
+  const b = field.values[1] ?? { value: null, status: 'unavailable' }
+  return {
+    id: field.id,
+    name: field.name,
+    unit: field.unit,
+    neighbourhood_a: { value: a.value, status: a.status },
+    neighbourhood_b: { value: b.value, status: b.status },
+    approved_difference: { value: null, status: 'unavailable' },
+    source: field.source,
+    reference_year: field.reference_year,
+    geographic_unit: field.geographic_unit,
+  }
+}
+
+function indicatorFamily(field: MultiComparisonField) {
+  const descriptor = `${field.id} ${field.name}`.toLowerCase()
+  if (/aedc|develop|on track|physical health|social competence|emotional maturity|language|communication/.test(descriptor)) return 'development'
+  if (/environment|vegetation|canopy|tree|green space|open space|urban heat|temperature|thermal/.test(descriptor)) return 'environment'
+  return 'context'
+}
+
 export default function DetailedComparison({ comparisonResult, limitations, outcomeComparison, outcomeError, environmentalDifference, environmentalError, patternInsight, patternError, onBack }: DetailedComparisonProps) {
   const [source, compared] = comparisonResult.neighbourhoods
   const names: [string, string] = [source?.name ?? 'Locality A', compared?.name ?? 'Locality B']
@@ -157,24 +183,31 @@ export default function DetailedComparison({ comparisonResult, limitations, outc
   const outcomes = outcomeMatches ? outcomeComparison?.data.outcome_indicators ?? [] : []
   const environment = environmentMatches ? environmentalDifference?.data.environmental_indicators ?? [] : []
   const patterns = patternMatches ? patternInsight?.data.patterns ?? [] : []
-  const summaryIndicators = [...outcomes.slice(0, 2), ...environment.slice(0, 2)].slice(0, 4)
+  const generalDevelopmentFields = comparisonResult.side_by_side.filter((field) => indicatorFamily(field) === 'development')
+  const generalEnvironmentFields = comparisonResult.side_by_side.filter((field) => indicatorFamily(field) === 'environment')
+  const contextFields = comparisonResult.side_by_side.filter((field) => indicatorFamily(field) === 'context')
+  const displayedOutcomes = outcomes.length > 0 ? outcomes : generalDevelopmentFields.map(fieldToIndicator)
+  const displayedEnvironment = environment.length > 0 ? environment : generalEnvironmentFields.map(fieldToIndicator)
+  const outcomeUsesApprovedDifference = outcomes.length > 0
+  const summaryIndicators = [...displayedOutcomes.slice(0, 2), ...displayedEnvironment.slice(0, 2)].slice(0, 4)
+  const hasComparisonBasis = comparisonResult.similarity_basis.length > 0 || comparisonResult.match_strength !== null
 
   return <main className="dc-dashboard page-enter">
     <aside className="dc-sidebar"><button className="dc-wordmark" type="button" onClick={onBack}>Vkinder</button><nav>
-      <a className="is-active" href="#comparison-overview"><span>⌂</span>Overview</a><a href="#comparison-development"><span>▥</span>Child development</a><a href="#comparison-environment"><span>◒</span>Environment</a><a href="#comparison-context"><span>◉</span>Services &amp; population</a><a href="#comparison-evidence"><span>▤</span>Evidence</a>
+      <a className="is-active" href="#comparison-overview"><span>⌂</span>Overview</a><a href="#comparison-development"><span>▥</span>Child development</a><a href="#comparison-environment"><span>◒</span>Environment</a><a href="#comparison-context"><span>◉</span>Community context</a><a href="#comparison-evidence"><span>▤</span>Evidence</a>
     </nav></aside>
     <div className="dc-main">
-      <header className="dc-topbar"><button type="button" onClick={onBack} aria-label="Back to map">←</button><div className="dc-search">Search this report</div><span>Detailed comparison</span></header>
+      <header className="dc-topbar"><button type="button" onClick={onBack} aria-label="Back to map">←</button><div className="dc-breadcrumb">Locality explorer <span>/</span> Detailed comparison</div><span>{names[0]} and {names[1]}</span></header>
       <section className="dc-overview" id="comparison-overview">
         <div className="dc-title-row"><div><h1>Detailed comparison</h1><p>Locality-level evidence shown side by side.</p></div><button className="dc-download" type="button" onClick={() => window.print()}>Download report</button></div>
         <div className="dc-locality-bar"><div><small>Locality A</small><strong><i className="dc-pin dc-pin-a" />{names[0]}</strong></div><span>⇄</span><div><small>Locality B</small><strong><i className="dc-pin dc-pin-b" />{names[1]}</strong></div></div>
         {summaryIndicators.length > 0 && <div className="dc-kpi-grid">{summaryIndicators.map((indicator) => <article className="dc-card dc-kpi-card" key={indicator.id}><h2>{indicator.name}</h2><div><strong className="dc-value-a">{formattedValue(indicator.neighbourhood_a.value, indicator.neighbourhood_a.status, indicator.unit)}</strong><i /><strong className="dc-value-b">{formattedValue(indicator.neighbourhood_b.value, indicator.neighbourhood_b.status, indicator.unit)}</strong></div><p><span>{names[0]}</span><span>{names[1]}</span></p></article>)}</div>}
-        <div className="dc-overview-grid"><article className="dc-card dc-basis-card"><h2>Comparison basis</h2><p>{comparisonResult.similarity_basis.length > 0 ? comparisonResult.similarity_basis.join(' · ') : 'No approved matching basis is available.'}</p><dl><div><dt>Match strength</dt><dd>{comparisonResult.match_strength ?? 'Not stated'}</dd></div><div><dt>Geography</dt><dd>{source?.geographic_unit ?? 'SA2'}</dd></div></dl></article><article className="dc-card dc-glance-card"><div className="dc-section-heading"><div><h2>At a glance</h2><p>Selected approved indicators</p></div><div className="dc-legend"><span><i className="dc-dot dc-dot-a" />{names[0]}</span><span><i className="dc-dot dc-dot-b" />{names[1]}</span></div></div><DumbbellChart indicators={summaryIndicators} sourceName={names[0]} comparedName={names[1]} /></article></div>
+        <div className={`dc-overview-grid${hasComparisonBasis ? '' : ' dc-overview-grid-single'}`}>{hasComparisonBasis && <article className="dc-card dc-basis-card"><h2>Comparison basis</h2><p>{comparisonResult.similarity_basis.join(' · ')}</p><dl><div><dt>Match strength</dt><dd>{comparisonResult.match_strength ?? 'Not stated'}</dd></div><div><dt>Geography</dt><dd>{source?.geographic_unit ?? 'SA2'}</dd></div></dl></article>}<article className="dc-card dc-glance-card"><div className="dc-section-heading"><div><h2>At a glance</h2><p>Selected available indicators</p></div><div className="dc-legend"><span><i className="dc-dot dc-dot-a" />{names[0]}</span><span><i className="dc-dot dc-dot-b" />{names[1]}</span></div></div>{summaryIndicators.length > 0 ? <DumbbellChart indicators={summaryIndicators} sourceName={names[0]} comparedName={names[1]} showDifference={false} /> : <p className="dc-compact-state">No comparable indicators are available for this pair.</p>}</article></div>
       </section>
-      <section className="dc-report-section" id="comparison-development"><div className="dc-report-heading"><span>01</span><div><h2>Child development</h2><p>AEDC outcome domains, compared without combining them into a single score.</p></div></div><div className="dc-section-grid"><article className="dc-card dc-chart-card"><h3>Developmentally on track</h3>{outcomes.length > 0 ? <DumbbellChart indicators={outcomes} sourceName={names[0]} comparedName={names[1]} /> : <p className="dc-empty">{availabilityMessage(outcomeComparison?.status ?? null, outcomeError, 'Approved child-development comparison data is unavailable.')}</p>}</article><article className="dc-card dc-insight-card"><h3>How to read this</h3><p>Dots show the reported value for each locality. The connecting line shows the size of the approved difference.</p><small>Aggregate outcomes describe localities, not individual children.</small></article></div></section>
-      <section className="dc-report-section" id="comparison-environment"><div className="dc-report-heading"><span>02</span><div><h2>Environment</h2><p>Each indicator uses a visual form suited to its measurement.</p></div></div>{environment.length > 0 ? <div className="dc-environment-grid">{environment.map((indicator, index) => <article className="dc-card dc-environment-card" key={indicator.id}><div className="dc-card-heading"><h3>{indicator.name}</h3><strong>{differenceLabel(indicator)}</strong></div><EnvironmentVisual indicator={indicator} index={index} names={names} /><footer><span>{provenance(indicator)}</span><span>{statusLabels[indicator.approved_difference.status] ?? indicator.approved_difference.status}</span></footer></article>)}</div> : <div className="dc-card dc-empty">{availabilityMessage(environmentalDifference?.status ?? null, environmentalError, 'Approved environmental comparison data is unavailable.')}</div>}</section>
-      <section className="dc-report-section" id="comparison-context"><div className="dc-report-heading"><span>03</span><div><h2>Services &amp; population</h2><p>Supporting context shown without implying cause or suitability.</p></div></div>{comparisonResult.side_by_side.length > 0 ? <div className="dc-context-grid">{comparisonResult.side_by_side.map((field, index) => <article className="dc-card dc-context-card" key={field.id}><h3>{field.name}</h3><ContextVisual field={field} names={names} index={index} /><footer>{[field.source, field.reference_year, field.geographic_unit].filter(Boolean).join(' · ')}</footer></article>)}</div> : <div className="dc-card dc-empty">No approved contextual indicators are available.</div>}</section>
-      <section className="dc-report-section" id="comparison-evidence"><div className="dc-report-heading"><span>04</span><div><h2>Evidence</h2><p>Interpretation, provenance and limitations remain visible.</p></div></div><div className="dc-evidence-grid"><article className="dc-card"><h3>Supported patterns</h3>{patterns.length > 0 ? patterns.map((pattern) => <details className="dc-pattern" key={pattern.id}><summary><span>{pattern.title}</span><small>{statusLabels[pattern.status] ?? pattern.status}</small></summary><p>{pattern.description}</p><div><span>Confidence <strong>{formattedValue(pattern.confidence.value, pattern.confidence.status)}</strong></span><span>Quality <strong>{formattedValue(pattern.quality.value, pattern.quality.status)}</strong></span><span>Stability <strong>{formattedValue(pattern.stability.value, pattern.stability.status)}</strong></span></div></details>) : <p className="dc-empty">{availabilityMessage(patternInsight?.status ?? null, patternError, 'No supported pattern is available for this comparison.')}</p>}</article><article className="dc-card"><h3>Limitations</h3><ul className="dc-limitations">{(limitations.length > 0 ? limitations : ['No additional comparison limitations were reported.']).map((message) => <li key={message}>{message}</li>)}</ul></article></div></section>
+      <section className="dc-report-section" id="comparison-development"><div className="dc-report-heading"><span>01</span><div><h2>Child development</h2><p>AEDC outcome domains, compared without combining them into a single score.</p></div></div><div className="dc-section-grid"><article className="dc-card dc-chart-card"><h3>Development outcomes</h3>{displayedOutcomes.length > 0 ? <DumbbellChart indicators={displayedOutcomes} sourceName={names[0]} comparedName={names[1]} showDifference={outcomeUsesApprovedDifference} /> : <p className="dc-compact-state">{availabilityMessage(outcomeComparison?.status ?? null, outcomeError, 'Child-development indicators are unavailable for this pair.')}</p>}</article><article className="dc-card dc-insight-card"><h3>How to read this</h3><p>Dots show each locality's published aggregate value. A connecting line makes the separation visible without implying causation.</p><small>Aggregate outcomes describe localities, not individual children.</small></article></div></section>
+      <section className="dc-report-section" id="comparison-environment"><div className="dc-report-heading"><span>02</span><div><h2>Environment</h2><p>Each indicator uses a visual form suited to its measurement.</p></div></div>{displayedEnvironment.length > 0 ? <div className="dc-environment-grid">{displayedEnvironment.map((indicator, index) => <article className="dc-card dc-environment-card" key={indicator.id}><div className="dc-card-heading"><h3>{indicator.name}</h3>{environment.length > 0 && <strong>{differenceLabel(indicator)}</strong>}</div><EnvironmentVisual indicator={indicator} index={index} names={names} /><footer><span>{provenance(indicator)}</span><span>{environment.length > 0 ? statusLabels[indicator.approved_difference.status] ?? indicator.approved_difference.status : 'Side-by-side values'}</span></footer></article>)}</div> : <div className="dc-card dc-compact-state">{availabilityMessage(environmentalDifference?.status ?? null, environmentalError, 'Environmental indicators are unavailable for this pair.')}</div>}</section>
+      <section className="dc-report-section" id="comparison-context"><div className="dc-report-heading"><span>03</span><div><h2>Community context</h2><p>Supporting measures shown without implying cause, quality or suitability.</p></div></div>{contextFields.length > 0 ? <div className="dc-context-grid">{contextFields.map((field, index) => <article className="dc-card dc-context-card" key={field.id}><h3>{field.name}</h3><ContextVisual field={field} names={names} index={index} /><footer>{[field.source, field.reference_year, field.geographic_unit].filter(Boolean).join(' · ')}</footer></article>)}</div> : <div className="dc-card dc-compact-state">No additional community-context indicators are available.</div>}</section>
+      <section className="dc-report-section" id="comparison-evidence"><div className="dc-report-heading"><span>04</span><div><h2>Evidence</h2><p>Interpretation, provenance and limitations remain visible.</p></div></div><div className={`dc-evidence-grid${patterns.length > 0 ? '' : ' dc-evidence-grid-single'}`}>{patterns.length > 0 && <article className="dc-card"><h3>Supported patterns</h3>{patterns.map((pattern) => <details className="dc-pattern" key={pattern.id}><summary><span>{pattern.title}</span><small>{statusLabels[pattern.status] ?? pattern.status}</small></summary><p>{pattern.description}</p><div><span>Confidence <strong>{formattedValue(pattern.confidence.value, pattern.confidence.status)}</strong></span><span>Quality <strong>{formattedValue(pattern.quality.value, pattern.quality.status)}</strong></span><span>Stability <strong>{formattedValue(pattern.stability.value, pattern.stability.status)}</strong></span></div></details>)}</article>}<article className="dc-card"><h3>Limitations</h3><ul className="dc-limitations">{(limitations.length > 0 ? limitations : ['No additional comparison limitations were reported.']).map((message) => <li key={message}>{message}</li>)}</ul>{patterns.length === 0 && patternError && <p className="dc-evidence-note">Pattern analysis is not available for this locality pair; the displayed indicators remain valid for side-by-side comparison.</p>}</article></div></section>
     </div>
   </main>
 }
