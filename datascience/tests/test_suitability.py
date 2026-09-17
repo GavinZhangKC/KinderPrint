@@ -1,5 +1,6 @@
 """Regression tests for the migrated locality-suitability prototype."""
 
+import json
 import sys
 from pathlib import Path
 
@@ -9,6 +10,33 @@ sys.path.insert(0, str(ROOT / "src"))
 
 from kinderprint.analytics.suitability import build_criterion_scores, build_rankings, rank_profiles
 from kinderprint.api.build_artefacts import build_suitability
+
+
+def test_published_aedc_domain_scores_match_runtime_profiles():
+    profiles = json.loads((ROOT / "outputs/iteration_2/profiles.json").read_text())["profiles"]
+    suitability = json.loads((ROOT / "outputs/iteration_2/suitability.json").read_text())["localities"]
+    by_id = {item["id"]: item for item in suitability}
+    criterion_indicators = {
+        "physical_health_on_track": "aedc_physical_on_track",
+        "social_competence_on_track": "aedc_social_on_track",
+        "emotional_maturity_on_track": "aedc_emotional_on_track",
+        "language_cognitive_on_track": "aedc_language_on_track",
+        "communication_knowledge_on_track": "aedc_communication_on_track",
+    }
+
+    assert len(profiles) == len(by_id) == 346
+    for criterion, indicator_id in criterion_indicators.items():
+        available = 0
+        for profile in profiles:
+            identifier = profile["neighbourhood"]["id"]
+            indicator = next(item for domain in profile["domains"]
+                             for item in domain["indicators"] if item["id"] == indicator_id)
+            expected = indicator["value"] if indicator["status"] == "available" else None
+            row = by_id[identifier]
+            assert row["measures"][criterion] == expected
+            assert row["scores"][criterion] == (round(expected, 2) if expected is not None else None)
+            available += expected is not None
+        assert available == 342
 
 
 def _indicator(identifier, value):
