@@ -242,6 +242,25 @@ def test_manual_comparison_preserves_missing_null(client, monkeypatch, write_jso
     assert social["source_status"] == "missing"
 
 
+def test_manual_comparison_merges_shared_limitations(client, monkeypatch, write_json) -> None:
+    path = write_json("profiles.json", json.dumps({
+        "profiles": [
+            profile("a", 1, social_status="missing"),
+            profile("b", 2, social_status="missing"),
+        ],
+    }))
+    monkeypatch.setenv(PROFILE_DATA_PATH_ENV, str(path))
+
+    body = client.get("/api/compare", params={
+        "neighbourhood_id_a": "a", "neighbourhood_id_b": "b",
+    }).json()
+
+    missing = [item for item in body["limitations"] if item["code"] == "indicator_missing"]
+    assert body["status"] == "limited"
+    assert len(missing) == 1
+    assert missing[0]["affected_fields"] == ["social", "a", "b"]
+
+
 def test_manual_comparison_marks_absent_indicator_unavailable(client, monkeypatch, write_json) -> None:
     source = profile("a", 1)
     source["domains"][2]["indicators"] = []

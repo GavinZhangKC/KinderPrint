@@ -397,7 +397,17 @@ def multi_profile_comparison_limitations(
                 identifier,
                 *missing_from,
             ))
-    return limitations
+
+    merged: dict[tuple[str, str], dict[str, Any]] = {}
+    for item in limitations:
+        key = (item["code"], item["message"])
+        if key not in merged:
+            merged[key] = {**item, "affected_fields": []}
+        fields = merged[key]["affected_fields"]
+        for field in item.get("affected_fields", []):
+            if field not in fields:
+                fields.append(field)
+    return list(merged.values())
 
 
 def profile_comparison_limitations(
