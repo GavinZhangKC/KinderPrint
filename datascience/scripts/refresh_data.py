@@ -400,6 +400,8 @@ def main() -> int:
             service_context=service_context,
             demand_context=demand_context,
         )
+        (ITERATION_2_OUT / "profiles.json").write_text(
+            json.dumps(profiles, separators=(",", ":")))
         for name, obj in {"profiles.json": profiles,
                           "priorities.json": B.build_priorities(final),
                           "explanations.json": B.build_explanations(final),
