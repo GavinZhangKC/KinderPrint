@@ -111,19 +111,38 @@ function SideNavigation({ current, onChange, onHome }: { current: HealthView; on
       return <button key={item.id} type="button" className={selected ? 'is-active' : undefined} aria-current={selected ? 'page' : undefined} disabled={!item.enabled} title={item.enabled ? undefined : `${item.label} is planned for a later release`} onClick={() => item.enabled && onChange(item.id as HealthView)}><span aria-hidden="true">{item.symbol}</span><b>{item.label}</b>{!item.enabled && <small>Planned</small>}</button>
     })}</nav>
     <footer><span>⌖</span><div><strong>Melbourne</strong><small>SA2 reporting localities</small></div></footer>
-    <div className="dh-community-mark"><i>▥</i><span>Community<br />for brighter futures</span></div>
+    <div className="dh-community-mark"><i>▥</i><span>Evidence<br />for brighter futures</span></div>
   </aside>
 }
 
 function DevelopmentWheel() {
-  return <div className="dh-development-wheel" aria-label="Five AEDC child development domains"><span className="domain physical">♥<small>Physical health<br />and wellbeing</small></span><span className="domain social">●●<small>Social<br />competence</small></span><span className="domain language">▣<small>Language and<br />cognitive skills</small></span><span className="domain emotional">☺<small>Emotional<br />maturity</small></span><span className="domain communication">●<small>Communication skills<br />and general knowledge</small></span><b>♟</b></div>
+  const domains = [
+    { className: 'physical', label: 'Physical health and wellbeing', icon: 'heart' },
+    { className: 'social', label: 'Social competence', icon: 'people' },
+    { className: 'language', label: 'Language and cognitive skills', icon: 'book' },
+    { className: 'emotional', label: 'Emotional maturity', icon: 'smile' },
+    { className: 'communication', label: 'Communication and general knowledge', icon: 'chat' },
+  ]
+  return <div className="dh-development-visual" aria-label="Five AEDC child development domains">
+    <div className="dh-development-wheel"><b><DomainIcon name="child" /></b></div>
+    <ul>{domains.map((domain) => <li key={domain.className} className={domain.className}><i><DomainIcon name={domain.icon} /></i><span>{domain.label}</span></li>)}</ul>
+  </div>
+}
+
+function DomainIcon({ name }: { name: string }) {
+  if (name === 'heart') return <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10Z" /></svg>
+  if (name === 'people') return <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="8" cy="8" r="3" /><circle cx="17" cy="9" r="2.5" /><path d="M3 20v-2a5 5 0 0 1 10 0v2M14 20v-1.5a4 4 0 0 1 7-2.7V20" /></svg>
+  if (name === 'book') return <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5.5A3.5 3.5 0 0 1 7.5 4H11v15H7.5A3.5 3.5 0 0 0 4 20.5ZM20 5.5A3.5 3.5 0 0 0 16.5 4H13v15h3.5a3.5 3.5 0 0 1 3.5 1.5Z" /></svg>
+  if (name === 'smile') return <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" /><path d="M8 14.5a5 5 0 0 0 8 0M9 9h.01M15 9h.01" /></svg>
+  if (name === 'chat') return <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v11H9l-5 4Z" /><path d="M8 9h8M8 12h5" /></svg>
+  return <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="7" r="3" /><path d="M12 10v7M7 13l5-3 5 3M9 21l3-4 3 4" /></svg>
 }
 
 function OverviewPage({ onConditions }: { onConditions: () => void }) {
   const [mapMode, setMapMode] = useState<'lens' | 'map'>('lens')
   return <div className="dh-page dh-overview-page">
     <header className="dh-topbar"><div className="dh-static-search">⌕ <span>Brunswick East · SA2</span></div><div className="dh-top-actions"><span>⌖ Melbourne</span><button type="button" disabled title="Help centre is planned">?</button><button type="button" disabled title="Accounts are not enabled">●</button></div></header>
-    <div className="dh-overview-title"><div><h1>Locality overview</h1><p>Community-level evidence — not individual diagnosis or medical advice.</p></div><div className="dh-lens-tabs" role="tablist" aria-label="Map presentation"><button type="button" role="tab" aria-selected={mapMode === 'lens'} onClick={() => setMapMode('lens')}>Locality lens</button><button type="button" role="tab" aria-selected={mapMode === 'map'} onClick={() => setMapMode('map')}>Standard map</button></div><button className="dh-view-button" type="button" disabled title="Additional audience views are planned">♟ Planner view⌄</button></div>
+    <div className="dh-overview-title"><div><h1>Locality overview</h1><p>Locality-level evidence. Not individual diagnosis or medical advice.</p></div><div className="dh-lens-tabs" role="tablist" aria-label="Map presentation"><button type="button" role="tab" aria-selected={mapMode === 'lens'} onClick={() => setMapMode('lens')}>Locality lens</button><button type="button" role="tab" aria-selected={mapMode === 'map'} onClick={() => setMapMode('map')}>Standard map</button></div><button className="dh-view-button" type="button" disabled title="Additional audience views are planned">♟ Planner view⌄</button></div>
     <div className="dh-overview-grid">
       <div className="dh-overview-left"><article className="dh-card dh-population-card"><div className="dh-card-title"><div><span>♟ Who lives here?</span><small>Children by age group, Brunswick East (SA2)</small></div><b>›</b></div><div className="dh-age-grid"><div><i>●</i><span>0–4 years</span><strong>488</strong><small>children</small></div><div><i>◆</i><span>5–9 years</span><strong>403</strong><small>children</small></div><div><i>▲</i><span>10–14 years</span><strong>360</strong><small>children</small></div></div><p className="dh-source">Source: Victoria in Future 2023 · SA2 projection</p></article><article className="dh-card dh-development-card"><div className="dh-card-title"><div><span>▥ Child development</span><small>AEDC 2024, Brunswick East (SA2)</small></div><b>›</b></div><div className="dh-development-content"><DevelopmentWheel /><dl><div><dt>Vulnerable on one or more domains</dt><dd>23.8%</dd></div><div><dt>On track across all five domains</dt><dd>56.8%</dd></div></dl></div><p className="dh-source">Source: Australian Early Development Census 2024</p></article></div>
       <section className="dh-locality-lens"><LocalityGlobe mode={mapMode} /></section>
