@@ -3,6 +3,7 @@ import { useState } from 'react'
 import LocalityGlobe from './LocalityGlobe'
 import './DigitalHealthHub.css'
 import './DigitalHealthHub.responsive.css'
+import './DigitalHealthHub.health.css'
 
 type HealthView = 'overview' | 'conditions'
 type ConditionId = 'brain' | 'lungs' | 'metabolic' | 'immune' | 'perinatal'
@@ -27,7 +28,80 @@ const conditions: Array<{ id: ConditionId; label: string; image: string; summary
   { id: 'perinatal', label: 'Perinatal health', image: '/health-assets/perinatal-health.png', summary: 'Perinatal indicators require a different reporting geography.', status: 'Geography limited' },
 ]
 
-const conditionTabs = ['Neurodevelopment', 'Emotional wellbeing', 'Mental health service use', 'Disability support'] as const
+type HealthPanel = 'Local health' | 'Prevention' | 'Daily routine' | 'Seasonal care' | 'Nearby care'
+
+const healthPanels: HealthPanel[] = ['Local health', 'Prevention', 'Daily routine', 'Seasonal care', 'Nearby care']
+
+const conditionGuidance: Record<ConditionId, {
+  indicators: Array<{ label: string; value: string; detail: string }>
+  prevention: string[]
+  routine: string[]
+  seasonal: string[]
+  source: string
+}> = {
+  brain: {
+    indicators: [
+      { label: 'Children with a mental-health condition', value: '1.43%', detail: 'Self-reported, 2021' },
+      { label: 'One or more long-term conditions', value: '7.47%', detail: 'Self-reported, 2021' },
+      { label: 'Developmentally vulnerable on ≥1 domain', value: '23.8%', detail: 'AEDC, SA2, 2024' },
+    ],
+    prevention: ['Respond early to learning, behaviour, hearing or developmental concerns.', 'Keep routine health, hearing and vision checks up to date.', 'Seek professional support when distress or behaviour changes persist.'],
+    routine: ['Use consistent sleep and wake times.', 'Include active play, reading and screen-free family interaction.', 'Create predictable routines with calm transition time.'],
+    seasonal: ['Maintain routines during school holidays and daylight-saving changes.', 'Plan indoor active play on extreme-heat or poor-air-quality days.', 'Watch for stress around school transitions and seek help early.'],
+    source: 'PHIDU 2026 PHA context and AEDC 2024 SA2 data',
+  },
+  lungs: {
+    indicators: [
+      { label: 'Children reporting asthma', value: '5.76%', detail: 'Self-reported, PHA, 2021' },
+      { label: 'Respiratory ED presentations, age 0–4', value: '166', detail: 'PHA count, 2022/23' },
+      { label: 'Respiratory ED presentations, age 5–14', value: '45', detail: 'PHA count, 2022/23' },
+    ],
+    prevention: ['Ask a GP for a current written asthma action plan.', 'Keep children away from tobacco smoke and known triggers.', 'Review inhaler and spacer technique with a clinician or pharmacist.'],
+    routine: ['Follow the child’s prescribed preventer plan.', 'Keep reliever medicine and the action plan accessible.', 'Support normal active play when asthma is controlled.'],
+    seasonal: ['Victoria’s grass-pollen season runs from October to December.', 'Check thunderstorm-asthma forecasts and pollen conditions.', 'On high-risk days, go indoors, close windows and use recirculated air.'],
+    source: 'PHIDU 2026 PHA context; Better Health Channel asthma guidance',
+  },
+  metabolic: {
+    indicators: [
+      { label: 'Children above healthy weight, excluding obesity', value: '17.04%', detail: 'Modelled PHA estimate, 2022' },
+      { label: 'Children living with obesity', value: '4.87%', detail: 'Modelled PHA estimate, 2022' },
+      { label: '95% confidence interval for obesity', value: '3.58–6.17%', detail: 'Modelled estimate uncertainty' },
+    ],
+    prevention: ['Use growth assessment by a qualified clinician rather than visual judgement.', 'Make water the usual drink and offer varied minimally processed foods.', 'Discuss persistent growth, feeding or energy concerns with a GP.'],
+    routine: ['Build active play into the day.', 'Keep regular meals and age-appropriate sleep routines.', 'Make changes as a household and avoid weight stigma.'],
+    seasonal: ['Use shaded or indoor activity during extreme heat.', 'Keep water available during warmer weather and sport.', 'Maintain movement routines during winter and school holidays.'],
+    source: 'PHIDU 2026 modelled PHA estimates',
+  },
+  immune: {
+    indicators: [
+      { label: 'Fully immunised at 1 year', value: '97.14%', detail: 'PHA, 2023' },
+      { label: 'Fully immunised at 2 years', value: '90.86%', detail: 'PHA, 2023' },
+      { label: 'Fully immunised at 5 years', value: '96.06%', detail: 'PHA, 2023' },
+    ],
+    prevention: ['Keep immunisations current using the Australian schedule.', 'Use an ASCIA action plan when a clinician diagnoses allergy or anaphylaxis.', 'Do not remove foods from a child’s diet without clinical advice.'],
+    routine: ['Keep prescribed allergy medicine accessible.', 'Share the child’s action plan with school or childcare.', 'Check labels and prevent cross-contact for confirmed food allergy.'],
+    seasonal: ['Monitor pollen during spring.', 'Manage hay fever with advice from a GP or pharmacist.', 'Children with asthma or hay fever need thunderstorm-asthma preparation.'],
+    source: 'PHIDU 2026 PHA immunisation context; Victorian health guidance',
+  },
+  perinatal: {
+    indicators: [
+      { label: 'Babies with low birthweight', value: '5.16%', detail: 'PHA pooled data, 2019–2021' },
+      { label: 'Smoking during pregnancy', value: '2.95%', detail: 'PHA pooled data, 2019–2021' },
+      { label: 'Infant mortality', value: '2.99 per 1,000', detail: 'PHA pooled data, 2019–2023' },
+    ],
+    prevention: ['Attend recommended antenatal and postnatal care.', 'Keep pregnancy and infant environments smoke-free.', 'Use safe-sleep advice and seek help for feeding or growth concerns.'],
+    routine: ['Follow the baby’s feeding plan and routine health checks.', 'Practise safe sleep for every sleep.', 'Use maternal and child health support when concerns arise.'],
+    seasonal: ['Protect babies from extreme heat and direct sun.', 'Reduce infection exposure and keep family vaccinations current.', 'Dress babies for the room temperature rather than the season alone.'],
+    source: 'PHIDU 2026 pooled PHA perinatal indicators',
+  },
+}
+
+const nearbyCare = [
+  { name: 'Maternal and Child Health Centre – Lygon East', type: 'Maternal, child and family health', distance: '0.31 km', fee: 'Contact service' },
+  { name: 'East Brunswick Medical Centre', type: 'General practice', distance: '0.35 km', fee: 'Contact clinic' },
+  { name: 'Inner North Medical Clinic', type: 'General practice', distance: '0.37 km', fee: 'Contact clinic' },
+  { name: "The Royal Children’s Hospital", type: 'Paediatric emergency department', distance: '3.63 km', fee: 'Public hospital conditions apply' },
+]
 
 function SideNavigation({ current, onChange, onHome }: { current: HealthView; onChange: (view: HealthView) => void; onHome: () => void }) {
   return <aside className="dh-sidebar">
@@ -59,20 +133,30 @@ function OverviewPage({ onConditions }: { onConditions: () => void }) {
   </div>
 }
 
-function Pathway() {
-  const stages = [['♟','Early childhood','Birth–5 years','Foundations for learning, health and wellbeing'],['♙','School entry','5–8 years','Transition, learning and social development'],['♟♟','Middle childhood','9–12 years','Growing independence and social connections'],['♙','Adolescence','13–17 years','Identity, mental wellbeing and future opportunities']]
-  return <article className="dh-pathway-card"><div className="dh-card-title"><div><span>▤ Developmental pathway across childhood</span><small>Different data sources inform each life stage. Select a stage to review its evidence boundary.</small></div></div><div className="dh-pathway-ribbon"><i /><i /><i /><i /></div><div className="dh-life-stages">{stages.map(([icon,title,age,copy]) => <button key={title} type="button" title={`${title}: ${copy}`}><i>{icon}</i><b>{title}</b><span>{age}</span><small>{copy}</small></button>)}</div></article>
-}
-
 function ConditionsPage() {
   const [conditionId, setConditionId] = useState<ConditionId>('brain')
-  const [topic, setTopic] = useState<(typeof conditionTabs)[number]>('Neurodevelopment')
+  const [panel, setPanel] = useState<HealthPanel>('Local health')
   const selected = conditions.find((item) => item.id === conditionId) ?? conditions[0]
-  const brainAvailable = conditionId === 'brain'
+  const guidance = conditionGuidance[conditionId]
+  const selectCondition = (id: ConditionId) => { setConditionId(id); setPanel('Local health') }
   return <div className="dh-page dh-conditions-page"><header className="dh-topbar"><div className="dh-static-search">⌕ <span>Search is unavailable in this release</span></div><div className="dh-top-actions"><span>⌖ Melbourne</span><button type="button" disabled title="Help centre is planned">?</button><button type="button" disabled title="Accounts are not enabled">●</button></div></header><div className="dh-condition-layout">
-    <section className="dh-condition-visual" aria-label="Selected child health condition"><span className="dh-eyebrow">Child health conditions</span><h1>Child health conditions</h1><p>Aggregate evidence — not an individual clinical record.<br />No diagnosis or medication advice.</p><div className="dh-organ-stage"><img src={selected.image} alt={`Medical educational illustration for ${selected.label}`} /><button className="hotspot one" type="button" aria-label="Open evidence summary"><i /></button><button className="hotspot two" type="button" aria-label="Open evidence boundary"><i /></button><span><strong>{selected.label}</strong><small>{selected.summary}</small></span></div><div className="dh-condition-picker" aria-label="Health condition categories">{conditions.map((item) => <button key={item.id} type="button" aria-pressed={conditionId === item.id} onClick={() => setConditionId(item.id)}><img src={item.image} alt="" /><span>{item.label}</span></button>)}</div></section>
-    <section className="dh-condition-detail"><div className="dh-condition-heading"><h2>{selected.label}</h2><span>{selected.status}</span></div><div className="dh-topic-tabs" role="tablist" aria-label="Condition evidence topics">{conditionTabs.map((item) => <button key={item} type="button" role="tab" aria-selected={topic === item} disabled={!brainAvailable && item !== 'Neurodevelopment'} title={!brainAvailable && item !== 'Neurodevelopment' ? 'No approved locality evidence is integrated for this topic' : undefined} onClick={() => setTopic(item)}>{item}</button>)}</div><Pathway /><div className="dh-condition-bottom"><article className="dh-detail-list"><h3>▤ Available evidence</h3>{brainAvailable ? <ul><li><span>AEDC development domains<small>Australian Early Development Census</small></span><b>SA2</b></li><li><span>School Entrant Health Questionnaire<small>Victorian Government data</small></span><b>LGA</b></li><li><span>Child mental-health conditions<small>PHIDU research context</small></span><b>PHA</b></li><li><span>NDIS disability-support participation<small>Public dataset candidate</small></span><b>SA2*</b></li></ul> : <div className="dh-unavailable"><strong>No approved SA2 outcome data</strong><p>{selected.summary}</p><small>This category remains visible to communicate the intended health model without fabricating locality statistics.</small></div>}</article><article className="dh-detail-list"><h3>⌘ Local service pathways</h3><ul><li><span>Maternal & child health<small>Council-delivered services</small></span></li><li><span>General practice<small>Primary care providers</small></span></li><li><span>Child and family health<small>Assessment and early support</small></span></li><li><span>Mental health support<small>Specialist and community services</small></span></li></ul><p>Listed presence does not mean availability, capacity or quality.</p></article><article className="dh-evidence-drawer"><h3>▤ Evidence details</h3><dl><div><dt>Source</dt><dd>{brainAvailable ? 'AEDC' : 'Not integrated'}</dd></div><div><dt>Year</dt><dd>{brainAvailable ? '2024' : 'Not available'}</dd></div><div><dt>Geography</dt><dd>{brainAvailable ? 'SA2 / context areas' : 'Unsupported at SA2'}</dd></div><div><dt>Status</dt><dd>{brainAvailable ? 'Published' : 'Unavailable'}</dd></div></dl><p>Population-level data only. Not suitable for identifying individual children or making clinical decisions.</p></article></div></section>
+    <section className="dh-condition-visual" aria-label="Selected child health condition"><span className="dh-eyebrow">Child health conditions</span><h1>Child health conditions</h1><p>Local population context and practical prevention guidance.<br />Not individual diagnosis or medical advice.</p><div className="dh-organ-stage" tabIndex={0}><img src={selected.image} alt={`Medical educational illustration for ${selected.label}`} /><span className="dh-organ-tooltip"><strong>{selected.label}</strong><small>{selected.summary}</small></span></div><div className="dh-condition-picker" aria-label="Health condition categories">{conditions.map((item) => <button key={item.id} type="button" aria-pressed={conditionId === item.id} onClick={() => selectCondition(item.id)}><img src={item.image} alt="" /><span>{item.label}</span></button>)}</div></section>
+    <section className="dh-condition-detail"><div className="dh-condition-heading"><h2>{selected.label}</h2><span>{selected.status}</span></div><div className="dh-topic-tabs dh-health-tabs" role="tablist" aria-label="Condition information">{healthPanels.map((item) => <button key={item} type="button" role="tab" aria-selected={panel === item} onClick={() => setPanel(item)}>{item}</button>)}</div>
+      {panel === 'Local health' && <article className="dh-health-panel"><header><div><h3>Health indicators for Brunswick / Brunswick East</h3><p>Regional PHA context unless an SA2 geography is stated.</p></div><span>Population data</span></header><div className="dh-health-metrics">{guidance.indicators.map((indicator) => <div key={indicator.label}><small>{indicator.label}</small><strong>{indicator.value}</strong><span>{indicator.detail}</span></div>)}</div><p className="dh-health-note">{guidance.source}. PHA values describe the broader Brunswick / Brunswick East population and are not SA2 estimates or individual risk predictions.</p></article>}
+      {panel === 'Prevention' && <GuidancePanel title="Practical prevention" icon="✚" items={guidance.prevention} footer="Discuss decisions about symptoms, medicines or treatment with a qualified health professional." />}
+      {panel === 'Daily routine' && <GuidancePanel title="Healthy daily routine" icon="☀" items={guidance.routine} footer="Adapt routines to the child’s age, ability, diagnosed conditions and clinical plan." />}
+      {panel === 'Seasonal care' && <GuidancePanel title="Melbourne seasonal care" icon="☁" items={guidance.seasonal} footer="Current warnings and forecasts should be checked through Victorian Government services." />}
+      {panel === 'Nearby care' && <NearbyCarePanel />}
+    </section>
   </div></div>
+}
+
+function GuidancePanel({ title, icon, items, footer }: { title: string; icon: string; items: string[]; footer: string }) {
+  return <article className="dh-health-panel dh-guidance-panel"><header><div><h3>{icon} {title}</h3><p>General, evidence-informed guidance for parents and carers.</p></div></header><ol>{items.map((item, index) => <li key={item}><b>{index + 1}</b><span>{item}</span></li>)}</ol><p className="dh-health-note">{footer}</p></article>
+}
+
+function NearbyCarePanel() {
+  return <article className="dh-health-panel dh-care-panel"><header><div><h3>Verified nearby care</h3><p>Distance from the Brunswick East reference point, calculated as straight-line distance.</p></div><span>Healthdirect 2025</span></header><div className="dh-care-list">{nearbyCare.map((service) => <div key={service.name}><i>⌖</i><span><strong>{service.name}</strong><small>{service.type}</small></span><b>{service.distance}</b><em>{service.fee}</em></div>)}</div><p className="dh-health-note">The public directory does not provide consultation prices, current bulk-billing eligibility, appointment availability or verified paediatric specialist staffing. Confirm fees, suitability and availability directly with the service. Distance is not travel time.</p></article>
 }
 
 export default function DigitalHealthHub({ onHome }: DigitalHealthHubProps) {
