@@ -151,7 +151,7 @@ const optionGroups: Array<{ title: string; summary: string; options: Suitability
     title: 'Primary, early-years and urgent healthcare access',
     summary: 'Presence is not the same as capacity, waiting time, eligibility, affordability or quality.',
     options: [
-      { id: 'general_paediatrics', label: 'General paediatricians', description: 'Community or hospital doctors providing specialist care for babies, children and adolescents.', source: 'Service directory not integrated', available: false },
+      { id: 'general_paediatrics', label: 'General paediatricians', description: 'Local or hospital doctors providing specialist care for babies, children and adolescents.', source: 'Service directory not integrated', available: false },
       { id: 'general_practice_access', label: 'Listed general practices per 10,000 residents', description: 'Active HealthDirect-listed practices located inside the locality divided by resident population. It does not measure bulk billing, capacity or opening hours.', source: 'HealthDirect facilities, 2025', available: true },
       { id: 'pharmacy_access', label: 'Listed pharmacies per 10,000 residents', description: 'Active HealthDirect-listed pharmacies located inside the locality divided by resident population. It does not measure stock, hours or service quality.', source: 'HealthDirect facilities, 2025', available: true },
       { id: 'mch', label: 'Maternal and Child Health services', description: 'Universal and enhanced MCH centres supporting families from birth to school age.', source: 'Service locations not integrated', available: false },
@@ -193,9 +193,9 @@ const optionGroups: Array<{ title: string; summary: string; options: Suitability
   },
   {
     title: 'Mental health, therapy and family support',
-    summary: 'Victorian community child health commonly includes several of these allied-health services.',
+    summary: 'Victorian child health care commonly includes several of these allied-health services.',
     options: [
-      { id: 'child_mental_health', label: 'Child and adolescent mental-health services', description: 'Psychiatry, psychology, crisis, community and specialist mental-health care.', source: 'Service data unavailable', available: false },
+      { id: 'child_mental_health', label: 'Child and adolescent mental-health services', description: 'Psychiatry, psychology, crisis and specialist mental-health care.', source: 'Service data unavailable', available: false },
       { id: 'speech_pathology', label: 'Speech pathology', description: 'Speech, language, communication, voice, fluency and swallowing support.', source: 'Service data unavailable', available: false },
       { id: 'occupational_therapy', label: 'Occupational therapy', description: 'Daily activities, sensory processing, participation and functional-development support.', source: 'Service data unavailable', available: false },
       { id: 'physiotherapy', label: 'Physiotherapy', description: 'Movement, mobility, strength, coordination and physical-development support.', source: 'Service data unavailable', available: false },
@@ -205,7 +205,7 @@ const optionGroups: Array<{ title: string; summary: string; options: Suitability
     ],
   },
   {
-    title: 'Community context',
+    title: 'Locality context',
     summary: 'Area-level context that may help comparison but does not describe every household.',
     options: [
       { id: 'socioeconomic_resources', label: 'Index of Relative Socio-economic Disadvantage (decile 1–10)', description: 'ABS IRSD area decile; 10 indicates relatively fewer disadvantage characteristics. It does not describe every resident.', source: 'ABS SEIFA IRSD, 2021', available: true },

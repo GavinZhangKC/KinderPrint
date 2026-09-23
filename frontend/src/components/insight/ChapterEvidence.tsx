@@ -57,7 +57,7 @@ export default function ChapterEvidence({ chapter, state, retry }: { chapter: nu
 }
 
 export const chapterCopy = [
-  'Every neighbourhood creates a different setting for childhood. Begin with the selected place, its community and the everyday environment surrounding young children.',
+  'Every neighbourhood creates a different setting for childhood. Begin with the selected place and the everyday environment surrounding young children.',
   'Urban heat can add environmental pressure to daily life. Follow the local heat island indicator to see how strongly the built environment retains heat.',
   'Tree canopy and accessible public open space help shape how a neighbourhood feels. Here, the journey turns to the amount of green cover available locally.',
   'Environmental context sits alongside child development evidence. AEDC data shows the share of children developmentally vulnerable on one or more domains in this neighbourhood.',

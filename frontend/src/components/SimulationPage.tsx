@@ -687,7 +687,7 @@ export default function SimulationPage({
               <div className="slider-row">
                 <div className="slider-labels">
                   <label>Tree canopy</label>
-                  <span>Current {baseline ? `${baseline.treeCanopy.toFixed(1)}%` : '—'}</span>
+                  <span>Current {baseline ? `${baseline.treeCanopy.toFixed(1)}%` : 'Not available'}</span>
                 </div>
                 <div className="slider-control">
                   <input
@@ -709,7 +709,7 @@ export default function SimulationPage({
               <div className="slider-row">
                 <div className="slider-labels">
                   <label>Public open space</label>
-                  <span>Current {baseline ? `${baseline.openSpace.toFixed(1)}%` : '—'}</span>
+                  <span>Current {baseline ? `${baseline.openSpace.toFixed(1)}%` : 'Not available'}</span>
                 </div>
                 <div className="slider-control">
                   <input
@@ -731,7 +731,7 @@ export default function SimulationPage({
               <div className="slider-row">
                 <div className="slider-labels">
                   <label>Urban heat island effect</label>
-                  <span>Current {baseline ? `${baseline.heatExposure.toFixed(1)}°C` : '—'}</span>
+                  <span>Current {baseline ? `${baseline.heatExposure.toFixed(1)}°C` : 'Not available'}</span>
                 </div>
                 <div className="slider-control">
                   <input
@@ -784,9 +784,9 @@ export default function SimulationPage({
                   <span>Heat exposure</span>
                 </div>
                 <div className="result-card-body">
-                  <strong>{baseline ? `${baseline.heatExposure.toFixed(1)}°C` : '—'}</strong>
+                  <strong>{baseline ? `${baseline.heatExposure.toFixed(1)}°C` : 'Not available'}</strong>
                   <span className="result-arrow">→</span>
-                  <strong>{scenarioResult ? `${scenarioValues.heat.toFixed(1)}°C` : '—'}</strong>
+                  <strong>{scenarioResult ? `${scenarioValues.heat.toFixed(1)}°C` : 'Not available'}</strong>
                 </div>
                 <div className="result-status success">{scenarioResult ? scenarioResult.heatDirection : 'Select area'}</div>
               </article>
@@ -796,11 +796,11 @@ export default function SimulationPage({
                   <span>Tree canopy</span>
                 </div>
                 <div className="result-card-body">
-                  <strong>{baseline ? `${baseline.treeCanopy.toFixed(1)}%` : '—'}</strong>
+                  <strong>{baseline ? `${baseline.treeCanopy.toFixed(1)}%` : 'Not available'}</strong>
                   <span className="result-arrow">→</span>
                   <strong>{scenarioValues.treeCanopy.toFixed(1)}%</strong>
                 </div>
-                <div className="result-status success">{baseline ? `+${(scenarioValues.treeCanopy - baseline.treeCanopy).toFixed(1)} pp` : '—'}</div>
+                <div className="result-status success">{baseline ? `+${(scenarioValues.treeCanopy - baseline.treeCanopy).toFixed(1)} pp` : 'Not available'}</div>
               </article>
 
               <article className="result-card">
@@ -808,9 +808,9 @@ export default function SimulationPage({
                   <span>Modelled vulnerability</span>
                 </div>
                 <div className="result-card-body">
-                  <strong>{baseline ? `${baseline.vulnerability.toFixed(1)}%` : '—'}</strong>
+                  <strong>{baseline ? `${baseline.vulnerability.toFixed(1)}%` : 'Not available'}</strong>
                   <span className="result-arrow">→</span>
-                  <strong>{scenarioResult ? `${scenarioResult.vulnerability.toFixed(1)}%` : '—'}</strong>
+                  <strong>{scenarioResult ? `${scenarioResult.vulnerability.toFixed(1)}%` : 'Not available'}</strong>
                 </div>
                 <div className="result-status success">{scenarioResult ? scenarioResult.vulnerabilityDirection : 'Pending'}</div>
               </article>
@@ -820,9 +820,9 @@ export default function SimulationPage({
                   <span>Child-development outlook</span>
                 </div>
                 <div className="result-card-body">
-                  <strong>{baseline ? `${baseline.childDevelopment.toFixed(1)}` : '—'}</strong>
+                  <strong>{baseline ? `${baseline.childDevelopment.toFixed(1)}` : 'Not available'}</strong>
                   <span className="result-arrow">→</span>
-                  <strong>{scenarioResult ? `${scenarioResult.developmentScore.toFixed(1)}` : '—'}</strong>
+                  <strong>{scenarioResult ? `${scenarioResult.developmentScore.toFixed(1)}` : 'Not available'}</strong>
                 </div>
                 <div className="result-status success">{scenarioResult ? scenarioResult.developmentDirection : 'Pending'}</div>
               </article>
