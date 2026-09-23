@@ -6,6 +6,16 @@
   transition: opacity 180ms ease, transform 180ms ease, visibility 180ms ease;
 }
 
+.dh-overview-right {
+  grid-template-rows: 1fr;
+}
+
+@media (max-width: 1450px) {
+  .dh-overview-right {
+    grid-template-columns: 1fr;
+  }
+}
+
 .dh-organ-stage:hover .dh-organ-tooltip,
 .dh-organ-stage:focus-visible .dh-organ-tooltip,
 .dh-organ-stage:focus-within .dh-organ-tooltip {
