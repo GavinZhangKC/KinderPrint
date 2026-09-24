@@ -27,6 +27,10 @@ Parameters:
     Type: String
     Default: https://iteration1.kinderprint.me
     Description: Exact HTTPS origin of the historical Iteration 1 frontend
+  IterationTwoOrigin:
+    Type: String
+    Default: https://iteration2.vkinder.me
+    Description: Exact HTTPS origin of the historical Iteration 2 frontend
   LocalDevelopmentOrigin:
     Type: String
     Default: http://localhost:5173
@@ -53,6 +57,7 @@ Resources:
           - !Ref VkinderOrigin
           - !Ref VkinderWwwOrigin
           - !Ref IterationOneOrigin
+          - !Ref IterationTwoOrigin
           - !Ref LocalDevelopmentOrigin
         AllowHeaders:
           - Accept
