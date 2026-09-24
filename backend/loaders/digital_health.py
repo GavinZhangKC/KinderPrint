@@ -1,0 +1,283 @@
+"""Load validated VCAMS context and Healthdirect facility presence."""
+
+from __future__ import annotations
+
+import csv
+from functools import lru_cache
+import math
+from pathlib import Path
+from typing import Any
+
+from core.data_loader import (
+    ABS_CHILD_HEALTH_DATA_PATH_ENV,
+    HEALTH_FACILITY_DATA_PATH_ENV,
+    VCAMS_AREA_DATA_PATH_ENV,
+    VCAMS_LGA_DATA_PATH_ENV,
+    abs_child_health_data_path,
+    health_facility_data_path,
+    vcams_area_data_path,
+    vcams_lga_data_path,
+)
+from core.responses import limitation
+
+
+AREA_FIELDS = {
+    "reference_year", "area_name", "geography", "indicator_id", "indicator_label",
+    "age_group", "percent", "rse_percent", "quality_flag", "source_id",
+    "geography_warning",
+}
+LGA_FIELDS = {
+    "reference_period", "lga_code", "lga_name", "geography", "indicator_id",
+    "numerator", "denominator", "percent", "publication_status", "source_id",
+    "geography_warning",
+}
+FACILITY_FIELDS = {
+    "facility_id", "facility_name", "facility_category", "official_service_type",
+    "operational_status", "address", "longitude", "latitude", "sa2_code",
+    "source_date", "source_id",
+}
+ABS_CHILD_HEALTH_FIELDS = {
+    "sa2_code_2021", "sa2_name_2021", "sa3_code_2021", "sa3_name_2021",
+    "reference_year", "age_group", "indicator", "count", "population_denominator",
+    "percent", "geography", "quality_flag", "source_id",
+}
+REQUIRED_FIELDS = {
+    "vcams_area_context": AREA_FIELDS,
+    "vcams_lga_context": LGA_FIELDS,
+    "health_facilities": FACILITY_FIELDS,
+    "abs_child_health": ABS_CHILD_HEALTH_FIELDS,
+}
+UNIQUE_FIELDS = {
+    "vcams_area_context": ("reference_year", "area_name", "indicator_id"),
+    "vcams_lga_context": ("reference_period", "lga_code", "indicator_id"),
+    "health_facilities": ("facility_id",),
+    "abs_child_health": ("sa2_code_2021", "reference_year", "indicator"),
+}
+
+
+def _number(value: str | None) -> float | None:
+    if value is None:
+        raise ValueError
+    if value == "":
+        return None
+    number = float(value)
+    if not math.isfinite(number) or number < 0:
+        raise ValueError
+    return number
+
+
+def _coordinate(value: str) -> float:
+    number = float(value)
+    if not math.isfinite(number):
+        raise ValueError
+    return number
+
+
+def _integer(value: str | None) -> int:
+    if value is None:
+        raise ValueError
+    number = int(value)
+    if number < 0:
+        raise ValueError
+    return number
+
+
+def _required_text(row: dict[str, str], *fields: str) -> None:
+    if any(not isinstance(row.get(field), str) or not row[field].strip() for field in fields):
+        raise ValueError
+
+
+def _area_row(row: dict[str, str]) -> dict[str, Any]:
+    _required_text(
+        row, "area_name", "geography", "indicator_id", "indicator_label",
+        "age_group", "quality_flag", "source_id", "geography_warning",
+    )
+    year = int(row["reference_year"])
+    if year < 1900 or year > 2100:
+        raise ValueError
+    return {
+        **row,
+        "reference_year": year,
+        "percent": _number(row["percent"]),
+        "rse_percent": _number(row["rse_percent"]),
+    }
+
+
+def _lga_row(row: dict[str, str]) -> dict[str, Any]:
+    _required_text(
+        row, "reference_period", "lga_code", "lga_name", "geography",
+        "indicator_id", "publication_status", "source_id", "geography_warning",
+    )
+    return {
+        **row,
+        "numerator": _number(row["numerator"]),
+        "denominator": _number(row["denominator"]),
+        "percent": _number(row["percent"]),
+    }
+
+
+def _facility_row(row: dict[str, str]) -> dict[str, Any]:
+    _required_text(
+        row, "facility_id", "facility_name", "facility_category",
+        "official_service_type", "operational_status", "address", "sa2_code",
+        "source_date", "source_id",
+    )
+    if not row["sa2_code"].isdigit() or len(row["sa2_code"]) != 9:
+        raise ValueError
+    longitude = _coordinate(row["longitude"])
+    latitude = _coordinate(row["latitude"])
+    if not -180 <= longitude <= 180 or not -90 <= latitude <= 90:
+        raise ValueError
+    return {**row, "longitude": longitude, "latitude": latitude}
+
+
+def _abs_child_health_row(row: dict[str, str]) -> dict[str, Any]:
+    _required_text(
+        row, "sa2_code_2021", "sa2_name_2021", "sa3_code_2021", "sa3_name_2021",
+        "age_group", "indicator", "geography", "quality_flag", "source_id",
+    )
+    if not row["sa2_code_2021"].isdigit() or len(row["sa2_code_2021"]) != 9:
+        raise ValueError
+    year = _integer(row["reference_year"])
+    count = _integer(row["count"])
+    denominator = _integer(row["population_denominator"])
+    if year < 1900 or year > 2100 or count > denominator:
+        raise ValueError
+    return {
+        **row,
+        "reference_year": year,
+        "count": count,
+        "population_denominator": denominator,
+        "percent": _number(row["percent"]),
+    }
+
+
+ROW_PARSERS = {
+    "vcams_area_context": _area_row,
+    "vcams_lga_context": _lga_row,
+    "health_facilities": _facility_row,
+    "abs_child_health": _abs_child_health_row,
+}
+
+
+@lru_cache(maxsize=4)
+def _read(path: Path, resource: str) -> tuple[dict[str, Any], ...]:
+    """Read, validate and parse a static digital-health dataset once per process."""
+    with path.open(encoding="utf-8-sig", newline="") as source:
+        reader = csv.DictReader(source)
+        required = REQUIRED_FIELDS[resource]
+        if not reader.fieldnames or not required.issubset(reader.fieldnames):
+            raise ValueError
+        parser = ROW_PARSERS[resource]
+        rows = []
+        keys: set[tuple[Any, ...]] = set()
+        for raw in reader:
+            row = parser(raw)
+            key = tuple(row[field] for field in UNIQUE_FIELDS[resource])
+            if key in keys:
+                raise ValueError
+            keys.add(key)
+            rows.append(row)
+        return tuple(rows)
+
+
+def _source(
+    path: Path | None,
+    env: str,
+    resource: str,
+) -> tuple[tuple[dict[str, Any], ...] | None, list[dict[str, Any]]]:
+    if path is None:
+        return None, [limitation(
+            f"{resource}_not_configured", f"Set {env} to the validated CSV.", resource,
+        )]
+    if not path.is_file():
+        return None, [limitation(
+            f"{resource}_unavailable", "The configured dataset could not be found.", resource,
+        )]
+    try:
+        return _read(path, resource), []
+    except (OSError, UnicodeError, csv.Error, KeyError, TypeError, ValueError):
+        return None, [limitation(
+            f"{resource}_invalid",
+            "The configured dataset failed schema or value validation.",
+            resource,
+        )]
+
+
+def load_vcams_area_context() -> tuple[tuple[dict[str, Any], ...] | None, list[dict[str, Any]]]:
+    return _source(vcams_area_data_path(), VCAMS_AREA_DATA_PATH_ENV, "vcams_area_context")
+
+
+def load_vcams_lga_context() -> tuple[tuple[dict[str, Any], ...] | None, list[dict[str, Any]]]:
+    return _source(vcams_lga_data_path(), VCAMS_LGA_DATA_PATH_ENV, "vcams_lga_context")
+
+
+def load_health_facilities() -> tuple[tuple[dict[str, Any], ...] | None, list[dict[str, Any]]]:
+    return _source(
+        health_facility_data_path(), HEALTH_FACILITY_DATA_PATH_ENV, "health_facilities",
+    )
+
+
+def load_abs_child_health() -> tuple[tuple[dict[str, Any], ...] | None, list[dict[str, Any]]]:
+    return _source(
+        abs_child_health_data_path(), ABS_CHILD_HEALTH_DATA_PATH_ENV, "abs_child_health",
+    )
+
+
+def vcams_area_context(
+    area_name: str,
+    year: int | None,
+) -> tuple[list[dict[str, Any]] | None, list[dict[str, Any]]]:
+    rows, limitations = load_vcams_area_context()
+    if rows is None:
+        return None, limitations
+    selected = [
+        dict(row) for row in rows
+        if row["area_name"] == area_name
+        and (year is None or row["reference_year"] == year)
+    ]
+    return selected, limitations
+
+
+def vcams_lga_context(
+    lga_name: str,
+) -> tuple[list[dict[str, Any]] | None, list[dict[str, Any]]]:
+    rows, limitations = load_vcams_lga_context()
+    if rows is None:
+        return None, limitations
+    names = {part.strip().casefold() for part in lga_name.split("|")}
+    selected = [dict(row) for row in rows if row["lga_name"].casefold() in names]
+    return selected, limitations
+
+
+def health_facilities(
+    sa2_code: str,
+) -> tuple[list[dict[str, Any]] | None, list[dict[str, Any]]]:
+    rows, limitations = load_health_facilities()
+    if rows is None:
+        return None, limitations
+    return [{
+        "facility_id": row["facility_id"],
+        "name": row["facility_name"],
+        "category": row["facility_category"],
+        "service_type": row["official_service_type"],
+        "address": row["address"],
+        "longitude": row["longitude"],
+        "latitude": row["latitude"],
+        "source_date": row["source_date"],
+    } for row in rows
+        if row["sa2_code"] == sa2_code and row["operational_status"] == "active"], limitations
+
+
+def child_health_conditions(
+    sa2_code: str,
+    year: int | None,
+) -> tuple[list[dict[str, Any]] | None, list[dict[str, Any]]]:
+    rows, limitations = load_abs_child_health()
+    if rows is None:
+        return None, limitations
+    return [
+        dict(row) for row in rows
+        if row["sa2_code_2021"] == sa2_code
+        and (year is None or row["reference_year"] == year)
+    ], limitations

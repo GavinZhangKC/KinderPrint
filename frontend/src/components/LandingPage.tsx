@@ -8,6 +8,7 @@ interface LandingPageProps {
   onInsight: () => void
   onSimulation: () => void
   onMap: () => void
+  onHealth: () => void
 }
 
 interface HomeHeaderProps extends LandingPageProps {
@@ -27,7 +28,7 @@ const heroVideoPlaybackRates = [0.9, 0.9, 0.85, 0.85, 0.85] as const
 
 const homeThemeStripItems = [
   'Child development',
-  'Community context',
+  'Locality context',
   'Heat exposure',
   'Green space',
   'Early years',
@@ -118,7 +119,7 @@ function ExploreMenuLink({ item, onSelect }: ExploreMenuLinkProps) {
   )
 }
 
-function HomeHeader({ onHome, onInsight, onSimulation, onMap }: HomeHeaderProps) {
+function HomeHeader({ onHome, onInsight, onSimulation, onMap, onHealth }: HomeHeaderProps) {
   return (
     <header className="glass home-header" data-no-ripple>
       <button className="home-brand" type="button" onClick={onHome} aria-label="Go to Vkinder home">
@@ -129,6 +130,7 @@ function HomeHeader({ onHome, onInsight, onSimulation, onMap }: HomeHeaderProps)
         <button type="button" aria-current="page" onClick={onHome}>Home</button>
         <button type="button" onClick={onInsight}>Insight Journey</button>
         <button type="button" onClick={onSimulation}>Simulation</button>
+        <button type="button" onClick={onHealth}>Child Health</button>
       </nav>
       <button className="home-nav-cta" type="button" onClick={onMap}>Explore Map</button>
     </header>
@@ -351,7 +353,7 @@ function HomeDiscoverySection({ onMap }: Pick<LandingPageProps, 'onMap'>) {
         <p className="home-section-kicker">Discovery</p>
         <h2 id="home-discovery-title">What matters most<br />for your child?</h2>
         <p>
-          Not a form to fill in—a first look at the layers behind a childhood.
+          Not a form to fill in. A first look at the layers behind a childhood.
           Choose a focus, then enter the live Melbourne map.
         </p>
       </div>
@@ -443,7 +445,7 @@ function HomeCompareSection({ onMap }: Pick<LandingPageProps, 'onMap'>) {
         <p className="home-section-kicker">Compare</p>
         <h2 id="home-compare-title">Two prints,<br />side by side.</h2>
         <p>
-          Compare localities layer by layer—never ranked, never reduced to a single score,
+          Compare localities layer by layer. Never ranked, never reduced to a single score,
           and always with evidence status attached.
         </p>
         <button type="button" onClick={onMap}>
@@ -504,7 +506,7 @@ function HomeEvidenceSection() {
       <div className="home-evidence-copy">
         <p className="home-section-kicker">Scientific transparency</p>
         <h2 id="home-evidence-title">
-          What this<br />evidence is—<br />and what it is<br />not.
+          What this<br />evidence is,<br />and what it is<br />not.
         </h2>
         <p>
           Vkinder supports serious exploration by making the boundary of every layer visible.
@@ -530,7 +532,7 @@ function scrollToSection(id: string) {
   document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
 }
 
-export default function LandingPage({ onInsight, onSimulation, onMap }: LandingPageProps) {
+export default function LandingPage({ onInsight, onSimulation, onMap, onHealth }: LandingPageProps) {
   const openExploreItem = (id: ExploreItemId) => {
     if (id === 'insight') onInsight()
     else if (id === 'map') onMap()
@@ -544,6 +546,7 @@ export default function LandingPage({ onInsight, onSimulation, onMap }: LandingP
         onInsight={onInsight}
         onSimulation={onSimulation}
         onMap={onMap}
+        onHealth={onHealth}
       />
 
       <main className="home-content">
@@ -555,7 +558,7 @@ export default function LandingPage({ onInsight, onSimulation, onMap }: LandingP
               Explore how child development, environment and<br />health-support conditions differ across Melbourne.
             </p>
             <p className="landing-copy">
-              Peel back the layers of a place—from heat and nature<br />to early-years support and observed development patterns.
+              Peel back the layers of a place, from heat and nature<br />to early-years support and observed development patterns.
             </p>
             <div className="home-hero-actions">
               <button className="button primary home-hero-button" type="button" onClick={onMap}>

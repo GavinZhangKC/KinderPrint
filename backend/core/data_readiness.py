@@ -4,10 +4,16 @@ from __future__ import annotations
 
 from typing import Any
 
+from geography import load_boundary_features
 from loaders.air_quality import load_station_year_observations
 from loaders.community_context import load_community_context
+from loaders.digital_health import (
+    load_abs_child_health,
+    load_health_facilities,
+    load_vcams_area_context,
+    load_vcams_lga_context,
+)
 from loaders.early_childhood import load_early_childhood_context
-from geography import load_boundary_features
 from loaders.geocoding_quality import load_geocoding_quality
 from loaders.population import load_population_projections
 from validation import (
@@ -49,6 +55,10 @@ def runtime_data_readiness() -> list[dict[str, Any]]:
     environmental, _, environmental_limitations = load_environmental_differences()
     pattern_insights, _, pattern_insight_limitations = load_pattern_insights()
     community_context, community_context_limitations = load_community_context()
+    vcams_area, vcams_area_limitations = load_vcams_area_context()
+    vcams_lga, vcams_lga_limitations = load_vcams_lga_context()
+    health_facilities, health_facility_limitations = load_health_facilities()
+    abs_child_health, abs_child_health_limitations = load_abs_child_health()
     priorities, _, priority_limitations = load_priority_results()
     explanations, _, explanation_limitations = load_explanations()
     comparisons, _, comparison_limitations = load_comparison_data()
@@ -75,6 +85,16 @@ def runtime_data_readiness() -> list[dict[str, Any]]:
         _check("declared_road_and_industrial_context", community_context,
                community_context_limitations,
                len(community_context) if community_context is not None else None),
+        _check("vcams_department_area_context", vcams_area, vcams_area_limitations,
+               len(vcams_area) if vcams_area is not None else None),
+        _check("vcams_lga_context", vcams_lga, vcams_lga_limitations,
+               len(vcams_lga) if vcams_lga is not None else None),
+        _check("healthdirect_facilities", health_facilities,
+               health_facility_limitations,
+               len(health_facilities) if health_facilities is not None else None),
+        _check("abs_child_health_sa2", abs_child_health,
+               abs_child_health_limitations,
+               len(abs_child_health) if abs_child_health is not None else None),
         _check("priority_for_investigation", priorities, priority_limitations,
                len(priorities) if priorities is not None else None),
         _check("priority_explanations", explanations, explanation_limitations,

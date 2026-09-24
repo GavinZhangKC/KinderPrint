@@ -1,0 +1,21 @@
+.digital-health-hub .dh-sidebar nav button {
+  width: 100%;
+  min-width: 0;
+  grid-template-columns: 32px minmax(0, 1fr) auto;
+  overflow: hidden;
+}
+
+@media (max-width: 1050px) {
+  .digital-health-hub .dh-sidebar nav button {
+    gap: 6px;
+    padding-inline: 10px;
+  }
+
+  .digital-health-hub .dh-sidebar nav button > b {
+    min-width: 0;
+  }
+
+  .digital-health-hub .dh-sidebar nav button small {
+    font-size: 6px;
+  }
+}

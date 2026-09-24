@@ -156,6 +156,43 @@ export interface PopulationProjectionResponse {
   projections: PopulationProjection[]
 }
 
+export interface VcamsAreaIndicator {
+  reference_year: number
+  area_name: string
+  geography: string
+  indicator_id: string
+  indicator_label: string
+  age_group: string
+  percent: number | null
+  rse_percent: number | null
+  quality_flag: string
+  geography_warning: string
+}
+
+export interface VcamsLgaIndicator {
+  reference_period: string
+  lga_code: string
+  lga_name: string
+  geography: string
+  indicator_id: string
+  numerator: number | null
+  denominator: number | null
+  percent: number | null
+  publication_status: string
+  geography_warning: string
+}
+
+export interface HealthFacility {
+  facility_id: string
+  name: string
+  category: string
+  service_type: string
+  address: string
+  longitude: number | null
+  latitude: number | null
+  source_date: string
+}
+
 export interface ContextMetric {
   value: number | null
   status: ApiStatus | string
@@ -435,6 +472,21 @@ export const api = {
     request<PopulationProjectionResponse>(
       `/api/population-projections?sa2_code=${encodeURIComponent(sa2Code)}`,
       signal,
+    ),
+
+  getVcamsAreaContext: (areaName: string, year = 2021, signal?: AbortSignal) =>
+    request<{ indicators: VcamsAreaIndicator[] }>(
+      `/api/digital-health/vcams-area?area_name=${encodeURIComponent(areaName)}&year=${year}`, signal,
+    ),
+
+  getVcamsLgaContext: (lgaNames: string, signal?: AbortSignal) =>
+    request<{ indicators: VcamsLgaIndicator[] }>(
+      `/api/digital-health/vcams-lga?lga_name=${encodeURIComponent(lgaNames)}`, signal,
+    ),
+
+  getHealthFacilities: (sa2Code: string, signal?: AbortSignal) =>
+    request<{ facilities: HealthFacility[] }>(
+      `/api/digital-health/facilities?sa2_code=${encodeURIComponent(sa2Code)}`, signal,
     ),
 
   getTrafficContext: (

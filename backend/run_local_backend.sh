@@ -23,6 +23,10 @@ export KINDERPRINT_ACECQA_GEOCODING_DATA_PATH="${PROJECT_ROOT}/datascience/data/
 export KINDERPRINT_ACECQA_CONTEXT_DATA_PATH="${PROJECT_ROOT}/datascience/data/processed/acecqa_gnaf_context_community.csv"
 export KINDERPRINT_COMMUNITY_CONTEXT_DATA_PATH="${PROJECT_ROOT}/datascience/data/processed/community_context.csv"
 export KINDERPRINT_COMMUNITY_IDENTITY_DATA_PATH="${PROJECT_ROOT}/datascience/data/processed/communities.csv"
+export KINDERPRINT_VCAMS_AREA_DATA_PATH="${PROJECT_ROOT}/datascience/data/processed/vcams_child_health_area.csv"
+export KINDERPRINT_VCAMS_LGA_DATA_PATH="${PROJECT_ROOT}/datascience/data/processed/vcams_child_health_lga.csv"
+export KINDERPRINT_HEALTH_FACILITY_DATA_PATH="${PROJECT_ROOT}/datascience/data/processed/healthdirect_facilities.csv"
+export KINDERPRINT_ABS_CHILD_HEALTH_DATA_PATH="${PROJECT_ROOT}/datascience/data/processed/abs_child_health_sa2.csv"
 
 cd "${SCRIPT_DIR}"
 exec uvicorn main:app --reload --host 0.0.0.0 --port 8000

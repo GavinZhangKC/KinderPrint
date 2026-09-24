@@ -1,0 +1,71 @@
+{
+  "source_id": "vcams_child_health_2024_release",
+  "area_rows": 544,
+  "lga_rows": 4316,
+  "area_indicators": 8,
+  "lga_indicators": 5,
+  "department_areas": 17,
+  "lgas": 81,
+  "latest_area_year": 2021,
+  "latest_area_quality": {
+    "available": 103,
+    "use_with_caution": 26,
+    "unreliable": 7
+  },
+  "geographic_rule": "Retain native area/LGA geography; never disaggregate to SA2.",
+  "downloaded_this_run": [],
+  "files": {
+    "2_1a.xlsx": {
+      "url": "https://content.vic.gov.au/sites/default/files/2024-04/VCAMS_indicator_2_1a.xlsx",
+      "sha256": "b8344b5fb1e952dbc4fe449525656e647dcf10d8dfae767802f8829417e6c986"
+    },
+    "2_1b.xlsx": {
+      "url": "https://content.vic.gov.au/sites/default/files/2024-04/VCAMS_indicator_2_1b.xlsx",
+      "sha256": "1c008620bfe4accc03240380fab132b414ef5f62f2129a00d14dd3c1396e9faa"
+    },
+    "2_5a.xlsx": {
+      "url": "https://content.vic.gov.au/sites/default/files/2024-04/VCAMS_indicator_2_5a.xlsx",
+      "sha256": "8dcd821d59978e7ffb36fb13ba8fa32e07f532e640a480a2aafad5ab7b165fd6"
+    },
+    "2_6.xlsx": {
+      "url": "https://content.vic.gov.au/sites/default/files/2024-04/VCAMS_indicator_2_6.xlsx",
+      "sha256": "30c17d677277e153cc580f9f60068f8fccbf02c55725601dca7f5e50e08f77f2"
+    },
+    "2_8a.xlsx": {
+      "url": "https://content.vic.gov.au/sites/default/files/2024-04/VCAMS_indicator_2_8a.xlsx",
+      "sha256": "d22bc7d2d39addefbc694930ea1950cd35fc7c3b4793de61a8169f66b9de48b4"
+    },
+    "2_9a.xlsx": {
+      "url": "https://content.vic.gov.au/sites/default/files/2024-04/VCAMS_indicator_2_9a.xlsx",
+      "sha256": "3d5faffa48da04471898f66c0a4bbcd95dfbc7354415fe2891834074ede412da"
+    },
+    "2_10a.xlsx": {
+      "url": "https://content.vic.gov.au/sites/default/files/2024-04/VCAMS_indicator_2_10a.xlsx",
+      "sha256": "7d45b206aba55bde0e107a592d062b5ba4c783047925cb67ea7a8457118117f5"
+    },
+    "2_12.xlsx": {
+      "url": "https://content.vic.gov.au/sites/default/files/2024-04/VCAMS_indicator_2_12.xlsx",
+      "sha256": "d4de1efda05fb38b46ebee53e8fbd1c2366dfbb396764b1473e44302fa88511d"
+    },
+    "3_1.xlsx": {
+      "url": "https://content.vic.gov.au/sites/default/files/2024-04/VCAMS_indicator_3_1.xlsx",
+      "sha256": "aeda5ea7072a9d11af24108411b42803c1c759f03fdbdcc405ce549ec5986b60"
+    },
+    "1_6.xlsx": {
+      "url": "https://content.vic.gov.au/sites/default/files/2024-04/VCAMS_Indicator_1_6.xlsx",
+      "sha256": "713f19eb5f2730ad9deba74c16d5a67b44bb4a533e4f1ef077932ea712dc72f3"
+    },
+    "1_7a.xlsx": {
+      "url": "https://content.vic.gov.au/sites/default/files/2024-04/VCAMS_indicator_1_7a.xlsx",
+      "sha256": "7dc3887ddefb01d0552c96d08b0a2e0d684fa4be523ec615fb5afa293460d377"
+    },
+    "1_7c.xlsx": {
+      "url": "https://content.vic.gov.au/sites/default/files/2024-04/VCAMS_indicator_1_7c.xlsx",
+      "sha256": "5aecee997c1fdcddaa3ff68dd934fa84fa0a678658514ec4974ffb209149b7c5"
+    },
+    "7_3.xlsx": {
+      "url": "https://content.vic.gov.au/sites/default/files/2024-04/VCAMS_indicator_7_3_1.xlsx",
+      "sha256": "4d6a4a86fc068005632ceb6d8363a7455532d83bd356cc4d33551b5103118e1d"
+    }
+  }
+}

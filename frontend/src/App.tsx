@@ -8,6 +8,7 @@ import ComparePanel from './components/ComparePanel'
 import DetailedComparison from './components/DetailedComparison'
 import DetailedComparisonWeather, { getDevelopmentWeatherState } from './components/DetailedComparisonWeather'
 import DetailedDataDrawer from './components/DetailedDataDrawer'
+import DigitalHealthHub from './components/DigitalHealthHub'
 import InsightPage from './components/InsightPage'
 import InteractiveAtmosphere from './components/InteractiveAtmosphere'
 import Legend from './components/Legend'
@@ -45,6 +46,7 @@ type View =
 
 type AppPage =
   | 'landing'
+  | 'health'
   | 'insight'
   | 'map'
   | 'simulation'
@@ -293,6 +295,10 @@ function openInsightPage() {
     resetExplore()
     setAppPage('insight')
   }
+function openHealthPage() {
+    resetExplore()
+    setAppPage('health')
+  }
 function choosePrimary(
     neighbourhood: Neighbourhood,
   ) {
@@ -500,9 +506,14 @@ if (appPage === 'landing') {
           onInsight={openInsightPage}
           onSimulation={openSimulationPage}
           onMap={openMapPage}
+          onHealth={openHealthPage}
         />
       </div>
     )
+  }
+
+  if (appPage === 'health') {
+    return <DigitalHealthHub onHome={backToLanding} />
   }
 
   if (appPage === 'simulation') {

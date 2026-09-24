@@ -50,6 +50,10 @@ def test_dataset_status_exposes_boundaries_without_local_paths(client, monkeypat
     assert products["epa_historical_air_quality"]["interpretation_status"] == "station_context_only"
     assert products["epa_historical_air_quality"]["user_facing"] is False
     assert products["phidu_child_health"]["interpretation_status"] == "research_only"
+    assert products["vcams_department_area_context"]["interpretation_status"] == "broad_area_context_only"
+    assert products["vcams_lga_context"]["geographic_unit"] == "Victorian Local Government Area"
+    assert products["healthdirect_facilities"]["interpretation_status"] == "directory_presence_only"
+    assert products["abs_child_health_sa2"]["interpretation_status"] == "aggregate_context_only"
     assert products["acecqa_gnaf_geocoding"]["boundary"].startswith("Only accepted matches")
     assert products["declared_road_and_industrial_context"]["interpretation_status"] == "context_only"
     assert str(tmp_path) not in str(body)
@@ -655,7 +659,7 @@ def test_data_health_distinguishes_process_health_from_unconfigured_data(client)
 
     assert_envelope(body)
     assert body["status"] == "limited"
-    assert body["metadata"] == {"check_count": 13, "ready_count": 0}
+    assert body["metadata"] == {"check_count": 17, "ready_count": 0}
     assert {check["readiness"] for check in body["data"]["checks"]} == {"not_configured"}
     assert all(check["record_count"] is None for check in body["data"]["checks"])
     assert {
