@@ -86,6 +86,7 @@ Resources:
           KINDERPRINT_VCAMS_AREA_DATA_PATH: /var/task/data/vcams_child_health_area.csv
           KINDERPRINT_VCAMS_LGA_DATA_PATH: /var/task/data/vcams_child_health_lga.csv
           KINDERPRINT_HEALTH_FACILITY_DATA_PATH: /var/task/data/healthdirect_facilities.csv
+          KINDERPRINT_ABS_CHILD_HEALTH_DATA_PATH: /var/task/data/abs_child_health_sa2.csv
       Events:
         ApiProxy:
           Type: HttpApi

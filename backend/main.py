@@ -41,7 +41,12 @@ from loaders.community_context import (
 from loaders.early_childhood import load_early_childhood_context
 from loaders.geocoding_quality import load_geocoding_quality
 from loaders.population import load_population_projections
-from loaders.digital_health import health_facilities, vcams_area_context, vcams_lga_context
+from loaders.digital_health import (
+    child_health_conditions,
+    health_facilities,
+    vcams_area_context,
+    vcams_lga_context,
+)
 from validation import (
     aggregate_status, environmental_difference_data, environmental_difference_for_pair,
     explanation_data,
@@ -180,11 +185,21 @@ def digital_health_vcams_area(
     """Return VCAMS survey context at its published Victorian Department area."""
     rows, limitations = vcams_area_context(area_name, year)
     if rows is None:
-        return envelope("unavailable", {"indicators": []}, limitations=limitations)
+        return envelope("unavailable", {"indicators": []}, limitations=limitations,
+                        notices=[AREA_LEVEL_NOTICE])
+    if not rows:
+        limitations = [*limitations, limitation(
+            "vcams_area_context_not_found",
+            "No VCAMS area indicators match the requested area and reference year.",
+            "area_name", "year",
+        )]
     return envelope("available" if rows else "missing", {"indicators": rows}, metadata={
+        "source": "Victorian Child and Adolescent Monitoring System",
         "geographic_unit": "Victorian Department area", "area_name": area_name,
+        "reference_year": year,
+        "result_count": len(rows),
         "interpretation": "Broad-area context only; not an SA2 estimate.",
-    }, limitations=limitations)
+    }, limitations=limitations, notices=[AREA_LEVEL_NOTICE])
 
 
 @app.get("/api/digital-health/vcams-lga")
@@ -194,11 +209,22 @@ def digital_health_vcams_lga(
     """Return VCAMS administrative indicators without disaggregating LGA values."""
     rows, limitations = vcams_lga_context(lga_name)
     if rows is None:
-        return envelope("unavailable", {"indicators": []}, limitations=limitations)
+        return envelope("unavailable", {"indicators": []}, limitations=limitations,
+                        notices=[AREA_LEVEL_NOTICE])
+    if not rows:
+        limitations = [*limitations, limitation(
+            "vcams_lga_context_not_found",
+            "No VCAMS LGA indicators match the requested local government area.",
+            "lga_name",
+        )]
     return envelope("available" if rows else "missing", {"indicators": rows}, metadata={
+        "source": "Victorian Child and Adolescent Monitoring System",
         "geographic_unit": "Victorian Local Government Area",
+        "requested_lga_name": lga_name,
+        "reference_periods": sorted({row["reference_period"] for row in rows}),
+        "result_count": len(rows),
         "interpretation": "LGA context only; not an SA2 estimate.",
-    }, limitations=limitations)
+    }, limitations=limitations, notices=[AREA_LEVEL_NOTICE])
 
 
 @app.get("/api/digital-health/facilities")
@@ -208,11 +234,48 @@ def digital_health_facilities(
     """Return active directory listings located inside the requested SA2."""
     rows, limitations = health_facilities(sa2_code)
     if rows is None:
-        return envelope("unavailable", {"facilities": []}, limitations=limitations)
+        return envelope("unavailable", {"facilities": []}, limitations=limitations,
+                        notices=[AREA_LEVEL_NOTICE])
+    if not rows:
+        limitations = [*limitations, limitation(
+            "health_facilities_not_found",
+            "No active Healthdirect facility records match the requested SA2.",
+            "sa2_code",
+        )]
     return envelope("available" if rows else "missing", {"facilities": rows}, metadata={
+        "source": "Geoscience Australia using National Health Services Directory",
         "geographic_unit": "facility point within SA2",
+        "sa2_code": sa2_code,
+        "source_dates": sorted({row["source_date"] for row in rows}),
+        "result_count": len(rows),
         "interpretation": "Listed presence only; not capacity, availability, fees or quality.",
-    }, limitations=limitations)
+    }, limitations=limitations, notices=[AREA_LEVEL_NOTICE])
+
+
+@app.get("/api/digital-health/child-conditions")
+def digital_health_child_conditions(
+    sa2_code: str = Query(..., min_length=9, max_length=9, pattern=r"^\d{9}$"),
+    year: int | None = Query(None, ge=2000, le=2030),
+) -> dict[str, Any]:
+    """Return published ABS child long-term-condition context for an SA2."""
+    rows, limitations = child_health_conditions(sa2_code, year)
+    if rows is None:
+        return envelope("unavailable", {"indicators": []}, limitations=limitations,
+                        notices=[AREA_LEVEL_NOTICE])
+    if not rows:
+        limitations = [*limitations, limitation(
+            "abs_child_health_not_found",
+            "No ABS child health indicators match the requested SA2 and reference year.",
+            "sa2_code", "year",
+        )]
+    return envelope("available" if rows else "missing", {"indicators": rows}, metadata={
+        "source": "Australian Bureau of Statistics Census 2021 G19",
+        "geographic_unit": "SA2 (ASGS Edition 3, 2021)",
+        "sa2_code": sa2_code,
+        "reference_year": year,
+        "result_count": len(rows),
+        "interpretation": "Published area-level long-term-condition context; not a diagnosis.",
+    }, limitations=limitations, notices=[AREA_LEVEL_NOTICE])
 
 
 @app.get("/api/air-quality/stations")

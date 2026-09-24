@@ -8,6 +8,7 @@ BACKEND_DIR = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(BACKEND_DIR))
 
 from core.data_loader import (  # noqa: E402
+    ABS_CHILD_HEALTH_DATA_PATH_ENV,
     ACECQA_CONTEXT_DATA_PATH_ENV,
     ACECQA_GEOCODING_DATA_PATH_ENV,
     BOUNDARY_DATA_PATH_ENV,
@@ -29,6 +30,7 @@ from core.data_loader import (  # noqa: E402
     HEALTH_FACILITY_DATA_PATH_ENV,
 )
 from main import app  # noqa: E402
+from loaders.digital_health import _read as load_digital_health_csv  # noqa: E402
 from validation import (  # noqa: E402
     load_comparison_data,
     load_explanations,
@@ -40,6 +42,7 @@ from validation import (  # noqa: E402
 
 @pytest.fixture(autouse=True)
 def clear_dataset_environment(monkeypatch: pytest.MonkeyPatch) -> None:
+    load_digital_health_csv.cache_clear()
     for loader in (
         load_profiles,
         load_suitability_rankings,
@@ -49,6 +52,7 @@ def clear_dataset_environment(monkeypatch: pytest.MonkeyPatch) -> None:
     ):
         loader.cache_clear()
     for variable in (
+        ABS_CHILD_HEALTH_DATA_PATH_ENV,
         ACECQA_CONTEXT_DATA_PATH_ENV,
         ACECQA_GEOCODING_DATA_PATH_ENV,
         BOUNDARY_DATA_PATH_ENV,

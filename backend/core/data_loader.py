@@ -26,6 +26,7 @@ COMMUNITY_IDENTITY_DATA_PATH_ENV = "KINDERPRINT_COMMUNITY_IDENTITY_DATA_PATH"
 VCAMS_AREA_DATA_PATH_ENV = "KINDERPRINT_VCAMS_AREA_DATA_PATH"
 VCAMS_LGA_DATA_PATH_ENV = "KINDERPRINT_VCAMS_LGA_DATA_PATH"
 HEALTH_FACILITY_DATA_PATH_ENV = "KINDERPRINT_HEALTH_FACILITY_DATA_PATH"
+ABS_CHILD_HEALTH_DATA_PATH_ENV = "KINDERPRINT_ABS_CHILD_HEALTH_DATA_PATH"
 
 
 def boundary_data_path() -> Path | None:
@@ -120,6 +121,11 @@ def vcams_lga_data_path() -> Path | None:
 
 def health_facility_data_path() -> Path | None:
     value = os.getenv(HEALTH_FACILITY_DATA_PATH_ENV)
+    return Path(value).expanduser() if value else None
+
+
+def abs_child_health_data_path() -> Path | None:
+    value = os.getenv(ABS_CHILD_HEALTH_DATA_PATH_ENV)
     return Path(value).expanduser() if value else None
 
 
