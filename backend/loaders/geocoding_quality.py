@@ -1,5 +1,7 @@
 """Load aggregate ACECQA/G-NAF quality data without address disclosure."""
 
+from __future__ import annotations
+
 import csv
 from collections import Counter
 from functools import lru_cache

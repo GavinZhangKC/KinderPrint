@@ -1,5 +1,7 @@
 """Load validated VIF SA2 child-population projections."""
 
+from __future__ import annotations
+
 import csv
 from functools import lru_cache
 import math

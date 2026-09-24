@@ -1,5 +1,7 @@
 """Load validated locality aggregates from accepted ACECQA/Open G-NAF matches."""
 
+from __future__ import annotations
+
 import csv
 from functools import lru_cache
 import math

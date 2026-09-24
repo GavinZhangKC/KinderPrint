@@ -1,5 +1,7 @@
 """Core KinderPrint response structures and notices."""
 
+from __future__ import annotations
+
 from typing import Any
 
 AREA_LEVEL_NOTICE = {

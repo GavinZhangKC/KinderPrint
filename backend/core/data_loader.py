@@ -1,5 +1,7 @@
 """Core configuration and generic approved JSON source loading."""
 
+from __future__ import annotations
+
 import json
 import os
 from pathlib import Path
