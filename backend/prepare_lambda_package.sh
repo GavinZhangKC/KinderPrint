@@ -29,6 +29,9 @@ cp "$TASK_PROCESSED_DATA_DIR/acecqa_gnaf_geocoding.csv" "$TASK_PACKAGE_DIR/data/
 cp "$TASK_PROCESSED_DATA_DIR/acecqa_gnaf_context_community.csv" "$TASK_PACKAGE_DIR/data/"
 cp "$TASK_PROCESSED_DATA_DIR/community_context.csv" "$TASK_PACKAGE_DIR/data/"
 cp "$TASK_PROCESSED_DATA_DIR/communities.csv" "$TASK_PACKAGE_DIR/data/"
+cp "$TASK_PROCESSED_DATA_DIR/vcams_child_health_area.csv" "$TASK_PACKAGE_DIR/data/"
+cp "$TASK_PROCESSED_DATA_DIR/vcams_child_health_lga.csv" "$TASK_PACKAGE_DIR/data/"
+cp "$TASK_PROCESSED_DATA_DIR/healthdirect_facilities.csv" "$TASK_PACKAGE_DIR/data/"
 
 python3 -m pip install \
     --disable-pip-version-check \

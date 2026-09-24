@@ -41,6 +41,7 @@ from loaders.community_context import (
 from loaders.early_childhood import load_early_childhood_context
 from loaders.geocoding_quality import load_geocoding_quality
 from loaders.population import load_population_projections
+from loaders.digital_health import health_facilities, vcams_area_context, vcams_lga_context
 from validation import (
     aggregate_status, environmental_difference_data, environmental_difference_for_pair,
     explanation_data,
@@ -169,6 +170,49 @@ def population_projections(
         "limit": limit,
         "available_years": sorted({row["projection_year"] for row in rows}),
     }, limitations=limitations, notices=[AREA_LEVEL_NOTICE])
+
+
+@app.get("/api/digital-health/vcams-area")
+def digital_health_vcams_area(
+    area_name: str = Query(..., min_length=2, max_length=100),
+    year: int | None = Query(None, ge=2000, le=2030),
+) -> dict[str, Any]:
+    """Return VCAMS survey context at its published Victorian Department area."""
+    rows, limitations = vcams_area_context(area_name, year)
+    if rows is None:
+        return envelope("unavailable", {"indicators": []}, limitations=limitations)
+    return envelope("available" if rows else "missing", {"indicators": rows}, metadata={
+        "geographic_unit": "Victorian Department area", "area_name": area_name,
+        "interpretation": "Broad-area context only; not an SA2 estimate.",
+    }, limitations=limitations)
+
+
+@app.get("/api/digital-health/vcams-lga")
+def digital_health_vcams_lga(
+    lga_name: str = Query(..., min_length=2, max_length=150),
+) -> dict[str, Any]:
+    """Return VCAMS administrative indicators without disaggregating LGA values."""
+    rows, limitations = vcams_lga_context(lga_name)
+    if rows is None:
+        return envelope("unavailable", {"indicators": []}, limitations=limitations)
+    return envelope("available" if rows else "missing", {"indicators": rows}, metadata={
+        "geographic_unit": "Victorian Local Government Area",
+        "interpretation": "LGA context only; not an SA2 estimate.",
+    }, limitations=limitations)
+
+
+@app.get("/api/digital-health/facilities")
+def digital_health_facilities(
+    sa2_code: str = Query(..., min_length=9, max_length=9, pattern=r"^\d{9}$"),
+) -> dict[str, Any]:
+    """Return active directory listings located inside the requested SA2."""
+    rows, limitations = health_facilities(sa2_code)
+    if rows is None:
+        return envelope("unavailable", {"facilities": []}, limitations=limitations)
+    return envelope("available" if rows else "missing", {"facilities": rows}, metadata={
+        "geographic_unit": "facility point within SA2",
+        "interpretation": "Listed presence only; not capacity, availability, fees or quality.",
+    }, limitations=limitations)
 
 
 @app.get("/api/air-quality/stations")

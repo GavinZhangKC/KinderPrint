@@ -24,6 +24,9 @@ from core.data_loader import (  # noqa: E402
     PROFILE_DATA_PATH_ENV,
     SUITABILITY_DATA_PATH_ENV,
     VIF_PROJECTION_DATA_PATH_ENV,
+    VCAMS_AREA_DATA_PATH_ENV,
+    VCAMS_LGA_DATA_PATH_ENV,
+    HEALTH_FACILITY_DATA_PATH_ENV,
 )
 from main import app  # noqa: E402
 from validation import (  # noqa: E402
@@ -62,6 +65,9 @@ def clear_dataset_environment(monkeypatch: pytest.MonkeyPatch) -> None:
         PREVENTION_OPPORTUNITY_DATA_PATH_ENV,
         SUITABILITY_DATA_PATH_ENV,
         VIF_PROJECTION_DATA_PATH_ENV,
+        VCAMS_AREA_DATA_PATH_ENV,
+        VCAMS_LGA_DATA_PATH_ENV,
+        HEALTH_FACILITY_DATA_PATH_ENV,
     ):
         monkeypatch.delenv(variable, raising=False)
 

@@ -83,6 +83,9 @@ Resources:
           KINDERPRINT_ACECQA_CONTEXT_DATA_PATH: /var/task/data/acecqa_gnaf_context_community.csv
           KINDERPRINT_COMMUNITY_CONTEXT_DATA_PATH: /var/task/data/community_context.csv
           KINDERPRINT_COMMUNITY_IDENTITY_DATA_PATH: /var/task/data/communities.csv
+          KINDERPRINT_VCAMS_AREA_DATA_PATH: /var/task/data/vcams_child_health_area.csv
+          KINDERPRINT_VCAMS_LGA_DATA_PATH: /var/task/data/vcams_child_health_lga.csv
+          KINDERPRINT_HEALTH_FACILITY_DATA_PATH: /var/task/data/healthdirect_facilities.csv
       Events:
         ApiProxy:
           Type: HttpApi
