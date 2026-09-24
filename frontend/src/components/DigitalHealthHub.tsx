@@ -1,12 +1,12 @@
 import { useEffect, useMemo, useState, type CSSProperties } from 'react'
 
 import LocalityGlobe from './LocalityGlobe'
-import { api, type HealthFacility, type PopulationProjection, type VcamsAreaIndicator, type VcamsLgaIndicator } from '../services/api'
+import { api, type EnvironmentalDifference, type HealthFacility, type NeighbourhoodProfile, type PopulationProjection, type ProfileIndicator, type VcamsAreaIndicator, type VcamsLgaIndicator } from '../services/api'
 import './DigitalHealthHub.css'
 import './DigitalHealthHub.responsive.css'
 import './DigitalHealthHub.health.css'
 
-type HealthView = 'overview' | 'conditions' | 'care' | 'demand'
+type HealthView = 'overview' | 'conditions' | 'environment' | 'care' | 'demand' | 'review'
 type ConditionId = 'brain' | 'lungs' | 'metabolic' | 'immune' | 'perinatal'
 
 interface DigitalHealthHubProps { onHome: () => void }
@@ -14,11 +14,12 @@ interface DigitalHealthHubProps { onHome: () => void }
 const navigation = [
   { id: 'overview', label: 'Overview', symbol: '⌂', enabled: true },
   { id: 'conditions', label: 'Child health conditions', symbol: '✚', enabled: true },
+  { id: 'environment', label: 'Environment', symbol: '◫', enabled: true },
   { id: 'development', label: 'Development', symbol: '▥', enabled: false },
   { id: 'prevention', label: 'Prevention', symbol: '♢', enabled: false },
   { id: 'care', label: 'Care access', symbol: '⌖', enabled: true },
   { id: 'demand', label: 'Future demand', symbol: '⌁', enabled: true },
-  { id: 'evidence', label: 'Evidence', symbol: '▤', enabled: false },
+  { id: 'review', label: 'Evidence review', symbol: '▤', enabled: true },
 ] as const
 
 const conditions: Array<{ id: ConditionId; label: string; image: string; summary: string; status: string }> = [
@@ -184,6 +185,8 @@ interface DigitalHealthData {
   lga: VcamsLgaIndicator[]
   facilities: HealthFacility[]
   projections: PopulationProjection[]
+  profile: NeighbourhoodProfile | null
+  environmentalDifference: EnvironmentalDifference | null
   loading: boolean
   error: string | null
 }
@@ -205,7 +208,7 @@ const indicatorNames: Record<string, string> = {
 }
 
 function useDigitalHealthData(): DigitalHealthData {
-  const [data, setData] = useState<DigitalHealthData>({ area: [], lga: [], facilities: [], projections: [], loading: true, error: null })
+  const [data, setData] = useState<DigitalHealthData>({ area: [], lga: [], facilities: [], projections: [], profile: null, environmentalDifference: null, loading: true, error: null })
   useEffect(() => {
     const controller = new AbortController()
     Promise.all([
@@ -213,11 +216,15 @@ function useDigitalHealthData(): DigitalHealthData {
       api.getVcamsLgaContext('Merri-bek (C)|Moreland (C)', controller.signal),
       api.getHealthFacilities('206011106', controller.signal),
       api.getPopulationProjections('206011106', controller.signal),
-    ]).then(([area, lga, facilities, projections]) => setData({
+      api.getProfile('206011106', controller.signal),
+      api.getEnvironmentalDifference('206011106', '206011496'),
+    ]).then(([area, lga, facilities, projections, profile, environmentalDifference]) => setData({
       area: area.data.indicators,
       lga: lga.data.indicators,
       facilities: facilities.data.facilities,
       projections: projections.data.projections,
+      profile: profile.data,
+      environmentalDifference: environmentalDifference.data,
       loading: false,
       error: null,
     })).catch(error => {
@@ -227,6 +234,38 @@ function useDigitalHealthData(): DigitalHealthData {
     return () => controller.abort()
   }, [])
   return data
+}
+
+function environmentIndicators(data: DigitalHealthData): ProfileIndicator[] {
+  return data.profile?.domains.find(domain => domain.id === 'environment')?.indicators ?? []
+}
+
+function EnvironmentPage({ data }: { data: DigitalHealthData }) {
+  const indicators = environmentIndicators(data).filter(item => item.id.startsWith('env_'))
+  const comparison = data.environmentalDifference
+  const metric = (id: string) => indicators.find(item => item.id === id)
+  const canopy = metric('env_vegetation_cover')
+  const heat = metric('env_urban_heat')
+  const openSpace = metric('env_open_space_access')
+  const exact = (item?: ProfileIndicator) => item?.value === null || item?.value === undefined ? 'Unavailable' : `${Number(item.value).toFixed(4)}${item.unit === 'percent' ? '%' : item.unit === 'degrees Celsius' ? '°C' : ''}`
+  return <div className="dh-page dh-board-page"><BoardHeader title="Environment and child health context" subtitle="Environmental conditions can shape opportunities for play, heat exposure and respiratory comfort. They do not diagnose a child or establish causation." />
+    <section className="dh-env-dashboard">
+      <article className="dh-env-insights"><header><div><h2>AI-assisted insight review</h2><p>Generated only from the validated values shown below</p></div><span>3 source-backed findings</span></header><div className="dh-insight-table"><div className="head"><span>Factor</span><span>Exact value</span><span>Generated interpretation</span><span>Evidence state</span></div><div><b>Tree canopy</b><strong>{exact(canopy)}</strong><p>Limited canopy coverage may reduce shade availability during hot conditions.</p><i>Source verified</i></div><div><b>Urban heat island</b><strong>{exact(heat)}</strong><p>The published surface-temperature context indicates a material urban heat effect.</p><i>Source verified</i></div><div><b>Public open space</b><strong>{exact(openSpace)}</strong><p>Open-space share provides place context, not a measure of accessibility or quality.</p><i>Source verified</i></div></div><footer>Interpretations are deterministic summaries of published values, not clinical recommendations or newly generated statistics.</footer></article>
+      <article className="dh-env-health"><h3>Environmental profile</h3><div className="dh-env-score"><strong>3/3</strong><span>indicators available</span></div>{indicators.map(item => <div className="dh-env-metric" key={item.id}><span><b>{item.name}</b><small>{item.reference_year} · {item.geographic_unit}</small></span><strong>{exact(item)}</strong><i style={{ width: `${Math.min(100, Math.abs(Number(item.value)) * 5)}%` }} /></div>)}</article>
+      <article className="dh-env-comparison"><header><div><h3>Environmental comparison</h3><p>Brunswick East compared with Brunswick South</p></div><span>Matched comparison</span></header><div>{comparison?.environmental_indicators.map(item => <article key={item.id}><header><b>{item.name}</b><small>{item.source} · {item.reference_year}</small></header><div><span><small>Brunswick East</small><strong>{Number(item.neighbourhood_a.value).toFixed(2)} {item.unit}</strong></span><i><b style={{ width: `${Math.min(100, Number(item.neighbourhood_a.value) * 6)}%` }} /></i><span><small>Brunswick South</small><strong>{Number(item.neighbourhood_b.value).toFixed(2)} {item.unit}</strong></span></div><footer>Difference: {Number(item.approved_difference.value).toFixed(2)} {item.unit}</footer></article>) ?? <p>Comparison data is loading.</p>}</div></article>
+      <article className="dh-needs-attention"><h3>Needs attention</h3><ul><li><i>!</i><span><b>Source age</b><small>Environmental observations are from 2018 and should not be described as current conditions.</small></span></li><li><i>!</i><span><b>Exposure boundary</b><small>Area-level heat and canopy do not estimate an individual child’s exposure.</small></span></li><li><i>✓</i><span><b>Geography verified</b><small>All three values are harmonised to ASGS Edition 3 SA2.</small></span></li></ul></article>
+    </section>
+  </div>
+}
+
+function EvidenceReviewPage({ data }: { data: DigitalHealthData }) {
+  const [language, setLanguage] = useState<'English' | 'Plain English'>('English')
+  const [verified, setVerified] = useState<string[]>([])
+  const evidence = environmentIndicators(data).filter(item => item.id.startsWith('env_'))
+  const verify = (id: string) => setVerified(current => current.includes(id) ? current : [...current, id])
+  return <div className="dh-page dh-board-page"><BoardHeader title="Evidence review" subtitle="Check generated statements against the actual published record before using them in reports or presentations." />
+    <section className="dh-review-layout"><article className="dh-review-list"><header><div><h2>Generated claims</h2><p>Select a claim and verify it against its source fields.</p></div><label>Display language<select value={language} onChange={event => setLanguage(event.target.value as 'English' | 'Plain English')}><option>English</option><option>Plain English</option></select></label></header>{evidence.map(item => <div key={item.id}><span><b>{item.name}</b><small>{language === 'Plain English' ? `The source reports ${Number(item.value).toFixed(4)} ${item.unit} for Brunswick East.` : `Claim value: ${Number(item.value).toFixed(4)} ${item.unit}`}</small></span><strong>{verified.includes(item.id) ? 'Verified' : 'Pending review'}</strong><button type="button" onClick={() => verify(item.id)} disabled={verified.includes(item.id)}>{verified.includes(item.id) ? 'Checked' : 'Verify source'}</button></div>)}</article><aside className="dh-source-document"><span>ACTUAL SOURCE RECORD</span><h3>Environmental context contract</h3><dl><div><dt>Locality</dt><dd>Brunswick East</dd></div><div><dt>Geography</dt><dd>SA2 (ASGS Edition 3, 2021)</dd></div><div><dt>Source</dt><dd>DELWP Cooling & Greening Melbourne 2018 / VPA Open Space</dd></div><div><dt>Reference year</dt><dd>2018</dd></div><div><dt>Available records</dt><dd>{evidence.length}</dd></div><div><dt>Verification progress</dt><dd>{verified.length}/{evidence.length}</dd></div></dl><p>The review confirms exact value, unit, source, year and geography. It does not independently validate the publisher’s methodology.</p></aside></section>
+  </div>
 }
 
 function BoardHeader({ title, subtitle }: { title: string; subtitle: string }) {
@@ -281,5 +320,12 @@ function VcamsContext({ data }: { data: DigitalHealthData }) {
 export default function DigitalHealthHub({ onHome }: DigitalHealthHubProps) {
   const [view, setView] = useState<HealthView>('overview')
   const data = useDigitalHealthData()
-  return <div className="digital-health-hub"><SideNavigation current={view} onChange={setView} onHome={onHome} /><main>{view === 'overview' ? <><OverviewPage onConditions={() => setView('conditions')} onDemand={() => setView('demand')} /><VcamsContext data={data} /></> : view === 'conditions' ? <><ConditionsPage /><VcamsContext data={data} /></> : view === 'care' ? <CareAccessPage data={data} /> : <FutureDemandPage data={data} />}</main></div>
+  const page = view === 'overview'
+    ? <OverviewPage onConditions={() => setView('conditions')} onDemand={() => setView('demand')} />
+    : view === 'conditions' ? <><ConditionsPage /><VcamsContext data={data} /></>
+      : view === 'environment' ? <EnvironmentPage data={data} />
+        : view === 'care' ? <CareAccessPage data={data} />
+          : view === 'demand' ? <FutureDemandPage data={data} />
+            : <EvidenceReviewPage data={data} />
+  return <div className="digital-health-hub"><SideNavigation current={view} onChange={setView} onHome={onHome} /><main>{page}</main></div>
 }
