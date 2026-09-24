@@ -1,11 +1,12 @@
-import { useState } from 'react'
+import { useEffect, useMemo, useState, type CSSProperties } from 'react'
 
 import LocalityGlobe from './LocalityGlobe'
+import { api, type HealthFacility, type PopulationProjection, type VcamsAreaIndicator, type VcamsLgaIndicator } from '../services/api'
 import './DigitalHealthHub.css'
 import './DigitalHealthHub.responsive.css'
 import './DigitalHealthHub.health.css'
 
-type HealthView = 'overview' | 'conditions'
+type HealthView = 'overview' | 'conditions' | 'care' | 'demand'
 type ConditionId = 'brain' | 'lungs' | 'metabolic' | 'immune' | 'perinatal'
 
 interface DigitalHealthHubProps { onHome: () => void }
@@ -15,8 +16,8 @@ const navigation = [
   { id: 'conditions', label: 'Child health conditions', symbol: '✚', enabled: true },
   { id: 'development', label: 'Development', symbol: '▥', enabled: false },
   { id: 'prevention', label: 'Prevention', symbol: '♢', enabled: false },
-  { id: 'care', label: 'Care access', symbol: '⌖', enabled: false },
-  { id: 'demand', label: 'Future demand', symbol: '⌁', enabled: false },
+  { id: 'care', label: 'Care access', symbol: '⌖', enabled: true },
+  { id: 'demand', label: 'Future demand', symbol: '⌁', enabled: true },
   { id: 'evidence', label: 'Evidence', symbol: '▤', enabled: false },
 ] as const
 
@@ -138,7 +139,7 @@ function DomainIcon({ name }: { name: string }) {
   return <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="7" r="3" /><path d="M12 10v7M7 13l5-3 5 3M9 21l3-4 3 4" /></svg>
 }
 
-function OverviewPage({ onConditions }: { onConditions: () => void }) {
+function OverviewPage({ onConditions, onDemand }: { onConditions: () => void; onDemand: () => void }) {
   const [mapMode, setMapMode] = useState<'lens' | 'map'>('lens')
   return <div className="dh-page dh-overview-page">
     <header className="dh-topbar"><div className="dh-static-search">⌕ <span>Brunswick East · SA2</span></div><div className="dh-top-actions"><span>⌖ Melbourne</span><button type="button" disabled title="Help centre is planned">?</button><button type="button" disabled title="Accounts are not enabled">●</button></div></header>
@@ -148,7 +149,7 @@ function OverviewPage({ onConditions }: { onConditions: () => void }) {
       <section className="dh-locality-lens"><LocalityGlobe mode={mapMode} /></section>
       <div className="dh-overview-right"><article className="dh-card dh-services-card"><div className="dh-card-title"><div><span>⌖ Child and family services</span><small>Listed presence only, Brunswick East (SA2)</small></div><b>›</b></div><div className="dh-service-grid"><div className="blue"><i>♧</i><strong>2</strong><span>General practices</span></div><div className="coral"><i>◆</i><strong>3</strong><span>Pharmacies</span></div><div className="mint"><i>●</i><strong>1</strong><span>Maternal & child health service</span></div><div className="slate"><i>✚</i><strong>0</strong><span>Hospitals</span></div></div><p className="dh-source">Source: Healthdirect 2025 · Listed presence only</p></article></div>
     </div>
-    <div className="dh-overview-actions"><button type="button" onClick={onConditions}><i>◉</i><span><strong>Explore child health conditions</strong><small>View data and evidence boundaries</small></span><b>›</b></button><button type="button" disabled title="The redesigned comparison is planned"><i>⇄</i><span><strong>Compare another locality</strong><small>Redesigned comparison coming next</small></span><b>›</b></button><button type="button" disabled title="The future demand board is planned"><i>▥</i><span><strong>View future demand</strong><small>Population projections and service planning</small></span><b>›</b></button></div>
+    <div className="dh-overview-actions"><button type="button" onClick={onConditions}><i>◉</i><span><strong>Explore child health conditions</strong><small>View data and evidence boundaries</small></span><b>›</b></button><button type="button" disabled title="The redesigned comparison is planned"><i>⇄</i><span><strong>Compare another locality</strong><small>Redesigned comparison coming next</small></span><b>›</b></button><button type="button" onClick={onDemand}><i>▥</i><span><strong>View future demand</strong><small>Population projections and service planning</small></span><b>›</b></button></div>
   </div>
 }
 
@@ -178,7 +179,107 @@ function NearbyCarePanel() {
   return <article className="dh-health-panel dh-care-panel"><header><div><h3>Verified nearby care</h3><p>Distance from the Brunswick East reference point, calculated as straight-line distance.</p></div><span>Healthdirect 2025</span></header><div className="dh-care-list">{nearbyCare.map((service) => <div key={service.name}><i>⌖</i><span><strong>{service.name}</strong><small>{service.type}</small></span><b>{service.distance}</b><em>{service.fee}</em></div>)}</div><p className="dh-health-note">The public directory does not provide consultation prices, current bulk-billing eligibility, appointment availability or verified paediatric specialist staffing. Confirm fees, suitability and availability directly with the service. Distance is not travel time.</p></article>
 }
 
+interface DigitalHealthData {
+  area: VcamsAreaIndicator[]
+  lga: VcamsLgaIndicator[]
+  facilities: HealthFacility[]
+  projections: PopulationProjection[]
+  loading: boolean
+  error: string | null
+}
+
+const indicatorNames: Record<string, string> = {
+  minimum_recommended_fruit: 'Recommended fruit intake',
+  minimum_recommended_vegetables: 'Recommended vegetable intake',
+  special_healthcare_needs: 'Special healthcare needs',
+  good_or_better_general_health: 'Good or better general health',
+  recommended_daily_physical_activity: 'Recommended daily physical activity',
+  electronic_media_over_two_hours: 'More than two hours screen time',
+  tobacco_smoke_exposure_at_home: 'Tobacco smoke exposure at home',
+  household_food_insecurity: 'Household food insecurity',
+  speech_or_language_concern_at_school_entry: 'Speech or language concern at school entry',
+  emotional_or_behavioural_difficulty_at_school_entry: 'Emotional or behavioural difficulty at school entry',
+  fully_breastfed: 'Fully breastfed at three months',
+  maternal_child_health_home_consultation: 'MCH home consultation',
+  maternal_child_health_3_5_year_visit: '3.5-year MCH visit',
+}
+
+function useDigitalHealthData(): DigitalHealthData {
+  const [data, setData] = useState<DigitalHealthData>({ area: [], lga: [], facilities: [], projections: [], loading: true, error: null })
+  useEffect(() => {
+    const controller = new AbortController()
+    Promise.all([
+      api.getVcamsAreaContext('Hume Moreland', 2021, controller.signal),
+      api.getVcamsLgaContext('Merri-bek (C)|Moreland (C)', controller.signal),
+      api.getHealthFacilities('206011106', controller.signal),
+      api.getPopulationProjections('206011106', controller.signal),
+    ]).then(([area, lga, facilities, projections]) => setData({
+      area: area.data.indicators,
+      lga: lga.data.indicators,
+      facilities: facilities.data.facilities,
+      projections: projections.data.projections,
+      loading: false,
+      error: null,
+    })).catch(error => {
+      if (error instanceof DOMException && error.name === 'AbortError') return
+      setData(current => ({ ...current, loading: false, error: 'Validated health data could not be loaded.' }))
+    })
+    return () => controller.abort()
+  }, [])
+  return data
+}
+
+function BoardHeader({ title, subtitle }: { title: string; subtitle: string }) {
+  return <><header className="dh-topbar"><div className="dh-static-search">⌕ <span>Brunswick East · SA2</span></div><div className="dh-top-actions"><span>⌖ Melbourne</span><button type="button" disabled title="Help centre is planned">?</button></div></header><div className="dh-board-heading"><div><span className="dh-eyebrow">Digital child health planning</span><h1>{title}</h1><p>{subtitle}</p></div><span className="dh-data-state">Validated data</span></div></>
+}
+
+function CareAccessPage({ data }: { data: DigitalHealthData }) {
+  const groups = useMemo(() => data.facilities.reduce<Record<string, HealthFacility[]>>((result, facility) => {
+    const key = facility.service_type.includes('Maternal') ? 'Maternal and child health' : facility.category === 'pharmacy' ? 'Pharmacy' : facility.category === 'hospital' ? 'Hospital' : 'General practice'
+    result[key] = [...(result[key] ?? []), facility]
+    return result
+  }, {}), [data.facilities])
+  const categories = ['General practice', 'Pharmacy', 'Maternal and child health', 'Hospital']
+  return <div className="dh-page dh-board-page"><BoardHeader title="Care access" subtitle="Verified service locations inside Brunswick East. Presence is not capacity, price or appointment availability." />
+    {data.error && <p className="dh-board-error">{data.error}</p>}
+    <section className="dh-board-grid dh-care-board">
+      <article className="dh-feature-card dh-care-hero"><div><span className="dh-card-kicker">LOCAL CARE NETWORK</span><h2>{data.loading ? 'Loading' : `${data.facilities.length} listed services`}</h2><p>Directory-listed services physically located within the Brunswick East SA2 boundary.</p></div><div className="dh-care-orbit" aria-hidden="true"><i>✚</i><span>⌖</span><b>●</b></div><small>Healthdirect facilities extract · 7 March 2025</small></article>
+      <article className="dh-board-card dh-access-summary"><h3>Service mix</h3><div className="dh-access-rings">{categories.map((category, index) => <div key={category}><span style={{ '--ring': `${Math.min(100, (groups[category]?.length ?? 0) * 25)}%` } as CSSProperties}><b>{groups[category]?.length ?? 0}</b></span><small>{category}</small><i className={`tone-${index}`} /></div>)}</div></article>
+      <article className="dh-board-card dh-service-directory"><header><div><h3>Verified directory</h3><p>Active records in the source extract</p></div><span>{data.facilities.length} results</span></header><div>{data.facilities.map(facility => <article key={facility.facility_id}><i>{facility.category === 'pharmacy' ? '◆' : facility.service_type.includes('Maternal') ? '●' : '✚'}</i><span><strong>{facility.name}</strong><small>{facility.service_type}</small><em>{facility.address}</em></span><b>Listed</b></article>)}</div></article>
+      <article className="dh-board-card dh-access-boundary"><h3>What this board can answer</h3><ul><li><b>Available</b><span>Service name, type, address and listed location</span></li><li><b>Not published</b><span>Consultation fee, bulk billing, waiting time and paediatric staffing</span></li><li><b>Interpret carefully</b><span>Being nearby does not mean the service is suitable or accepting patients</span></li></ul></article>
+    </section>
+  </div>
+}
+
+function FutureDemandPage({ data }: { data: DigitalHealthData }) {
+  const projections = [...data.projections].filter(row => row.sex === 'persons').sort((a, b) => a.projection_year - b.projection_year)
+  const first = projections[0]
+  const last = projections.length ? projections[projections.length - 1] : undefined
+  const childChange = first && last ? ((last.population_age_0_14_projected ?? 0) - (first.population_age_0_14_projected ?? 0)) : null
+  const max = Math.max(...projections.map(row => row.population_age_0_14_projected ?? 0), 1)
+  return <div className="dh-page dh-board-page"><BoardHeader title="Future demand" subtitle="Published population projections help plan child and family services. They are modelled scenarios, not forecasts of individual need." />
+    {data.error && <p className="dh-board-error">{data.error}</p>}
+    <section className="dh-board-grid dh-demand-board">
+      <article className="dh-feature-card dh-demand-hero"><div><span className="dh-card-kicker">CHILD POPULATION OUTLOOK</span><h2>{last ? Math.round(last.population_age_0_14_projected ?? 0).toLocaleString() : 'Loading'}</h2><p>children aged 0–14 projected for Brunswick East in {last?.projection_year ?? '2036'}</p></div><div className="dh-demand-wave">{projections.map(row => <i key={row.projection_year} style={{ height: `${32 + ((row.population_age_0_14_projected ?? 0) / max) * 90}px` }}><span>{row.projection_year}</span></i>)}</div><small>Victoria in Future 2023 Release 2 · SA2</small></article>
+      <article className="dh-board-card dh-demand-change"><h3>Planning signal</h3><strong>{childChange === null ? 'Loading' : `${childChange >= 0 ? '+' : ''}${Math.round(childChange).toLocaleString()}`}</strong><p>projected change in children aged 0–14 from {first?.projection_year ?? 2021} to {last?.projection_year ?? 2036}</p><span>Projection, not observed growth</span></article>
+      <article className="dh-board-card dh-age-outlook"><header><div><h3>Age-group outlook</h3><p>Published counts by five-year age band</p></div></header><div className="dh-projection-chart">{projections.map(row => <div key={row.projection_year}><b>{row.projection_year}</b><span title={`Ages 0–4: ${Math.round(row.population_age_0_4_projected ?? 0)}`} style={{ '--value': `${((row.population_age_0_4_projected ?? 0) / max) * 100}%` } as CSSProperties} /><span title={`Ages 5–9: ${Math.round(row.population_age_5_9_projected ?? 0)}`} style={{ '--value': `${((row.population_age_5_9_projected ?? 0) / max) * 100}%` } as CSSProperties} /><span title={`Ages 10–14: ${Math.round(row.population_age_10_14_projected ?? 0)}`} style={{ '--value': `${((row.population_age_10_14_projected ?? 0) / max) * 100}%` } as CSSProperties} /></div>)}</div><footer><span>● 0–4 years</span><span>● 5–9 years</span><span>● 10–14 years</span></footer></article>
+      <article className="dh-board-card dh-health-demand"><h3>Health planning context</h3><div>{data.area.filter(item => ['special_healthcare_needs', 'recommended_daily_physical_activity', 'household_food_insecurity'].includes(item.indicator_id)).map(item => <div key={item.indicator_id}><span><b>{indicatorNames[item.indicator_id]}</b><small>Hume Moreland · {item.reference_year}</small></span><strong>{item.percent?.toFixed(1)}%</strong><i className={item.quality_flag}>{item.quality_flag.replace(/_/g, ' ')}</i></div>)}</div><p>These broad-area survey estimates describe current context; they are not projected forward.</p></article>
+    </section>
+  </div>
+}
+
+function VcamsContext({ data }: { data: DigitalHealthData }) {
+  const latestLga = Object.values(data.lga.reduce<Record<string, VcamsLgaIndicator>>((result, item) => {
+    if (!result[item.indicator_id] || item.reference_period > result[item.indicator_id].reference_period) result[item.indicator_id] = item
+    return result
+  }, {}))
+  const items = [...data.area, ...latestLga]
+  if (!items.length) return null
+  return <section className="dh-context-strip"><header><div><h2>Wider child health and healthy-living context</h2><p>All newly integrated VCAMS indicators, shown at their published geography.</p></div><span>{items.length} measures</span></header><div>{items.map(item => <article key={`${item.indicator_id}-${'reference_year' in item ? item.reference_year : item.reference_period}`}><small>{indicatorNames[item.indicator_id] ?? item.indicator_id}</small><strong>{item.percent === null ? 'Not published' : `${item.percent.toFixed(1)}%`}</strong><span>{'area_name' in item ? `${item.area_name} area · ${item.reference_year}` : `${item.lga_name.replace(' (C)', '')} LGA · ${item.reference_period}`}</span><i>{'quality_flag' in item ? item.quality_flag.replace(/_/g, ' ') : item.publication_status}</i></article>)}</div></section>
+}
+
 export default function DigitalHealthHub({ onHome }: DigitalHealthHubProps) {
   const [view, setView] = useState<HealthView>('overview')
-  return <div className="digital-health-hub"><SideNavigation current={view} onChange={setView} onHome={onHome} /><main>{view === 'overview' ? <OverviewPage onConditions={() => setView('conditions')} /> : <ConditionsPage />}</main></div>
+  const data = useDigitalHealthData()
+  return <div className="digital-health-hub"><SideNavigation current={view} onChange={setView} onHome={onHome} /><main>{view === 'overview' ? <><OverviewPage onConditions={() => setView('conditions')} onDemand={() => setView('demand')} /><VcamsContext data={data} /></> : view === 'conditions' ? <><ConditionsPage /><VcamsContext data={data} /></> : view === 'care' ? <CareAccessPage data={data} /> : <FutureDemandPage data={data} />}</main></div>
 }
