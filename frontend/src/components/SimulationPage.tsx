@@ -15,37 +15,41 @@ interface SimulationPageProps {
 interface SimulationBaseline {
   id: string
   name: string
-  treeCanopy: number
-  openSpace: number
-  heatExposure: number
+  generalPracticeAccess: number
+  pharmacyAccess: number
+  hospitalAccess: number
+  earlyYearsPlaces: number
+  physicalHealth: number
+  socialCompetence: number
   vulnerability: number
   childDevelopment: number
   serviceAccess: number
   futureDemand: number
-  environmentQuality: number
   trafficPressure: number
   industrialPressure: number
 }
 
 interface ScenarioValues {
-  treeCanopy: number
-  openSpace: number
-  heat: number
+  generalPracticeAccess: number
+  pharmacyAccess: number
+  hospitalAccess: number
+  earlyYearsPlaces: number
 }
 
 interface ScenarioResult {
-  heatExposure: string
-  heatDirection: string
+  careAccessDirection: string
   vulnerabilityDirection: string
-  treeCanopy: number
-  baselineTreeCanopy: number
+  generalPracticeAccess: number
+  baselineGeneralPracticeAccess: number
   vulnerability: number
   baselineVulnerability: number
-  developmentScore: number
-  baselineDevelopmentScore: number
-  developmentDirection: string
+  physicalHealth: number
+  baselinePhysicalHealth: number
+  physicalHealthDirection: string
+  socialCompetence: number
+  socialCompetenceDirection: string
   projectedChange: string
-  projectedDevelopmentChange: string
+  projectedPhysicalHealthChange: string
   aiSummary: string
   modelContext: string
   insight: string
@@ -53,9 +57,9 @@ interface ScenarioResult {
 
 interface AiLinearModel {
   intercept: number
-  treeCanopyWeight: number
-  openSpaceWeight: number
-  heatWeight: number
+  generalPracticeWeight: number
+  pharmacyWeight: number
+  earlyYearsWeight: number
   r2: number
   sampleSize: number
 }
@@ -63,6 +67,7 @@ interface AiLinearModel {
 interface AiSimulationModel {
   vulnerabilityModel: AiLinearModel | null
   developmentModel: AiLinearModel | null
+  socialModel: AiLinearModel | null
   status: 'learned' | 'fallback'
   notes: string[]
 }
@@ -70,7 +75,7 @@ interface AiSimulationModel {
 const clamp = (value: number, min: number, max: number) => Math.min(Math.max(value, min), max)
 
 type ComparisonMetric = {
-  id: 'heat' | 'treeCanopy' | 'openSpace' | 'vulnerability'
+  id: 'generalPractice' | 'pharmacy' | 'hospital' | 'earlyYears' | 'vulnerability'
   label: string
   unit: string
   baseline: number
@@ -138,7 +143,7 @@ function solveLinearSystem4x4(matrix: number[][], vector: number[]): number[] | 
   return a.map((row) => row[size])
 }
 
-function trainAiLinearModel(samples: Array<{ treeCanopy: number; openSpace: number; heatExposure: number; target: number }>): AiLinearModel | null {
+function trainAiLinearModel(samples: Array<{ generalPracticeAccess: number; pharmacyAccess: number; earlyYearsPlaces: number; target: number }>): AiLinearModel | null {
   if (samples.length < 24) {
     return null
   }
@@ -151,7 +156,7 @@ function trainAiLinearModel(samples: Array<{ treeCanopy: number; openSpace: numb
   const xTy = [0, 0, 0, 0]
   const ridge = 0.08
   for (const sample of samples) {
-    const features = [1, sample.treeCanopy, sample.openSpace, sample.heatExposure]
+    const features = [1, sample.generalPracticeAccess, sample.pharmacyAccess, sample.earlyYearsPlaces]
     for (let row = 0; row < 4; row += 1) {
       xTy[row] += features[row] * sample.target
       for (let col = 0; col < 4; col += 1) {
@@ -166,15 +171,15 @@ function trainAiLinearModel(samples: Array<{ treeCanopy: number; openSpace: numb
   if (!coefficients) {
     return null
   }
-  const [intercept, treeCanopyWeight, openSpaceWeight, heatWeight] = coefficients
+  const [intercept, generalPracticeWeight, pharmacyWeight, earlyYearsWeight] = coefficients
   const meanTarget = samples.reduce((total, sample) => total + sample.target, 0) / samples.length
   let sse = 0
   let sst = 0
   for (const sample of samples) {
     const predicted = intercept
-      + (treeCanopyWeight * sample.treeCanopy)
-      + (openSpaceWeight * sample.openSpace)
-      + (heatWeight * sample.heatExposure)
+      + (generalPracticeWeight * sample.generalPracticeAccess)
+      + (pharmacyWeight * sample.pharmacyAccess)
+      + (earlyYearsWeight * sample.earlyYearsPlaces)
     const residual = sample.target - predicted
     sse += residual * residual
     const centered = sample.target - meanTarget
@@ -183,54 +188,64 @@ function trainAiLinearModel(samples: Array<{ treeCanopy: number; openSpace: numb
   const rawR2 = sst > 0 ? 1 - (sse / sst) : 0
   return {
     intercept,
-    treeCanopyWeight,
-    openSpaceWeight,
-    heatWeight,
+    generalPracticeWeight,
+    pharmacyWeight,
+    earlyYearsWeight,
     r2: clamp(rawR2, 0, 1),
     sampleSize: samples.length,
   }
 }
 
-function predictAi(model: AiLinearModel, treeCanopy: number, openSpace: number, heatExposure: number): number {
+function predictAi(model: AiLinearModel, generalPracticeAccess: number, pharmacyAccess: number, earlyYearsPlaces: number): number {
   return model.intercept
-    + (model.treeCanopyWeight * treeCanopy)
-    + (model.openSpaceWeight * openSpace)
-    + (model.heatWeight * heatExposure)
+    + (model.generalPracticeWeight * generalPracticeAccess)
+    + (model.pharmacyWeight * pharmacyAccess)
+    + (model.earlyYearsWeight * earlyYearsPlaces)
 }
 
 function buildAiModel(indicatorRows: Array<{ indicators: Record<string, { value: number | null; status: string }> }>): AiSimulationModel {
   const notes: string[] = []
-  const vulnerabilitySamples: Array<{ treeCanopy: number; openSpace: number; heatExposure: number; target: number }> = []
-  const developmentSamples: Array<{ treeCanopy: number; openSpace: number; heatExposure: number; target: number }> = []
+  const vulnerabilitySamples: Array<{ generalPracticeAccess: number; pharmacyAccess: number; earlyYearsPlaces: number; target: number }> = []
+  const physicalHealthSamples: Array<{ generalPracticeAccess: number; pharmacyAccess: number; earlyYearsPlaces: number; target: number }> = []
+  const socialSamples: Array<{ generalPracticeAccess: number; pharmacyAccess: number; earlyYearsPlaces: number; target: number }> = []
 
   for (const row of indicatorRows) {
-    const treeCanopy = metricNumber(row.indicators, 'env_vegetation_cover')
-    const openSpace = metricNumber(row.indicators, 'env_open_space_access')
-    const heatExposure = metricNumber(row.indicators, 'env_urban_heat')
-    if (treeCanopy === null || openSpace === null || heatExposure === null) {
+    const generalPracticeAccess = metricNumber(row.indicators, 'general_practice_access')
+    const pharmacyAccess = metricNumber(row.indicators, 'pharmacy_access')
+    const earlyYearsPlaces = metricNumber(row.indicators, 'approved_early_childhood_places')
+    if (generalPracticeAccess === null || pharmacyAccess === null || earlyYearsPlaces === null) {
       continue
     }
     const vulnerability = metricNumber(row.indicators, 'aedc_vulnerable_one_or_more')
     if (vulnerability !== null) {
-      vulnerabilitySamples.push({ treeCanopy, openSpace, heatExposure, target: vulnerability })
+      vulnerabilitySamples.push({ generalPracticeAccess, pharmacyAccess, earlyYearsPlaces, target: vulnerability })
     }
-    const development = metricNumber(row.indicators, 'aedc_on_track_five')
-    if (development !== null) {
-      developmentSamples.push({ treeCanopy, openSpace, heatExposure, target: development })
+    const physicalHealth = metricNumber(row.indicators, 'aedc_physical_on_track')
+    if (physicalHealth !== null) {
+      physicalHealthSamples.push({ generalPracticeAccess, pharmacyAccess, earlyYearsPlaces, target: physicalHealth })
+    }
+    const socialCompetence = metricNumber(row.indicators, 'aedc_social_on_track')
+    if (socialCompetence !== null) {
+      socialSamples.push({ generalPracticeAccess, pharmacyAccess, earlyYearsPlaces, target: socialCompetence })
     }
   }
 
   const vulnerabilityModel = trainAiLinearModel(vulnerabilitySamples)
-  const developmentModel = trainAiLinearModel(developmentSamples)
+  const developmentModel = trainAiLinearModel(physicalHealthSamples)
+  const socialModel = trainAiLinearModel(socialSamples)
   if (!vulnerabilityModel) {
     notes.push('Vulnerability model fallback: insufficient or unstable samples')
   }
   if (!developmentModel) {
-    notes.push('Development model fallback: insufficient or unstable samples')
+    notes.push('Physical-health model fallback: insufficient or unstable samples')
+  }
+  if (!socialModel) {
+    notes.push('Social-health model fallback: insufficient or unstable samples')
   }
   return {
     vulnerabilityModel,
     developmentModel,
+    socialModel,
     status: vulnerabilityModel && developmentModel ? 'learned' : 'fallback',
     notes,
   }
@@ -241,21 +256,22 @@ function buildScenarioResult(
   values: ScenarioValues,
   aiModel: AiSimulationModel | null,
 ): ScenarioResult {
-  const treeIncrease = values.treeCanopy - baseline.treeCanopy
-  const openSpaceIncrease = values.openSpace - baseline.openSpace
-  const heatReduction = baseline.heatExposure - values.heat
-  const ruleVulnerabilityAdjustment = (treeIncrease * 0.25) + (openSpaceIncrease * 0.18) + (heatReduction * 2.1)
-  const ruleDevelopmentAdjustment = (treeIncrease * 0.22) + (openSpaceIncrease * 0.16) + (heatReduction * 1.6)
+  const generalPracticeIncrease = values.generalPracticeAccess - baseline.generalPracticeAccess
+  const pharmacyIncrease = values.pharmacyAccess - baseline.pharmacyAccess
+  const hospitalIncrease = values.hospitalAccess - baseline.hospitalAccess
+  const earlyYearsIncrease = values.earlyYearsPlaces - baseline.earlyYearsPlaces
+  const ruleVulnerabilityAdjustment = (generalPracticeIncrease * 1.4) + (pharmacyIncrease * 0.8) + (hospitalIncrease * 1.1) + (earlyYearsIncrease * 0.08)
+  const rulePhysicalHealthAdjustment = (generalPracticeIncrease * 0.9) + (pharmacyIncrease * 0.5) + (hospitalIncrease * 0.7) + (earlyYearsIncrease * 0.1)
+  const ruleSocialAdjustment = (generalPracticeIncrease * 0.5) + (pharmacyIncrease * 0.3) + (hospitalIncrease * 0.3) + (earlyYearsIncrease * 0.12)
 
-  // Higher local service capacity makes built-environment gains easier to convert into outcomes,
-  // while stronger projected child demand and context pressure dampen expected effect size.
-  const serviceCapacityFactor = clamp(0.85 + (baseline.serviceAccess / 100) * 0.35, 0.85, 1.2)
+  // Stronger care access makes capacity improvements easier to convert into outcomes,
+  // while projected demand and contextual pressure dampen expected effect size.
+  const serviceCapacityFactor = clamp(0.8 + (baseline.serviceAccess / 100) * 0.25 + (baseline.hospitalAccess / 20) * 0.15, 0.8, 1.2)
   const demandPressureFactor = clamp(1.15 - (baseline.futureDemand / 100) * 0.35, 0.8, 1.15)
   const backgroundPressure = (baseline.trafficPressure + baseline.industrialPressure) / 2
   const pressureDampeningFactor = clamp(1.1 - (backgroundPressure / 100) * 0.35, 0.75, 1.1)
-  const environmentResilienceFactor = clamp(0.9 + (baseline.environmentQuality / 100) * 0.2, 0.9, 1.1)
   const contextMultiplier = clamp(
-    (serviceCapacityFactor + demandPressureFactor + pressureDampeningFactor + environmentResilienceFactor) / 4,
+    (serviceCapacityFactor + demandPressureFactor + pressureDampeningFactor) / 3,
     0.7,
     1.2,
   )
@@ -263,43 +279,62 @@ function buildScenarioResult(
   const aiVulnerabilityAdjustment = aiModel?.vulnerabilityModel
     ? predictAi(
       aiModel.vulnerabilityModel,
-      baseline.treeCanopy,
-      baseline.openSpace,
-      baseline.heatExposure,
+      baseline.generalPracticeAccess,
+      baseline.pharmacyAccess,
+      baseline.earlyYearsPlaces,
     ) - predictAi(
       aiModel.vulnerabilityModel,
-      values.treeCanopy,
-      values.openSpace,
-      values.heat,
+      values.generalPracticeAccess,
+      values.pharmacyAccess,
+      values.earlyYearsPlaces,
     )
     : null
-  const aiDevelopmentAdjustment = aiModel?.developmentModel
+  const aiPhysicalHealthAdjustment = aiModel?.developmentModel
     ? predictAi(
       aiModel.developmentModel,
-      values.treeCanopy,
-      values.openSpace,
-      values.heat,
+      values.generalPracticeAccess,
+      values.pharmacyAccess,
+      values.earlyYearsPlaces,
     ) - predictAi(
       aiModel.developmentModel,
-      baseline.treeCanopy,
-      baseline.openSpace,
-      baseline.heatExposure,
+      baseline.generalPracticeAccess,
+      baseline.pharmacyAccess,
+      baseline.earlyYearsPlaces,
+    )
+    : null
+  const aiSocialAdjustment = aiModel?.socialModel
+    ? predictAi(
+      aiModel.socialModel,
+      values.generalPracticeAccess,
+      values.pharmacyAccess,
+      values.earlyYearsPlaces,
+    ) - predictAi(
+      aiModel.socialModel,
+      baseline.generalPracticeAccess,
+      baseline.pharmacyAccess,
+      baseline.earlyYearsPlaces,
     )
     : null
 
   const vulnerabilityAdjustment = aiVulnerabilityAdjustment === null
     ? ruleVulnerabilityAdjustment
     : (ruleVulnerabilityAdjustment * 0.4) + (aiVulnerabilityAdjustment * 0.6)
-  const developmentAdjustment = aiDevelopmentAdjustment === null
-    ? ruleDevelopmentAdjustment
-    : (ruleDevelopmentAdjustment * 0.4) + (aiDevelopmentAdjustment * 0.6)
+  const physicalHealthAdjustment = aiPhysicalHealthAdjustment === null
+    ? rulePhysicalHealthAdjustment
+    : (rulePhysicalHealthAdjustment * 0.4) + (aiPhysicalHealthAdjustment * 0.6)
+  const socialAdjustment = aiSocialAdjustment === null
+    ? ruleSocialAdjustment
+    : (ruleSocialAdjustment * 0.4) + (aiSocialAdjustment * 0.6)
 
   const effectiveVulnerabilityAdjustment = vulnerabilityAdjustment > 0
     ? vulnerabilityAdjustment * contextMultiplier
     : vulnerabilityAdjustment
-  const effectiveDevelopmentAdjustment = developmentAdjustment > 0
-    ? developmentAdjustment * contextMultiplier
-    : developmentAdjustment
+  const effectivePhysicalHealthAdjustment = physicalHealthAdjustment > 0
+    ? physicalHealthAdjustment * contextMultiplier
+    : physicalHealthAdjustment
+  const effectiveSocialAdjustment = socialAdjustment > 0
+    ? socialAdjustment * contextMultiplier
+    : socialAdjustment
 
   const projectedVulnerability = clamp(
     baseline.vulnerability - effectiveVulnerabilityAdjustment,
@@ -307,37 +342,43 @@ function buildScenarioResult(
     100,
   )
 
-  const projectedDevelopment = clamp(
-    baseline.childDevelopment + effectiveDevelopmentAdjustment,
+  const projectedPhysicalHealth = clamp(
+    baseline.physicalHealth + effectivePhysicalHealthAdjustment,
+    30,
+    100,
+  )
+  const projectedSocialCompetence = clamp(
+    baseline.socialCompetence + effectiveSocialAdjustment,
     30,
     100,
   )
 
-  const heatExposure = values.heat <= 5 ? 'Moderate' : values.heat <= 8 ? 'High' : 'Very high'
-  const heatDirection = heatReduction > 0 ? 'Improves' : 'Higher exposure'
+  const careAccessDirection = generalPracticeIncrease + pharmacyIncrease + hospitalIncrease + earlyYearsIncrease > 0 ? 'Improves' : 'Lower access'
   const vulnerabilityDirection = projectedVulnerability < baseline.vulnerability ? 'Improves' : projectedVulnerability > baseline.vulnerability ? 'Higher risk' : 'No change'
-  const developmentDirection = projectedDevelopment > baseline.childDevelopment ? 'Improves' : 'Lower outlook'
-  const aiSummary = aiModel?.status === 'learned' && aiModel.vulnerabilityModel && aiModel.developmentModel
-    ? `AI learned from ${Math.min(aiModel.vulnerabilityModel.sampleSize, aiModel.developmentModel.sampleSize)} localities (R2 vulnerability ${aiModel.vulnerabilityModel.r2.toFixed(2)}, development ${aiModel.developmentModel.r2.toFixed(2)}).`
+  const physicalHealthDirection = projectedPhysicalHealth > baseline.physicalHealth ? 'Improves' : projectedPhysicalHealth < baseline.physicalHealth ? 'Lower outlook' : 'No change'
+  const socialCompetenceDirection = projectedSocialCompetence > baseline.socialCompetence ? 'Improves' : projectedSocialCompetence < baseline.socialCompetence ? 'Lower outlook' : 'No change'
+  const aiSummary = aiModel?.status === 'learned' && aiModel.vulnerabilityModel && aiModel.developmentModel && aiModel.socialModel
+    ? `AI learned from ${Math.min(aiModel.vulnerabilityModel.sampleSize, aiModel.developmentModel.sampleSize, aiModel.socialModel.sampleSize)} localities across vulnerability, physical-health, and social-competence outcomes.`
     : 'AI fallback to rules for one or more outputs because model training data was incomplete.'
-  const modelContext = `Service ${baseline.serviceAccess.toFixed(1)} · Demand ${baseline.futureDemand.toFixed(1)} · Environment ${baseline.environmentQuality.toFixed(1)} · Traffic ${baseline.trafficPressure.toFixed(1)} · Industrial ${baseline.industrialPressure.toFixed(1)} · Multiplier ${contextMultiplier.toFixed(2)}x`
-  const insight = heatReduction > 0
-    ? 'Reducing heat exposure while increasing canopy and green access produces a lower estimated vulnerability profile for this area, adjusted for local service access and projected demand pressure.'
-    : 'This scenario increases heat pressure and reduces the expected benefit from buffering child-development outcomes, even after applying local service-access and demand context.'
+  const modelContext = `Care access ${baseline.serviceAccess.toFixed(1)} · Demand ${baseline.futureDemand.toFixed(1)} · Traffic ${baseline.trafficPressure.toFixed(1)} · Industrial ${baseline.industrialPressure.toFixed(1)} · Multiplier ${contextMultiplier.toFixed(2)}x`
+  const insight = generalPracticeIncrease + pharmacyIncrease + hospitalIncrease + earlyYearsIncrease > 0
+    ? 'Increasing primary-care, pharmacy, hospital, and early-years capacity produces stronger estimated physical-health and social-competence profiles with lower vulnerability.'
+    : 'This scenario reduces local health-service capacity, increasing estimated vulnerability and weakening the physical-health outlook after context adjustment.'
 
   return {
-    heatExposure,
-    heatDirection,
+    careAccessDirection,
     vulnerabilityDirection,
-    treeCanopy: values.treeCanopy,
-    baselineTreeCanopy: baseline.treeCanopy,
+    generalPracticeAccess: values.generalPracticeAccess,
+    baselineGeneralPracticeAccess: baseline.generalPracticeAccess,
     vulnerability: Number(projectedVulnerability.toFixed(1)),
     baselineVulnerability: baseline.vulnerability,
-    developmentScore: Number(projectedDevelopment.toFixed(1)),
-    baselineDevelopmentScore: baseline.childDevelopment,
-    developmentDirection,
+    physicalHealth: Number(projectedPhysicalHealth.toFixed(1)),
+    baselinePhysicalHealth: baseline.physicalHealth,
+    physicalHealthDirection,
+    socialCompetence: Number(projectedSocialCompetence.toFixed(1)),
+    socialCompetenceDirection,
     projectedChange: `${Number(baseline.vulnerability.toFixed(1))}% → ${Number(projectedVulnerability.toFixed(1))}%`,
-    projectedDevelopmentChange: `${Number(baseline.childDevelopment.toFixed(1))} → ${Number(projectedDevelopment.toFixed(1))}`,
+    projectedPhysicalHealthChange: `${Number(baseline.physicalHealth.toFixed(1))} → ${Number(projectedPhysicalHealth.toFixed(1))}`,
     aiSummary,
     modelContext,
     insight,
@@ -354,9 +395,10 @@ export default function SimulationPage({
   const [selectedNeighbourhoodId, setSelectedNeighbourhoodId] = useState<string | null>(null)
   const [baseline, setBaseline] = useState<SimulationBaseline | null>(null)
   const [scenarioValues, setScenarioValues] = useState<ScenarioValues>({
-    treeCanopy: 35,
-    openSpace: 42,
-    heat: 4.8,
+    generalPracticeAccess: 1.8,
+    pharmacyAccess: 1.2,
+    hospitalAccess: 0.4,
+    earlyYearsPlaces: 85,
   })
   const [scenarioResult, setScenarioResult] = useState<ScenarioResult | null>(null)
   const [aiModel, setAiModel] = useState<AiSimulationModel | null>(null)
@@ -369,6 +411,7 @@ export default function SimulationPage({
     setShowSearchResults,
     searchResults,
     searchLoading,
+    searchError,
     handleSearchResultSelect,
     submitSearch,
   } = useNeighbourhoodSearch({
@@ -469,40 +512,44 @@ export default function SimulationPage({
       const nextAiModel = (
         (indicatorsResponse.status === 'available' || indicatorsResponse.status === 'limited')
           ? buildAiModel(indicatorsResponse.data.neighbourhoods)
-          : { vulnerabilityModel: null, developmentModel: null, status: 'fallback' as const, notes: ['Map indicators unavailable for AI training'] }
+          : { vulnerabilityModel: null, developmentModel: null, socialModel: null, status: 'fallback' as const, notes: ['Map indicators unavailable for AI training'] }
       )
       setAiModel(nextAiModel)
+
+      const selectedIndicators = (indicatorsResponse.status === 'available' || indicatorsResponse.status === 'limited')
+        ? indicatorsResponse.data.neighbourhoods.find((item) => item.id === id)?.indicators ?? {}
+        : {}
+      const selectedIndicatorValue = (indicatorId: string, fallback: number) => metricNumber(selectedIndicators, indicatorId) ?? fallback
 
       const nextBaseline: SimulationBaseline = {
         id: neighbourhood.id,
         name: neighbourhood.name,
-        treeCanopy: clamp(neighbourhood.treeCanopy ?? 22.7, 0, 100),
-        openSpace: clamp(neighbourhood.greenSpaceAccess ?? 31.6, 0, 100),
-        heatExposure: clamp(neighbourhood.heatExposure ?? 6.5, 0, 20),
+        generalPracticeAccess: clamp(selectedIndicatorValue('general_practice_access', 1.8), 0, 20),
+        pharmacyAccess: clamp(selectedIndicatorValue('pharmacy_access', 1.2), 0, 20),
+        hospitalAccess: clamp(selectedIndicatorValue('hospital_access', 0.4), 0, 20),
+        earlyYearsPlaces: clamp(selectedIndicatorValue('approved_early_childhood_places', 85), 0, 300),
+        physicalHealth: clamp(selectedIndicatorValue('aedc_physical_on_track', 68), 0, 100),
+        socialCompetence: clamp(selectedIndicatorValue('aedc_social_on_track', 68), 0, 100),
         vulnerability: clamp(neighbourhood.developmentalVulnerability ?? 25, 0, 100),
         childDevelopment: clamp(neighbourhood.childDevelopmentScore ?? 68, 0, 100),
-        serviceAccess: clamp(neighbourhood.serviceAccessScore ?? neighbourhood.environmentQualityScore ?? 50, 0, 100),
+        serviceAccess: clamp(neighbourhood.serviceAccessScore ?? 50, 0, 100),
         futureDemand: clamp(neighbourhood.futureDemandScore ?? 50, 0, 100),
-        environmentQuality: clamp(
-          neighbourhood.environmentQualityScore
-          ?? ((neighbourhood.treeCanopy ?? 22.7) + (neighbourhood.greenSpaceAccess ?? 31.6)) / 2,
-          0,
-          100,
-        ),
         trafficPressure: clamp(trafficPressure ?? 50, 0, 100),
         industrialPressure: clamp(industrialPressure ?? 50, 0, 100),
       }
 
       setBaseline(nextBaseline)
       setScenarioValues({
-        treeCanopy: nextBaseline.treeCanopy,
-        openSpace: nextBaseline.openSpace,
-        heat: nextBaseline.heatExposure,
+        generalPracticeAccess: nextBaseline.generalPracticeAccess,
+        pharmacyAccess: nextBaseline.pharmacyAccess,
+        hospitalAccess: nextBaseline.hospitalAccess,
+        earlyYearsPlaces: nextBaseline.earlyYearsPlaces,
       })
       setScenarioResult(buildScenarioResult(nextBaseline, {
-        treeCanopy: nextBaseline.treeCanopy,
-        openSpace: nextBaseline.openSpace,
-        heat: nextBaseline.heatExposure,
+        generalPracticeAccess: nextBaseline.generalPracticeAccess,
+        pharmacyAccess: nextBaseline.pharmacyAccess,
+        hospitalAccess: nextBaseline.hospitalAccess,
+        earlyYearsPlaces: nextBaseline.earlyYearsPlaces,
       }, nextAiModel))
     } catch (error) {
       console.error('Failed to load simulation baseline:', error)
@@ -533,9 +580,10 @@ export default function SimulationPage({
     }
 
     const defaultValues = {
-      treeCanopy: baseline.treeCanopy,
-      openSpace: baseline.openSpace,
-      heat: baseline.heatExposure,
+      generalPracticeAccess: baseline.generalPracticeAccess,
+      pharmacyAccess: baseline.pharmacyAccess,
+      hospitalAccess: baseline.hospitalAccess,
+      earlyYearsPlaces: baseline.earlyYearsPlaces,
     }
 
     setScenarioValues(defaultValues)
@@ -544,30 +592,39 @@ export default function SimulationPage({
 
   const comparisonMetrics: ComparisonMetric[] = baseline ? [
     {
-      id: 'heat',
-      label: 'Heat exposure',
-      unit: '°C',
-      baseline: baseline.heatExposure,
-      simulated: scenarioValues.heat,
+      id: 'generalPractice',
+      label: 'General practices',
+      unit: '/10k',
+      baseline: baseline.generalPracticeAccess,
+      simulated: scenarioValues.generalPracticeAccess,
       max: 20,
-      lowerIsBetter: true,
-    },
-    {
-      id: 'treeCanopy',
-      label: 'Tree canopy',
-      unit: '%',
-      baseline: baseline.treeCanopy,
-      simulated: scenarioValues.treeCanopy,
-      max: 100,
       lowerIsBetter: false,
     },
     {
-      id: 'openSpace',
-      label: 'Public open space',
-      unit: '%',
-      baseline: baseline.openSpace,
-      simulated: scenarioValues.openSpace,
-      max: 100,
+      id: 'pharmacy',
+      label: 'Pharmacies',
+      unit: '/10k',
+      baseline: baseline.pharmacyAccess,
+      simulated: scenarioValues.pharmacyAccess,
+      max: 20,
+      lowerIsBetter: false,
+    },
+    {
+      id: 'hospital',
+      label: 'Hospitals',
+      unit: '/10k',
+      baseline: baseline.hospitalAccess,
+      simulated: scenarioValues.hospitalAccess,
+      max: 20,
+      lowerIsBetter: false,
+    },
+    {
+      id: 'earlyYears',
+      label: 'Approved early-years places',
+      unit: '/1k',
+      baseline: baseline.earlyYearsPlaces,
+      simulated: scenarioValues.earlyYearsPlaces,
+      max: 300,
       lowerIsBetter: false,
     },
     {
@@ -601,7 +658,7 @@ export default function SimulationPage({
         </div>
 
         <p className="simulation-subtitle">
-          Test how changes in neighbourhood conditions could influence modelled child-development outcomes.
+          Test how changes in local care capacity could influence modelled child-health outcomes.
         </p>
 
         <div className="simulation-assumption-banner">
@@ -612,9 +669,9 @@ export default function SimulationPage({
             </button>
             <div className="assumption-info-tooltip">
               <strong>Scenario formula</strong>
-              <p>Estimated vulnerability = baseline vulnerability − (tree canopy gain × 0.25) − (open space gain × 0.18) − (heat reduction × 2.1)</p>
-              <p>Estimated child-development outlook = baseline score + (tree canopy gain × 0.22) + (open space gain × 0.16) + (heat reduction × 1.6)</p>
-              <p>Effects are context-adjusted using local service access, projected future demand, and available traffic and industrial context indicators.</p>
+              <p>Estimated vulnerability = baseline vulnerability − (GP access gain × 1.4) − (pharmacy access gain × 0.8) − (hospital access gain × 1.1) − (early-years capacity gain × 0.08)</p>
+              <p>Estimated health outcomes combine AEDC physical-health and social-competence indicators with care-capacity changes.</p>
+              <p>Effects are context-adjusted using care access, projected child demand, and available traffic and industrial context indicators.</p>
               <p>Values are clamped to realistic ranges to keep the estimate stable and interpretable for planning comparisons.</p>
             </div>
           </div>
@@ -674,7 +731,7 @@ export default function SimulationPage({
                     ))}
 
                     {!searchLoading && searchResults.length === 0 && (
-                      <div className="search-state">No neighbourhood found</div>
+                      <div className="search-state">{searchError ?? 'No neighbourhood found'}</div>
                     )}
                   </div>
                 )}
@@ -686,81 +743,103 @@ export default function SimulationPage({
 
               <div className="slider-row">
                 <div className="slider-labels">
-                  <label>Tree canopy</label>
-                  <span>Current {baseline ? `${baseline.treeCanopy.toFixed(1)}%` : 'Not available'}</span>
-                </div>
-                <div className="slider-control">
-                  <input
-                    type="range"
-                    min="0"
-                    max="100"
-                    step="0.1"
-                    value={scenarioValues.treeCanopy}
-                    onChange={(event) => setScenarioValues((current) => ({ ...current, treeCanopy: Number(event.target.value) }))}
-                    aria-label="Tree canopy"
-                  />
-                  <div className="slider-meta">
-                    <span>Proposed</span>
-                    <strong>{scenarioValues.treeCanopy.toFixed(1)}%</strong>
-                  </div>
-                </div>
-              </div>
-
-              <div className="slider-row">
-                <div className="slider-labels">
-                  <label>Public open space</label>
-                  <span>Current {baseline ? `${baseline.openSpace.toFixed(1)}%` : 'Not available'}</span>
-                </div>
-                <div className="slider-control">
-                  <input
-                    type="range"
-                    min="0"
-                    max="100"
-                    step="0.1"
-                    value={scenarioValues.openSpace}
-                    onChange={(event) => setScenarioValues((current) => ({ ...current, openSpace: Number(event.target.value) }))}
-                    aria-label="Public open space"
-                  />
-                  <div className="slider-meta">
-                    <span>Proposed</span>
-                    <strong>{scenarioValues.openSpace.toFixed(1)}%</strong>
-                  </div>
-                </div>
-              </div>
-
-              <div className="slider-row">
-                <div className="slider-labels">
-                  <label>Urban heat island effect</label>
-                  <span>Current {baseline ? `${baseline.heatExposure.toFixed(1)}°C` : 'Not available'}</span>
+                  <label>General practices</label>
+                  <span>Current {baseline ? `${baseline.generalPracticeAccess.toFixed(2)}/10k` : '—'}</span>
                 </div>
                 <div className="slider-control">
                   <input
                     type="range"
                     min="0"
                     max="20"
-                    step="0.1"
-                    value={scenarioValues.heat}
-                    onChange={(event) => setScenarioValues((current) => ({ ...current, heat: Number(event.target.value) }))}
-                    aria-label="Urban heat island effect"
+                    step="0.01"
+                    value={scenarioValues.generalPracticeAccess}
+                    onChange={(event) => setScenarioValues((current) => ({ ...current, generalPracticeAccess: Number(event.target.value) }))}
+                    aria-label="General practices per 10,000 residents"
                   />
                   <div className="slider-meta">
                     <span>Proposed</span>
-                    <strong>{scenarioValues.heat.toFixed(1)}°C</strong>
+                    <strong>{scenarioValues.generalPracticeAccess.toFixed(2)}/10k</strong>
+                  </div>
+                </div>
+              </div>
+
+              <div className="slider-row">
+                <div className="slider-labels">
+                  <label>Pharmacies</label>
+                  <span>Current {baseline ? `${baseline.pharmacyAccess.toFixed(2)}/10k` : '—'}</span>
+                </div>
+                <div className="slider-control">
+                  <input
+                    type="range"
+                    min="0"
+                    max="20"
+                    step="0.01"
+                    value={scenarioValues.pharmacyAccess}
+                    onChange={(event) => setScenarioValues((current) => ({ ...current, pharmacyAccess: Number(event.target.value) }))}
+                    aria-label="Pharmacies per 10,000 residents"
+                  />
+                  <div className="slider-meta">
+                    <span>Proposed</span>
+                    <strong>{scenarioValues.pharmacyAccess.toFixed(2)}/10k</strong>
+                  </div>
+                </div>
+              </div>
+
+              <div className="slider-row">
+                <div className="slider-labels">
+                  <label>Approved early-years places</label>
+                  <span>Current {baseline ? `${baseline.earlyYearsPlaces.toFixed(1)}/1k` : '—'}</span>
+                </div>
+                <div className="slider-control">
+                  <input
+                    type="range"
+                    min="0"
+                    max="300"
+                    step="0.1"
+                    value={scenarioValues.earlyYearsPlaces}
+                    onChange={(event) => setScenarioValues((current) => ({ ...current, earlyYearsPlaces: Number(event.target.value) }))}
+                    aria-label="Approved early-years places per 1,000 children"
+                  />
+                  <div className="slider-meta">
+                    <span>Proposed</span>
+                    <strong>{scenarioValues.earlyYearsPlaces.toFixed(1)}/1k</strong>
+                  </div>
+                </div>
+              </div>
+
+              <div className="slider-row">
+                <div className="slider-labels">
+                  <label>Hospitals</label>
+                  <span>Current {baseline ? `${baseline.hospitalAccess.toFixed(2)}/10k` : '—'}</span>
+                </div>
+                <div className="slider-control">
+                  <input
+                    type="range"
+                    min="0"
+                    max="20"
+                    step="0.01"
+                    value={scenarioValues.hospitalAccess}
+                    onChange={(event) => setScenarioValues((current) => ({ ...current, hospitalAccess: Number(event.target.value) }))}
+                    aria-label="Hospitals per 10,000 residents"
+                  />
+                  <div className="slider-meta">
+                    <span>Proposed</span>
+                    <strong>{scenarioValues.hospitalAccess.toFixed(2)}/10k</strong>
                   </div>
                 </div>
               </div>
             </div>
 
             <p className="scenario-note">
-              Assumes the current neighbourhood baseline and applies a simple evidence-based sensitivity model to compare planning options.
+              Assumes the current neighbourhood baseline and applies a simple evidence-based sensitivity model to compare health-service options.
             </p>
 
             <div className="method-panel">
               <h3>How the estimate is built</h3>
               <ul>
-                <li>Tree canopy and public open space improvements lower vulnerability in the scenario model.</li>
-                <li>Lower heat exposure reduces the expected pressure on child-development outcomes.</li>
-                <li>Higher local service access amplifies expected gains, while stronger projected demand dampens gains.</li>
+                <li>More general practices, pharmacies, and hospitals lower vulnerability in the scenario model.</li>
+                <li>More approved early-years places support the modelled physical-health outlook.</li>
+                <li>Higher care access amplifies expected gains, while stronger projected demand dampens gains.</li>
                 <li>Higher traffic and industrial context pressure further dampens estimated gains in the scenario output.</li>
                 <li>The output is a planning comparison, not a forecast of a future year-by-year trend.</li>
               </ul>
@@ -781,26 +860,26 @@ export default function SimulationPage({
             <div className="result-cards">
               <article className="result-card">
                 <div className="result-card-header">
-                  <span>Heat exposure</span>
+                  <span>General practices</span>
                 </div>
                 <div className="result-card-body">
-                  <strong>{baseline ? `${baseline.heatExposure.toFixed(1)}°C` : 'Not available'}</strong>
+                  <strong>{baseline ? `${baseline.generalPracticeAccess.toFixed(2)}/10k` : '—'}</strong>
                   <span className="result-arrow">→</span>
-                  <strong>{scenarioResult ? `${scenarioValues.heat.toFixed(1)}°C` : 'Not available'}</strong>
+                  <strong>{scenarioResult ? `${scenarioValues.generalPracticeAccess.toFixed(2)}/10k` : '—'}</strong>
                 </div>
-                <div className="result-status success">{scenarioResult ? scenarioResult.heatDirection : 'Select area'}</div>
+                <div className="result-status success">{scenarioResult ? scenarioResult.careAccessDirection : 'Select area'}</div>
               </article>
 
               <article className="result-card">
                 <div className="result-card-header">
-                  <span>Tree canopy</span>
+                  <span>Pharmacies</span>
                 </div>
                 <div className="result-card-body">
-                  <strong>{baseline ? `${baseline.treeCanopy.toFixed(1)}%` : 'Not available'}</strong>
+                  <strong>{baseline ? `${baseline.pharmacyAccess.toFixed(2)}/10k` : '—'}</strong>
                   <span className="result-arrow">→</span>
-                  <strong>{scenarioValues.treeCanopy.toFixed(1)}%</strong>
+                  <strong>{scenarioValues.pharmacyAccess.toFixed(2)}/10k</strong>
                 </div>
-                <div className="result-status success">{baseline ? `+${(scenarioValues.treeCanopy - baseline.treeCanopy).toFixed(1)} pp` : 'Not available'}</div>
+                <div className="result-status success">{baseline ? `+${(scenarioValues.pharmacyAccess - baseline.pharmacyAccess).toFixed(2)}/10k` : '—'}</div>
               </article>
 
               <article className="result-card">
@@ -808,23 +887,35 @@ export default function SimulationPage({
                   <span>Modelled vulnerability</span>
                 </div>
                 <div className="result-card-body">
-                  <strong>{baseline ? `${baseline.vulnerability.toFixed(1)}%` : 'Not available'}</strong>
+                  <strong>{baseline ? `${baseline.vulnerability.toFixed(1)}%` : '—'}</strong>
                   <span className="result-arrow">→</span>
-                  <strong>{scenarioResult ? `${scenarioResult.vulnerability.toFixed(1)}%` : 'Not available'}</strong>
+                  <strong>{scenarioResult ? `${scenarioResult.vulnerability.toFixed(1)}%` : '—'}</strong>
                 </div>
                 <div className="result-status success">{scenarioResult ? scenarioResult.vulnerabilityDirection : 'Pending'}</div>
               </article>
 
               <article className="result-card">
                 <div className="result-card-header">
-                  <span>Child-development outlook</span>
+                  <span>Physical-health outlook</span>
                 </div>
                 <div className="result-card-body">
-                  <strong>{baseline ? `${baseline.childDevelopment.toFixed(1)}` : 'Not available'}</strong>
+                  <strong>{baseline ? `${baseline.physicalHealth.toFixed(1)}%` : '—'}</strong>
                   <span className="result-arrow">→</span>
-                  <strong>{scenarioResult ? `${scenarioResult.developmentScore.toFixed(1)}` : 'Not available'}</strong>
+                  <strong>{scenarioResult ? `${scenarioResult.physicalHealth.toFixed(1)}%` : '—'}</strong>
                 </div>
-                <div className="result-status success">{scenarioResult ? scenarioResult.developmentDirection : 'Pending'}</div>
+                <div className="result-status success">{scenarioResult ? scenarioResult.physicalHealthDirection : 'Pending'}</div>
+              </article>
+
+              <article className="result-card">
+                <div className="result-card-header">
+                  <span>Social-competence outlook</span>
+                </div>
+                <div className="result-card-body">
+                  <strong>{baseline ? `${baseline.socialCompetence.toFixed(1)}%` : '—'}</strong>
+                  <span className="result-arrow">→</span>
+                  <strong>{scenarioResult ? `${scenarioResult.socialCompetence.toFixed(1)}%` : '—'}</strong>
+                </div>
+                <div className="result-status success">{scenarioResult ? scenarioResult.socialCompetenceDirection : 'Pending'}</div>
               </article>
             </div>
 
@@ -888,8 +979,8 @@ export default function SimulationPage({
                 <strong>{scenarioResult ? scenarioResult.projectedChange : `${baseline?.vulnerability ?? 25}% → ${baseline?.vulnerability ?? 25}%`}</strong>
               </div>
               <div className="projected-change secondary">
-                <span>Development outlook:</span>
-                <strong>{scenarioResult ? scenarioResult.projectedDevelopmentChange : `${baseline?.childDevelopment ?? 68} → ${baseline?.childDevelopment ?? 68}`}</strong>
+                <span>Physical-health outlook:</span>
+                <strong>{scenarioResult ? scenarioResult.projectedPhysicalHealthChange : `${baseline?.physicalHealth ?? 68} → ${baseline?.physicalHealth ?? 68}`}</strong>
               </div>
             </div>
 
