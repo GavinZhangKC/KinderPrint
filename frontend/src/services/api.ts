@@ -193,6 +193,42 @@ export interface HealthFacility {
   source_date: string
 }
 
+export interface ChildHealthSa2Indicator {
+  sa2_code_2021: string
+  sa2_name_2021: string
+  reference_year: string
+  age_group: string
+  indicator: string
+  count: number | null
+  population_denominator: number | null
+  percent: number | null
+  geography: string
+  quality_flag: string
+  source_id: string
+}
+
+export interface ChildHealthPhaIndicator {
+  pha_code_2021: string
+  pha_name_2021: string
+  indicator_id: string
+  reference_period: string
+  methodology_class: string
+  count_or_numerator: number | null
+  denominator: number | null
+  rate_or_percent: number | null
+  lower_95_ci: number | null
+  upper_95_ci: number | null
+  publication_status: string
+  source_id: string
+  geography_warning: string
+}
+
+export interface ChildHealthContext {
+  locality: { sa2_code: string; sa2_name: string; pha_code: string | null; pha_name: string | null } | null
+  sa2_indicators: ChildHealthSa2Indicator[]
+  pha_context: ChildHealthPhaIndicator[]
+}
+
 export interface ContextMetric {
   value: number | null
   status: ApiStatus | string
@@ -496,6 +532,11 @@ export const api = {
     request<NeighbourhoodContext | null>(
       `/api/neighbourhoods/${encodeURIComponent(id)}/traffic-context`,
       signal,
+    ),
+
+  getChildHealthContext: (sa2Code: string, signal?: AbortSignal) =>
+    request<ChildHealthContext>(
+      `/api/digital-health/child-health-context?sa2_code=${encodeURIComponent(sa2Code)}`, signal,
     ),
 
   getIndustrialContext: (
