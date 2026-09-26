@@ -9,7 +9,11 @@ import './DigitalHealthHub.health.css'
 type HealthView = 'overview' | 'conditions' | 'environment' | 'care' | 'demand' | 'review'
 type ConditionId = 'brain' | 'lungs' | 'metabolic' | 'immune' | 'perinatal'
 
-interface DigitalHealthHubProps { onHome: () => void }
+interface DigitalHealthHubProps {
+  onHome: () => void
+  onBack?: () => void
+  initialLocalities?: NeighbourhoodSearchResult[]
+}
 
 const navigation = [
   { id: 'overview', label: 'Overview', symbol: '⌂', enabled: true },
@@ -239,7 +243,7 @@ const indicatorNames: Record<string, string> = {
   maternal_child_health_3_5_year_visit: '3.5-year MCH visit',
 }
 
-function useDigitalHealthData(locality: NeighbourhoodSearchResult): DigitalHealthData {
+function useDigitalHealthData(locality: NeighbourhoodSearchResult, comparisonId?: string): DigitalHealthData {
   const [data, setData] = useState<DigitalHealthData>({ area: [], lga: [], facilities: [], projections: [], profile: null, environmentalDifference: null, childHealth: null, loading: true, error: null })
   useEffect(() => {
     const controller = new AbortController()
@@ -248,7 +252,7 @@ function useDigitalHealthData(locality: NeighbourhoodSearchResult): DigitalHealt
       api.getHealthFacilities(locality.id, controller.signal),
       api.getPopulationProjections(locality.id, controller.signal),
       api.getProfile(locality.id, controller.signal),
-      api.getEnvironmentalDifference(locality.id, '206011496'),
+      api.getEnvironmentalDifference(locality.id, comparisonId ?? locality.id),
       api.getChildHealthContext(locality.id, controller.signal),
     ]).then(([facilities, projections, profile, environmentalDifference, childHealth]) => setData({
       area: [],
@@ -265,7 +269,7 @@ function useDigitalHealthData(locality: NeighbourhoodSearchResult): DigitalHealt
       setData(current => ({ ...current, loading: false, error: 'Validated health data could not be loaded.' }))
     })
     return () => controller.abort()
-  }, [locality.id])
+  }, [comparisonId, locality.id])
   return data
 }
 
@@ -340,10 +344,57 @@ function FutureDemandPage({ data, locality }: { data: DigitalHealthData; localit
   </div>
 }
 
-export default function DigitalHealthHub({ onHome }: DigitalHealthHubProps) {
-  const [view, setView] = useState<HealthView>('overview')
-  const [locality, setLocality] = useState<NeighbourhoodSearchResult>({ id: '206011106', name: 'Brunswick East', geographic_unit: 'SA2 (ASGS Edition 3, 2021)' })
-  const data = useDigitalHealthData(locality)
+type AudienceView = 'parent' | 'practitioner'
+
+function ComparisonHealthPage({ primary, secondary, primaryData, secondaryData, onBack }: {
+  primary: NeighbourhoodSearchResult
+  secondary: NeighbourhoodSearchResult
+  primaryData: DigitalHealthData
+  secondaryData: DigitalHealthData
+  onBack?: () => void
+}) {
+  const [audience, setAudience] = useState<AudienceView>('parent')
+  const [conditionId, setConditionId] = useState<ConditionId>('brain')
+  const ids = conditionIndicatorIds[conditionId].sa2
+  const rows = ids.map(id => ({
+    id,
+    label: healthIndicatorLabels[id] ?? id,
+    a: primaryData.childHealth?.sa2_indicators.find(item => item.indicator === id),
+    b: secondaryData.childHealth?.sa2_indicators.find(item => item.indicator === id),
+  }))
+  const regionalRows = conditionIndicatorIds[conditionId].pha.map(id => ({
+    id,
+    label: healthIndicatorLabels[id] ?? id,
+    a: primaryData.childHealth?.pha_context.find(item => item.indicator_id === id),
+    b: secondaryData.childHealth?.pha_context.find(item => item.indicator_id === id),
+  }))
+  const guidance = conditionGuidance[conditionId]
+  const pct = (value: number | null | undefined) => value === null || value === undefined ? 'Not published' : `${value.toFixed(2)}%`
+  const developmentMetric = (data: DigitalHealthData, id: string) => data.profile?.domains.find(domain => domain.id === 'child-development')?.indicators.find(item => item.id === id)?.value
+  return <div className="dh-page dh-health-compare-page">
+    <header className="dh-compare-topbar"><button type="button" onClick={onBack}>← Back to map</button><div><span>Comparing</span><strong>{primary.name}</strong><i>and</i><strong>{secondary.name}</strong></div><div className="dh-audience-toggle" role="tablist" aria-label="Audience view"><button type="button" role="tab" aria-selected={audience === 'parent'} onClick={() => setAudience('parent')}>Parent view</button><button type="button" role="tab" aria-selected={audience === 'practitioner'} onClick={() => setAudience('practitioner')}>Health practitioner view</button></div></header>
+    <section className="dh-compare-intro"><div><span className="dh-eyebrow">Child health comparison</span><h1>{audience === 'parent' ? 'Understand the health context around your child' : 'Population evidence for care planning'}</h1><p>{audience === 'parent' ? 'Compare reported local health patterns and find practical questions to discuss with a health professional.' : 'Review exact SA2 observations, denominators, regional context and service-presence limitations.'}</p></div><aside><b>Important</b><span>These are area-level statistics. They cannot assess, diagnose or predict an individual child’s health.</span></aside></section>
+    <nav className="dh-compare-condition-tabs" aria-label="Condition category">{conditions.map(item => <button key={item.id} type="button" aria-pressed={conditionId === item.id} onClick={() => setConditionId(item.id)}><img src={item.image} alt="" /><span>{item.label}</span></button>)}</nav>
+    <section className="dh-compare-summary">
+      <article><small>{primary.name}</small><strong>{pct(developmentMetric(primaryData, 'aedc_vulnerable_one_or_more') as number | null)}</strong><span>developmentally vulnerable on one or more AEDC domains</span></article>
+      <article><small>{secondary.name}</small><strong>{pct(developmentMetric(secondaryData, 'aedc_vulnerable_one_or_more') as number | null)}</strong><span>developmentally vulnerable on one or more AEDC domains</span></article>
+      <article><small>Care directory</small><strong>{primaryData.facilities.length} / {secondaryData.facilities.length}</strong><span>active Healthdirect listings inside each SA2</span></article>
+    </section>
+    <section className="dh-compare-content">
+      <article className="dh-compare-evidence"><header><div><h2>{conditions.find(item => item.id === conditionId)?.label}</h2><p>Exact locality observations and separately labelled regional context</p></div><span>Validated evidence</span></header>{rows.length > 0 ? <><h3 className="dh-geography-title">Exact SA2 · ABS Census 2021, ages 0–14</h3><div className="dh-health-comparison-table"><div className="head"><span>Reported condition</span><span>{primary.name}</span><span>{secondary.name}</span></div>{rows.map(row => <div key={row.id}><b>{row.label}</b><span><strong>{pct(row.a?.percent)}</strong>{audience === 'practitioner' && <small>{row.a?.count ?? 'N/A'} of {row.a?.population_denominator ?? 'N/A'}</small>}</span><span><strong>{pct(row.b?.percent)}</strong>{audience === 'practitioner' && <small>{row.b?.count ?? 'N/A'} of {row.b?.population_denominator ?? 'N/A'}</small>}</span></div>)}</div></> : <p className="dh-health-empty">No exact SA2 condition measure is published for this category.</p>}<h3 className="dh-geography-title">Containing Population Health Area · not an SA2 estimate</h3><div className="dh-health-comparison-table"><div className="head"><span>Regional indicator</span><span>{primaryData.childHealth?.locality?.pha_name ?? primary.name}</span><span>{secondaryData.childHealth?.locality?.pha_name ?? secondary.name}</span></div>{regionalRows.map(row => <div key={row.id}><b>{row.label}</b><span><strong>{row.a?.rate_or_percent == null ? 'Not published' : `${row.a.rate_or_percent.toFixed(2)}${row.id === 'infant_mortality' ? ' per 1,000' : '%'}`}</strong><small>{row.a?.reference_period ?? ''}{audience === 'practitioner' && row.a?.methodology_class ? ` · ${row.a.methodology_class.replace(/_/g, ' ')}` : ''}</small></span><span><strong>{row.b?.rate_or_percent == null ? 'Not published' : `${row.b.rate_or_percent.toFixed(2)}${row.id === 'infant_mortality' ? ' per 1,000' : '%'}`}</strong><small>{row.b?.reference_period ?? ''}{audience === 'practitioner' && row.b?.methodology_class ? ` · ${row.b.methodology_class.replace(/_/g, ' ')}` : ''}</small></span></div>)}</div><footer>Differences are descriptive only. No significance test or causal claim is made. PHA values are not assigned to component SA2s.</footer></article>
+      {audience === 'parent' ? <aside className="dh-audience-panel"><h2>Useful next steps</h2><ol>{guidance.prevention.map((item, index) => <li key={item}><b>{index + 1}</b><span>{item}</span></li>)}</ol><div><strong>When comparing areas</strong><p>Use these results to identify questions about services and support. Do not choose care or a home from one percentage alone.</p></div></aside> : <aside className="dh-audience-panel"><h2>Clinical interpretation boundary</h2><dl><div><dt>Exact locality layer</dt><dd>ABS Census 2021, SA2, ages 0–14</dd></div><div><dt>{primary.name} regional layer</dt><dd>{primaryData.childHealth?.locality?.pha_name ?? 'Not available'}</dd></div><div><dt>{secondary.name} regional layer</dt><dd>{secondaryData.childHealth?.locality?.pha_name ?? 'Not available'}</dd></div><div><dt>Service layer</dt><dd>Listed presence, not capacity or referral availability</dd></div></dl><div><strong>Use case</strong><p>Supports population planning, service conversations and hypothesis generation. Not case finding or clinical triage.</p></div></aside>}
+    </section>
+  </div>
+}
+
+export default function DigitalHealthHub({ onHome, onBack, initialLocalities = [] }: DigitalHealthHubProps) {
+  const comparisonMode = initialLocalities.length >= 2
+  const [view, setView] = useState<HealthView>(comparisonMode ? 'conditions' : 'overview')
+  const [locality, setLocality] = useState<NeighbourhoodSearchResult>(initialLocalities[0] ?? { id: '206011106', name: 'Brunswick East', geographic_unit: 'SA2 (ASGS Edition 3, 2021)' })
+  const secondary = initialLocalities[1] ?? locality
+  const data = useDigitalHealthData(locality, comparisonMode ? secondary.id : undefined)
+  const secondaryData = useDigitalHealthData(secondary)
+  if (comparisonMode && view === 'conditions') return <div className="digital-health-hub"><SideNavigation current={view} onChange={setView} onHome={onHome} /><main><ComparisonHealthPage primary={locality} secondary={secondary} primaryData={data} secondaryData={secondaryData} onBack={onBack} /></main></div>
   const page = view === 'overview'
     ? <OverviewPage onConditions={() => setView('conditions')} onDemand={() => setView('demand')} data={data} locality={locality} />
     : view === 'conditions' ? <ConditionsPage data={data} locality={locality} />
