@@ -42,6 +42,7 @@ from loaders.early_childhood import load_early_childhood_context
 from loaders.geocoding_quality import load_geocoding_quality
 from loaders.population import load_population_projections
 from loaders.digital_health import (
+    child_health_context,
     child_health_conditions,
     health_facilities,
     vcams_area_context,
@@ -275,6 +276,23 @@ def digital_health_child_conditions(
         "reference_year": year,
         "result_count": len(rows),
         "interpretation": "Published area-level long-term-condition context; not a diagnosis.",
+    }, limitations=limitations, notices=[AREA_LEVEL_NOTICE])
+
+
+@app.get("/api/digital-health/child-health-context")
+def digital_health_child_health_context(
+    sa2_code: str = Query(..., min_length=9, max_length=9, pattern=r"^\d{9}$"),
+) -> dict[str, Any]:
+    """Return exact SA2 conditions and separately labelled containing-PHA context."""
+    data, limitations = child_health_context(sa2_code)
+    empty = {"locality": None, "sa2_indicators": [], "pha_context": []}
+    if data is None:
+        return envelope("unavailable", empty, limitations=limitations, notices=[AREA_LEVEL_NOTICE])
+    has_data = bool(data["sa2_indicators"] or data["pha_context"])
+    return envelope("available" if has_data else "missing", data, metadata={
+        "source": "ABS Census 2021 G19 and PHIDU Child Health Atlas 2026",
+        "sa2_interpretation": "Observed Census responses for children aged 0–14 in the selected SA2.",
+        "pha_interpretation": "Published context for the containing Population Health Area; not an SA2 estimate.",
     }, limitations=limitations, notices=[AREA_LEVEL_NOTICE])
 
 

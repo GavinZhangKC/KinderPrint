@@ -9,6 +9,8 @@ sys.path.insert(0, str(BACKEND_DIR))
 
 from core.data_loader import (  # noqa: E402
     ABS_CHILD_HEALTH_DATA_PATH_ENV,
+    PHIDU_CHILD_HEALTH_DATA_PATH_ENV,
+    PHIDU_PHA_SA2_BRIDGE_DATA_PATH_ENV,
     ACECQA_CONTEXT_DATA_PATH_ENV,
     ACECQA_GEOCODING_DATA_PATH_ENV,
     BOUNDARY_DATA_PATH_ENV,
@@ -53,6 +55,8 @@ def clear_dataset_environment(monkeypatch: pytest.MonkeyPatch) -> None:
         loader.cache_clear()
     for variable in (
         ABS_CHILD_HEALTH_DATA_PATH_ENV,
+        PHIDU_CHILD_HEALTH_DATA_PATH_ENV,
+        PHIDU_PHA_SA2_BRIDGE_DATA_PATH_ENV,
         ACECQA_CONTEXT_DATA_PATH_ENV,
         ACECQA_GEOCODING_DATA_PATH_ENV,
         BOUNDARY_DATA_PATH_ENV,

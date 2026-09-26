@@ -27,6 +27,8 @@ export KINDERPRINT_VCAMS_AREA_DATA_PATH="${PROJECT_ROOT}/datascience/data/proces
 export KINDERPRINT_VCAMS_LGA_DATA_PATH="${PROJECT_ROOT}/datascience/data/processed/vcams_child_health_lga.csv"
 export KINDERPRINT_HEALTH_FACILITY_DATA_PATH="${PROJECT_ROOT}/datascience/data/processed/healthdirect_facilities.csv"
 export KINDERPRINT_ABS_CHILD_HEALTH_DATA_PATH="${PROJECT_ROOT}/datascience/data/processed/abs_child_health_sa2.csv"
+export KINDERPRINT_PHIDU_CHILD_HEALTH_DATA_PATH="${PROJECT_ROOT}/datascience/data/processed/phidu_child_health_pha.csv"
+export KINDERPRINT_PHIDU_PHA_SA2_BRIDGE_DATA_PATH="${PROJECT_ROOT}/datascience/data/processed/phidu_pha_sa2_bridge.csv"
 
 cd "${SCRIPT_DIR}"
 exec uvicorn main:app --reload --host 0.0.0.0 --port 8000

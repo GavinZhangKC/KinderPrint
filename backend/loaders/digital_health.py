@@ -11,10 +11,14 @@ from typing import Any
 from core.data_loader import (
     ABS_CHILD_HEALTH_DATA_PATH_ENV,
     HEALTH_FACILITY_DATA_PATH_ENV,
+    PHIDU_CHILD_HEALTH_DATA_PATH_ENV,
+    PHIDU_PHA_SA2_BRIDGE_DATA_PATH_ENV,
     VCAMS_AREA_DATA_PATH_ENV,
     VCAMS_LGA_DATA_PATH_ENV,
     abs_child_health_data_path,
     health_facility_data_path,
+    phidu_child_health_data_path,
+    phidu_pha_sa2_bridge_data_path,
     vcams_area_data_path,
     vcams_lga_data_path,
 )
@@ -41,17 +45,28 @@ ABS_CHILD_HEALTH_FIELDS = {
     "reference_year", "age_group", "indicator", "count", "population_denominator",
     "percent", "geography", "quality_flag", "source_id",
 }
+PHIDU_CHILD_HEALTH_FIELDS = {
+    "pha_code_2021", "pha_name_2021", "indicator_id", "reference_period",
+    "methodology_class", "count_or_numerator", "denominator", "rate_or_percent",
+    "lower_95_ci", "upper_95_ci", "standardised_ratio", "rrmse",
+    "publication_status", "source_id", "geography_warning",
+}
+PHIDU_BRIDGE_FIELDS = {"sa2_code_2021", "sa2_name_2021", "pha_code_2021", "pha_name_2021"}
 REQUIRED_FIELDS = {
     "vcams_area_context": AREA_FIELDS,
     "vcams_lga_context": LGA_FIELDS,
     "health_facilities": FACILITY_FIELDS,
     "abs_child_health": ABS_CHILD_HEALTH_FIELDS,
+    "phidu_child_health": PHIDU_CHILD_HEALTH_FIELDS,
+    "phidu_pha_sa2_bridge": PHIDU_BRIDGE_FIELDS,
 }
 UNIQUE_FIELDS = {
     "vcams_area_context": ("reference_year", "area_name", "indicator_id"),
     "vcams_lga_context": ("reference_period", "lga_code", "indicator_id"),
     "health_facilities": ("facility_id",),
     "abs_child_health": ("sa2_code_2021", "reference_year", "indicator"),
+    "phidu_child_health": ("pha_code_2021", "reference_period", "indicator_id"),
+    "phidu_pha_sa2_bridge": ("sa2_code_2021",),
 }
 
 
@@ -152,15 +167,34 @@ def _abs_child_health_row(row: dict[str, str]) -> dict[str, Any]:
     }
 
 
+def _phidu_child_health_row(row: dict[str, str]) -> dict[str, Any]:
+    _required_text(row, "pha_code_2021", "pha_name_2021", "indicator_id",
+                   "reference_period", "methodology_class", "publication_status",
+                   "source_id", "geography_warning")
+    return {**row, **{field: _number(row[field]) for field in (
+        "count_or_numerator", "denominator", "rate_or_percent", "lower_95_ci",
+        "upper_95_ci", "standardised_ratio", "rrmse",
+    )}}
+
+
+def _phidu_bridge_row(row: dict[str, str]) -> dict[str, Any]:
+    _required_text(row, "sa2_code_2021", "sa2_name_2021", "pha_code_2021", "pha_name_2021")
+    if not row["sa2_code_2021"].isdigit() or len(row["sa2_code_2021"]) != 9:
+        raise ValueError
+    return dict(row)
+
+
 ROW_PARSERS = {
     "vcams_area_context": _area_row,
     "vcams_lga_context": _lga_row,
     "health_facilities": _facility_row,
     "abs_child_health": _abs_child_health_row,
+    "phidu_child_health": _phidu_child_health_row,
+    "phidu_pha_sa2_bridge": _phidu_bridge_row,
 }
 
 
-@lru_cache(maxsize=4)
+@lru_cache(maxsize=8)
 def _read(path: Path, resource: str) -> tuple[dict[str, Any], ...]:
     """Read, validate and parse a static digital-health dataset once per process."""
     with path.open(encoding="utf-8-sig", newline="") as source:
@@ -224,6 +258,16 @@ def load_abs_child_health() -> tuple[tuple[dict[str, Any], ...] | None, list[dic
     )
 
 
+def load_phidu_child_health() -> tuple[tuple[dict[str, Any], ...] | None, list[dict[str, Any]]]:
+    return _source(phidu_child_health_data_path(), PHIDU_CHILD_HEALTH_DATA_PATH_ENV,
+                   "phidu_child_health")
+
+
+def load_phidu_bridge() -> tuple[tuple[dict[str, Any], ...] | None, list[dict[str, Any]]]:
+    return _source(phidu_pha_sa2_bridge_data_path(), PHIDU_PHA_SA2_BRIDGE_DATA_PATH_ENV,
+                   "phidu_pha_sa2_bridge")
+
+
 def vcams_area_context(
     area_name: str,
     year: int | None,
@@ -281,3 +325,22 @@ def child_health_conditions(
         if row["sa2_code_2021"] == sa2_code
         and (year is None or row["reference_year"] == year)
     ], limitations
+
+
+def child_health_context(sa2_code: str) -> tuple[dict[str, Any] | None, list[dict[str, Any]]]:
+    """Return exact SA2 observations and separate containing-PHA context."""
+    exact, limitations = child_health_conditions(sa2_code, None)
+    phidu, phidu_limits = load_phidu_child_health()
+    bridge_rows, bridge_limits = load_phidu_bridge()
+    limitations = [*limitations, *phidu_limits, *bridge_limits]
+    if exact is None or phidu is None or bridge_rows is None:
+        return None, limitations
+    bridge = next((row for row in bridge_rows if row["sa2_code_2021"] == sa2_code), None)
+    regional = [dict(row) for row in phidu if bridge and row["pha_code_2021"] == bridge["pha_code_2021"]]
+    locality = None if not exact and not bridge else {
+        "sa2_code": sa2_code,
+        "sa2_name": exact[0]["sa2_name_2021"] if exact else bridge["sa2_name_2021"],
+        "pha_code": bridge["pha_code_2021"] if bridge else None,
+        "pha_name": bridge["pha_name_2021"] if bridge else None,
+    }
+    return {"locality": locality, "sa2_indicators": exact, "pha_context": regional}, limitations

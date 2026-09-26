@@ -6,9 +6,10 @@ record, diagnosis, treatment plan or prediction.
 
 ## Local health indicators
 
-The locality currently shown in the prototype is Brunswick East SA2 (`206011106`).
-Clinical context comes from its containing Population Health Area, Brunswick /
-Brunswick East (`20001`), using the validated PHIDU child-health extract:
+The user selects a supported Greater Melbourne SA2. Exact condition responses come
+from ABS Census 2021 table G19 for children aged 0–14. The selected SA2 is then
+resolved through the validated `phidu_pha_sa2_bridge.csv`; broader clinical context
+comes from that SA2's containing Population Health Area using the PHIDU extract:
 
 - childhood asthma, mental-health conditions and long-term conditions: 2021
   self-reported prevalence;
@@ -19,12 +20,18 @@ Brunswick East (`20001`), using the validated PHIDU child-health extract:
 - infant mortality: pooled 2019–2023 observations;
 - respiratory emergency presentations: 2022/23 counts by published age group.
 
-PHA results remain labelled as regional context. They are never copied to the SA2
-or described as a Brunswick East SA2 estimate. AEDC child-development values are
-the only health/development measures on this page reported at SA2.
+PHA results remain labelled as regional context. They are never copied to the SA2.
+The interface keeps exact SA2 values and PHA context in separate sections and
+refreshes both after every locality change.
+
+The condition groups are decision-oriented rather than diagnostic: users can see
+what is actually reported locally, review general prevention/routine information,
+and inspect active Healthdirect listings inside the selected SA2. Zero Census
+counts are displayed as reported values, not interpreted as absence of disease.
 
 Source files:
 
+- `data/processed/abs_child_health_sa2.csv`
 - `data/processed/phidu_child_health_pha.csv`
 - `data/processed/child_youth_health_context_pha.csv`
 - `data/processed/phidu_pha_sa2_bridge.csv`
@@ -33,10 +40,9 @@ Source files:
 
 Facility name, service type and coordinates come from the 7 March 2025 National
 HealthDirect Health Facilities extract in
-`data/processed/healthdirect_facilities.csv`. Distances are great-circle,
-straight-line distances from the Brunswick East reference point
-(`-37.769, 144.976`), rounded to two decimals. They are not road distance or travel
-time.
+`data/processed/healthdirect_facilities.csv`. The page returns active listings whose
+validated coordinates fall inside the selected SA2. It does not claim travel
+distance or travel time.
 
 The public extract does not provide current consultation prices, bulk-billing
 eligibility, appointments, capacity or verified paediatric specialist staffing.
