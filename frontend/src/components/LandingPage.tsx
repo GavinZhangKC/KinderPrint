@@ -8,7 +8,6 @@ interface LandingPageProps {
   onInsight: () => void
   onSimulation: () => void
   onMap: () => void
-  onHealth: () => void
 }
 
 interface HomeHeaderProps extends LandingPageProps {
@@ -119,7 +118,7 @@ function ExploreMenuLink({ item, onSelect }: ExploreMenuLinkProps) {
   )
 }
 
-function HomeHeader({ onHome, onInsight, onSimulation, onMap, onHealth }: HomeHeaderProps) {
+function HomeHeader({ onHome, onInsight, onSimulation, onMap }: HomeHeaderProps) {
   return (
     <header className="glass home-header" data-no-ripple>
       <button className="home-brand" type="button" onClick={onHome} aria-label="Go to Vkinder home">
@@ -130,7 +129,6 @@ function HomeHeader({ onHome, onInsight, onSimulation, onMap, onHealth }: HomeHe
         <button type="button" aria-current="page" onClick={onHome}>Home</button>
         <button type="button" onClick={onInsight}>Insight Journey</button>
         <button type="button" onClick={onSimulation}>Simulation</button>
-        <button type="button" onClick={onHealth}>Child Health</button>
       </nav>
       <button className="home-nav-cta" type="button" onClick={onMap}>Explore Map</button>
     </header>
@@ -532,7 +530,7 @@ function scrollToSection(id: string) {
   document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
 }
 
-export default function LandingPage({ onInsight, onSimulation, onMap, onHealth }: LandingPageProps) {
+export default function LandingPage({ onInsight, onSimulation, onMap }: LandingPageProps) {
   const openExploreItem = (id: ExploreItemId) => {
     if (id === 'insight') onInsight()
     else if (id === 'map') onMap()
@@ -546,7 +544,6 @@ export default function LandingPage({ onInsight, onSimulation, onMap, onHealth }
         onInsight={onInsight}
         onSimulation={onSimulation}
         onMap={onMap}
-        onHealth={onHealth}
       />
 
       <main className="home-content">

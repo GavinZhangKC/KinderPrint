@@ -5,12 +5,9 @@ import './components/SimulationPage.css'
 
 import BrandHeader from './components/BrandHeader'
 import ComparePanel from './components/ComparePanel'
-import DetailedComparison from './components/DetailedComparison'
-import DetailedComparisonWeather, { getDevelopmentWeatherState } from './components/DetailedComparisonWeather'
 import DetailedDataDrawer from './components/DetailedDataDrawer'
 import DigitalHealthHub from './components/DigitalHealthHub'
 import InsightPage from './components/InsightPage'
-import InteractiveAtmosphere from './components/InteractiveAtmosphere'
 import Legend from './components/Legend'
 import LandingPage from './components/LandingPage'
 import LocalitySuitabilityPanel from './components/LocalitySuitabilityPanel'
@@ -26,11 +23,7 @@ import { api } from './services/api'
 import { toNeighbourhood } from './services/profileAdapter'
 
 import type {
-  ApiEnvelope,
-  EnvironmentalDifference,
   MultiNeighbourhoodComparison,
-  OutcomeComparison,
-  PatternInsight,
 } from './services/api'
 
 import type {
@@ -46,7 +39,6 @@ type View =
 
 type AppPage =
   | 'landing'
-  | 'health'
   | 'insight'
   | 'map'
   | 'simulation'
@@ -67,17 +59,6 @@ const [view, setView] =
     useState<MultiNeighbourhoodComparison | null>(null)
   const [compareLoading, setCompareLoading] = useState(false)
   const [compareError, setCompareError] = useState<string | null>(null)
-  const [comparisonLimitations, setComparisonLimitations] =
-    useState<string[]>([])
-  const [outcomeComparison, setOutcomeComparison] =
-    useState<ApiEnvelope<OutcomeComparison> | null>(null)
-  const [environmentalDifference, setEnvironmentalDifference] =
-    useState<ApiEnvelope<EnvironmentalDifference> | null>(null)
-  const [outcomeComparisonError, setOutcomeComparisonError] = useState<string | null>(null)
-  const [environmentalDifferenceError, setEnvironmentalDifferenceError] = useState<string | null>(null)
-  const [patternInsight, setPatternInsight] =
-    useState<ApiEnvelope<PatternInsight> | null>(null)
-  const [patternInsightError, setPatternInsightError] = useState<string | null>(null)
   const [isMapSelectionMode, setIsMapSelectionMode] = useState(false)
   const compareRequestNumberRef = useRef(0)
   const profileRequestNumberRef = useRef(0)
@@ -248,13 +229,6 @@ function resetComparisonState() {
     setComparisonResult(null)
     setCompareError(null)
     setCompareLoading(false)
-    setComparisonLimitations([])
-    setOutcomeComparison(null)
-    setEnvironmentalDifference(null)
-    setOutcomeComparisonError(null)
-    setEnvironmentalDifferenceError(null)
-    setPatternInsight(null)
-    setPatternInsightError(null)
   }
 function handleCloseCompare(targetView: 'profile' | 'map' = 'profile') {
     profileRequestNumberRef.current += 1
@@ -294,10 +268,6 @@ function openSimulationPage() {
 function openInsightPage() {
     resetExplore()
     setAppPage('insight')
-  }
-function openHealthPage() {
-    resetExplore()
-    setAppPage('health')
   }
 function choosePrimary(
     neighbourhood: Neighbourhood,
@@ -433,28 +403,9 @@ function startComparison() {
       setCompareLoading(true)
       setCompareError(null)
       setComparisonResult(null)
-      setComparisonLimitations([])
-      setOutcomeComparison(null)
-      setEnvironmentalDifference(null)
-      setOutcomeComparisonError(null)
-      setEnvironmentalDifferenceError(null)
-      setPatternInsight(null)
-      setPatternInsightError(null)
 
       const selectedIds = [selected.id, ...comparisons.map((item) => item.id)]
-      const pairedLocality = comparisons.length === 1 ? comparisons[0] : null
-      const comparisonRequest = api.compare(selectedIds)
-      const advancedRequests = pairedLocality
-        ? Promise.allSettled([
-            api.getOutcomeComparison(selected.id, pairedLocality.id),
-            api.getEnvironmentalDifference(selected.id, pairedLocality.id),
-            api.getPatternInsight(selected.id, pairedLocality.id),
-          ])
-        : Promise.resolve(null)
-      const [response, advancedResults] = await Promise.all([
-        comparisonRequest,
-        advancedRequests,
-      ])
+      const response = await api.compare(selectedIds)
       if (requestNumber !== compareRequestNumberRef.current) {
         return
       }
@@ -463,25 +414,6 @@ function startComparison() {
         throw new Error(response.limitations[0]?.message ?? 'No approved comparison is available for these neighbourhoods.')
       }
       setComparisonResult(response.data)
-      setComparisonLimitations(response.limitations.map((item) => item.message))
-      if (advancedResults) {
-        const [outcomeRequest, environmentRequest, patternRequest] = advancedResults
-        if (outcomeRequest.status === 'fulfilled') {
-          setOutcomeComparison(outcomeRequest.value)
-        } else {
-          setOutcomeComparisonError('Child development comparison data is currently unavailable.')
-        }
-        if (environmentRequest.status === 'fulfilled') {
-          setEnvironmentalDifference(environmentRequest.value)
-        } else {
-          setEnvironmentalDifferenceError('Environmental comparison data is currently unavailable.')
-        }
-        if (patternRequest.status === 'fulfilled') {
-          setPatternInsight(patternRequest.value)
-        } else {
-          setPatternInsightError('Pattern insight is currently unavailable.')
-        }
-      }
       setView('comparison')
       window.scrollTo({ top: 0, behavior: 'smooth' })
     } catch (error) {
@@ -490,7 +422,6 @@ function startComparison() {
       }
       console.error('Failed to compare neighbourhoods:', error)
       setComparisonResult(null)
-      setComparisonLimitations([])
       setCompareError(error instanceof Error ? error.message : 'Could not load this comparison.')
     } finally {
       if (requestNumber === compareRequestNumberRef.current) {
@@ -506,14 +437,9 @@ if (appPage === 'landing') {
           onInsight={openInsightPage}
           onSimulation={openSimulationPage}
           onMap={openMapPage}
-          onHealth={openHealthPage}
         />
       </div>
     )
-  }
-
-  if (appPage === 'health') {
-    return <DigitalHealthHub onHome={backToLanding} />
   }
 
   if (appPage === 'simulation') {
@@ -543,37 +469,11 @@ if (
     comparisons.length > 0 &&
     comparisonResult
   ) {
-    const weatherState = getDevelopmentWeatherState(selected.priority)
-
-    return (
-      <div
-        className="app-background detailed-background detailed-comparison-scene"
-        data-state={weatherState}
-      >
-        <DetailedComparisonWeather state={weatherState} />
-        <InteractiveAtmosphere mode="compare" />
-
-        <BrandHeader
-          activePage="map"
-          onHome={backToLanding}
-          onInsight={openInsightPage}
-          onMap={resetExplore}
-          onSimulation={openSimulationPage}
-        />
-
-        <DetailedComparison
-          comparisonResult={comparisonResult}
-          limitations={comparisonLimitations}
-          outcomeComparison={outcomeComparison}
-          outcomeError={outcomeComparisonError}
-          environmentalDifference={environmentalDifference}
-          environmentalError={environmentalDifferenceError}
-          patternInsight={patternInsight}
-          patternError={patternInsightError}
-          onBack={() => handleCloseCompare('profile')}
-        />
-      </div>
-    )
+    return <DigitalHealthHub
+      onHome={backToLanding}
+      onBack={() => handleCloseCompare('profile')}
+      initialLocalities={[selected, ...comparisons].map(item => ({ id: item.id, name: item.name, geographic_unit: item.geographicUnit }))}
+    />
   }
 return (
     <div
@@ -748,8 +648,8 @@ setMapSelectedId(null)
                   return
                 }
 
-                if (comparisons.length >= 3) {
-                  setCompareError('You can compare up to four localities.')
+                if (comparisons.length >= 1) {
+                  setCompareError('The child-health dashboard compares two localities at a time.')
                   return
                 }
               }

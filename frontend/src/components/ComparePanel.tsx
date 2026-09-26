@@ -39,7 +39,7 @@ export default function ComparePanel({ source, comparisons, onSelectResult, mapS
     ? comparable
     : { sourceId: source.id, status: 'loading' as const, match: null, limitations: [] }
   const selectedIds = new Set([source.id, ...comparisons.map((item) => item.id)])
-  const maximumReached = comparisons.length >= 3
+  const maximumReached = comparisons.length >= 1
 
   useEffect(() => {
     const requestNumber = ++searchRequestNumberRef.current
@@ -120,7 +120,7 @@ export default function ComparePanel({ source, comparisons, onSelectResult, mapS
     <aside className="glass compare-panel page-enter" aria-labelledby="compare-panel-title">
       <header className="compare-panel__header">
         <h1 id="compare-panel-title">Compare Neighbourhoods</h1>
-        <p className="compare-intro">Keep {source.name} as your starting point, then select up to three more neighbourhoods.</p>
+        <p className="compare-intro">Keep {source.name} as your starting point, then select one locality for the child-health comparison.</p>
       </header>
 
       <div className="compare-panel-scroll compare-panel__body">
@@ -265,7 +265,7 @@ export default function ComparePanel({ source, comparisons, onSelectResult, mapS
         {compareError && <div className="selection-hint" role="alert">{compareError}</div>}
         {comparisons.length === 0 && <div className="selection-hint">Select a second neighbourhood to continue.</div>}
         {comparisons.length > 0 && !compareError && (
-          <div className="selection-hint">{comparisons.length + 1} of 4 localities selected.</div>
+          <div className="selection-hint">Two localities selected. Continue to the child-health comparison.</div>
         )}
       </footer>
     </aside>
