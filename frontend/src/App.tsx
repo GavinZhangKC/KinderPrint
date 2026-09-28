@@ -42,6 +42,7 @@ type AppPage =
   | 'insight'
   | 'map'
   | 'simulation'
+  | 'health'
 
 export default function App() {
 const [appPage, setAppPage] =
@@ -269,6 +270,9 @@ function openInsightPage() {
     resetExplore()
     setAppPage('insight')
   }
+function openHealthPage() {
+    setAppPage('health')
+  }
 function choosePrimary(
     neighbourhood: Neighbourhood,
   ) {
@@ -437,6 +441,7 @@ if (appPage === 'landing') {
           onInsight={openInsightPage}
           onSimulation={openSimulationPage}
           onMap={openMapPage}
+          onHealth={openHealthPage}
         />
       </div>
     )
@@ -461,6 +466,10 @@ if (appPage === 'landing') {
         onSimulation={openSimulationPage}
       />
     )
+  }
+
+  if (appPage === 'health') {
+    return <DigitalHealthHub onHome={backToLanding} onBack={openMapPage} />
   }
 
 if (

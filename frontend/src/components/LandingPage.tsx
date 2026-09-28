@@ -8,6 +8,7 @@ interface LandingPageProps {
   onInsight: () => void
   onSimulation: () => void
   onMap: () => void
+  onHealth: () => void
 }
 
 interface HomeHeaderProps extends LandingPageProps {
@@ -530,7 +531,7 @@ function scrollToSection(id: string) {
   document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
 }
 
-export default function LandingPage({ onInsight, onSimulation, onMap }: LandingPageProps) {
+export default function LandingPage({ onInsight, onSimulation, onMap, onHealth }: LandingPageProps) {
   const openExploreItem = (id: ExploreItemId) => {
     if (id === 'insight') onInsight()
     else if (id === 'map') onMap()
@@ -544,6 +545,7 @@ export default function LandingPage({ onInsight, onSimulation, onMap }: LandingP
         onInsight={onInsight}
         onSimulation={onSimulation}
         onMap={onMap}
+        onHealth={onHealth}
       />
 
       <main className="home-content">
@@ -558,6 +560,9 @@ export default function LandingPage({ onInsight, onSimulation, onMap }: LandingP
               Peel back the layers of a place, from heat and nature<br />to early-years support and observed development patterns.
             </p>
             <div className="home-hero-actions">
+              <button className="button primary home-hero-button" type="button" onClick={onHealth}>
+                Explore child health <span aria-hidden="true">↗</span>
+              </button>
               <button className="button primary home-hero-button" type="button" onClick={onMap}>
                 Explore Melbourne <span aria-hidden="true">↗</span>
               </button>
