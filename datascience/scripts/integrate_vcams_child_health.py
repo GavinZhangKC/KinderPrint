@@ -23,8 +23,6 @@ DEPARTMENT_AREAS = {
     "Southern Melbourne", "Western Melbourne", "Wimmera South West",
 }
 
-STATE_POPULATION_GROUP = "Victoria"
-
 AREA_INDICATORS = {
     "2_1a.xlsx": ("minimum_recommended_fruit", "4-12 years", "VCAMS indicator 2.1a"),
     "2_1b.xlsx": ("minimum_recommended_vegetables", "4-12 years", "VCAMS indicator 2.1b"),
@@ -76,15 +74,14 @@ def build_area(source_dir: Path) -> pd.DataFrame:
     for filename, (indicator, age_group, label) in AREA_INDICATORS.items():
         frame = pd.read_excel(source_dir / filename)
         frame["Population group"] = frame["Population group"].astype(str).str.strip()
-        frame = frame[frame["Population group"].isin(DEPARTMENT_AREAS | {STATE_POPULATION_GROUP})].copy()
+        frame = frame[frame["Population group"].isin(DEPARTMENT_AREAS)].copy()
         for record in frame.to_dict("records"):
-            is_state = record["Population group"] == STATE_POPULATION_GROUP
             value = pd.to_numeric(record["Indicator calculation"], errors="coerce")
             rse = pd.to_numeric(record["RSE"], errors="coerce")
             rows.append({
                 "reference_year": int(record["Year"]),
                 "area_name": record["Population group"],
-                "geography": "Victoria (state total)" if is_state else "Victorian Department area",
+                "geography": "Victorian Department area",
                 "indicator_id": indicator,
                 "indicator_label": label,
                 "age_group": age_group,
@@ -92,11 +89,7 @@ def build_area(source_dir: Path) -> pd.DataFrame:
                 "rse_percent": round(rse * 100, 2) if pd.notna(rse) else pd.NA,
                 "quality_flag": quality_from_rse(rse),
                 "source_id": "vcams_child_health_area_2024_release",
-                "geography_warning": (
-                    "Statewide reference; must not be presented as an SA2 estimate."
-                    if is_state else
-                    "Broad-area context only; must not be presented as an SA2 estimate."
-                ),
+                "geography_warning": "Broad-area context only; must not be presented as an SA2 estimate.",
             })
     return pd.DataFrame(rows).sort_values(["area_name", "indicator_id", "reference_year"]).reset_index(drop=True)
 
