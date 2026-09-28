@@ -31,6 +31,9 @@ HEALTH_FACILITY_DATA_PATH_ENV = "KINDERPRINT_HEALTH_FACILITY_DATA_PATH"
 ABS_CHILD_HEALTH_DATA_PATH_ENV = "KINDERPRINT_ABS_CHILD_HEALTH_DATA_PATH"
 PHIDU_CHILD_HEALTH_DATA_PATH_ENV = "KINDERPRINT_PHIDU_CHILD_HEALTH_DATA_PATH"
 PHIDU_PHA_SA2_BRIDGE_DATA_PATH_ENV = "KINDERPRINT_PHIDU_PHA_SA2_BRIDGE_DATA_PATH"
+DEPARTMENT_AREA_BRIDGE_DATA_PATH_ENV = "KINDERPRINT_DEPARTMENT_AREA_BRIDGE_DATA_PATH"
+BUSHFIRE_CONTEXT_DATA_PATH_ENV = "KINDERPRINT_BUSHFIRE_CONTEXT_DATA_PATH"
+TRANSPORT_CONTEXT_DATA_PATH_ENV = "KINDERPRINT_TRANSPORT_CONTEXT_DATA_PATH"
 
 
 def boundary_data_path() -> Path | None:
@@ -140,6 +143,21 @@ def phidu_child_health_data_path() -> Path | None:
 
 def phidu_pha_sa2_bridge_data_path() -> Path | None:
     value = os.getenv(PHIDU_PHA_SA2_BRIDGE_DATA_PATH_ENV)
+    return Path(value).expanduser() if value else None
+
+
+def department_area_bridge_data_path() -> Path | None:
+    value = os.getenv(DEPARTMENT_AREA_BRIDGE_DATA_PATH_ENV)
+    return Path(value).expanduser() if value else None
+
+
+def bushfire_context_data_path() -> Path | None:
+    value = os.getenv(BUSHFIRE_CONTEXT_DATA_PATH_ENV)
+    return Path(value).expanduser() if value else None
+
+
+def transport_context_data_path() -> Path | None:
+    value = os.getenv(TRANSPORT_CONTEXT_DATA_PATH_ENV)
     return Path(value).expanduser() if value else None
 
 

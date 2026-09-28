@@ -46,6 +46,8 @@ from loaders.population import load_population_projections
 from loaders.digital_health import (
     child_health_context,
     immunisation_context,
+    nutrition_context,
+    prevention_context,
     child_health_conditions,
     health_facilities,
     vcams_area_context,
@@ -320,6 +322,44 @@ def digital_health_immunisation(
         "victoria_method": "Sum of published PHA numerators divided by sum of denominators.",
         "target_source": "National aspirational coverage target of 95%.",
         "interpretation": "Area coverage for the containing PHA; not an SA2 estimate or a child's status.",
+    }, limitations=limitations, notices=[AREA_LEVEL_NOTICE])
+
+
+@app.get("/api/digital-health/nutrition")
+def digital_health_nutrition(
+    sa2_code: str = Query(..., min_length=9, max_length=9, pattern=r"^\d{9}$"),
+) -> dict[str, Any]:
+    """Return VCAMS healthy-eating context for the SA2's Department area and PHA weight estimates."""
+    data, limitations = nutrition_context(sa2_code)
+    empty = {"locality": None, "vcams": [], "weight": []}
+    if data is None:
+        return envelope("unavailable", empty, limitations=limitations, notices=[AREA_LEVEL_NOTICE])
+    has_data = bool(data["vcams"] or data["weight"])
+    return envelope("available" if has_data else "missing", data, metadata={
+        "vcams_source": "Victorian Child and Adolescent Monitoring System, Victorian Child Health and Wellbeing Survey",
+        "vcams_geographic_unit": "Victorian Department area containing the SA2 (via LGA 2023 label-point allocation)",
+        "weight_source": "PHIDU Child and Youth Social Health Atlas 2026 modelled estimates",
+        "weight_geographic_unit": "Population Health Area containing the SA2",
+        "victoria_weight_method": "Pooled PHA counts divided by the population implied by each published rate.",
+        "interpretation": "Broad-area survey and modelled context; not SA2 estimates and not a child's status.",
+    }, limitations=limitations, notices=[AREA_LEVEL_NOTICE])
+
+
+@app.get("/api/digital-health/prevention-context")
+def digital_health_prevention_context(
+    sa2_code: str = Query(..., min_length=9, max_length=9, pattern=r"^\d{9}$"),
+) -> dict[str, Any]:
+    """Return SA2 bushfire, transport and road context with Department-area smoke exposure."""
+    data, limitations = prevention_context(sa2_code)
+    if data is None:
+        return envelope("unavailable", {"locality": None, "bushfire": None, "transport": None, "vcams": []},
+                        limitations=limitations, notices=[AREA_LEVEL_NOTICE])
+    has_data = bool(data["bushfire"] or data["transport"] or data["vcams"])
+    return envelope("available" if has_data else "missing", data, metadata={
+        "bushfire_source": "Designated Bushfire Prone Area, Victorian Department of Transport and Planning",
+        "transport_source": "Public transport stops (current at September 2026) and historical AADT 2019",
+        "geographic_unit": "SA2 (ASGS Edition 3, 2021); smoke exposure at Victorian Department area",
+        "interpretation": "Place context for preparation; not a property risk rating, exposure dose or forecast.",
     }, limitations=limitations, notices=[AREA_LEVEL_NOTICE])
 
 

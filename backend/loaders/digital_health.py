@@ -10,15 +10,21 @@ from typing import Any
 
 from core.data_loader import (
     ABS_CHILD_HEALTH_DATA_PATH_ENV,
+    BUSHFIRE_CONTEXT_DATA_PATH_ENV,
+    DEPARTMENT_AREA_BRIDGE_DATA_PATH_ENV,
     HEALTH_FACILITY_DATA_PATH_ENV,
     PHIDU_CHILD_HEALTH_DATA_PATH_ENV,
     PHIDU_PHA_SA2_BRIDGE_DATA_PATH_ENV,
     VCAMS_AREA_DATA_PATH_ENV,
+    TRANSPORT_CONTEXT_DATA_PATH_ENV,
     VCAMS_LGA_DATA_PATH_ENV,
     abs_child_health_data_path,
+    bushfire_context_data_path,
+    department_area_bridge_data_path,
     health_facility_data_path,
     phidu_child_health_data_path,
     phidu_pha_sa2_bridge_data_path,
+    transport_context_data_path,
     vcams_area_data_path,
     vcams_lga_data_path,
 )
@@ -52,6 +58,15 @@ PHIDU_CHILD_HEALTH_FIELDS = {
     "publication_status", "source_id", "geography_warning",
 }
 PHIDU_BRIDGE_FIELDS = {"sa2_code_2021", "sa2_name_2021", "pha_code_2021", "pha_name_2021"}
+DEPARTMENT_BRIDGE_FIELDS = {
+    "sa2_code_2021", "sa2_name_2021", "lga_code_2023", "lga_name_2023",
+    "department_area", "allocation_method", "source_id",
+}
+BUSHFIRE_FIELDS = {"sa2_code", "sa2_name", "area_sqkm", "bushfire_prone_sqkm", "bushfire_prone_pct"}
+TRANSPORT_FIELDS = {
+    "sa2_code", "sa2_name", "area_sqkm", "declared_road_length_km",
+    "declared_road_traffic_intensity", "public_transport_stop_count",
+}
 REQUIRED_FIELDS = {
     "vcams_area_context": AREA_FIELDS,
     "vcams_lga_context": LGA_FIELDS,
@@ -59,6 +74,9 @@ REQUIRED_FIELDS = {
     "abs_child_health": ABS_CHILD_HEALTH_FIELDS,
     "phidu_child_health": PHIDU_CHILD_HEALTH_FIELDS,
     "phidu_pha_sa2_bridge": PHIDU_BRIDGE_FIELDS,
+    "department_area_bridge": DEPARTMENT_BRIDGE_FIELDS,
+    "bushfire_context": BUSHFIRE_FIELDS,
+    "transport_context": TRANSPORT_FIELDS,
 }
 UNIQUE_FIELDS = {
     "vcams_area_context": ("reference_year", "area_name", "indicator_id"),
@@ -67,6 +85,9 @@ UNIQUE_FIELDS = {
     "abs_child_health": ("sa2_code_2021", "reference_year", "indicator"),
     "phidu_child_health": ("pha_code_2021", "reference_period", "indicator_id"),
     "phidu_pha_sa2_bridge": ("sa2_code_2021",),
+    "department_area_bridge": ("sa2_code_2021",),
+    "bushfire_context": ("sa2_code",),
+    "transport_context": ("sa2_code",),
 }
 
 
@@ -184,6 +205,22 @@ def _phidu_bridge_row(row: dict[str, str]) -> dict[str, Any]:
     return dict(row)
 
 
+def _department_bridge_row(row: dict[str, str]) -> dict[str, Any]:
+    _required_text(row, "sa2_code_2021", "sa2_name_2021", "lga_name_2023", "department_area")
+    if not row["sa2_code_2021"].isdigit() or len(row["sa2_code_2021"]) != 9:
+        raise ValueError
+    return dict(row)
+
+
+def _sa2_numeric_row(*fields: str):
+    def parse(row: dict[str, str]) -> dict[str, Any]:
+        _required_text(row, "sa2_code", "sa2_name")
+        if not row["sa2_code"].isdigit() or len(row["sa2_code"]) != 9:
+            raise ValueError
+        return {**row, **{field: _number(row[field]) for field in fields}}
+    return parse
+
+
 ROW_PARSERS = {
     "vcams_area_context": _area_row,
     "vcams_lga_context": _lga_row,
@@ -191,10 +228,16 @@ ROW_PARSERS = {
     "abs_child_health": _abs_child_health_row,
     "phidu_child_health": _phidu_child_health_row,
     "phidu_pha_sa2_bridge": _phidu_bridge_row,
+    "department_area_bridge": _department_bridge_row,
+    "bushfire_context": _sa2_numeric_row("area_sqkm", "bushfire_prone_sqkm", "bushfire_prone_pct"),
+    "transport_context": _sa2_numeric_row(
+        "area_sqkm", "declared_road_length_km", "declared_road_traffic_intensity",
+        "public_transport_stop_count",
+    ),
 }
 
 
-@lru_cache(maxsize=8)
+@lru_cache(maxsize=16)
 def _read(path: Path, resource: str) -> tuple[dict[str, Any], ...]:
     """Read, validate and parse a static digital-health dataset once per process."""
     with path.open(encoding="utf-8-sig", newline="") as source:
@@ -424,4 +467,166 @@ def immunisation_context(sa2_code: str) -> tuple[dict[str, Any] | None, list[dic
             "pha_name": bridge["pha_name_2021"],
         },
         "indicators": indicators,
+    }, limitations
+
+
+def load_department_area_bridge() -> tuple[tuple[dict[str, Any], ...] | None, list[dict[str, Any]]]:
+    return _source(department_area_bridge_data_path(), DEPARTMENT_AREA_BRIDGE_DATA_PATH_ENV,
+                   "department_area_bridge")
+
+
+def load_bushfire_context() -> tuple[tuple[dict[str, Any], ...] | None, list[dict[str, Any]]]:
+    return _source(bushfire_context_data_path(), BUSHFIRE_CONTEXT_DATA_PATH_ENV, "bushfire_context")
+
+
+def load_transport_context() -> tuple[tuple[dict[str, Any], ...] | None, list[dict[str, Any]]]:
+    return _source(transport_context_data_path(), TRANSPORT_CONTEXT_DATA_PATH_ENV, "transport_context")
+
+
+NUTRITION_VCAMS_INDICATORS = (
+    "minimum_recommended_vegetables",
+    "minimum_recommended_fruit",
+    "recommended_daily_physical_activity",
+    "electronic_media_over_two_hours",
+    "household_food_insecurity",
+)
+PREVENTION_VCAMS_INDICATORS = ("tobacco_smoke_exposure_at_home",)
+WEIGHT_INDICATORS = ("child_overweight_not_obese", "child_obese")
+
+
+def _vcams_area_comparison(
+    rows: tuple[dict[str, Any], ...],
+    area_name: str,
+    indicator_ids: tuple[str, ...],
+) -> list[dict[str, Any]]:
+    """Latest survey year for the area compared with every Department area in that year.
+
+    VCAMS publishes these estimates for 17 Department areas. The comparison uses
+    those published estimates only; no statewide value is derived from them.
+    """
+    result = []
+    for indicator_id in indicator_ids:
+        area_rows = [row for row in rows if row["indicator_id"] == indicator_id and row["area_name"] == area_name]
+        if not area_rows:
+            continue
+        latest = max(area_rows, key=lambda row: row["reference_year"])
+        year = latest["reference_year"]
+        peers = sorted(
+            (row["percent"] for row in rows if row["indicator_id"] == indicator_id
+             and row["reference_year"] == year and row["percent"] is not None),
+        )
+        rank = None if latest["percent"] is None else 1 + sum(1 for value in peers if value > latest["percent"])
+        middle = len(peers) // 2
+        median = None if not peers else (
+            peers[middle] if len(peers) % 2 else (peers[middle - 1] + peers[middle]) / 2
+        )
+        result.append({
+            "indicator_id": indicator_id,
+            "indicator_label": latest["indicator_label"],
+            "age_group": latest["age_group"],
+            "reference_year": year,
+            "area": {"percent": latest["percent"], "rse_percent": latest["rse_percent"],
+                     "quality_flag": latest["quality_flag"]},
+            "department_areas": None if not peers else {
+                "count": len(peers), "lowest": peers[0], "median": median, "highest": peers[-1],
+            },
+            "area_rank_highest_first": rank,
+        })
+    return result
+
+
+def _locality(sa2_code: str) -> tuple[dict[str, Any] | None, dict[str, Any] | None, list[dict[str, Any]]]:
+    department, limitations = load_department_area_bridge()
+    bridge_rows, bridge_limits = load_phidu_bridge()
+    limitations = [*limitations, *bridge_limits]
+    if department is None or bridge_rows is None:
+        return None, None, limitations
+    area = next((row for row in department if row["sa2_code_2021"] == sa2_code), None)
+    pha = next((row for row in bridge_rows if row["sa2_code_2021"] == sa2_code), None)
+    return area, pha, limitations
+
+
+def nutrition_context(sa2_code: str) -> tuple[dict[str, Any] | None, list[dict[str, Any]]]:
+    """Department-area VCAMS healthy-eating and activity context plus PHA weight estimates.
+
+    Every value keeps its native geography. The Victorian weight reference is derived
+    by pooling PHA counts and the population implied by each published rate.
+    """
+    area, pha, limitations = _locality(sa2_code)
+    vcams, vcams_limits = load_vcams_area_context()
+    phidu, phidu_limits = load_phidu_child_health()
+    limitations = [*limitations, *vcams_limits, *phidu_limits]
+    if vcams is None or phidu is None or (area is None and pha is None and limitations):
+        return None, limitations
+    weight = []
+    for indicator_id in WEIGHT_INDICATORS:
+        statewide = [row for row in phidu if row["indicator_id"] == indicator_id]
+        local = next((row for row in statewide if pha and row["pha_code_2021"] == pha["pha_code_2021"]), None)
+        if local is None:
+            continue
+        usable = [row for row in statewide if row["count_or_numerator"] and row["rate_or_percent"]]
+        implied = sum(row["count_or_numerator"] / (row["rate_or_percent"] / 100) for row in usable)
+        weight.append({
+            "indicator_id": indicator_id,
+            "reference_period": local["reference_period"],
+            "methodology_class": local["methodology_class"],
+            "pha": {
+                "percent": local["rate_or_percent"],
+                "lower_95_ci": local["lower_95_ci"],
+                "upper_95_ci": local["upper_95_ci"],
+                "count": local["count_or_numerator"],
+            },
+            "victoria": None if not implied else {
+                "percent": sum(row["count_or_numerator"] for row in usable) / implied * 100,
+                "pha_count": len(usable),
+            },
+        })
+    return {
+        "locality": None if area is None and pha is None else {
+            "sa2_code": sa2_code,
+            "sa2_name": (area or pha)["sa2_name_2021"],
+            "lga_name": area["lga_name_2023"] if area else None,
+            "department_area": area["department_area"] if area else None,
+            "pha_name": pha["pha_name_2021"] if pha else None,
+        },
+        "vcams": [] if area is None else _vcams_area_comparison(vcams, area["department_area"], NUTRITION_VCAMS_INDICATORS),
+        "weight": weight,
+    }, limitations
+
+
+def prevention_context(sa2_code: str) -> tuple[dict[str, Any] | None, list[dict[str, Any]]]:
+    """SA2 bushfire designation, public transport and road context plus area smoke exposure."""
+    area, _pha, limitations = _locality(sa2_code)
+    bushfire, bushfire_limits = load_bushfire_context()
+    transport, transport_limits = load_transport_context()
+    vcams, vcams_limits = load_vcams_area_context()
+    limitations = [*limitations, *bushfire_limits, *transport_limits, *vcams_limits]
+    if bushfire is None or transport is None or vcams is None:
+        return None, limitations
+    fire = next((row for row in bushfire if row["sa2_code"] == sa2_code), None)
+    move = next((row for row in transport if row["sa2_code"] == sa2_code), None)
+    intensities = sorted(row["declared_road_traffic_intensity"] for row in transport
+                         if row["declared_road_traffic_intensity"] is not None)
+    traffic_percentile = None
+    if move and move["declared_road_traffic_intensity"] is not None and intensities:
+        value = move["declared_road_traffic_intensity"]
+        traffic_percentile = sum(1 for other in intensities if other <= value) / len(intensities) * 100
+    return {
+        "locality": {
+            "sa2_code": sa2_code,
+            "sa2_name": (fire or move or area or {}).get("sa2_name") or (area or {}).get("sa2_name_2021"),
+            "department_area": area["department_area"] if area else None,
+        },
+        "bushfire": None if fire is None else {
+            "bushfire_prone_pct": fire["bushfire_prone_pct"],
+            "area_sqkm": fire["area_sqkm"],
+        },
+        "transport": None if move is None else {
+            "public_transport_stop_count": move["public_transport_stop_count"],
+            "declared_road_length_km": move["declared_road_length_km"],
+            "declared_road_traffic_intensity": move["declared_road_traffic_intensity"],
+            "traffic_intensity_percentile": traffic_percentile,
+            "sa2_compared": len(intensities),
+        },
+        "vcams": [] if area is None else _vcams_area_comparison(vcams, area["department_area"], PREVENTION_VCAMS_INDICATORS),
     }, limitations

@@ -94,6 +94,9 @@ Resources:
           KINDERPRINT_ABS_CHILD_HEALTH_DATA_PATH: /var/task/data/abs_child_health_sa2.csv
           KINDERPRINT_PHIDU_CHILD_HEALTH_DATA_PATH: /var/task/data/phidu_child_health_pha.csv
           KINDERPRINT_PHIDU_PHA_SA2_BRIDGE_DATA_PATH: /var/task/data/phidu_pha_sa2_bridge.csv
+          KINDERPRINT_DEPARTMENT_AREA_BRIDGE_DATA_PATH: /var/task/data/sa2_department_area_bridge.csv
+          KINDERPRINT_BUSHFIRE_CONTEXT_DATA_PATH: /var/task/data/bushfire_context_sa2.csv
+          KINDERPRINT_TRANSPORT_CONTEXT_DATA_PATH: /var/task/data/transport_context_sa2.csv
       Events:
         ApiProxy:
           Type: HttpApi

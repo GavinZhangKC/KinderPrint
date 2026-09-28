@@ -35,6 +35,9 @@ cp "$TASK_PROCESSED_DATA_DIR/healthdirect_facilities.csv" "$TASK_PACKAGE_DIR/dat
 cp "$TASK_PROCESSED_DATA_DIR/abs_child_health_sa2.csv" "$TASK_PACKAGE_DIR/data/"
 cp "$TASK_PROCESSED_DATA_DIR/phidu_child_health_pha.csv" "$TASK_PACKAGE_DIR/data/"
 cp "$TASK_PROCESSED_DATA_DIR/phidu_pha_sa2_bridge.csv" "$TASK_PACKAGE_DIR/data/"
+cp "$TASK_PROCESSED_DATA_DIR/sa2_department_area_bridge.csv" "$TASK_PACKAGE_DIR/data/"
+cp "$TASK_PROCESSED_DATA_DIR/bushfire_context_sa2.csv" "$TASK_PACKAGE_DIR/data/"
+cp "$TASK_PROCESSED_DATA_DIR/transport_context_sa2.csv" "$TASK_PACKAGE_DIR/data/"
 
 python3 -m pip install \
     --disable-pip-version-check \

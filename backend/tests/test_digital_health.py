@@ -166,3 +166,80 @@ def test_immunisation_reports_missing_for_unbridged_sa2(client, monkeypatch, tmp
 
     assert body["status"] == "missing"
     assert body["limitations"][-1]["code"] == "immunisation_context_not_found"
+
+
+def _write(path, text):
+    path.write_text(text, encoding="utf-8")
+    return str(path)
+
+
+DEPARTMENT_BRIDGE = (
+    "sa2_code_2021,sa2_name_2021,lga_code_2023,lga_name_2023,department_area,allocation_method,source_id\n"
+    "206011106,Brunswick East,24700,Merri-bek,Hume Moreland,sa2_label_point_in_lga_2023,abs\n"
+)
+VCAMS_HEADER = "reference_year,area_name,geography,indicator_id,indicator_label,age_group,percent,rse_percent,quality_flag,source_id,geography_warning\n"
+
+
+def test_nutrition_compares_department_areas_and_pools_pha_weight(client, monkeypatch, tmp_path):
+    _read.cache_clear()
+    monkeypatch.setenv("KINDERPRINT_DEPARTMENT_AREA_BRIDGE_DATA_PATH", _write(tmp_path / "d.csv", DEPARTMENT_BRIDGE))
+    monkeypatch.setenv("KINDERPRINT_PHIDU_PHA_SA2_BRIDGE_DATA_PATH", _write(
+        tmp_path / "b.csv", "sa2_code_2021,sa2_name_2021,pha_code_2021,pha_name_2021\n"
+        "206011106,Brunswick East,20001,Brunswick/ Brunswick East\n"))
+    monkeypatch.setenv("KINDERPRINT_VCAMS_AREA_DATA_PATH", _write(
+        tmp_path / "v.csv", VCAMS_HEADER
+        + "2019,Hume Moreland,Victorian Department area,minimum_recommended_vegetables,2.1b,4-12 years,9.0,20,available,vcams,Broad\n"
+        + "2021,Hume Moreland,Victorian Department area,minimum_recommended_vegetables,2.1b,4-12 years,3.0,39,use_with_caution,vcams,Broad\n"
+        + "2021,Barwon,Victorian Department area,minimum_recommended_vegetables,2.1b,4-12 years,5.0,30,use_with_caution,vcams,Broad\n"
+        + "2021,Mallee,Victorian Department area,minimum_recommended_vegetables,2.1b,4-12 years,1.0,60,unreliable,vcams,Broad\n"))
+    monkeypatch.setenv("KINDERPRINT_PHIDU_CHILD_HEALTH_DATA_PATH", _write(
+        tmp_path / "p.csv",
+        "pha_code_2021,pha_name_2021,indicator_id,reference_period,methodology_class,count_or_numerator,denominator,rate_or_percent,lower_95_ci,upper_95_ci,standardised_ratio,rrmse,publication_status,source_id,geography_warning\n"
+        "20001,Brunswick/ Brunswick East,child_obese,2022,modelled_estimate,10,,5.0,4.0,6.0,,,PUBLISHED,phidu,PHA only\n"
+        "20002,Elsewhere,child_obese,2022,modelled_estimate,30,,10.0,8.0,12.0,,,PUBLISHED,phidu,PHA only\n"))
+
+    body = client.get("/api/digital-health/nutrition?sa2_code=206011106").json()
+
+    assert body["status"] == "available"
+    assert body["data"]["locality"]["department_area"] == "Hume Moreland"
+    vegetables = body["data"]["vcams"][0]
+    assert vegetables["reference_year"] == 2021
+    assert vegetables["area"]["percent"] == 3.0
+    assert vegetables["area_rank_highest_first"] == 2
+    assert vegetables["department_areas"] == {"count": 3, "lowest": 1.0, "median": 3.0, "highest": 5.0}
+    assert "victoria" not in vegetables
+    obese = body["data"]["weight"][0]
+    # (10 + 30) / (10/0.05 + 30/0.10) = 40 / 500
+    assert round(obese["victoria"]["percent"], 4) == 8.0
+    assert obese["pha"]["lower_95_ci"] == 4.0
+
+
+def test_prevention_context_returns_sa2_place_measures(client, monkeypatch, tmp_path):
+    _read.cache_clear()
+    monkeypatch.setenv("KINDERPRINT_DEPARTMENT_AREA_BRIDGE_DATA_PATH", _write(tmp_path / "d.csv", DEPARTMENT_BRIDGE))
+    monkeypatch.setenv("KINDERPRINT_PHIDU_PHA_SA2_BRIDGE_DATA_PATH", _write(
+        tmp_path / "b.csv", "sa2_code_2021,sa2_name_2021,pha_code_2021,pha_name_2021\n"))
+    monkeypatch.setenv("KINDERPRINT_BUSHFIRE_CONTEXT_DATA_PATH", _write(
+        tmp_path / "f.csv", "sa2_code,sa2_name,area_sqkm,bushfire_prone_sqkm,bushfire_prone_pct,lower_bushfire_prone_share_score\n"
+        "206011106,Brunswick East,2.17,0.0,0.0,100\n"))
+    monkeypatch.setenv("KINDERPRINT_TRANSPORT_CONTEXT_DATA_PATH", _write(
+        tmp_path / "t.csv", "sa2_code,sa2_name,area_sqkm,declared_road_length_km,aadt_road_km,traffic_segment_count,declared_road_traffic_intensity,public_transport_stop_count\n"
+        "206011106,Brunswick East,2.17,11.0,76599,33,35331,45\n"
+        "206011107,Brunswick West,3.0,5.0,1000,10,1000,20\n"))
+    monkeypatch.setenv("KINDERPRINT_VCAMS_AREA_DATA_PATH", _write(
+        tmp_path / "v.csv", VCAMS_HEADER
+        + "2021,Hume Moreland,Victorian Department area,tobacco_smoke_exposure_at_home,2.12,Under 13 years,15.5,14,available,vcams,Broad\n"))
+
+    body = client.get("/api/digital-health/prevention-context?sa2_code=206011106").json()
+
+    assert body["status"] == "available"
+    assert body["data"]["bushfire"]["bushfire_prone_pct"] == 0.0
+    assert body["data"]["transport"]["public_transport_stop_count"] == 45.0
+    assert body["data"]["transport"]["traffic_intensity_percentile"] == 100.0
+    assert body["data"]["vcams"][0]["area"]["percent"] == 15.5
+    assert "not a property risk rating" in body["metadata"]["interpretation"]
+
+
+def test_prevention_context_unavailable_without_configuration(client):
+    body = client.get("/api/digital-health/prevention-context?sa2_code=206011106").json()
+    assert body["status"] == "unavailable"
