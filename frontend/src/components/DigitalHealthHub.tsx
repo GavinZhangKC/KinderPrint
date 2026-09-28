@@ -3,13 +3,13 @@ import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 import gsap from 'gsap'
 
 import LocalityGlobe from './LocalityGlobe'
-import { NutritionPage, PreventionPage, VaccinationsPage } from './health/HealthActionPages'
+import KinderHub from './hub/KinderHub'
 import { api, type ChildHealthContext, type EnvironmentalDifference, type HealthFacility, type NeighbourhoodProfile, type NeighbourhoodSearchResult, type PopulationProjection, type ProfileIndicator, type VcamsAreaIndicator, type VcamsLgaIndicator } from '../services/api'
 import './DigitalHealthHub.css'
 import './DigitalHealthHub.responsive.css'
 import './DigitalHealthHub.health.css'
 
-type HealthView = 'overview' | 'conditions' | 'environment' | 'vaccinations' | 'nutrition' | 'prevention' | 'care' | 'demand' | 'review'
+type HealthView = 'overview' | 'conditions' | 'environment' | 'care' | 'demand' | 'review'
 type ConditionId = 'brain' | 'lungs' | 'metabolic' | 'immune' | 'perinatal'
 
 interface DigitalHealthHubProps {
@@ -23,9 +23,7 @@ const navigation = [
   { id: 'conditions', label: 'Child health conditions', symbol: '✚', enabled: true },
   { id: 'environment', label: 'Environment', symbol: '◫', enabled: true },
   { id: 'development', label: 'Development', symbol: '▥', enabled: false },
-  { id: 'vaccinations', label: 'Vaccinations', symbol: '⊕', enabled: true },
-  { id: 'nutrition', label: 'Nutrition', symbol: '◒', enabled: true },
-  { id: 'prevention', label: 'Prevention', symbol: '♢', enabled: true },
+  { id: 'prevention', label: 'Prevention', symbol: '♢', enabled: false },
   { id: 'care', label: 'Care access', symbol: '⌖', enabled: true },
   { id: 'demand', label: 'Future demand', symbol: '⌁', enabled: true },
   { id: 'review', label: 'Evidence review', symbol: '▤', enabled: true },
@@ -491,20 +489,14 @@ export default function DigitalHealthHub({ onHome, onBack, initialLocalities = [
   const comparisonMode = initialLocalities.length >= 2
   const [view, setView] = useState<HealthView>(comparisonMode ? 'conditions' : 'overview')
   const [locality, setLocality] = useState<NeighbourhoodSearchResult>(initialLocalities[0] ?? { id: '206011106', name: 'Brunswick East', geographic_unit: 'SA2 (ASGS Edition 3, 2021)' })
+  const [plan, setPlan] = useState<{ body: ConditionId; age: string } | null>(null)
   const secondary = initialLocalities[1] ?? locality
   const data = useDigitalHealthData(locality, comparisonMode ? secondary.id : undefined)
   const secondaryData = useDigitalHealthData(secondary)
   if (comparisonMode && view === 'conditions') return <div className="digital-health-hub"><SideNavigation current={view} onChange={setView} onHome={onHome} /><main><ComparisonHealthPage primary={locality} secondary={secondary} primaryData={data} secondaryData={secondaryData} onBack={onBack} /></main></div>
-  const page = view === 'overview'
-    ? <OverviewPage onConditions={() => setView('conditions')} onDemand={() => setView('demand')} data={data} locality={locality} />
-    : view === 'conditions' ? <ConditionsPage data={data} locality={locality} onSelectLocality={setLocality} />
-      : view === 'environment' ? <EnvironmentPage data={data} locality={locality} />
-        : view === 'vaccinations' || view === 'nutrition' || view === 'prevention' ? (() => {
-          const props = { locality, facilities: data.facilities, childHealth: data.childHealth, environment: environmentIndicators(data) }
-          return view === 'vaccinations' ? <VaccinationsPage {...props} /> : view === 'nutrition' ? <NutritionPage {...props} /> : <PreventionPage {...props} />
-        })()
-        : view === 'care' ? <CareAccessPage data={data} locality={locality} />
-          : view === 'demand' ? <FutureDemandPage data={data} locality={locality} />
-            : <EvidenceReviewPage data={data} locality={locality} />
-  return <div className="digital-health-hub"><SideNavigation current={view} onChange={setView} onHome={onHome} /><main>{view !== 'conditions' && <LocalitySearch locality={locality} onSelect={setLocality} />}{page}</main></div>
+  const planCondition = plan ? conditions.find(item => item.id === plan.body) ?? conditions[0] : null
+  return <>
+    <KinderHub locality={locality} data={data} onSelectLocality={setLocality} onHome={onHome} onOpenPlan={(body, age) => setPlan({ body, age })} />
+    <AnimatePresence>{plan && planCondition && <PreparationPlan condition={planCondition.label} locality={locality.name} age={plan.age} items={conditionGuidance[plan.body].prevention} sourceUrl={conditionSourceLinks[plan.body]} facilities={data.facilities} onClose={() => setPlan(null)} />}</AnimatePresence>
+  </>
 }
