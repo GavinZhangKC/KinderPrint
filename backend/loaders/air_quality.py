@@ -1,5 +1,7 @@
 """Load validated station-level EPA historical observations."""
 
+from __future__ import annotations
+
 import csv
 from functools import lru_cache
 import math

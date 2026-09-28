@@ -1,5 +1,7 @@
 """Load validated traffic and industrial reporting-locality context."""
 
+from __future__ import annotations
+
 import csv
 from functools import lru_cache
 import math

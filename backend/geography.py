@@ -1,5 +1,7 @@
 """GeoJSON source validation and boundary query helpers."""
 
+from __future__ import annotations
+
 from copy import deepcopy
 from functools import lru_cache
 import json

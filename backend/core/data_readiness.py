@@ -1,5 +1,7 @@
 """Core runtime-readiness checks for configured backend datasets."""
 
+from __future__ import annotations
+
 from typing import Any
 
 from geography import load_boundary_features

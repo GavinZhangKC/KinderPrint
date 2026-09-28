@@ -408,18 +408,23 @@ html:has(.simulation-shell) body::-webkit-scrollbar {
   display: flex;
   align-items: center;
   justify-content: center;
+  min-width: 0;
+  flex-wrap: wrap;
   gap: 8px;
-  font-size: 18px;
+  font-size: 16px;
   color: #23406b;
   font-weight: 800;
   margin-bottom: 12px;
 }
 
 .result-card-body strong {
+  min-width: 0;
   font-weight: 800;
+  overflow-wrap: anywhere;
 }
 
 .result-arrow {
+  flex: 0 0 auto;
   color: #6179a8;
 }
 
