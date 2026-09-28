@@ -45,6 +45,7 @@ from loaders.geocoding_quality import load_geocoding_quality
 from loaders.population import load_population_projections
 from loaders.digital_health import (
     child_health_context,
+    immunisation_context,
     child_health_conditions,
     health_facilities,
     vcams_area_context,
@@ -295,6 +296,30 @@ def digital_health_child_health_context(
         "source": "ABS Census 2021 G19 and PHIDU Child Health Atlas 2026",
         "sa2_interpretation": "Observed Census responses for children aged 0–14 in the selected SA2.",
         "pha_interpretation": "Published context for the containing Population Health Area; not an SA2 estimate.",
+    }, limitations=limitations, notices=[AREA_LEVEL_NOTICE])
+
+
+@app.get("/api/digital-health/immunisation")
+def digital_health_immunisation(
+    sa2_code: str = Query(..., min_length=9, max_length=9, pattern=r"^\d{9}$"),
+) -> dict[str, Any]:
+    """Return containing-PHA childhood immunisation coverage and a pooled Victorian reference."""
+    data, limitations = immunisation_context(sa2_code)
+    empty = {"locality": None, "indicators": []}
+    if data is None:
+        return envelope("unavailable", empty, limitations=limitations, notices=[AREA_LEVEL_NOTICE])
+    if not data["indicators"]:
+        limitations = [*limitations, limitation(
+            "immunisation_context_not_found",
+            "No published PHIDU immunisation coverage matches the SA2's Population Health Area.",
+            "sa2_code",
+        )]
+    return envelope("available" if data["indicators"] else "missing", data, metadata={
+        "source": "PHIDU Child and Youth Social Health Atlas 2026 (Australian Immunisation Register data)",
+        "geographic_unit": "Population Health Area containing the SA2",
+        "victoria_method": "Sum of published PHA numerators divided by sum of denominators.",
+        "target_source": "National aspirational coverage target of 95%.",
+        "interpretation": "Area coverage for the containing PHA; not an SA2 estimate or a child's status.",
     }, limitations=limitations, notices=[AREA_LEVEL_NOTICE])
 
 

@@ -117,3 +117,52 @@ def test_child_health_context_keeps_sa2_and_pha_geographies_separate(client, mon
     assert body["data"]["sa2_indicators"][0]["percent"] == 5.0
     assert body["data"]["pha_context"][0]["rate_or_percent"] == 4.8
     assert "not an SA2 estimate" in body["metadata"]["pha_interpretation"]
+
+
+def test_immunisation_pools_victoria_from_numerators_and_labels_pha(client, monkeypatch, tmp_path):
+    _read.cache_clear()
+    header = "pha_code_2021,pha_name_2021,indicator_id,reference_period,methodology_class,count_or_numerator,denominator,rate_or_percent,lower_95_ci,upper_95_ci,standardised_ratio,rrmse,publication_status,source_id,geography_warning\n"
+    pha_path = tmp_path / "pha.csv"
+    pha_path.write_text(
+        header
+        + "20001,Brunswick/ Brunswick East,immunised_age_2,2023,administrative,90,100,90.0,,,,,PUBLISHED,phidu,PHA only\n"
+        + "20002,Elsewhere,immunised_age_2,2023,administrative,285,300,95.0,,,,,PUBLISHED,phidu,PHA only\n",
+        encoding="utf-8",
+    )
+    bridge_path = tmp_path / "bridge.csv"
+    bridge_path.write_text(
+        "sa2_code_2021,sa2_name_2021,pha_code_2021,pha_name_2021\n"
+        "206011106,Brunswick East,20001,Brunswick/ Brunswick East\n", encoding="utf-8")
+    monkeypatch.setenv("KINDERPRINT_PHIDU_CHILD_HEALTH_DATA_PATH", str(pha_path))
+    monkeypatch.setenv("KINDERPRINT_PHIDU_PHA_SA2_BRIDGE_DATA_PATH", str(bridge_path))
+
+    body = client.get("/api/digital-health/immunisation?sa2_code=206011106").json()
+
+    assert body["status"] == "available"
+    indicator = body["data"]["indicators"][0]
+    assert indicator["pha"]["percent"] == 90.0
+    # (90 + 285) / (100 + 300), not the mean of 90% and 95%
+    assert round(indicator["victoria"]["percent"], 4) == 93.75
+    assert indicator["gap_to_target"] == 5.0
+    assert body["data"]["locality"]["pha_name"] == "Brunswick/ Brunswick East"
+    assert "not an SA2 estimate" in body["metadata"]["interpretation"]
+
+
+def test_immunisation_reports_missing_for_unbridged_sa2(client, monkeypatch, tmp_path):
+    _read.cache_clear()
+    pha_path = tmp_path / "pha.csv"
+    pha_path.write_text(
+        "pha_code_2021,pha_name_2021,indicator_id,reference_period,methodology_class,count_or_numerator,denominator,rate_or_percent,lower_95_ci,upper_95_ci,standardised_ratio,rrmse,publication_status,source_id,geography_warning\n"
+        "20001,Brunswick/ Brunswick East,immunised_age_1,2023,administrative,90,100,90.0,,,,,PUBLISHED,phidu,PHA only\n",
+        encoding="utf-8",
+    )
+    bridge_path = tmp_path / "bridge.csv"
+    bridge_path.write_text("sa2_code_2021,sa2_name_2021,pha_code_2021,pha_name_2021\n"
+                           "206011106,Brunswick East,20001,Brunswick/ Brunswick East\n", encoding="utf-8")
+    monkeypatch.setenv("KINDERPRINT_PHIDU_CHILD_HEALTH_DATA_PATH", str(pha_path))
+    monkeypatch.setenv("KINDERPRINT_PHIDU_PHA_SA2_BRIDGE_DATA_PATH", str(bridge_path))
+
+    body = client.get("/api/digital-health/immunisation?sa2_code=999999999").json()
+
+    assert body["status"] == "missing"
+    assert body["limitations"][-1]["code"] == "immunisation_context_not_found"

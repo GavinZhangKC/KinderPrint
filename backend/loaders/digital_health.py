@@ -344,3 +344,84 @@ def child_health_context(sa2_code: str) -> tuple[dict[str, Any] | None, list[dic
         "pha_name": bridge["pha_name_2021"] if bridge else None,
     }
     return {"locality": locality, "sa2_indicators": exact, "pha_context": regional}, limitations
+
+
+IMMUNISATION_INDICATORS = (
+    ("immunised_age_1", "12 months"),
+    ("immunised_age_2", "24 months"),
+    ("immunised_age_5", "60 months"),
+)
+NATIONAL_ASPIRATIONAL_COVERAGE = 95.0
+
+
+def _pooled_rate(rows: list[dict[str, Any]]) -> dict[str, Any] | None:
+    """Pool published numerators and denominators; never average percentages."""
+    usable = [
+        row for row in rows
+        if row["count_or_numerator"] is not None and row["denominator"]
+    ]
+    if not usable:
+        return None
+    numerator = sum(row["count_or_numerator"] for row in usable)
+    denominator = sum(row["denominator"] for row in usable)
+    return {
+        "numerator": numerator,
+        "denominator": denominator,
+        "percent": numerator / denominator * 100,
+        "pha_count": len(usable),
+    }
+
+
+def immunisation_context(sa2_code: str) -> tuple[dict[str, Any] | None, list[dict[str, Any]]]:
+    """Return containing-PHA childhood immunisation coverage with a pooled Victorian reference.
+
+    The Victorian reference pools every published PHA numerator and denominator in the
+    PHIDU extract, so it is a derived total rather than an average of PHA percentages.
+    The PHA value describes the containing Population Health Area and is never
+    assigned to the SA2 as an SA2 estimate.
+    """
+    phidu, limitations = load_phidu_child_health()
+    bridge_rows, bridge_limits = load_phidu_bridge()
+    limitations = [*limitations, *bridge_limits]
+    if phidu is None or bridge_rows is None:
+        return None, limitations
+    bridge = next((row for row in bridge_rows if row["sa2_code_2021"] == sa2_code), None)
+    if bridge is None:
+        return {"locality": None, "indicators": []}, limitations
+    indicators = []
+    for indicator_id, age_label in IMMUNISATION_INDICATORS:
+        statewide = [row for row in phidu if row["indicator_id"] == indicator_id]
+        local = next((row for row in statewide if row["pha_code_2021"] == bridge["pha_code_2021"]), None)
+        if local is None:
+            continue
+        ranked = sorted(
+            (row["rate_or_percent"] for row in statewide if row["rate_or_percent"] is not None),
+        )
+        value = local["rate_or_percent"]
+        percentile = None
+        if value is not None and ranked:
+            percentile = sum(1 for other in ranked if other <= value) / len(ranked) * 100
+        indicators.append({
+            "indicator_id": indicator_id,
+            "age": age_label,
+            "reference_period": local["reference_period"],
+            "pha": {
+                "percent": value,
+                "numerator": local["count_or_numerator"],
+                "denominator": local["denominator"],
+                "publication_status": local["publication_status"],
+            },
+            "victoria": _pooled_rate(statewide),
+            "pha_percentile_in_victoria": percentile,
+            "national_aspirational_target": NATIONAL_ASPIRATIONAL_COVERAGE,
+            "gap_to_target": None if value is None else max(0.0, NATIONAL_ASPIRATIONAL_COVERAGE - value),
+        })
+    return {
+        "locality": {
+            "sa2_code": sa2_code,
+            "sa2_name": bridge["sa2_name_2021"],
+            "pha_code": bridge["pha_code_2021"],
+            "pha_name": bridge["pha_name_2021"],
+        },
+        "indicators": indicators,
+    }, limitations
