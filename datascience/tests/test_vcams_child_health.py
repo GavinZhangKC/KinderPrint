@@ -25,9 +25,10 @@ def test_area_builder_preserves_broad_geography(tmp_path, monkeypatch):
     })
     monkeypatch.setattr(pd, "read_excel", lambda *_args, **_kwargs: frame)
     result = build_area(tmp_path)
-    assert set(result.area_name) == {"Hume Moreland"}
-    assert set(result.geography) == {"Victorian Department area"}
-    assert set(result.percent) == {42.0}
+    assert set(result.area_name) == {"Hume Moreland", "Victoria"}
+    geography = dict(zip(result.area_name, result.geography))
+    assert geography == {"Hume Moreland": "Victorian Department area", "Victoria": "Victoria (state total)"}
+    assert set(result[result.area_name == "Hume Moreland"].percent) == {42.0}
     assert result.geography_warning.str.contains("must not be presented as an SA2").all()
 
 
