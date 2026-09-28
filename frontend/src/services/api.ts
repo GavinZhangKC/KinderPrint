@@ -229,6 +229,59 @@ export interface ChildHealthContext {
   pha_context: ChildHealthPhaIndicator[]
 }
 
+export interface ImmunisationIndicator {
+  indicator_id: 'immunised_age_1' | 'immunised_age_2' | 'immunised_age_5'
+  age: string
+  reference_period: string
+  pha: { percent: number | null; numerator: number | null; denominator: number | null; publication_status: string }
+  victoria: { numerator: number; denominator: number; percent: number; pha_count: number } | null
+  pha_percentile_in_victoria: number | null
+  national_aspirational_target: number
+  gap_to_target: number | null
+}
+
+export interface ImmunisationContext {
+  locality: { sa2_code: string; sa2_name: string; pha_code: string; pha_name: string } | null
+  indicators: ImmunisationIndicator[]
+}
+
+export interface DepartmentAreaIndicator {
+  indicator_id: string
+  indicator_label: string
+  age_group: string
+  reference_year: number
+  area: { percent: number | null; rse_percent: number | null; quality_flag: string }
+  department_areas: { count: number; lowest: number; median: number; highest: number } | null
+  area_rank_highest_first: number | null
+}
+
+export interface WeightIndicator {
+  indicator_id: 'child_overweight_not_obese' | 'child_obese'
+  reference_period: string
+  methodology_class: string
+  pha: { percent: number | null; lower_95_ci: number | null; upper_95_ci: number | null; count: number | null }
+  victoria: { percent: number; pha_count: number } | null
+}
+
+export interface NutritionContext {
+  locality: { sa2_code: string; sa2_name: string; lga_name: string | null; department_area: string | null; pha_name: string | null } | null
+  vcams: DepartmentAreaIndicator[]
+  weight: WeightIndicator[]
+}
+
+export interface PreventionContext {
+  locality: { sa2_code: string; sa2_name: string | null; department_area: string | null } | null
+  bushfire: { bushfire_prone_pct: number | null; area_sqkm: number | null } | null
+  transport: {
+    public_transport_stop_count: number | null
+    declared_road_length_km: number | null
+    declared_road_traffic_intensity: number | null
+    traffic_intensity_percentile: number | null
+    sa2_compared: number
+  } | null
+  vcams: DepartmentAreaIndicator[]
+}
+
 export interface ContextMetric {
   value: number | null
   status: ApiStatus | string
@@ -537,6 +590,21 @@ export const api = {
   getChildHealthContext: (sa2Code: string, signal?: AbortSignal) =>
     request<ChildHealthContext>(
       `/api/digital-health/child-health-context?sa2_code=${encodeURIComponent(sa2Code)}`, signal,
+    ),
+
+  getImmunisationContext: (sa2Code: string, signal?: AbortSignal) =>
+    request<ImmunisationContext>(
+      `/api/digital-health/immunisation?sa2_code=${encodeURIComponent(sa2Code)}`, signal,
+    ),
+
+  getNutritionContext: (sa2Code: string, signal?: AbortSignal) =>
+    request<NutritionContext>(
+      `/api/digital-health/nutrition?sa2_code=${encodeURIComponent(sa2Code)}`, signal,
+    ),
+
+  getPreventionContext: (sa2Code: string, signal?: AbortSignal) =>
+    request<PreventionContext>(
+      `/api/digital-health/prevention-context?sa2_code=${encodeURIComponent(sa2Code)}`, signal,
     ),
 
   getIndustrialContext: (

@@ -3,12 +3,13 @@ import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 import gsap from 'gsap'
 
 import LocalityGlobe from './LocalityGlobe'
+import { NutritionPage, PreventionPage, VaccinationsPage } from './health/HealthActionPages'
 import { api, type ChildHealthContext, type EnvironmentalDifference, type HealthFacility, type NeighbourhoodProfile, type NeighbourhoodSearchResult, type PopulationProjection, type ProfileIndicator, type VcamsAreaIndicator, type VcamsLgaIndicator } from '../services/api'
 import './DigitalHealthHub.css'
 import './DigitalHealthHub.responsive.css'
 import './DigitalHealthHub.health.css'
 
-type HealthView = 'overview' | 'conditions' | 'environment' | 'care' | 'demand' | 'review'
+type HealthView = 'overview' | 'conditions' | 'environment' | 'vaccinations' | 'nutrition' | 'prevention' | 'care' | 'demand' | 'review'
 type ConditionId = 'brain' | 'lungs' | 'metabolic' | 'immune' | 'perinatal'
 
 interface DigitalHealthHubProps {
@@ -22,7 +23,9 @@ const navigation = [
   { id: 'conditions', label: 'Child health conditions', symbol: '✚', enabled: true },
   { id: 'environment', label: 'Environment', symbol: '◫', enabled: true },
   { id: 'development', label: 'Development', symbol: '▥', enabled: false },
-  { id: 'prevention', label: 'Prevention', symbol: '♢', enabled: false },
+  { id: 'vaccinations', label: 'Vaccinations', symbol: '⊕', enabled: true },
+  { id: 'nutrition', label: 'Nutrition', symbol: '◒', enabled: true },
+  { id: 'prevention', label: 'Prevention', symbol: '♢', enabled: true },
   { id: 'care', label: 'Care access', symbol: '⌖', enabled: true },
   { id: 'demand', label: 'Future demand', symbol: '⌁', enabled: true },
   { id: 'review', label: 'Evidence review', symbol: '▤', enabled: true },
@@ -496,6 +499,10 @@ export default function DigitalHealthHub({ onHome, onBack, initialLocalities = [
     ? <OverviewPage onConditions={() => setView('conditions')} onDemand={() => setView('demand')} data={data} locality={locality} />
     : view === 'conditions' ? <ConditionsPage data={data} locality={locality} onSelectLocality={setLocality} />
       : view === 'environment' ? <EnvironmentPage data={data} locality={locality} />
+        : view === 'vaccinations' || view === 'nutrition' || view === 'prevention' ? (() => {
+          const props = { locality, facilities: data.facilities, childHealth: data.childHealth, environment: environmentIndicators(data) }
+          return view === 'vaccinations' ? <VaccinationsPage {...props} /> : view === 'nutrition' ? <NutritionPage {...props} /> : <PreventionPage {...props} />
+        })()
         : view === 'care' ? <CareAccessPage data={data} locality={locality} />
           : view === 'demand' ? <FutureDemandPage data={data} locality={locality} />
             : <EvidenceReviewPage data={data} locality={locality} />
