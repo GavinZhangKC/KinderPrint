@@ -1,4 +1,6 @@
-import { useEffect, useMemo, useState, type CSSProperties } from 'react'
+import { useEffect, useMemo, useRef, useState, type CSSProperties } from 'react'
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
+import gsap from 'gsap'
 
 import LocalityGlobe from './LocalityGlobe'
 import { api, type ChildHealthContext, type EnvironmentalDifference, type HealthFacility, type NeighbourhoodProfile, type NeighbourhoodSearchResult, type PopulationProjection, type ProfileIndicator, type VcamsAreaIndicator, type VcamsLgaIndicator } from '../services/api'
@@ -37,6 +39,24 @@ const conditions: Array<{ id: ConditionId; label: string; image: string; summary
 type HealthPanel = 'Local health' | 'Prevention' | 'Daily routine' | 'Seasonal care' | 'Nearby care'
 
 const healthPanels: HealthPanel[] = ['Local health', 'Prevention', 'Daily routine', 'Seasonal care', 'Nearby care']
+
+const OFFICIAL_LINKS = {
+  asthmaForecast: 'https://www.health.vic.gov.au/environmental-health/epidemic-thunderstorm-asthma-risk-forecast',
+  airWatch: 'https://www.epa.vic.gov.au/check-air-and-water-quality',
+  heatWarning: 'https://www.health.vic.gov.au/environmental-health/heat-health-warning',
+  asthmaPlan: 'https://www.nationalasthma.org.au/living-with-asthma/asthma-action-plans',
+  immunisation: 'https://www.health.gov.au/topics/immunisation/immunisation-throughout-life/national-immunisation-program-schedule',
+  childHealth: 'https://www.betterhealth.vic.gov.au/health/healthyliving/child-health',
+  urgentCare: 'https://www.health.vic.gov.au/urgent-care-clinics',
+} as const
+
+const conditionSourceLinks: Record<ConditionId, string> = {
+  brain: OFFICIAL_LINKS.childHealth,
+  lungs: OFFICIAL_LINKS.asthmaPlan,
+  metabolic: OFFICIAL_LINKS.childHealth,
+  immune: OFFICIAL_LINKS.immunisation,
+  perinatal: OFFICIAL_LINKS.childHealth,
+}
 
 const conditionGuidance: Record<ConditionId, {
   indicators: Array<{ label: string; value: string; detail: string }>
@@ -186,29 +206,59 @@ const healthIndicatorLabels: Record<string, string> = {
   low_birthweight: 'Babies with low birthweight', smoking_during_pregnancy: 'Smoking during pregnancy', infant_mortality: 'Infant mortality',
 }
 
-function ConditionsPage({ data, locality }: { data: DigitalHealthData; locality: NeighbourhoodSearchResult }) {
+function ConditionsPage({ data, locality, onSelectLocality }: { data: DigitalHealthData; locality: NeighbourhoodSearchResult; onSelectLocality: (value: NeighbourhoodSearchResult) => void }) {
   const [conditionId, setConditionId] = useState<ConditionId>('brain')
   const [panel, setPanel] = useState<HealthPanel>('Local health')
+  const [age, setAge] = useState(() => window.localStorage.getItem('kinderprint-child-age') ?? '5–9 years')
+  const [knownCondition, setKnownCondition] = useState(() => window.localStorage.getItem('kinderprint-known-condition') === 'true')
+  const [planOpen, setPlanOpen] = useState(false)
+  const stageRef = useRef<HTMLDivElement>(null)
+  const reduceMotion = useReducedMotion()
   const selected = conditions.find((item) => item.id === conditionId) ?? conditions[0]
   const guidance = conditionGuidance[conditionId]
   const ids = conditionIndicatorIds[conditionId]
   const exact = (data.childHealth?.sa2_indicators ?? []).filter(item => ids.sa2.includes(item.indicator))
   const regional = (data.childHealth?.pha_context ?? []).filter(item => ids.pha.includes(item.indicator_id))
   const selectCondition = (id: ConditionId) => { setConditionId(id); setPanel('Local health') }
-  return <div className="dh-page dh-conditions-page"><header className="dh-topbar"><div className="dh-static-search">⌕ <span>Search is unavailable in this release</span></div><div className="dh-top-actions"><span>⌖ Melbourne</span><button type="button" disabled title="Help centre is planned">?</button><button type="button" disabled title="Accounts are not enabled">●</button></div></header><div className="dh-condition-layout">
-    <section className="dh-condition-visual" aria-label="Selected child health condition"><span className="dh-eyebrow">Child health conditions</span><h1>Child health conditions</h1><p>Local population context and practical prevention guidance.<br />Not individual diagnosis or medical advice.</p><div className="dh-organ-stage" tabIndex={0}><img src={selected.image} alt={`Medical educational illustration for ${selected.label}`} /><span className="dh-organ-tooltip"><strong>{selected.label}</strong><small>{selected.summary}</small></span></div><div className="dh-condition-picker" aria-label="Health condition categories">{conditions.map((item) => <button key={item.id} type="button" aria-pressed={conditionId === item.id} onClick={() => selectCondition(item.id)}><img src={item.image} alt="" /><span>{item.label}</span></button>)}</div></section>
+  useEffect(() => {
+    window.localStorage.setItem('kinderprint-child-age', age)
+    window.localStorage.setItem('kinderprint-known-condition', String(knownCondition))
+  }, [age, knownCondition])
+  useEffect(() => {
+    if (!stageRef.current || reduceMotion) return
+    const image = stageRef.current.querySelector('img')
+    if (!image) return
+    gsap.fromTo(image, { autoAlpha: 0.35, y: 18, scale: 0.97 }, { autoAlpha: 1, y: 0, scale: 1, duration: 0.55, ease: 'power2.out' })
+  }, [conditionId, reduceMotion])
+  return <div className="dh-page dh-conditions-page"><header className="dh-topbar"><LocalitySearch locality={locality} onSelect={onSelectLocality} /><div className="dh-child-context"><label>Child age<select value={age} onChange={event => setAge(event.target.value)}><option>0–4 years</option><option>5–9 years</option><option>10–14 years</option></select></label><button type="button" aria-pressed={knownCondition} onClick={() => setKnownCondition(value => !value)}>{knownCondition ? `${selected.label} selected` : 'Add known condition'}</button></div></header><div className="dh-condition-layout">
+    <section className="dh-condition-visual" aria-label="Selected child health condition"><span className="dh-eyebrow">Child health conditions</span><h1>Child health conditions</h1><p>Choose a locality and body system to build a practical child-health preparation plan.</p><div className="dh-organ-stage" ref={stageRef} tabIndex={0}><img src={selected.image} alt={`Medical educational illustration for ${selected.label}`} /><span className="dh-organ-tooltip"><strong>{selected.label}</strong><small>{selected.summary}</small></span></div><div className="dh-condition-picker" aria-label="Health condition categories">{conditions.map((item) => <button key={item.id} type="button" aria-pressed={conditionId === item.id} onClick={() => selectCondition(item.id)}><img src={item.image} alt="" /><span>{item.label}</span></button>)}</div></section>
     <section className="dh-condition-detail"><div className="dh-condition-heading"><h2>{selected.label}</h2><span>{selected.status}</span></div><div className="dh-topic-tabs dh-health-tabs" role="tablist" aria-label="Condition information">{healthPanels.map((item) => <button key={item} type="button" role="tab" aria-selected={panel === item} onClick={() => setPanel(item)}>{item}</button>)}</div>
-      {panel === 'Local health' && <article className="dh-health-panel"><header><div><h3>Health indicators for {locality.name}</h3><p>Exact SA2 observations are separated from containing-PHA context.</p></div><span>{exact.length + regional.length} relevant measures</span></header>{data.loading ? <p className="dh-health-empty">Loading validated locality data.</p> : <><h4 className="dh-geography-title">Selected SA2 · {locality.name}</h4><div className="dh-health-metrics">{exact.map(indicator => <div key={indicator.indicator}><small>{healthIndicatorLabels[indicator.indicator] ?? indicator.indicator}</small><strong>{indicator.percent === null ? 'Not published' : `${indicator.percent.toFixed(2)}%`}</strong><span>{indicator.count?.toLocaleString() ?? 'Not published'} children · ABS Census {indicator.reference_year}</span></div>)}{exact.length === 0 && <p className="dh-health-empty">No exact SA2 measure is published for this condition group.</p>}</div><h4 className="dh-geography-title">Regional context · {data.childHealth?.locality?.pha_name ?? 'Population Health Area unavailable'}</h4><div className="dh-health-metrics">{regional.map(indicator => <div key={indicator.indicator_id}><small>{healthIndicatorLabels[indicator.indicator_id] ?? indicator.indicator_id}</small><strong>{indicator.rate_or_percent === null ? 'Not published' : `${indicator.rate_or_percent.toFixed(2)}${indicator.indicator_id === 'infant_mortality' ? ' per 1,000' : '%'}`}</strong><span>{indicator.reference_period} · {indicator.methodology_class.replace(/_/g, ' ')}{indicator.lower_95_ci !== null ? ` · 95% CI ${indicator.lower_95_ci.toFixed(2)}–${indicator.upper_95_ci?.toFixed(2)}` : ''}</span></div>)}</div></>}</article>}
-      {panel === 'Prevention' && <GuidancePanel title="Practical prevention" icon="✚" items={guidance.prevention} footer="Discuss decisions about symptoms, medicines or treatment with a qualified health professional." />}
-      {panel === 'Daily routine' && <GuidancePanel title="Healthy daily routine" icon="☀" items={guidance.routine} footer="Adapt routines to the child’s age, ability, diagnosed conditions and clinical plan." />}
-      {panel === 'Seasonal care' && <GuidancePanel title="Melbourne seasonal care" icon="☁" items={guidance.seasonal} footer="Current warnings and forecasts should be checked through Victorian Government services." />}
+      <AnimatePresence mode="wait"><motion.div key={`${conditionId}-${panel}`} initial={reduceMotion ? false : { opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={reduceMotion ? undefined : { opacity: 0, y: -8 }} transition={{ duration: 0.22 }}>
+      {panel === 'Local health' && <article className="dh-health-panel"><header><div><h3>Health indicators for {locality.name}</h3><p>Published locality measures and the containing regional context.</p></div><span>{exact.length + regional.length} relevant measures</span></header>{data.loading ? <p className="dh-health-empty">Loading locality data.</p> : <><div className="dh-health-metrics">{exact.map(indicator => <div key={indicator.indicator}><small>{healthIndicatorLabels[indicator.indicator] ?? indicator.indicator}</small><strong>{indicator.percent === null ? 'Not published' : `${indicator.percent.toFixed(2)}%`}</strong><span>{indicator.count?.toLocaleString() ?? 'Not published'} children · ABS Census {indicator.reference_year} · SA2</span></div>)}{regional.map(indicator => <div key={indicator.indicator_id}><small>{healthIndicatorLabels[indicator.indicator_id] ?? indicator.indicator_id}</small><strong>{indicator.rate_or_percent === null ? 'Not published' : `${indicator.rate_or_percent.toFixed(2)}${indicator.indicator_id === 'infant_mortality' ? ' per 1,000' : '%'}`}</strong><span>{indicator.reference_period} · {data.childHealth?.locality?.pha_name ?? 'PHA'}{indicator.lower_95_ci !== null ? ` · 95% CI ${indicator.lower_95_ci.toFixed(2)}–${indicator.upper_95_ci?.toFixed(2)}` : ''}</span></div>)}</div><button className="dh-primary-action" type="button" onClick={() => { setPanel('Prevention'); setPlanOpen(true) }}>Build preparation plan</button></>}</article>}
+      {panel === 'Prevention' && <GuidancePanel title="Practical prevention" icon="✚" items={guidance.prevention} sourceUrl={conditionSourceLinks[conditionId]} onOpenPlan={() => setPlanOpen(true)} />}
+      {panel === 'Daily routine' && <GuidancePanel title="Healthy daily routine" icon="☀" items={guidance.routine} sourceUrl={conditionSourceLinks[conditionId]} onOpenPlan={() => setPlanOpen(true)} />}
+      {panel === 'Seasonal care' && <SeasonalCarePanel guidance={guidance.seasonal} locality={locality} conditionId={conditionId} onOpenPlan={() => setPlanOpen(true)} />}
       {panel === 'Nearby care' && <NearbyCarePanel data={data} locality={locality} />}
+      </motion.div></AnimatePresence>
     </section>
-  </div></div>
+  </div><AnimatePresence>{planOpen && <PreparationPlan condition={selected.label} locality={locality.name} age={age} items={guidance.prevention} sourceUrl={conditionSourceLinks[conditionId]} onClose={() => setPlanOpen(false)} />}</AnimatePresence></div>
 }
 
-function GuidancePanel({ title, icon, items, footer }: { title: string; icon: string; items: string[]; footer: string }) {
-  return <article className="dh-health-panel dh-guidance-panel"><header><div><h3>{icon} {title}</h3><p>General, evidence-informed guidance for parents and carers.</p></div></header><ol>{items.map((item, index) => <li key={item}><b>{index + 1}</b><span>{item}</span></li>)}</ol><p className="dh-health-note">{footer}</p></article>
+function GuidancePanel({ title, icon, items, sourceUrl, onOpenPlan }: { title: string; icon: string; items: string[]; sourceUrl: string; onOpenPlan: () => void }) {
+  return <article className="dh-health-panel dh-guidance-panel"><header><div><h3>{icon} {title}</h3><p>Official preparation guidance organised into clear steps.</p></div><button className="dh-primary-action" type="button" onClick={onOpenPlan}>Keep your plan ready</button></header><ol>{items.map((item, index) => <li key={item}><b>{index + 1}</b><span>{item}</span><a href={sourceUrl} target="_blank" rel="noreferrer">How to prepare ↗</a></li>)}</ol><a className="dh-official-link" href={sourceUrl} target="_blank" rel="noreferrer">Open official guidance ↗</a></article>
+}
+
+function SeasonalCarePanel({ guidance, locality, conditionId, onOpenPlan }: { guidance: string[]; locality: NeighbourhoodSearchResult; conditionId: ConditionId; onOpenPlan: () => void }) {
+  const month = new Date().getMonth()
+  const asthmaSeason = month >= 9 && month <= 11
+  return <article className="dh-health-panel dh-seasonal-panel"><header><div><h3>Seasonal care for {locality.name}</h3><p>Official live services and preparation steps for the selected body system.</p></div><button className="dh-primary-action" type="button" onClick={onOpenPlan}>Recommended today</button></header><div className="dh-live-grid"><a href={OFFICIAL_LINKS.airWatch} target="_blank" rel="noreferrer"><b>EPA AirWatch</b><strong>Updated hourly</strong><span>Open monitoring-site readings and Melbourne’s daily forecast ↗</span></a><a href={OFFICIAL_LINKS.asthmaForecast} target="_blank" rel="noreferrer"><b>Thunderstorm asthma</b><strong>{asthmaSeason ? 'Forecast in season' : 'Season starts 1 October'}</strong><span>Three-day Central district forecast ↗</span></a><a href={OFFICIAL_LINKS.heatWarning} target="_blank" rel="noreferrer"><b>Heat-health warning</b><strong>Central district</strong><span>Open current Victorian warning status ↗</span></a></div><ol>{guidance.map((item, index) => <li key={item}><b>{index + 1}</b><span>{item}</span></li>)}</ol>{conditionId === 'lungs' && <a className="dh-official-link" href={OFFICIAL_LINKS.asthmaForecast} target="_blank" rel="noreferrer">Check today’s official forecast ↗</a>}</article>
+}
+
+function PreparationPlan({ condition, locality, age, items, sourceUrl, onClose }: { condition: string; locality: string; age: string; items: string[]; sourceUrl: string; onClose: () => void }) {
+  const storageKey = `kinderprint-plan:${locality}:${condition}:${age}`
+  const [done, setDone] = useState<string[]>(() => { try { return JSON.parse(window.localStorage.getItem(storageKey) ?? '[]') as string[] } catch { return [] } })
+  const toggle = (item: string) => setDone(current => { const next = current.includes(item) ? current.filter(value => value !== item) : [...current, item]; window.localStorage.setItem(storageKey, JSON.stringify(next)); return next })
+  return <motion.div className="dh-plan-backdrop" role="presentation" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onMouseDown={event => event.target === event.currentTarget && onClose()}><motion.section className="dh-plan-sheet" role="dialog" aria-modal="true" aria-labelledby="dh-plan-title" initial={{ x: '100%' }} animate={{ x: 0 }} exit={{ x: '100%' }} transition={{ type: 'spring', damping: 28, stiffness: 260 }}><header><div><span>Saved on this device</span><h2 id="dh-plan-title">{condition} preparation plan</h2><p>{locality} · {age}</p></div><button type="button" aria-label="Close preparation plan" onClick={onClose}>×</button></header><div className="dh-plan-progress"><span style={{ width: `${(done.length / items.length) * 100}%` }} /></div><p>{done.length} of {items.length} steps complete</p><ol>{items.map(item => <li key={item}><label><input type="checkbox" checked={done.includes(item)} onChange={() => toggle(item)} /><span>{item}</span></label></li>)}</ol><a href={sourceUrl} target="_blank" rel="noreferrer">Read the official guidance ↗</a><button className="dh-plan-done" type="button" onClick={onClose}>Done</button></motion.section></motion.div>
 }
 
 function NearbyCarePanel({ data, locality }: { data: DigitalHealthData; locality: NeighbourhoodSearchResult }) {
@@ -355,6 +405,7 @@ function ComparisonHealthPage({ primary, secondary, primaryData, secondaryData, 
 }) {
   const [audience, setAudience] = useState<AudienceView>('parent')
   const [conditionId, setConditionId] = useState<ConditionId>('brain')
+  const [planOpen, setPlanOpen] = useState(false)
   const ids = conditionIndicatorIds[conditionId].sa2
   const rows = ids.map(id => ({
     id,
@@ -382,8 +433,9 @@ function ComparisonHealthPage({ primary, secondary, primaryData, secondaryData, 
     </section>
     <section className="dh-compare-content">
       <article className="dh-compare-evidence"><header><div><h2>{conditions.find(item => item.id === conditionId)?.label}</h2><p>Exact locality observations and separately labelled regional context</p></div><span>Validated evidence</span></header>{rows.length > 0 ? <><h3 className="dh-geography-title">Exact SA2 · ABS Census 2021, ages 0–14</h3><div className="dh-health-comparison-table"><div className="head"><span>Reported condition</span><span>{primary.name}</span><span>{secondary.name}</span></div>{rows.map(row => <div key={row.id}><b>{row.label}</b><span><strong>{pct(row.a?.percent)}</strong>{audience === 'practitioner' && <small>{row.a?.count ?? 'N/A'} of {row.a?.population_denominator ?? 'N/A'}</small>}</span><span><strong>{pct(row.b?.percent)}</strong>{audience === 'practitioner' && <small>{row.b?.count ?? 'N/A'} of {row.b?.population_denominator ?? 'N/A'}</small>}</span></div>)}</div></> : <p className="dh-health-empty">No exact SA2 condition measure is published for this category.</p>}<h3 className="dh-geography-title">Containing Population Health Area · not an SA2 estimate</h3><div className="dh-health-comparison-table"><div className="head"><span>Regional indicator</span><span>{primaryData.childHealth?.locality?.pha_name ?? primary.name}</span><span>{secondaryData.childHealth?.locality?.pha_name ?? secondary.name}</span></div>{regionalRows.map(row => <div key={row.id}><b>{row.label}</b><span><strong>{row.a?.rate_or_percent == null ? 'Not published' : `${row.a.rate_or_percent.toFixed(2)}${row.id === 'infant_mortality' ? ' per 1,000' : '%'}`}</strong><small>{row.a?.reference_period ?? ''}{audience === 'practitioner' && row.a?.methodology_class ? ` · ${row.a.methodology_class.replace(/_/g, ' ')}` : ''}</small></span><span><strong>{row.b?.rate_or_percent == null ? 'Not published' : `${row.b.rate_or_percent.toFixed(2)}${row.id === 'infant_mortality' ? ' per 1,000' : '%'}`}</strong><small>{row.b?.reference_period ?? ''}{audience === 'practitioner' && row.b?.methodology_class ? ` · ${row.b.methodology_class.replace(/_/g, ' ')}` : ''}</small></span></div>)}</div><footer>Differences are descriptive only. No significance test or causal claim is made. PHA values are not assigned to component SA2s.</footer></article>
-      {audience === 'parent' ? <aside className="dh-audience-panel"><h2>Useful next steps</h2><ol>{guidance.prevention.map((item, index) => <li key={item}><b>{index + 1}</b><span>{item}</span></li>)}</ol><div><strong>When comparing areas</strong><p>Use these results to identify questions about services and support. Do not choose care or a home from one percentage alone.</p></div></aside> : <aside className="dh-audience-panel"><h2>Clinical interpretation boundary</h2><dl><div><dt>Exact locality layer</dt><dd>ABS Census 2021, SA2, ages 0–14</dd></div><div><dt>{primary.name} regional layer</dt><dd>{primaryData.childHealth?.locality?.pha_name ?? 'Not available'}</dd></div><div><dt>{secondary.name} regional layer</dt><dd>{secondaryData.childHealth?.locality?.pha_name ?? 'Not available'}</dd></div><div><dt>Service layer</dt><dd>Listed presence, not capacity or referral availability</dd></div></dl><div><strong>Use case</strong><p>Supports population planning, service conversations and hypothesis generation. Not case finding or clinical triage.</p></div></aside>}
+      {audience === 'parent' ? <aside className="dh-audience-panel"><h2>Useful next steps</h2><ol>{guidance.prevention.map((item, index) => <li key={item}><b>{index + 1}</b><span>{item}</span></li>)}</ol><button className="dh-primary-action" type="button" onClick={() => setPlanOpen(true)}>Keep your plan ready</button><a className="dh-official-link" href={conditionSourceLinks[conditionId]} target="_blank" rel="noreferrer">Official guidance and how to prepare ↗</a><div><strong>When comparing areas</strong><p>Use these results to identify questions about services and support. Do not choose care or a home from one percentage alone.</p></div></aside> : <aside className="dh-audience-panel"><h2>Clinical interpretation boundary</h2><dl><div><dt>Exact locality layer</dt><dd>ABS Census 2021, SA2, ages 0–14</dd></div><div><dt>{primary.name} regional layer</dt><dd>{primaryData.childHealth?.locality?.pha_name ?? 'Not available'}</dd></div><div><dt>{secondary.name} regional layer</dt><dd>{secondaryData.childHealth?.locality?.pha_name ?? 'Not available'}</dd></div><div><dt>Service layer</dt><dd>Listed presence, not capacity or referral availability</dd></div></dl><div><strong>Use case</strong><p>Supports population planning, service conversations and hypothesis generation. Not case finding or clinical triage.</p></div></aside>}
     </section>
+    <AnimatePresence>{planOpen && <PreparationPlan condition={conditions.find(item => item.id === conditionId)?.label ?? 'Child health'} locality={`${primary.name} and ${secondary.name}`} age="All child age groups" items={guidance.prevention} sourceUrl={conditionSourceLinks[conditionId]} onClose={() => setPlanOpen(false)} />}</AnimatePresence>
   </div>
 }
 
@@ -397,10 +449,10 @@ export default function DigitalHealthHub({ onHome, onBack, initialLocalities = [
   if (comparisonMode && view === 'conditions') return <div className="digital-health-hub"><SideNavigation current={view} onChange={setView} onHome={onHome} /><main><ComparisonHealthPage primary={locality} secondary={secondary} primaryData={data} secondaryData={secondaryData} onBack={onBack} /></main></div>
   const page = view === 'overview'
     ? <OverviewPage onConditions={() => setView('conditions')} onDemand={() => setView('demand')} data={data} locality={locality} />
-    : view === 'conditions' ? <ConditionsPage data={data} locality={locality} />
+    : view === 'conditions' ? <ConditionsPage data={data} locality={locality} onSelectLocality={setLocality} />
       : view === 'environment' ? <EnvironmentPage data={data} locality={locality} />
         : view === 'care' ? <CareAccessPage data={data} locality={locality} />
           : view === 'demand' ? <FutureDemandPage data={data} locality={locality} />
             : <EvidenceReviewPage data={data} locality={locality} />
-  return <div className="digital-health-hub"><SideNavigation current={view} onChange={setView} onHome={onHome} /><main><LocalitySearch locality={locality} onSelect={setLocality} />{page}</main></div>
+  return <div className="digital-health-hub"><SideNavigation current={view} onChange={setView} onHome={onHome} /><main>{view !== 'conditions' && <LocalitySearch locality={locality} onSelect={setLocality} />}{page}</main></div>
 }
