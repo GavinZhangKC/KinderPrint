@@ -11,6 +11,7 @@ from core.data_loader import (
     COMMUNITY_CONTEXT_DATA_PATH_ENV,
     COMMUNITY_IDENTITY_DATA_PATH_ENV,
     EPA_STATION_YEAR_DATA_PATH_ENV,
+    PHIDU_CHILD_HEALTH_DATA_PATH_ENV,
     PROFILE_DATA_PATH_ENV,
     SUITABILITY_DATA_PATH_ENV,
     VIF_PROJECTION_DATA_PATH_ENV,
@@ -40,6 +41,7 @@ def test_dataset_status_exposes_boundaries_without_local_paths(client, monkeypat
     configured = tmp_path / "vif.csv"
     configured.write_text("header\n", encoding="utf-8")
     monkeypatch.setenv("KINDERPRINT_VIF_PROJECTION_DATA_PATH", str(configured))
+    monkeypatch.setenv(PHIDU_CHILD_HEALTH_DATA_PATH_ENV, str(configured))
 
     body = client.get("/api/datasets/status").json()
 
@@ -50,6 +52,11 @@ def test_dataset_status_exposes_boundaries_without_local_paths(client, monkeypat
     assert products["epa_historical_air_quality"]["interpretation_status"] == "station_context_only"
     assert products["epa_historical_air_quality"]["user_facing"] is False
     assert products["phidu_child_health"]["interpretation_status"] == "research_only"
+    assert products["phidu_child_health"]["configured"] is True
+    assert products["phidu_pha_sa2_bridge"]["interpretation_status"] == "join_only"
+    assert products["sa2_department_area_bridge"]["interpretation_status"] == "join_only"
+    assert products["bushfire_context_sa2"]["interpretation_status"] == "context_only"
+    assert products["transport_context_sa2"]["interpretation_status"] == "context_only"
     assert products["vcams_department_area_context"]["interpretation_status"] == "broad_area_context_only"
     assert products["vcams_lga_context"]["geographic_unit"] == "Victorian Local Government Area"
     assert products["healthdirect_facilities"]["interpretation_status"] == "directory_presence_only"
@@ -659,7 +666,7 @@ def test_data_health_distinguishes_process_health_from_unconfigured_data(client)
 
     assert_envelope(body)
     assert body["status"] == "limited"
-    assert body["metadata"] == {"check_count": 17, "ready_count": 0}
+    assert body["metadata"] == {"check_count": 22, "ready_count": 0}
     assert {check["readiness"] for check in body["data"]["checks"]} == {"not_configured"}
     assert all(check["record_count"] is None for check in body["data"]["checks"])
     assert {
@@ -667,6 +674,11 @@ def test_data_health_distinguishes_process_health_from_unconfigured_data(client)
         "priority_explanations",
         "approved_neighbourhood_comparisons",
         "locality_suitability",
+        "phidu_child_health",
+        "phidu_pha_sa2_bridge",
+        "sa2_department_area_bridge",
+        "bushfire_context_sa2",
+        "transport_context_sa2",
     }.issubset({check["id"] for check in body["data"]["checks"]})
 
 

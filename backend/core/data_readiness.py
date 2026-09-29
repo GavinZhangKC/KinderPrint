@@ -9,7 +9,12 @@ from loaders.air_quality import load_station_year_observations
 from loaders.community_context import load_community_context
 from loaders.digital_health import (
     load_abs_child_health,
+    load_bushfire_context,
+    load_department_area_bridge,
     load_health_facilities,
+    load_phidu_bridge,
+    load_phidu_child_health,
+    load_transport_context,
     load_vcams_area_context,
     load_vcams_lga_context,
 )
@@ -59,6 +64,11 @@ def runtime_data_readiness() -> list[dict[str, Any]]:
     vcams_lga, vcams_lga_limitations = load_vcams_lga_context()
     health_facilities, health_facility_limitations = load_health_facilities()
     abs_child_health, abs_child_health_limitations = load_abs_child_health()
+    phidu_child_health, phidu_child_health_limitations = load_phidu_child_health()
+    phidu_bridge, phidu_bridge_limitations = load_phidu_bridge()
+    department_bridge, department_bridge_limitations = load_department_area_bridge()
+    bushfire_context, bushfire_context_limitations = load_bushfire_context()
+    transport_context, transport_context_limitations = load_transport_context()
     priorities, _, priority_limitations = load_priority_results()
     explanations, _, explanation_limitations = load_explanations()
     comparisons, _, comparison_limitations = load_comparison_data()
@@ -95,6 +105,21 @@ def runtime_data_readiness() -> list[dict[str, Any]]:
         _check("abs_child_health_sa2", abs_child_health,
                abs_child_health_limitations,
                len(abs_child_health) if abs_child_health is not None else None),
+        _check("phidu_child_health", phidu_child_health,
+               phidu_child_health_limitations,
+               len(phidu_child_health) if phidu_child_health is not None else None),
+        _check("phidu_pha_sa2_bridge", phidu_bridge,
+               phidu_bridge_limitations,
+               len(phidu_bridge) if phidu_bridge is not None else None),
+        _check("sa2_department_area_bridge", department_bridge,
+               department_bridge_limitations,
+               len(department_bridge) if department_bridge is not None else None),
+        _check("bushfire_context_sa2", bushfire_context,
+               bushfire_context_limitations,
+               len(bushfire_context) if bushfire_context is not None else None),
+        _check("transport_context_sa2", transport_context,
+               transport_context_limitations,
+               len(transport_context) if transport_context is not None else None),
         _check("priority_for_investigation", priorities, priority_limitations,
                len(priorities) if priorities is not None else None),
         _check("priority_explanations", explanations, explanation_limitations,
