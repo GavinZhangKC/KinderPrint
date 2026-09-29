@@ -196,7 +196,7 @@ export interface HealthFacility {
 export interface ChildHealthSa2Indicator {
   sa2_code_2021: string
   sa2_name_2021: string
-  reference_year: string
+  reference_year: number
   age_group: string
   indicator: string
   count: number | null
