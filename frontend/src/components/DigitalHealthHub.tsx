@@ -320,8 +320,10 @@ interface DigitalHealthData {
   environmentalDifference: EnvironmentalDifference | null
   childHealth: ChildHealthContext | null
   loading: boolean
-  error: string | null
+  errors: Partial<Record<DigitalHealthResource, string>>
 }
+
+type DigitalHealthResource = 'facilities' | 'projections' | 'profile' | 'environmentalDifference' | 'childHealth'
 
 const indicatorNames: Record<string, string> = {
   minimum_recommended_fruit: 'Recommended fruit intake',
@@ -340,29 +342,35 @@ const indicatorNames: Record<string, string> = {
 }
 
 function useDigitalHealthData(locality: NeighbourhoodSearchResult, comparisonId?: string): DigitalHealthData {
-  const [data, setData] = useState<DigitalHealthData>({ area: [], lga: [], facilities: [], projections: [], profile: null, environmentalDifference: null, childHealth: null, loading: true, error: null })
+  const [data, setData] = useState<DigitalHealthData>({ area: [], lga: [], facilities: [], projections: [], profile: null, environmentalDifference: null, childHealth: null, loading: true, errors: {} })
   useEffect(() => {
     const controller = new AbortController()
-    setData(current => ({ ...current, loading: true, error: null }))
-    Promise.all([
+    setData(current => ({ ...current, loading: true, errors: {} }))
+    Promise.allSettled([
       api.getHealthFacilities(locality.id, controller.signal),
       api.getPopulationProjections(locality.id, controller.signal),
       api.getProfile(locality.id, controller.signal),
       api.getEnvironmentalDifference(locality.id, comparisonId ?? locality.id),
       api.getChildHealthContext(locality.id, controller.signal),
-    ]).then(([facilities, projections, profile, environmentalDifference, childHealth]) => setData({
-      area: [],
-      lga: [],
-      facilities: facilities.data.facilities,
-      projections: projections.data.projections,
-      profile: profile.data,
-      environmentalDifference: environmentalDifference.data,
-      childHealth: childHealth.data,
-      loading: false,
-      error: null,
-    })).catch(error => {
-      if (error instanceof DOMException && error.name === 'AbortError') return
-      setData(current => ({ ...current, loading: false, error: 'Validated health data could not be loaded.' }))
+    ]).then(([facilities, projections, profile, environmentalDifference, childHealth]) => {
+      if (controller.signal.aborted) return
+      const errors: DigitalHealthData['errors'] = {}
+      if (facilities.status === 'rejected') errors.facilities = 'Health facility data could not be loaded.'
+      if (projections.status === 'rejected') errors.projections = 'Population projection data could not be loaded.'
+      if (profile.status === 'rejected') errors.profile = 'Neighbourhood profile data could not be loaded.'
+      if (environmentalDifference.status === 'rejected') errors.environmentalDifference = 'Environmental comparison data could not be loaded.'
+      if (childHealth.status === 'rejected') errors.childHealth = 'Child health context could not be loaded.'
+      setData({
+        area: [],
+        lga: [],
+        facilities: facilities.status === 'fulfilled' ? facilities.value.data.facilities : [],
+        projections: projections.status === 'fulfilled' ? projections.value.data.projections : [],
+        profile: profile.status === 'fulfilled' ? profile.value.data : null,
+        environmentalDifference: environmentalDifference.status === 'fulfilled' ? environmentalDifference.value.data : null,
+        childHealth: childHealth.status === 'fulfilled' ? childHealth.value.data : null,
+        loading: false,
+        errors,
+      })
     })
     return () => controller.abort()
   }, [comparisonId, locality.id])
@@ -413,7 +421,7 @@ function CareAccessPage({ data, locality }: { data: DigitalHealthData; locality:
   }, {}), [data.facilities])
   const categories = ['General practice', 'Pharmacy', 'Maternal and child health', 'Hospital']
   return <div className="dh-page dh-board-page"><BoardHeader locality={locality} title="Care access" subtitle={`Verified service locations inside ${locality.name}. Presence is not capacity, price or appointment availability.`} />
-    {data.error && <p className="dh-board-error">{data.error}</p>}
+    {data.errors.facilities && <p className="dh-board-error">{data.errors.facilities}</p>}
     <section className="dh-board-grid dh-care-board">
       <article className="dh-feature-card dh-care-hero"><div><span className="dh-card-kicker">LOCAL CARE NETWORK</span><h2>{data.loading ? 'Loading' : `${data.facilities.length} listed services`}</h2><p>Directory-listed services physically located within the {locality.name} SA2 boundary.</p></div><div className="dh-care-orbit" aria-hidden="true"><i>✚</i><span>⌖</span><b>●</b></div><small>Healthdirect facilities extract · 7 March 2025</small></article>
       <article className="dh-board-card dh-access-summary"><h3>Service mix</h3><div className="dh-access-rings">{categories.map((category, index) => <div key={category}><span style={{ '--ring': `${Math.min(100, (groups[category]?.length ?? 0) * 25)}%` } as CSSProperties}><b>{groups[category]?.length ?? 0}</b></span><small>{category}</small><i className={`tone-${index}`} /></div>)}</div></article>
@@ -430,12 +438,12 @@ function FutureDemandPage({ data, locality }: { data: DigitalHealthData; localit
   const childChange = first && last ? ((last.population_age_0_14_projected ?? 0) - (first.population_age_0_14_projected ?? 0)) : null
   const max = Math.max(...projections.map(row => row.population_age_0_14_projected ?? 0), 1)
   return <div className="dh-page dh-board-page"><BoardHeader locality={locality} title="Future demand" subtitle="Published population projections help plan child and family services. They are modelled scenarios, not forecasts of individual need." />
-    {data.error && <p className="dh-board-error">{data.error}</p>}
+    {data.errors.projections && <p className="dh-board-error">{data.errors.projections}</p>}
     <section className="dh-board-grid dh-demand-board">
       <article className="dh-feature-card dh-demand-hero"><div><span className="dh-card-kicker">CHILD POPULATION OUTLOOK</span><h2>{last ? Math.round(last.population_age_0_14_projected ?? 0).toLocaleString() : data.loading ? 'Loading' : 'Not available'}</h2><p>children aged 0–14 projected for {locality.name} in {last?.projection_year ?? 'the latest published year'}</p></div><div className="dh-demand-wave">{projections.map(row => <i key={row.projection_year} style={{ height: `${32 + ((row.population_age_0_14_projected ?? 0) / max) * 90}px` }}><span>{row.projection_year}</span></i>)}</div><small>Victoria in Future 2023 Release 2 · SA2</small></article>
       <article className="dh-board-card dh-demand-change"><h3>Planning signal</h3><strong>{childChange === null ? 'Loading' : `${childChange >= 0 ? '+' : ''}${Math.round(childChange).toLocaleString()}`}</strong><p>projected change in children aged 0–14 from {first?.projection_year ?? 2021} to {last?.projection_year ?? 2036}</p><span>Projection, not observed growth</span></article>
       <article className="dh-board-card dh-age-outlook"><header><div><h3>Age-group outlook</h3><p>Published counts by five-year age band</p></div></header><div className="dh-projection-chart">{projections.map(row => <div key={row.projection_year}><b>{row.projection_year}</b><span title={`Ages 0–4: ${Math.round(row.population_age_0_4_projected ?? 0)}`} style={{ '--value': `${((row.population_age_0_4_projected ?? 0) / max) * 100}%` } as CSSProperties} /><span title={`Ages 5–9: ${Math.round(row.population_age_5_9_projected ?? 0)}`} style={{ '--value': `${((row.population_age_5_9_projected ?? 0) / max) * 100}%` } as CSSProperties} /><span title={`Ages 10–14: ${Math.round(row.population_age_10_14_projected ?? 0)}`} style={{ '--value': `${((row.population_age_10_14_projected ?? 0) / max) * 100}%` } as CSSProperties} /></div>)}</div><footer><span>● 0–4 years</span><span>● 5–9 years</span><span>● 10–14 years</span></footer></article>
-      <article className="dh-board-card dh-health-demand"><h3>Health planning context</h3><div>{data.area.filter(item => ['special_healthcare_needs', 'recommended_daily_physical_activity', 'household_food_insecurity'].includes(item.indicator_id)).map(item => <div key={item.indicator_id}><span><b>{indicatorNames[item.indicator_id]}</b><small>Hume Moreland · {item.reference_year}</small></span><strong>{item.percent?.toFixed(1)}%</strong><i className={item.quality_flag}>{item.quality_flag.replace(/_/g, ' ')}</i></div>)}</div><p>These broad-area survey estimates describe current context; they are not projected forward.</p></article>
+      <article className="dh-board-card dh-health-demand"><h3>Health planning context</h3><div>{data.area.filter(item => ['special_healthcare_needs', 'recommended_daily_physical_activity', 'household_food_insecurity'].includes(item.indicator_id)).map(item => <div key={item.indicator_id}><span><b>{indicatorNames[item.indicator_id]}</b><small>{item.area_name} · {item.reference_year}</small></span><strong>{item.percent?.toFixed(1)}%</strong><i className={item.quality_flag}>{item.quality_flag.replace(/_/g, ' ')}</i></div>)}</div><p>These broad-area survey estimates describe current context; they are not projected forward.</p></article>
     </section>
   </div>
 }

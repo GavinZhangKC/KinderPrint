@@ -53,7 +53,7 @@ export interface HubData {
   profile: NeighbourhoodProfile | null
   childHealth: ChildHealthContext | null
   loading: boolean
-  error: string | null
+  errors: Partial<Record<'facilities' | 'projections' | 'profile' | 'environmentalDifference' | 'childHealth', string>>
 }
 
 interface KinderHubProps {
@@ -64,7 +64,7 @@ interface KinderHubProps {
   onOpenPlan: (body: BodyId, age: string) => void
 }
 
-type Loaded<T> = { data: T | null; loading: boolean }
+type Loaded<T> = { data: T | null; loading: boolean; error: string | null }
 
 /* ------------------------------------------------------------------ constants */
 
@@ -167,13 +167,13 @@ const slug = (value: string) => value.replace(/\W+/g, '-').replace(/^-|-$/g, '')
 const mapsLink = (facility: HealthFacility) => `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${facility.name} ${facility.address}`)}`
 
 function useEndpoint<T>(load: (signal: AbortSignal) => Promise<{ data: T }>, key: string): Loaded<T> {
-  const [state, setState] = useState<Loaded<T>>({ data: null, loading: true })
+  const [state, setState] = useState<Loaded<T>>({ data: null, loading: true, error: null })
   useEffect(() => {
     const controller = new AbortController()
-    setState({ data: null, loading: true })
+    setState({ data: null, loading: true, error: null })
     load(controller.signal)
-      .then(response => setState({ data: response.data, loading: false }))
-      .catch(error => { if (!(error instanceof DOMException && error.name === 'AbortError')) setState({ data: null, loading: false }) })
+      .then(response => setState({ data: response.data, loading: false, error: null }))
+      .catch(error => { if (!(error instanceof DOMException && error.name === 'AbortError')) setState({ data: null, loading: false, error: 'This data section could not be loaded.' }) })
     return () => controller.abort()
     // The loader closes over the locality id, which is the key.
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -318,6 +318,22 @@ export default function KinderHub({ locality, data, onSelectLocality, onHome, on
     seasons: ['Seasonal prevention', 'Seasonal risks explained with SA2 place context. 2018 environment measures describe the area, not exposure.'],
     care: ['Care access', 'Directory presence inside the SA2. Not capacity, fees, bulk billing or waiting time.'],
   }
+  const pageErrors = [
+    ...(page === 'home' ? [data.errors.profile, data.errors.projections, data.errors.facilities, data.errors.childHealth] : []),
+    ...(page === 'health' ? [data.errors.profile, data.errors.childHealth] : []),
+    ...(page === 'vaccines' ? [immunisation.error, data.errors.facilities] : []),
+    ...(page === 'food' ? [nutrition.error] : []),
+    ...(page === 'seasons' ? [data.errors.profile, prevention.error] : []),
+    ...(page === 'care' ? [data.errors.facilities, childcare.error, prevention.error] : []),
+  ].filter((message): message is string => Boolean(message))
+  const mappingLimitations = [
+    ...(!data.loading && data.childHealth && data.childHealth.locality === null && (page === 'home' || page === 'health')
+      ? ['Regional child-health context is unavailable for this locality; no replacement values were created.'] : []),
+    ...(!immunisation.loading && immunisation.data?.locality === null && page === 'vaccines'
+      ? ['Immunisation context is unavailable because this locality has no supported Population Health Area mapping.'] : []),
+    ...(!nutrition.loading && nutrition.data?.locality === null && page === 'food'
+      ? ['Nutrition context is unavailable because this locality has no supported regional mapping.'] : []),
+  ]
 
   return <div className={`kp-hub ${parent ? 'is-parent' : 'is-practitioner'}`}>
     <div className="kh-shell">
@@ -345,7 +361,7 @@ export default function KinderHub({ locality, data, onSelectLocality, onHome, on
         </div>
       </section>
 
-      {data.error && <p className="kh-error" role="alert">{data.error}</p>}
+      {[...new Set([...pageErrors, ...mappingLimitations])].map(message => <p key={message} className="kh-error" role="alert">{message}</p>)}
       <main className="kh-main" key={`${page}-${audience}-${locality.id}`}>
         {page === 'home' && <HomePage {...context} />}
         {page === 'health' && <HealthPage {...context} />}
