@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState, type CSSProperties } from 'react'
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 import gsap from 'gsap'
 
+import BrandHeader from './BrandHeader'
 import LocalityGlobe from './LocalityGlobe'
 import KinderHub from './hub/KinderHub'
 import { api, type ChildHealthContext, type EnvironmentalDifference, type HealthFacility, type NeighbourhoodProfile, type NeighbourhoodSearchResult, type PopulationProjection, type ProfileIndicator, type VcamsAreaIndicator, type VcamsLgaIndicator } from '../services/api'
@@ -14,8 +15,16 @@ type ConditionId = 'brain' | 'lungs' | 'metabolic' | 'immune' | 'perinatal'
 
 interface DigitalHealthHubProps {
   onHome: () => void
-  onBack?: () => void
-  initialLocalities?: NeighbourhoodSearchResult[]
+  onInsight: () => void
+  onSimulation: () => void
+  onMap: () => void
+  onHealth: () => void
+}
+
+interface ChildHealthComparisonPageProps {
+  primary: NeighbourhoodSearchResult
+  secondary: NeighbourhoodSearchResult
+  onBack: () => void
 }
 
 const navigation = [
@@ -199,7 +208,7 @@ const conditionIndicatorIds: Record<ConditionId, { sa2: string[]; pha: string[] 
 
 const healthIndicatorLabels: Record<string, string> = {
   asthma: 'Children reporting asthma', lung_condition: 'Children reporting another lung condition',
-  mental_health_condition: 'Children reporting a mental health condition', other_long_term_condition: 'Other long-term condition',
+  mental_health_condition: 'Mental health condition', other_long_term_condition: 'Other long-term condition',
   diabetes: 'Children reporting diabetes', heart_disease: 'Children reporting heart disease', kidney_disease: 'Children reporting kidney disease', cancer: 'Children reporting cancer',
   child_asthma: 'Childhood asthma', child_mental_health_condition: 'Child mental health condition', child_one_or_more_long_term_conditions: 'One or more long-term conditions',
   child_overweight_not_obese: 'Above healthy weight, excluding obesity', child_obese: 'Children living with obesity',
@@ -211,9 +220,11 @@ function ConditionsPage({ data, locality, onSelectLocality }: { data: DigitalHea
   const [conditionId, setConditionId] = useState<ConditionId>('brain')
   const [panel, setPanel] = useState<HealthPanel>('Local health')
   const [age, setAge] = useState(() => window.localStorage.getItem('kinderprint-child-age') ?? '5–9 years')
+  const [ageMenuOpen, setAgeMenuOpen] = useState(false)
   const [knownCondition, setKnownCondition] = useState(() => window.localStorage.getItem('kinderprint-known-condition') === 'true')
   const [planOpen, setPlanOpen] = useState(false)
   const stageRef = useRef<HTMLDivElement>(null)
+  const ageMenuRef = useRef<HTMLDivElement>(null)
   const reduceMotion = useReducedMotion()
   const selected = conditions.find((item) => item.id === conditionId) ?? conditions[0]
   const guidance = conditionGuidance[conditionId]
@@ -226,12 +237,27 @@ function ConditionsPage({ data, locality, onSelectLocality }: { data: DigitalHea
     window.localStorage.setItem('kinderprint-known-condition', String(knownCondition))
   }, [age, knownCondition])
   useEffect(() => {
+    if (!ageMenuOpen) return
+    const closeOnOutsideClick = (event: PointerEvent) => {
+      if (!ageMenuRef.current?.contains(event.target as Node)) setAgeMenuOpen(false)
+    }
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setAgeMenuOpen(false)
+    }
+    document.addEventListener('pointerdown', closeOnOutsideClick)
+    document.addEventListener('keydown', closeOnEscape)
+    return () => {
+      document.removeEventListener('pointerdown', closeOnOutsideClick)
+      document.removeEventListener('keydown', closeOnEscape)
+    }
+  }, [ageMenuOpen])
+  useEffect(() => {
     if (!stageRef.current || reduceMotion) return
     const image = stageRef.current.querySelector('img')
     if (!image) return
     gsap.fromTo(image, { autoAlpha: 0.35, y: 18, scale: 0.97 }, { autoAlpha: 1, y: 0, scale: 1, duration: 0.55, ease: 'power2.out' })
   }, [conditionId, reduceMotion])
-  return <div className="dh-page dh-conditions-page"><header className="dh-topbar"><LocalitySearch locality={locality} onSelect={onSelectLocality} /><div className="dh-child-context"><label>Child age<select value={age} onChange={event => setAge(event.target.value)}><option>0–4 years</option><option>5–9 years</option><option>10–14 years</option></select></label><button type="button" aria-pressed={knownCondition} onClick={() => setKnownCondition(value => !value)}>{knownCondition ? `${selected.label} selected` : 'Add known condition'}</button></div></header><div className="dh-condition-layout">
+  return <div className="dh-page dh-conditions-page"><header className="dh-topbar"><LocalitySearch locality={locality} onSelect={onSelectLocality} /><div className="dh-child-context"><div className="dh-child-age-picker" ref={ageMenuRef}><button className={`dh-child-age-trigger${ageMenuOpen ? ' is-open' : ''}`} type="button" aria-haspopup="listbox" aria-expanded={ageMenuOpen} onClick={() => setAgeMenuOpen(open => !open)}><span>Child age</span><strong>{age}</strong><i aria-hidden="true" /></button><AnimatePresence>{ageMenuOpen && <motion.div className="dh-child-age-menu" role="listbox" aria-label="Child age" initial={reduceMotion ? false : { opacity: 0, y: -8, scale: .98 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={reduceMotion ? undefined : { opacity: 0, y: -6, scale: .98 }} transition={{ duration: .18, ease: 'easeOut' }}>{['0–4 years', '5–9 years', '10–14 years'].map(option => <button key={option} type="button" role="option" aria-selected={age === option} onClick={() => { setAge(option); setAgeMenuOpen(false) }}><span>{option}</span><b aria-hidden="true">✓</b></button>)}</motion.div>}</AnimatePresence></div><button type="button" aria-pressed={knownCondition} onClick={() => setKnownCondition(value => !value)}>{knownCondition ? `${selected.label} selected` : 'Add known condition'}</button></div></header><div className="dh-condition-layout">
     <section className="dh-condition-visual" aria-label="Selected child health condition"><span className="dh-eyebrow">Child health conditions</span><h1>Child health conditions</h1><p>Choose a locality and body system to build a practical child-health preparation plan.</p><div className="dh-organ-stage" ref={stageRef} tabIndex={0}><img src={selected.image} alt={`Medical educational illustration for ${selected.label}`} /><span className="dh-organ-tooltip"><strong>{selected.label}</strong><small>{selected.summary}</small></span></div><div className="dh-condition-picker" aria-label="Health condition categories">{conditions.map((item) => <button key={item.id} type="button" aria-pressed={conditionId === item.id} onClick={() => selectCondition(item.id)}><img src={item.image} alt="" /><span>{item.label}</span></button>)}</div></section>
     <section className="dh-condition-detail"><div className="dh-condition-heading"><h2>{selected.label}</h2><span>{selected.status}</span></div><div className="dh-topic-tabs dh-health-tabs" role="tablist" aria-label="Condition information">{healthPanels.map((item) => <button key={item} type="button" role="tab" aria-selected={panel === item} onClick={() => setPanel(item)}>{item}</button>)}</div>
       <AnimatePresence mode="wait"><motion.div key={`${conditionId}-${panel}`} initial={reduceMotion ? false : { opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={reduceMotion ? undefined : { opacity: 0, y: -8 }} transition={{ duration: 0.22 }}>
@@ -478,33 +504,40 @@ function ComparisonHealthPage({ primary, secondary, primaryData, secondaryData, 
   const developmentMetric = (data: DigitalHealthData, id: string) => data.profile?.domains.find(domain => domain.id === 'child-development')?.indicators.find(item => item.id === id)?.value
   return <div className="dh-page dh-health-compare-page">
     <header className="dh-compare-topbar"><button type="button" onClick={onBack}>← Back to map</button><div><span>Comparing</span><strong>{primary.name}</strong><i>and</i><strong>{secondary.name}</strong></div><div className="dh-audience-toggle" role="tablist" aria-label="Audience view"><button type="button" role="tab" aria-selected={audience === 'parent'} onClick={() => setAudience('parent')}>Parent view</button><button type="button" role="tab" aria-selected={audience === 'practitioner'} onClick={() => setAudience('practitioner')}>Health practitioner view</button></div></header>
-    <section className="dh-compare-intro"><div><span className="dh-eyebrow">Child health comparison</span><h1>{audience === 'parent' ? 'Understand the health context around your child' : 'Population evidence for care planning'}</h1><p>{audience === 'parent' ? 'Compare reported local health patterns and find practical questions to discuss with a health professional.' : 'Review exact SA2 observations, denominators, regional context and service-presence limitations.'}</p></div><aside><b>Important</b><span>These are area-level statistics. They cannot assess, diagnose or predict an individual child’s health.</span></aside></section>
-    <nav className="dh-compare-condition-tabs" aria-label="Condition category">{conditions.map(item => <button key={item.id} type="button" aria-pressed={conditionId === item.id} onClick={() => setConditionId(item.id)}><img src={item.image} alt="" /><span>{item.label}</span></button>)}</nav>
+    <section className="dh-compare-intro"><div><h1>{audience === 'parent' ? 'Understand the health context around your child' : 'Population evidence for care planning'}</h1><p>{audience === 'parent' ? 'Compare reported local health patterns and find practical questions to discuss with a health professional.' : 'Review exact SA2 observations, denominators, regional context and service-presence limitations.'}</p></div><aside><b>Important</b><span>These are area-level statistics. They cannot assess, diagnose or predict an individual child’s health.</span></aside></section>
     <section className="dh-compare-summary">
       <article><small>{primary.name}</small><strong>{pct(developmentMetric(primaryData, 'aedc_vulnerable_one_or_more') as number | null)}</strong><span>developmentally vulnerable on one or more AEDC domains</span></article>
       <article><small>{secondary.name}</small><strong>{pct(developmentMetric(secondaryData, 'aedc_vulnerable_one_or_more') as number | null)}</strong><span>developmentally vulnerable on one or more AEDC domains</span></article>
       <article><small>Care directory</small><strong>{primaryData.facilities.length} / {secondaryData.facilities.length}</strong><span>active Healthdirect listings inside each SA2</span></article>
     </section>
-    <section className="dh-compare-content">
+    <section className="dh-condition-comparison-card">
+      <nav className="dh-compare-condition-tabs" aria-label="Condition category">{conditions.map(item => <button key={item.id} type="button" aria-pressed={conditionId === item.id} onClick={() => setConditionId(item.id)}><img src={item.image} alt="" /><span>{item.label}</span></button>)}</nav>
+      <section className="dh-compare-content">
       <article className="dh-compare-evidence"><header><div><h2>{conditions.find(item => item.id === conditionId)?.label}</h2><p>Exact locality observations and separately labelled regional context</p></div><span>Validated evidence</span></header>{rows.length > 0 ? <><h3 className="dh-geography-title">Exact SA2 · ABS Census 2021, ages 0–14</h3><div className="dh-health-comparison-table"><div className="head"><span>Reported condition</span><span>{primary.name}</span><span>{secondary.name}</span></div>{rows.map(row => <div key={row.id}><b>{row.label}</b><span><strong>{pct(row.a?.percent)}</strong>{audience === 'practitioner' && <small>{row.a?.count ?? 'N/A'} of {row.a?.population_denominator ?? 'N/A'}</small>}</span><span><strong>{pct(row.b?.percent)}</strong>{audience === 'practitioner' && <small>{row.b?.count ?? 'N/A'} of {row.b?.population_denominator ?? 'N/A'}</small>}</span></div>)}</div></> : <p className="dh-health-empty">No exact SA2 condition measure is published for this category.</p>}<h3 className="dh-geography-title">Containing Population Health Area · not an SA2 estimate</h3><div className="dh-health-comparison-table"><div className="head"><span>Regional indicator</span><span>{primaryData.childHealth?.locality?.pha_name ?? primary.name}</span><span>{secondaryData.childHealth?.locality?.pha_name ?? secondary.name}</span></div>{regionalRows.map(row => <div key={row.id}><b>{row.label}</b><span><strong>{row.a?.rate_or_percent == null ? 'Not published' : `${row.a.rate_or_percent.toFixed(2)}${row.id === 'infant_mortality' ? ' per 1,000' : '%'}`}</strong><small>{row.a?.reference_period ?? ''}{audience === 'practitioner' && row.a?.methodology_class ? ` · ${row.a.methodology_class.replace(/_/g, ' ')}` : ''}</small></span><span><strong>{row.b?.rate_or_percent == null ? 'Not published' : `${row.b.rate_or_percent.toFixed(2)}${row.id === 'infant_mortality' ? ' per 1,000' : '%'}`}</strong><small>{row.b?.reference_period ?? ''}{audience === 'practitioner' && row.b?.methodology_class ? ` · ${row.b.methodology_class.replace(/_/g, ' ')}` : ''}</small></span></div>)}</div><footer>Differences are descriptive only. No significance test or causal claim is made. PHA values are not assigned to component SA2s.</footer></article>
       {audience === 'parent' ? <aside className="dh-audience-panel"><h2>Useful next steps</h2><ol>{guidance.prevention.map((item, index) => <li key={item}><b>{index + 1}</b><span>{item}</span></li>)}</ol><button className="dh-primary-action" type="button" onClick={() => setPlanOpen(true)}>Keep your plan ready</button><a className="dh-official-link" href={conditionSourceLinks[conditionId]} target="_blank" rel="noreferrer">Official guidance and how to prepare ↗</a><div><strong>When comparing areas</strong><p>Use these results to identify questions about services and support. Do not choose care or a home from one percentage alone.</p></div></aside> : <aside className="dh-audience-panel"><h2>Clinical interpretation boundary</h2><dl><div><dt>Exact locality layer</dt><dd>ABS Census 2021, SA2, ages 0–14</dd></div><div><dt>{primary.name} regional layer</dt><dd>{primaryData.childHealth?.locality?.pha_name ?? 'Not available'}</dd></div><div><dt>{secondary.name} regional layer</dt><dd>{secondaryData.childHealth?.locality?.pha_name ?? 'Not available'}</dd></div><div><dt>Service layer</dt><dd>Listed presence, not capacity or referral availability</dd></div></dl><div><strong>Use case</strong><p>Supports population planning, service conversations and hypothesis generation. Not case finding or clinical triage.</p></div></aside>}
+      </section>
     </section>
     <AnimatePresence>{planOpen && <PreparationPlan condition={conditions.find(item => item.id === conditionId)?.label ?? 'Child health'} locality={`${primary.name} and ${secondary.name}`} age="All child age groups" items={guidance.prevention} sourceUrl={conditionSourceLinks[conditionId]} facilities={[...primaryData.facilities, ...secondaryData.facilities]} onClose={() => setPlanOpen(false)} />}</AnimatePresence>
   </div>
 }
 
-export default function DigitalHealthHub({ onHome, onBack, initialLocalities = [] }: DigitalHealthHubProps) {
-  const comparisonMode = initialLocalities.length >= 2
-  const [view, setView] = useState<HealthView>(comparisonMode ? 'conditions' : 'overview')
-  const [locality, setLocality] = useState<NeighbourhoodSearchResult>(initialLocalities[0] ?? { id: '206011106', name: 'Brunswick East', geographic_unit: 'SA2 (ASGS Edition 3, 2021)' })
-  const [plan, setPlan] = useState<{ body: ConditionId; age: string } | null>(null)
-  const secondary = initialLocalities[1] ?? locality
-  const data = useDigitalHealthData(locality, comparisonMode ? secondary.id : undefined)
+export function ChildHealthComparisonPage({ primary, secondary, onBack }: ChildHealthComparisonPageProps) {
+  const primaryData = useDigitalHealthData(primary, secondary.id)
   const secondaryData = useDigitalHealthData(secondary)
-  if (comparisonMode && view === 'conditions') return <div className="digital-health-hub"><SideNavigation current={view} onChange={setView} onHome={onHome} /><main><ComparisonHealthPage primary={locality} secondary={secondary} primaryData={data} secondaryData={secondaryData} onBack={onBack} /></main></div>
+  return <div className="locality-comparison-shell"><main><ComparisonHealthPage primary={primary} secondary={secondary} primaryData={primaryData} secondaryData={secondaryData} onBack={onBack} /></main></div>
+}
+
+export default function DigitalHealthHub({ onHome, onInsight, onSimulation, onMap, onHealth }: DigitalHealthHubProps) {
+  const [locality, setLocality] = useState<NeighbourhoodSearchResult>({ id: '206011106', name: 'Brunswick East', geographic_unit: 'SA2 (ASGS Edition 3, 2021)' })
+  const [plan, setPlan] = useState<{ body: ConditionId; age: string } | null>(null)
+  const data = useDigitalHealthData(locality)
+  const header = <BrandHeader activePage="health" onHome={onHome} onInsight={onInsight} onSimulation={onSimulation} onMap={onMap} onHealth={onHealth} />
   const planCondition = plan ? conditions.find(item => item.id === plan.body) ?? conditions[0] : null
-  return <>
-    <KinderHub locality={locality} data={data} onSelectLocality={setLocality} onHome={onHome} onOpenPlan={(body, age) => setPlan({ body, age })} />
-    <AnimatePresence>{plan && planCondition && <PreparationPlan condition={planCondition.label} locality={locality.name} age={plan.age} items={conditionGuidance[plan.body].prevention} sourceUrl={conditionSourceLinks[plan.body]} facilities={data.facilities} onClose={() => setPlan(null)} />}</AnimatePresence>
-  </>
+  return <div className="health-page-shell">
+    {header}
+    <div className="digital-health-hub dh-global-shell">
+      <main><KinderHub locality={locality} data={data} onSelectLocality={setLocality} onOpenPlan={(body, age) => setPlan({ body, age })} /></main>
+      <AnimatePresence>{plan && planCondition && <PreparationPlan condition={planCondition.label} locality={locality.name} age={plan.age} items={conditionGuidance[plan.body].prevention} sourceUrl={conditionSourceLinks[plan.body]} facilities={data.facilities} onClose={() => setPlan(null)} />}</AnimatePresence>
+    </div>
+  </div>
 }

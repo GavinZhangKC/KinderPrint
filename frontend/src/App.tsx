@@ -6,7 +6,7 @@ import './components/SimulationPage.css'
 import BrandHeader from './components/BrandHeader'
 import ComparePanel from './components/ComparePanel'
 import DetailedDataDrawer from './components/DetailedDataDrawer'
-import DigitalHealthHub from './components/DigitalHealthHub'
+import DigitalHealthHub, { ChildHealthComparisonPage } from './components/DigitalHealthHub'
 import InsightPage from './components/InsightPage'
 import Legend from './components/Legend'
 import LandingPage from './components/LandingPage'
@@ -271,6 +271,7 @@ function openInsightPage() {
     setAppPage('insight')
   }
 function openHealthPage() {
+    resetExplore()
     setAppPage('health')
   }
 function choosePrimary(
@@ -342,7 +343,7 @@ function choosePrimary(
           if (
             realNeighbourhood.id === selected.id
             || current.some((item) => item.id === realNeighbourhood.id)
-            || current.length >= 3
+            || current.length >= 1
           ) {
             return current
           }
@@ -454,6 +455,7 @@ if (appPage === 'landing') {
         onInsight={openInsightPage}
         onExploreMap={openMapPage}
         onSimulation={openSimulationPage}
+        onHealth={openHealthPage}
       />
     )
   }
@@ -464,12 +466,19 @@ if (appPage === 'landing') {
         onLogoClick={backToLanding}
         onExploreMap={openMapPage}
         onSimulation={openSimulationPage}
+        onHealth={openHealthPage}
       />
     )
   }
 
   if (appPage === 'health') {
-    return <DigitalHealthHub onHome={backToLanding} onBack={openMapPage} />
+    return <DigitalHealthHub
+      onHome={backToLanding}
+      onInsight={openInsightPage}
+      onSimulation={openSimulationPage}
+      onMap={openMapPage}
+      onHealth={openHealthPage}
+    />
   }
 
 if (
@@ -478,11 +487,27 @@ if (
     comparisons.length > 0 &&
     comparisonResult
   ) {
-    return <DigitalHealthHub
-      onHome={backToLanding}
-      onBack={() => handleCloseCompare('profile')}
-      initialLocalities={[selected, ...comparisons].map(item => ({ id: item.id, name: item.name, geographic_unit: item.geographicUnit }))}
-    />
+    const secondary = comparisons[0]
+
+    return (
+      <div className="app-background map-page standalone-comparison-page">
+        <div className="ambient ambient-one" />
+        <div className="ambient ambient-two" />
+        <BrandHeader
+          activePage="map"
+          onHome={backToLanding}
+          onInsight={openInsightPage}
+          onMap={resetExplore}
+          onSimulation={openSimulationPage}
+          onHealth={openHealthPage}
+        />
+        <ChildHealthComparisonPage
+          primary={{ id: selected.id, name: selected.name, geographic_unit: selected.geographicUnit }}
+          secondary={{ id: secondary.id, name: secondary.name, geographic_unit: secondary.geographicUnit }}
+          onBack={() => handleCloseCompare('profile')}
+        />
+      </div>
+    )
   }
 return (
     <div
@@ -498,6 +523,7 @@ return (
           onInsight={openInsightPage}
           onMap={resetExplore}
           onSimulation={openSimulationPage}
+          onHealth={openHealthPage}
         />
 
       <main className="map-shell">
@@ -658,7 +684,7 @@ setMapSelectedId(null)
                 }
 
                 if (comparisons.length >= 1) {
-                  setCompareError('The child-health dashboard compares two localities at a time.')
+                  setCompareError('The comparison page compares two localities at a time.')
                   return
                 }
               }

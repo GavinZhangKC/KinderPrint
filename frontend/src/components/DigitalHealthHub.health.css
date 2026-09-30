@@ -364,3 +364,573 @@
 @media print{body>*{visibility:hidden}.dh-plan-backdrop,.dh-plan-backdrop *{visibility:visible}.dh-plan-backdrop{position:absolute;background:#fff}.dh-plan-sheet{width:100%;box-shadow:none}.dh-plan-sheet>header button,.dh-plan-steps,.dh-plan-actions,.dh-plan-done{display:none}}
 .dh-plan-notes input{min-height:48px;padding:0 13px;border:1px solid var(--line);border-radius:12px;font:inherit;font-weight:400}.dh-choice-group,.dh-multi-check{display:grid;gap:10px;margin:22px 0}.dh-choice-group>div{display:flex;flex-wrap:wrap;gap:8px}.dh-choice-group label input{position:absolute;opacity:0}.dh-choice-group label span{display:grid;place-items:center;min-height:42px;padding:8px 16px;border:1px solid var(--line);border-radius:999px;color:#40577e;cursor:pointer}.dh-choice-group label input:checked+span{color:#fff;border-color:var(--blue);background:var(--blue)}.dh-choice-group>p{margin:0;color:var(--copy);font-size:11px;line-height:1.5}.dh-multi-check>label{display:flex;align-items:center;gap:11px;padding:13px;border:1px solid var(--line);border-radius:11px}.dh-multi-check input{width:19px;height:19px;accent-color:var(--blue)}.dh-question-nav{display:grid;grid-template-columns:auto minmax(180px,280px);justify-content:space-between;gap:12px;margin-top:22px}.dh-question-nav>button:first-child{min-height:48px;padding:0 20px;border:1px solid var(--line);border-radius:12px;background:#fff;color:var(--ink);font-weight:800;cursor:pointer}.dh-question-nav .dh-plan-done{margin-top:0}.dh-summary-preview ul{color:var(--copy);font-size:12px;line-height:1.6}
 @media(max-width:700px){.dh-question-nav{grid-template-columns:1fr 1fr}.dh-choice-group>div{display:grid;grid-template-columns:1fr 1fr}}
+
+/* Keep the site-wide navigation while the new KinderHub owns health navigation. */
+.health-page-shell{min-height:100vh;padding-top:20px;background:radial-gradient(circle at 18% 22%,rgba(184,178,255,.28),transparent 34%),radial-gradient(circle at 84% 48%,rgba(131,214,255,.25),transparent 35%),linear-gradient(135deg,#eff2ff 0%,#e8f5ff 52%,#e8efff 100%)}
+.health-page-shell>.nav-shell{margin-bottom:8px}
+.digital-health-hub.dh-global-shell{display:block;min-height:calc(100vh - 104px);background:transparent}
+.digital-health-hub.dh-global-shell>main{min-width:0}
+.locality-comparison-shell{--navy:#2c5eaf;--navy2:#405fa6;--blue:#6d78e8;--indigo:#7b75f5;--coral:#ff7e75;--mint:#30bfad;--ink:#233a63;--copy:#63779d;--line:rgba(255,255,255,.78);width:min(1440px,100%);margin:14px auto 0;color:var(--ink);font-family:Inter,"Helvetica Neue",Arial,sans-serif}
+.locality-comparison-shell *{box-sizing:border-box}.locality-comparison-shell button,.locality-comparison-shell input{font:inherit}.locality-comparison-shell button:focus-visible{outline:3px solid rgba(109,120,232,.35);outline-offset:2px}.locality-comparison-shell>main{min-width:0}.locality-comparison-shell .dh-health-compare-page{min-height:calc(100vh - 130px);border:1px solid rgba(255,255,255,.78);border-radius:24px;background:rgba(255,255,255,.48);box-shadow:0 18px 42px rgba(51,82,140,.13);backdrop-filter:blur(22px)}
+@media(max-width:680px){.health-page-shell{padding-top:10px}.health-page-shell>.nav-shell{margin-bottom:0}.digital-health-hub.dh-global-shell{min-height:calc(100vh - 72px)}}
+
+/* Standalone locality comparison uses the site palette and normal page scrolling. */
+.standalone-comparison-page{
+  height:auto;
+  min-height:100vh;
+  display:block;
+  overflow-x:hidden;
+  overflow-y:visible;
+  padding-bottom:56px;
+}
+
+.locality-comparison-shell .dh-audience-toggle{
+  border:1px solid rgba(109,120,232,.14);
+  background:rgba(232,237,255,.72);
+}
+
+.locality-comparison-shell .dh-audience-toggle button[aria-selected=true]{
+  color:#fff;
+  background:#6d78e8;
+  box-shadow:0 7px 18px rgba(109,120,232,.24);
+}
+
+/* Keep the comparison hierarchy flat: the page is the canvas, while only
+   evidence and guidance remain as content panels. */
+.locality-comparison-shell .dh-health-compare-page{
+  border:0;
+  border-radius:0;
+  background:transparent;
+  box-shadow:none;
+  backdrop-filter:none;
+}
+
+.locality-comparison-shell .dh-compare-topbar{
+  padding:8px 0 18px;
+  border:0;
+  border-bottom:1px solid rgba(99,119,157,.18);
+  border-radius:0;
+  background:transparent;
+}
+
+.locality-comparison-shell .dh-compare-topbar>button{
+  padding:10px 0;
+  border:0;
+  border-radius:0;
+  background:transparent;
+  color:#405fa6;
+  font-weight:700;
+}
+
+.locality-comparison-shell .dh-compare-topbar>button:hover{
+  color:#6d78e8;
+}
+
+.locality-comparison-shell .dh-audience-toggle{
+  gap:4px;
+  padding:0;
+  border:0;
+  background:transparent;
+}
+
+.locality-comparison-shell .dh-audience-toggle button[aria-selected=true]{
+  box-shadow:none;
+}
+
+.locality-comparison-shell .dh-compare-condition-tabs{
+  gap:4px;
+  padding-bottom:10px;
+  border-bottom:1px solid rgba(99,119,157,.16);
+}
+
+.locality-comparison-shell .dh-compare-condition-tabs button{
+  border:0;
+  background:transparent;
+}
+
+.locality-comparison-shell .dh-compare-condition-tabs button[aria-pressed=true]{
+  border:0;
+  background:rgba(255,255,255,.58);
+  box-shadow:none;
+}
+
+.locality-comparison-shell .dh-compare-summary{
+  gap:0;
+  padding:10px 0 22px;
+  border-bottom:1px solid rgba(99,119,157,.16);
+}
+
+.locality-comparison-shell .dh-compare-summary article{
+  padding:10px 22px;
+  border:0;
+  border-left:1px solid rgba(99,119,157,.16);
+  border-radius:0;
+  background:transparent;
+}
+
+.locality-comparison-shell .dh-compare-summary article:first-child{
+  padding-left:4px;
+  border-left:0;
+}
+
+.locality-comparison-shell .dh-compare-summary small{
+  color:#2c4778;
+  font-size:15px;
+  font-weight:800;
+  line-height:1.25;
+  letter-spacing:-.01em;
+}
+
+.locality-comparison-shell .dh-compare-summary strong{
+  margin:3px 0 1px;
+  color:#304f9f;
+  font-size:34px;
+  line-height:1.08;
+  letter-spacing:-.035em;
+}
+
+.locality-comparison-shell .dh-compare-summary span{
+  max-width:340px;
+  color:#52698f;
+  font-size:13px;
+  line-height:1.45;
+}
+
+@media(max-width:700px){
+  .locality-comparison-shell .dh-compare-summary article,
+  .locality-comparison-shell .dh-compare-summary article:first-child{
+    padding:14px 4px;
+    border-left:0;
+    border-top:1px solid rgba(99,119,157,.16);
+  }
+
+  .locality-comparison-shell .dh-compare-summary article:first-child{
+    border-top:0;
+  }
+}
+
+.locality-comparison-shell .dh-condition-comparison-card{
+  padding:12px 22px 22px;
+  overflow:hidden;
+  border:1px solid rgba(255,255,255,.82);
+  border-radius:22px;
+  background:rgba(255,255,255,.62);
+  box-shadow:0 16px 38px rgba(51,82,140,.11);
+  backdrop-filter:blur(18px);
+}
+
+.locality-comparison-shell .dh-condition-comparison-card .dh-compare-evidence,
+.locality-comparison-shell .dh-condition-comparison-card .dh-audience-panel{
+  border:0;
+  border-radius:0;
+  background:transparent;
+}
+
+.locality-comparison-shell .dh-condition-comparison-card .dh-compare-evidence{
+  padding:20px 24px 8px 2px;
+}
+
+.locality-comparison-shell .dh-condition-comparison-card .dh-audience-panel{
+  padding:20px 2px 8px 24px;
+  border-left:1px solid rgba(99,119,157,.16);
+}
+
+@media(max-width:1100px){
+  .locality-comparison-shell .dh-condition-comparison-card .dh-audience-panel{
+    padding:22px 2px 8px;
+    border-top:1px solid rgba(99,119,157,.16);
+    border-left:0;
+  }
+}
+
+@media(max-width:700px){
+  .locality-comparison-shell .dh-condition-comparison-card{
+    padding:10px 14px 18px;
+    border-radius:18px;
+  }
+}
+
+.locality-comparison-shell .dh-health-comparison-table .head{
+  color:#40577e;
+  font-size:12px;
+  font-weight:800;
+  letter-spacing:.025em;
+}
+
+/* Preparation plan: match the site's soft blue-violet, glassy visual language. */
+.dh-plan-backdrop{
+  padding:16px;
+  background:rgba(35,58,99,.34);
+  backdrop-filter:blur(12px);
+}
+
+.dh-plan-sheet.dh-plan-workflow{
+  --plan-primary:#6d78e8;
+  --plan-primary-deep:#4e63bd;
+  --plan-ink:#233a63;
+  --plan-copy:#60749a;
+  width:min(800px,calc(100% - 16px));
+  height:calc(100% - 32px);
+  margin:auto 0;
+  padding:34px 38px 40px;
+  border:1px solid rgba(255,255,255,.82);
+  border-radius:28px;
+  background:
+    radial-gradient(circle at 8% 4%,rgba(184,178,255,.28),transparent 29%),
+    radial-gradient(circle at 100% 36%,rgba(131,214,255,.21),transparent 35%),
+    linear-gradient(145deg,rgba(250,250,255,.98),rgba(239,246,255,.98));
+  box-shadow:-24px 22px 70px rgba(35,58,99,.24);
+  color:var(--plan-ink);
+}
+
+.dh-plan-sheet.dh-plan-workflow>header{
+  align-items:flex-start;
+  padding-bottom:24px;
+  border-bottom:1px solid rgba(96,116,154,.16);
+}
+
+.dh-plan-sheet.dh-plan-workflow>header span,
+.dh-plan-sheet.dh-plan-workflow .dh-plan-kicker{
+  color:var(--plan-primary-deep);
+}
+
+.dh-plan-sheet.dh-plan-workflow h2{
+  margin-top:10px;
+  color:var(--plan-ink);
+  font-size:34px;
+  line-height:1.12;
+  letter-spacing:-.035em;
+}
+
+.dh-plan-sheet.dh-plan-workflow header p,
+.dh-plan-sheet.dh-plan-workflow>.dh-plan-panel>p{
+  color:var(--plan-copy);
+}
+
+.dh-plan-sheet.dh-plan-workflow>header button{
+  flex:0 0 auto;
+  border-color:rgba(109,120,232,.2);
+  background:rgba(255,255,255,.58);
+  color:#405484;
+  box-shadow:0 8px 20px rgba(51,82,140,.08);
+}
+
+.dh-plan-sheet.dh-plan-workflow .dh-plan-steps{
+  gap:4px;
+  margin:24px 0 34px;
+  padding:5px;
+  border:1px solid rgba(109,120,232,.12);
+  border-radius:16px;
+  background:rgba(226,232,252,.66);
+}
+
+.dh-plan-sheet.dh-plan-workflow .dh-plan-steps button{
+  border:0;
+  border-radius:11px;
+  background:transparent;
+  color:#61749a;
+}
+
+.dh-plan-sheet.dh-plan-workflow .dh-plan-steps button b{
+  background:rgba(255,255,255,.58);
+  color:#5d7198;
+}
+
+.dh-plan-sheet.dh-plan-workflow .dh-plan-steps button[aria-current=step]{
+  background:linear-gradient(135deg,#6d78e8,#728de9);
+  color:#fff;
+  box-shadow:0 8px 20px rgba(109,120,232,.24);
+}
+
+.dh-plan-sheet.dh-plan-workflow .dh-plan-steps button[aria-current=step] b{
+  color:var(--plan-primary-deep);
+  background:#fff;
+}
+
+.dh-plan-sheet.dh-plan-workflow .dh-plan-panel h3{
+  color:var(--plan-ink);
+  font-size:28px;
+  line-height:1.2;
+  letter-spacing:-.025em;
+}
+
+.dh-plan-sheet.dh-plan-workflow .dh-plan-explainer{
+  gap:0;
+  margin:24px 0;
+  padding:0 4px;
+}
+
+.dh-plan-sheet.dh-plan-workflow .dh-plan-explainer article{
+  padding:17px 4px;
+  border:0;
+  border-bottom:1px solid rgba(96,116,154,.16);
+  border-radius:0;
+  background:transparent;
+}
+
+.dh-plan-sheet.dh-plan-workflow .dh-plan-explainer article:last-child{
+  border-bottom:0;
+}
+
+.dh-plan-sheet.dh-plan-workflow .dh-plan-explainer article>b{
+  background:linear-gradient(135deg,#6d78e8,#72a1e9);
+  box-shadow:0 7px 16px rgba(109,120,232,.2);
+}
+
+.dh-plan-sheet.dh-plan-workflow .dh-plan-explainer small{
+  color:var(--plan-copy);
+}
+
+.dh-plan-sheet.dh-plan-workflow .dh-plan-panel>aside{
+  padding:17px 18px;
+  border:1px solid rgba(109,120,232,.13);
+  border-radius:14px;
+  background:linear-gradient(135deg,rgba(231,232,255,.76),rgba(231,245,255,.7));
+}
+
+.dh-plan-sheet.dh-plan-workflow .dh-plan-done{
+  min-height:52px;
+  border-radius:14px;
+  background:linear-gradient(135deg,#5268c8,#6d78e8 56%,#688fdc);
+  box-shadow:0 12px 26px rgba(79,99,190,.24);
+}
+
+.dh-plan-sheet.dh-plan-workflow .dh-observation-list fieldset,
+.dh-plan-sheet.dh-plan-workflow .dh-summary-preview,
+.dh-plan-sheet.dh-plan-workflow .dh-multi-check>label,
+.dh-plan-sheet.dh-plan-workflow .dh-action-checklist label,
+.dh-plan-sheet.dh-plan-workflow .dh-plan-services article{
+  border-color:rgba(109,120,232,.16);
+  background:rgba(255,255,255,.5);
+}
+
+.dh-plan-sheet.dh-plan-workflow .dh-plan-notes input,
+.dh-plan-sheet.dh-plan-workflow .dh-plan-notes textarea,
+.dh-plan-sheet.dh-plan-workflow .dh-choice-group label span,
+.dh-plan-sheet.dh-plan-workflow .dh-observation-list label span,
+.dh-plan-sheet.dh-plan-workflow .dh-plan-actions button,
+.dh-plan-sheet.dh-plan-workflow .dh-question-nav>button:first-child{
+  border-color:rgba(109,120,232,.2);
+  background:rgba(255,255,255,.62);
+  color:#405484;
+}
+
+.dh-plan-sheet.dh-plan-workflow .dh-choice-group label input:checked+span,
+.dh-plan-sheet.dh-plan-workflow .dh-observation-list label input:checked+span{
+  border-color:var(--plan-primary);
+  background:var(--plan-primary);
+  color:#fff;
+}
+
+.dh-plan-sheet.dh-plan-workflow input{
+  accent-color:var(--plan-primary);
+}
+
+.dh-plan-sheet.dh-plan-workflow .dh-summary-preview{
+  background:rgba(255,255,255,.56);
+  box-shadow:0 12px 28px rgba(51,82,140,.07);
+}
+
+.dh-plan-sheet.dh-plan-workflow .dh-plan-service-note{
+  background:rgba(230,236,253,.72);
+  color:var(--plan-copy);
+}
+
+@media(max-width:700px){
+  .dh-plan-backdrop{padding:0}
+  .dh-plan-sheet.dh-plan-workflow{
+    width:100%;
+    height:100%;
+    margin:0;
+    padding:24px 20px 32px;
+    border:0;
+    border-radius:0;
+  }
+  .dh-plan-sheet.dh-plan-workflow h2{font-size:29px}
+  .dh-plan-sheet.dh-plan-workflow .dh-plan-steps{grid-template-columns:1fr 1fr}
+}
+
+@media print{
+  .dh-plan-backdrop{padding:0;background:#fff;backdrop-filter:none}
+  .dh-plan-sheet.dh-plan-workflow{width:100%;height:auto;margin:0;border:0;border-radius:0;background:#fff;box-shadow:none}
+}
+
+/* Animated child-age dropdown. */
+.dh-child-age-picker{
+  position:relative;
+  min-width:296px;
+}
+
+.dh-child-context .dh-child-age-trigger{
+  width:100%;
+  min-height:50px;
+  display:grid;
+  grid-template-columns:auto 1fr auto;
+  align-items:center;
+  gap:18px;
+  padding:0 20px;
+  border:1px solid rgba(255,255,255,.82);
+  border-radius:999px;
+  background:rgba(255,255,255,.62);
+  color:#304876;
+  box-shadow:0 10px 28px rgba(51,82,140,.08);
+  backdrop-filter:blur(16px);
+  cursor:pointer;
+}
+
+.dh-child-age-trigger span{
+  font-weight:650;
+}
+
+.dh-child-age-trigger strong{
+  justify-self:start;
+  color:#233a63;
+  font-weight:800;
+}
+
+.dh-child-age-trigger i{
+  width:9px;
+  height:9px;
+  margin-top:-4px;
+  border-right:2px solid #405484;
+  border-bottom:2px solid #405484;
+  transform:rotate(45deg);
+  transition:transform .2s ease,margin .2s ease;
+}
+
+.dh-child-age-trigger.is-open i{
+  margin-top:4px;
+  transform:rotate(225deg);
+}
+
+.dh-child-age-menu{
+  position:absolute;
+  top:calc(100% + 10px);
+  right:0;
+  left:0;
+  z-index:80;
+  display:grid;
+  gap:3px;
+  padding:8px;
+  border:1px solid rgba(109,120,232,.16);
+  border-radius:18px;
+  background:rgba(247,249,255,.96);
+  box-shadow:0 18px 42px rgba(51,82,140,.18);
+  backdrop-filter:blur(20px);
+  transform-origin:top center;
+}
+
+.dh-child-context .dh-child-age-menu button{
+  width:100%;
+  min-height:44px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 14px;
+  border:0;
+  border-radius:11px;
+  background:transparent;
+  color:#52698f;
+  font-weight:650;
+  text-align:left;
+  cursor:pointer;
+}
+
+.dh-child-context .dh-child-age-menu button:hover,
+.dh-child-context .dh-child-age-menu button:focus-visible{
+  background:rgba(226,232,252,.78);
+  color:#304f9f;
+}
+
+.dh-child-context .dh-child-age-menu button[aria-selected=true]{
+  background:linear-gradient(135deg,rgba(109,120,232,.16),rgba(104,170,225,.14));
+  color:#4054a5;
+  font-weight:800;
+}
+
+.dh-child-age-menu button b{
+  color:#6d78e8;
+  opacity:0;
+}
+
+.dh-child-age-menu button[aria-selected=true] b{
+  opacity:1;
+}
+
+@media(max-width:700px){
+  .dh-child-age-picker{
+    width:100%;
+    min-width:0;
+  }
+}
+
+@media(prefers-reduced-motion:reduce){
+  .dh-child-age-trigger i{transition:none}
+}
+
+/* Child Health document keeps scrolling without showing the browser rail. */
+html:has(.health-page-shell),
+html:has(.health-page-shell) body{
+  scrollbar-width:none;
+}
+
+html:has(.health-page-shell)::-webkit-scrollbar,
+html:has(.health-page-shell) body::-webkit-scrollbar{
+  display:none;
+}
+
+/* Audience switches share the same clear hover language as the hub controls. */
+.locality-comparison-shell .dh-audience-toggle button{
+  transition:color .18s ease,background-color .18s ease,transform .18s ease;
+}
+
+.locality-comparison-shell .dh-audience-toggle button:hover{
+  color:#4e63bd;
+  background:rgba(109,120,232,.1);
+  transform:translateY(-1px);
+}
+
+.locality-comparison-shell .dh-audience-toggle button[aria-selected=true]:hover{
+  color:#fff;
+  background:#5f6bd8;
+}
+
+/* Match the preparation drawer scrollbar to the map drawers. */
+.dh-plan-sheet.dh-plan-workflow{
+  scrollbar-width:thin;
+  scrollbar-color:rgba(109,120,232,.35) transparent;
+}
+
+.dh-plan-sheet.dh-plan-workflow::-webkit-scrollbar{
+  width:7px;
+}
+
+.dh-plan-sheet.dh-plan-workflow::-webkit-scrollbar-track{
+  margin-block:18px;
+  background:transparent;
+}
+
+.dh-plan-sheet.dh-plan-workflow::-webkit-scrollbar-thumb{
+  border:2px solid transparent;
+  border-radius:999px;
+  background:rgba(109,120,232,.35);
+  background-clip:padding-box;
+}
+
+.dh-plan-sheet.dh-plan-workflow::-webkit-scrollbar-thumb:hover{
+  background:rgba(93,108,213,.52);
+  background-clip:padding-box;
+}
+
+/* Keep the legacy child-age control aligned with the same hover/selected palette. */
+.dh-child-context .dh-child-age-menu button:hover,
+.dh-child-context .dh-child-age-menu button:focus-visible{
+  background:rgba(109,120,232,.12);
+  color:#4e63bd;
+}
+
+.dh-child-context .dh-child-age-menu button[aria-selected=true]{
+  background:linear-gradient(135deg,#6d78e8,#708be4);
+  color:#fff;
+  box-shadow:0 7px 16px rgba(109,120,232,.22);
+}

@@ -1,6 +1,6 @@
 import { indicatorStatusLabel } from '../../services/profileAdapter'
 import type { IndicatorProvenance, Neighbourhood } from '../../types/neighbourhood'
-import EvidenceSection from './EvidenceSection'
+import SectionEvidence from './SectionEvidence'
 
 interface ActiveLivingMetric {
   id: string
@@ -15,24 +15,6 @@ function displayMetric(value: number | null, provenance?: IndicatorProvenance, u
   }
 
   return `${new Intl.NumberFormat('en-AU', { maximumFractionDigits: 1 }).format(value)}${unit}`
-}
-
-function MetricEvidence({ provenance }: { provenance?: IndicatorProvenance }) {
-  if (!provenance) return null
-
-  return (
-    <EvidenceSection
-      items={[
-        { label: 'Source', value: provenance.source },
-        { label: 'Reference year', value: provenance.referenceYear },
-        { label: 'Geographic unit', value: provenance.geographicUnit },
-        { label: 'Data status', value: indicatorStatusLabel(provenance.status) },
-        { label: 'Data quality', value: provenance.dataQuality },
-      ]}
-      limitations={provenance.limitations}
-      notices={provenance.notices}
-    />
-  )
 }
 
 export default function ActiveLivingSection({ neighbourhood }: { neighbourhood: Neighbourhood }) {
@@ -68,10 +50,13 @@ export default function ActiveLivingSection({ neighbourhood }: { neighbourhood: 
           <div className="drawer-metric" key={metric.id}>
             <span>{metric.label}</span>
             <strong>{displayMetric(metric.value, provenance, metric.unit)}</strong>
-            <MetricEvidence provenance={provenance} />
           </div>
         )
       })}
+      <SectionEvidence entries={metrics.map((metric) => ({
+        label: metric.label,
+        provenance: neighbourhood.indicatorProvenance[metric.id],
+      }))} />
     </section>
   )
 }

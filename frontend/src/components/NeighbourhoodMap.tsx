@@ -323,7 +323,7 @@ useEffect(() => {
           mapContainerRef.current,
 
         style:
-          'mapbox://styles/mapbox/standard',
+          'mapbox://styles/tomatooo88/cmukuaww1007501so6yus9ois',
 
         config: {
           basemap: {

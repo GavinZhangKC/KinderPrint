@@ -6,7 +6,8 @@
  * values, denominators, confidence intervals and a geography badge on every figure.
  * Every value comes from a validated KinderPrint endpoint; nothing is invented client-side.
  */
-import { useEffect, useMemo, useState, type ReactNode } from 'react'
+import { useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from 'react'
+import { AnimatePresence, motion } from 'framer-motion'
 
 import {
   api,
@@ -60,7 +61,6 @@ interface KinderHubProps {
   locality: NeighbourhoodSearchResult
   data: HubData
   onSelectLocality: (value: NeighbourhoodSearchResult) => void
-  onHome: () => void
   onOpenPlan: (body: BodyId, age: string) => void
 }
 
@@ -84,7 +84,7 @@ const MONTH_LETTERS = ['J', 'F', 'M', 'A', 'M', 'J', 'J', 'A', 'S', 'O', 'N', 'D
 const MONTH_NAMES = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
 
 const NAV: Array<{ id: Page; label: string; icon: ReactNode }> = [
-  { id: 'home', label: 'Home', icon: <path d="M3 11l9-7 9 7v9H5z" /> },
+  { id: 'home', label: 'Overview', icon: <path d="M3 11l9-7 9 7v9H5z" /> },
   { id: 'health', label: 'Health', icon: <path d="M12 21s-7-4.5-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 11c0 5.5-7 10-7 10z" /> },
   { id: 'vaccines', label: 'Vaccines', icon: <path d="M18 2l4 4M17 7l-9 9-3 1 1-3 9-9M3 21l3-3" /> },
   { id: 'food', label: 'Food & play', icon: <path d="M12 7c-3-2-8-1-8 5s4 9 6 9c1 0 1.5-.5 2-.5s1 .5 2 .5c2 0 6-3 6-9s-5-7-8-5zM12 7c0-2 1-4 3-4" /> },
@@ -155,6 +155,15 @@ const VCAMS_LABEL: Record<string, string> = {
   tobacco_smoke_exposure_at_home: 'Tobacco smoke at home',
 }
 
+const VCAMS_STANDARD_DIRECTION: Partial<Record<string, 'higher' | 'lower'>> = {
+  minimum_recommended_vegetables: 'higher',
+  minimum_recommended_fruit: 'higher',
+  recommended_daily_physical_activity: 'higher',
+  electronic_media_over_two_hours: 'lower',
+  household_food_insecurity: 'lower',
+  tobacco_smoke_exposure_at_home: 'lower',
+}
+
 /* ------------------------------------------------------------------ helpers */
 
 const pct = (value: number | null | undefined, digits = 1) => value === null || value === undefined ? '—' : `${value.toFixed(digits)}%`
@@ -220,12 +229,17 @@ function People({ value }: { value: number | null | undefined }) {
 }
 
 function RangeMarker({ item }: { item: DepartmentAreaIndicator }) {
-  const range = item.department_areas
-  if (!range || item.area.percent === null) return null
-  const span = Math.max(range.highest - range.lowest, 0.01)
-  const place = (value: number) => `${((value - range.lowest) / span) * 100}%`
-  return <span className="kh-range" title={`Lowest ${range.lowest}% · middle ${range.median}% · highest ${range.highest}%`}>
-    <i /><em style={{ left: place(range.median) }} /><b style={{ left: place(item.area.percent) }} />
+  if (item.area.percent === null) return null
+  const value = Math.max(0, Math.min(100, item.area.percent))
+  const direction = VCAMS_STANDARD_DIRECTION[item.indicator_id]
+  const rawStandard = item.department_areas?.median
+  const standard = rawStandard === undefined ? null : Math.max(0, Math.min(100, rawStandard))
+  const hasStandard = Boolean(direction && standard !== null)
+  const meetsStandard = !hasStandard || (direction === 'higher' ? value >= standard! : value <= standard!)
+  const description = hasStandard ? `${value.toFixed(1)}% in this region · standard ${standard!.toFixed(1)}% · ${meetsStandard ? 'meets standard' : 'does not meet standard'}` : `${value.toFixed(1)}% in this region`
+  return <span className={`kh-range ${meetsStandard ? 'is-met' : 'is-below'}${hasStandard ? ' has-standard' : ''}`} role="img" aria-label={description} title={description}>
+    <i><b style={{ width: `${value}%` }} /></i>
+    {hasStandard && <em style={{ left: `${standard}%` }} />}
   </span>
 }
 
@@ -284,9 +298,83 @@ function useHubFigures(data: HubData) {
 
 /* ------------------------------------------------------------------ root */
 
-export default function KinderHub({ locality, data, onSelectLocality, onHome, onOpenPlan }: KinderHubProps) {
+function AgePicker({ value, onChange }: { value: string; onChange: (value: string) => void }) {
+  const [open, setOpen] = useState(false)
+  const rootRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (!open) return
+    const closeOutside = (event: PointerEvent) => {
+      if (!rootRef.current?.contains(event.target as Node)) setOpen(false)
+    }
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setOpen(false)
+    }
+    document.addEventListener('pointerdown', closeOutside)
+    document.addEventListener('keydown', closeOnEscape)
+    return () => {
+      document.removeEventListener('pointerdown', closeOutside)
+      document.removeEventListener('keydown', closeOnEscape)
+    }
+  }, [open])
+
+  return <div className="kh-age-picker" ref={rootRef}>
+    <button className="kh-chip kh-age-trigger" type="button" aria-haspopup="listbox" aria-expanded={open} onClick={() => setOpen(value => !value)}>
+      <span>Child age</span><strong>{value}</strong><i className={open ? 'is-open' : undefined} aria-hidden="true" />
+    </button>
+    <AnimatePresence>{open && <motion.div className="kh-age-list" role="listbox" aria-label="Child age" initial={{ opacity: 0, y: -8, scale: .98 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: -6, scale: .98 }} transition={{ duration: .18, ease: 'easeOut' }}>
+      {AGES.map(option => <button key={option} type="button" role="option" aria-selected={value === option} onClick={() => { onChange(option); setOpen(false) }}><span>{option}</span><b aria-hidden="true">✓</b></button>)}
+    </motion.div>}</AnimatePresence>
+  </div>
+}
+
+function MonthPicker({ value, onChange }: { value: string; onChange: (value: string) => void }) {
+  const now = new Date()
+  const selectedYear = value ? Number(value.slice(0, 4)) : now.getFullYear()
+  const selectedMonth = value ? Number(value.slice(5, 7)) - 1 : -1
+  const [open, setOpen] = useState(false)
+  const [viewYear, setViewYear] = useState(selectedYear)
+  const rootRef = useRef<HTMLDivElement>(null)
+  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+  const displayValue = value ? `${months[selectedMonth]} ${selectedYear}` : 'Select month'
+
+  useEffect(() => {
+    if (!open) return
+    const closeOutside = (event: PointerEvent) => {
+      if (!rootRef.current?.contains(event.target as Node)) setOpen(false)
+    }
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setOpen(false)
+    }
+    document.addEventListener('pointerdown', closeOutside)
+    document.addEventListener('keydown', closeOnEscape)
+    return () => {
+      document.removeEventListener('pointerdown', closeOutside)
+      document.removeEventListener('keydown', closeOnEscape)
+    }
+  }, [open])
+
+  const chooseMonth = (month: number) => {
+    onChange(`${viewYear}-${String(month + 1).padStart(2, '0')}`)
+    setOpen(false)
+  }
+
+  return <div className="kh-month-picker" ref={rootRef}>
+    <button className="kh-chip kh-month-trigger" type="button" aria-haspopup="dialog" aria-expanded={open} onClick={() => { setViewYear(selectedYear); setOpen(current => !current) }}>
+      <span>Born</span><strong>{displayValue}</strong><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="6" width="16" height="14" rx="3" /><path d="M8 3v5M16 3v5M4 10h16" /></svg>
+    </button>
+    <AnimatePresence>{open && <motion.div className="kh-month-popover" role="dialog" aria-label="Choose birth month" initial={{ opacity: 0, y: -8, scale: .98 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: -6, scale: .98 }} transition={{ duration: .18, ease: 'easeOut' }}>
+      <header><button type="button" aria-label="Previous year" onClick={() => setViewYear(year => year - 1)}>‹</button><strong>{viewYear}</strong><button type="button" aria-label="Next year" disabled={viewYear >= now.getFullYear()} onClick={() => setViewYear(year => year + 1)}>›</button></header>
+      <div className="kh-month-grid">{months.map((month, index) => { const future = viewYear > now.getFullYear() || (viewYear === now.getFullYear() && index > now.getMonth()); const selected = viewYear === selectedYear && index === selectedMonth; return <button key={month} type="button" aria-pressed={selected} disabled={future} onClick={() => chooseMonth(index)}>{month}</button> })}</div>
+      <footer><button type="button" disabled={!value} onClick={() => { onChange(''); setOpen(false) }}>Clear</button><button type="button" onClick={() => { onChange(`${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`); setOpen(false) }}>This month</button></footer>
+    </motion.div>}</AnimatePresence>
+  </div>
+}
+
+export default function KinderHub({ locality, data, onSelectLocality, onOpenPlan }: KinderHubProps) {
   const [audience, setAudience] = useStored<Audience>(AUDIENCE_KEY, 'parent')
   const [page, setPage] = useStored<Page>(PAGE_KEY, 'home')
+  const [navExpanded, setNavExpanded] = useState(false)
   const [age, setAge] = useState(() => { try { return window.localStorage.getItem(AGE_KEY) ?? '5–9 years' } catch { return '5–9 years' } })
   const [body, setBody] = useState<BodyId>('brain')
   useEffect(() => { try { window.localStorage.setItem(AGE_KEY, age) } catch { /* storage unavailable */ } }, [age])
@@ -334,17 +422,14 @@ export default function KinderHub({ locality, data, onSelectLocality, onHome, on
     ...(!nutrition.loading && nutrition.data?.locality === null && page === 'food'
       ? ['Nutrition context is unavailable because this locality has no supported regional mapping.'] : []),
   ]
+  const orderedNav = [...NAV.filter(item => item.id === page), ...NAV.filter(item => item.id !== page)]
 
   return <div className={`kp-hub ${parent ? 'is-parent' : 'is-practitioner'}`}>
     <div className="kh-shell">
       <header className="kh-top">
-        <button type="button" className="kh-logo" onClick={onHome} aria-label="KinderPrint home">
-          <svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="15" /><path d="M11 9v14M11 16l8-7M13.5 14l6.5 9" /></svg>
-          <span>KinderPrint</span>
-        </button>
-        <nav className="kh-nav" aria-label="Dashboard sections">{NAV.map(item => <button key={item.id} type="button" aria-current={page === item.id ? 'page' : undefined} onClick={() => go(item.id)}>
+        <nav className={`kh-nav${navExpanded ? ' is-expanded' : ''}`} aria-label="Dashboard sections" onMouseEnter={() => setNavExpanded(true)} onMouseLeave={() => setNavExpanded(false)} onFocus={() => setNavExpanded(true)} onBlur={event => { if (!event.currentTarget.contains(event.relatedTarget as Node)) setNavExpanded(false) }}>{orderedNav.map(item => <button key={item.id} type="button" aria-current={page === item.id ? 'page' : undefined} onClick={event => { go(item.id); setNavExpanded(false); event.currentTarget.blur() }}>
           <svg viewBox="0 0 24 24" aria-hidden="true">{item.icon}</svg>{item.label}
-        </button>)}</nav>
+        </button>)}<button className="kh-nav-expand" type="button" aria-label={navExpanded ? 'Collapse Child Health menu' : 'Expand Child Health menu'} aria-expanded={navExpanded} onClick={event => { setNavExpanded(value => !value); event.currentTarget.blur() }}>›</button></nav>
         <div className="kh-seg" role="group" aria-label="Who is using KinderPrint">
           <button type="button" aria-pressed={parent} onClick={() => setAudience('parent')}>Parent</button>
           <button type="button" aria-pressed={!parent} onClick={() => setAudience('practitioner')}>Practitioner</button>
@@ -356,7 +441,7 @@ export default function KinderHub({ locality, data, onSelectLocality, onHome, on
         <div className="kh-chips">
           <LocalityPicker locality={locality} onSelect={onSelectLocality} />
           {parent
-            ? <label className="kh-chip">Child age<select value={age} onChange={event => setAge(event.target.value)}>{AGES.map(item => <option key={item}>{item}</option>)}</select></label>
+            ? <AgePicker value={age} onChange={setAge} />
             : <span className="kh-chip">SA2 {locality.id}</span>}
         </div>
       </section>
@@ -424,7 +509,7 @@ function ParentHome({ locality, figures, immunisation, nutrition, data, childcar
   ]
   const toggle = (id: string) => setDoneWeek(current => current.includes(id) ? current.filter(item => item !== id) : [...current, id])
   return <div className="kh-stack">
-    <Card title="This week" sub="Three things worth doing. Tick them off when done." aside={<span className="kh-tag">{tasks.filter(task => doneWeek.includes(task.id)).length} of 3 done</span>}>
+    <Card title="Recommended this week" sub="Seasonal, vaccination and health actions worth checking now." aside={<span className="kh-tag">{tasks.filter(task => doneWeek.includes(task.id)).length} of 3 done</span>}>
       <div className="kh-week">{tasks.map(task => <article key={task.id} className={`kh-todo tone-${task.tone} ${doneWeek.includes(task.id) ? 'is-done' : ''}`}>
         <span className="kh-todo-ic"><svg viewBox="0 0 24 24" aria-hidden="true">{task.icon}</svg></span>
         <span className="kh-when">{task.when}</span>
@@ -489,7 +574,7 @@ function ProjectionChart({ rows }: { rows: PopulationProjection[] }) {
   const width = 560, height = 210, pad = 36
   const series: Array<[keyof PopulationProjection, string, string]> = [
     ['population_age_0_4_projected', '0–4', 'var(--kh-blue)'],
-    ['population_age_5_9_projected', '5–9', 'var(--kh-amber)'],
+    ['population_age_5_9_projected', '5–9', 'var(--kh-coral)'],
     ['population_age_10_14_projected', '10–14', 'var(--kh-green)'],
   ]
   const values = rows.flatMap(row => series.map(([key]) => Number(row[key] ?? 0)))
@@ -639,7 +724,7 @@ function VaccinesPage({ parent, immunisation, data, locality, figures }: PageCon
         </ul>
       </Card>
     </div>
-    <Card title={parent ? 'Your child’s schedule' : 'Family schedule tool'} sub="National Immunisation Program, June 2026. Saved only on this device." aside={<label className="kh-chip">Born<input type="month" value={birthMonth} max={new Date().toISOString().slice(0, 7)} onChange={event => setBirthMonth(event.target.value)} /></label>}>
+    <Card title={parent ? 'Your child’s schedule' : 'Family schedule tool'} sub="National Immunisation Program, June 2026. Saved only on this device." aside={<MonthPicker value={birthMonth} onChange={setBirthMonth} />}>
       <label className="kh-check"><input type="checkbox" checked={aboriginal} onChange={event => setAboriginal(event.target.checked)} />Aboriginal and/or Torres Strait Islander child (adds free Meningococcal B)</label>
       <ol className="kh-timeline">{rows.map(row => <li key={row.item.id} className={row.status ?? 'none'}>
         <span className="kh-when-col"><b>{row.item.when}</b><small>{row.due ? monthYear(row.due) : ''}</small></span>
@@ -671,15 +756,15 @@ function FoodPage({ parent, nutrition, age, locality }: PageContext) {
   const summary = [`Food plan · ${band}`, ...guide.map(row => `${row.group}: ${serves[row.group] ?? 0} of ${row.serves} serves`)].join('\n')
   return <div className="kh-split">
     {parent && <Card title="Today’s serves" sub={`Australian Dietary Guidelines · ages ${band}`} aside={<span className={reached >= 4 ? 'kh-tag good' : 'kh-tag'}>{reached} of {guide.length} groups</span>}>
-      {guide.map(row => { const current = serves[row.group] ?? 0; const total = Math.ceil(row.serves); return <div key={row.group} className="kh-serve">
+      {guide.map(row => { const current = Math.min(serves[row.group] ?? 0, row.serves); const steps = Math.round(row.serves * 2); const progress = row.serves > 0 ? (current / row.serves) * 100 : 0; return <div key={row.group} className="kh-serve">
         <span><b>{row.group}</b><small>1 serve = {row.example}</small></span>
-        <span className="kh-dots">{Array.from({ length: total }, (_, index) => <button key={index} type="button" aria-label={`${row.group}, serve ${index + 1}`} aria-pressed={index < current} className={index === total - 1 && row.serves % 1 ? 'half' : undefined} onClick={() => setServes(value => ({ ...value, [row.group]: value[row.group] === index + 1 ? index : index + 1 }))} />)}</span>
+        <label className="kh-serve-slider" style={{ '--serve-progress': `${progress}%` } as CSSProperties}><span className="kh-sr">{row.group} serves</span><input type="range" min="0" max={row.serves} step="0.5" value={current} onChange={event => setServes(value => ({ ...value, [row.group]: Number(event.target.value) }))} /><span className="kh-serve-ticks" aria-hidden="true">{Array.from({ length: steps + 1 }, (_, index) => <i key={index} className={index % 2 === 0 ? 'major' : undefined} />)}</span></label>
         <em>{current} / {row.serves}</em>
       </div> })}
       <div className="kh-row"><button type="button" className="kh-btn" onClick={() => setServes({})}>Reset today</button><button type="button" className="kh-btn" onClick={() => emailToSelf(`Food plan · ${locality.name}`, summary)}>Email to myself</button></div>
       <a className="kh-link" href={OFFICIAL.serves} target="_blank" rel="noreferrer">Eat for Health ↗</a>
     </Card>}
-    <Card title={parent ? `Kids in the ${area ?? ''} region` : `Healthy habits · ${area ?? 'Department area'}`} sub={parent ? 'Blue dot: this region. Grey line: the middle of Victoria’s 17 regions.' : 'VCAMS survey · marker against the median of 17 Department areas'} aside={<Geo>Dept area</Geo>}>
+    <Card title={parent ? `Kids in the ${area ?? ''} region` : `Healthy habits · ${area ?? 'Department area'}`} sub={parent ? 'The mark shows the standard. Green meets it; orange-red does not.' : 'VCAMS survey · mark shows the standard; colour indicates whether it is met'} aside={<Geo>Dept area</Geo>}>
       {nutrition.loading ? <p className="kh-empty">Loading survey context.</p> : <div className="kh-habits">{habits.map(item => <div key={item.indicator_id}>
         <span className="kh-habit-label">{parent ? <><b>{inHundred(item.area.percent)}</b> children {VCAMS_PLAIN[item.indicator_id] ?? item.indicator_label}</> : <b>{VCAMS_LABEL[item.indicator_id] ?? item.indicator_label}</b>}
           <small>{item.age_group} · {item.reference_year}{item.area.quality_flag !== 'available' ? ` · ${item.area.quality_flag.replace(/_/g, ' ')} (RSE ${item.area.rse_percent?.toFixed(0)}%)` : ''}</small></span>

@@ -22,7 +22,7 @@ export default function LocalityGlobe({ mode, localityId, localityName }: Locali
     mapboxgl.accessToken = TOKEN
     const map = new mapboxgl.Map({
       container: containerRef.current,
-      style: 'mapbox://styles/mapbox/satellite-streets-v12',
+      style: 'mapbox://styles/tomatooo88/cmukuaww1007501so6yus9ois',
       center: [144.9631, -37.8136],
       zoom: 7.15,
       projection: 'globe',

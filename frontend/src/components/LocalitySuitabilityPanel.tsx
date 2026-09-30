@@ -253,7 +253,9 @@ export default function LocalitySuitabilityPanel({
 
       <p className="suitability-intro">Choose from the evidence currently supported for every reporting locality. Results are relative area-level matches, not medical or personal advice.</p>
 
-      <div className="suitability-patterns" aria-label="Evidence pattern shortcuts">
+      <div className="suitability-layout">
+        <div className="suitability-controls">
+          <div className="suitability-patterns" aria-label="Evidence pattern shortcuts">
         <strong>Explore a concrete evidence pattern</strong>
         <p>These shortcuts combine measured indicators; they do not claim that one causes another.</p>
         <div>
@@ -273,16 +275,16 @@ export default function LocalitySuitabilityPanel({
             )
           })}
         </div>
-      </div>
+          </div>
 
-      <div className="suitability-options" aria-label="Suitability filters">
+          <div className="suitability-options" aria-label="Suitability filters">
         {optionGroups.map((group) => ({
           ...group,
           options: group.options.filter((option) => option.available),
         })).filter((group) => group.options.length > 0).map((group) => {
           const availableCount = group.options.length
           return (
-            <details key={group.title} className="suitability-group" open>
+            <details key={group.title} className="suitability-group">
               <summary>
                 <span>{group.title}</span>
                 <small>{availableCount} available</small>
@@ -308,9 +310,10 @@ export default function LocalitySuitabilityPanel({
             </details>
           )
         })}
-      </div>
+          </div>
+        </div>
 
-      <div className="suitability-results" aria-live="polite">
+        <div className="suitability-results" aria-live="polite">
         {loading ? (
           <p>Calculating suitable localities…</p>
         ) : error ? (
@@ -345,6 +348,7 @@ export default function LocalitySuitabilityPanel({
             <p className="suitability-score-note">Relative evidence fit for the selected indicators. It is not an overall suburb rating.</p>
           </>
         )}
+        </div>
       </div>
     </section>
   )

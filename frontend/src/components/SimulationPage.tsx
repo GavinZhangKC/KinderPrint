@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 
 import BrandHeader from './BrandHeader'
 import { useNeighbourhoodSearch } from '../hooks/useNeighbourhoodSearch'
@@ -10,6 +10,7 @@ interface SimulationPageProps {
   onInsight: () => void
   onExploreMap: () => void
   onSimulation: () => void
+  onHealth: () => void
 }
 
 interface SimulationBaseline {
@@ -84,6 +85,8 @@ type ComparisonMetric = {
   lowerIsBetter: boolean
 }
 
+type SimulationUpdateStatus = 'idle' | 'updating' | 'updated'
+
 function formatMetricValue(value: number, unit: string) {
   return `${value.toFixed(1)}${unit}`
 }
@@ -91,7 +94,7 @@ function formatMetricValue(value: number, unit: string) {
 function metricDirection(metric: ComparisonMetric) {
   const delta = metric.simulated - metric.baseline
   if (Math.abs(delta) < 0.05) {
-    return { delta, label: 'No meaningful change', tone: 'neutral' as const }
+    return { delta, label: 'No change', tone: 'neutral' as const }
   }
   const improves = metric.lowerIsBetter ? delta < 0 : delta > 0
   return {
@@ -99,6 +102,15 @@ function metricDirection(metric: ComparisonMetric) {
     label: improves ? 'Improves' : 'Worsens',
     tone: improves ? 'improves' as const : 'worsens' as const,
   }
+}
+
+function outcomeDirection(baseline: number, simulated: number, lowerIsBetter = false) {
+  const delta = simulated - baseline
+  if (Math.abs(delta) < 0.05) return { status: 'No change', tone: 'neutral' as const, symbol: '→' }
+  const improves = lowerIsBetter ? delta < 0 : delta > 0
+  return improves
+    ? { status: 'Improves', tone: 'improves' as const, symbol: '↗' }
+    : { status: 'Worsens', tone: 'worsens' as const, symbol: '↘' }
 }
 
 function metricNumber(indicators: Record<string, { value: number | null; status: string }>, id: string): number | null {
@@ -390,6 +402,7 @@ export default function SimulationPage({
   onInsight,
   onExploreMap,
   onSimulation,
+  onHealth,
 }: SimulationPageProps) {
   const [selectedNeighbourhood, setSelectedNeighbourhood] = useState('')
   const [selectedNeighbourhoodId, setSelectedNeighbourhoodId] = useState<string | null>(null)
@@ -403,6 +416,11 @@ export default function SimulationPage({
   const [scenarioResult, setScenarioResult] = useState<ScenarioResult | null>(null)
   const [aiModel, setAiModel] = useState<AiSimulationModel | null>(null)
   const [scenarioLoading, setScenarioLoading] = useState(false)
+  const [insightExpanded, setInsightExpanded] = useState(false)
+  const [updateStatus, setUpdateStatus] = useState<SimulationUpdateStatus>('idle')
+  const [showResults, setShowResults] = useState(false)
+  const searchWrapRef = useRef<HTMLDivElement>(null)
+  const autoRunPendingRef = useRef(false)
 
   const {
     search,
@@ -425,6 +443,7 @@ export default function SimulationPage({
 
   async function loadNeighbourhoodScenario(id: string, name: string) {
     setScenarioLoading(true)
+    setUpdateStatus('updating')
 
     try {
       const [
@@ -538,6 +557,7 @@ export default function SimulationPage({
         industrialPressure: clamp(industrialPressure ?? 50, 0, 100),
       }
 
+      autoRunPendingRef.current = false
       setBaseline(nextBaseline)
       setScenarioValues({
         generalPracticeAccess: nextBaseline.generalPracticeAccess,
@@ -551,11 +571,15 @@ export default function SimulationPage({
         hospitalAccess: nextBaseline.hospitalAccess,
         earlyYearsPlaces: nextBaseline.earlyYearsPlaces,
       }, nextAiModel))
+      setShowResults(true)
+      setUpdateStatus('updated')
     } catch (error) {
       console.error('Failed to load simulation baseline:', error)
       setBaseline(null)
       setAiModel(null)
       setScenarioResult(null)
+      setShowResults(false)
+      setUpdateStatus('idle')
     } finally {
       setScenarioLoading(false)
     }
@@ -566,28 +590,55 @@ export default function SimulationPage({
     await submitSearch()
   }
 
-  const runSimulation = () => {
+  const runSimulation = useCallback(() => {
+    autoRunPendingRef.current = false
     if (!baseline) {
       return
     }
 
     setScenarioResult(buildScenarioResult(baseline, scenarioValues, aiModel))
-  }
+    setUpdateStatus('updated')
+  }, [aiModel, baseline, scenarioValues])
 
-  const resetScenario = () => {
-    if (!baseline) {
-      return
+  useEffect(() => {
+    if (!baseline || !autoRunPendingRef.current) return
+    const timer = window.setTimeout(() => {
+      if (autoRunPendingRef.current) runSimulation()
+    }, 350)
+    return () => window.clearTimeout(timer)
+  }, [baseline, runSimulation, scenarioValues])
+
+  useEffect(() => {
+    if (updateStatus !== 'updated') return
+    const timer = window.setTimeout(() => setUpdateStatus('idle'), 1600)
+    return () => window.clearTimeout(timer)
+  }, [updateStatus])
+
+  useEffect(() => {
+    if (!showSearchResults) return
+
+    const handlePointerDown = (event: PointerEvent) => {
+      if (!searchWrapRef.current?.contains(event.target as Node)) {
+        setShowSearchResults(false)
+      }
+    }
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setShowSearchResults(false)
     }
 
-    const defaultValues = {
-      generalPracticeAccess: baseline.generalPracticeAccess,
-      pharmacyAccess: baseline.pharmacyAccess,
-      hospitalAccess: baseline.hospitalAccess,
-      earlyYearsPlaces: baseline.earlyYearsPlaces,
+    document.addEventListener('pointerdown', handlePointerDown)
+    document.addEventListener('keydown', handleKeyDown)
+    return () => {
+      document.removeEventListener('pointerdown', handlePointerDown)
+      document.removeEventListener('keydown', handleKeyDown)
     }
+  }, [showSearchResults])
 
-    setScenarioValues(defaultValues)
-    setScenarioResult(buildScenarioResult(baseline, defaultValues, aiModel))
+  const updateScenarioValue = (key: keyof ScenarioValues, value: number) => {
+    autoRunPendingRef.current = true
+    setShowResults(true)
+    setUpdateStatus('updating')
+    setScenarioValues((current) => ({ ...current, [key]: value }))
   }
 
   const comparisonMetrics: ComparisonMetric[] = baseline ? [
@@ -638,6 +689,14 @@ export default function SimulationPage({
     },
   ] : []
 
+  const outcomeSummaries = baseline ? [
+    { label: 'GP', ...outcomeDirection(baseline.generalPracticeAccess, scenarioValues.generalPracticeAccess) },
+    { label: 'Pharmacy', ...outcomeDirection(baseline.pharmacyAccess, scenarioValues.pharmacyAccess) },
+    { label: 'Vulnerability', ...outcomeDirection(baseline.vulnerability, scenarioResult?.vulnerability ?? baseline.vulnerability, true) },
+    { label: 'Physical health', ...outcomeDirection(baseline.physicalHealth, scenarioResult?.physicalHealth ?? baseline.physicalHealth) },
+    { label: 'Social competence', ...outcomeDirection(baseline.socialCompetence, scenarioResult?.socialCompetence ?? baseline.socialCompetence) },
+  ] : []
+
   return (
     <div className="app-background simulation-page">
       <div className="ambient ambient-one" />
@@ -649,41 +708,47 @@ export default function SimulationPage({
         onInsight={onInsight}
         onMap={onExploreMap}
         onSimulation={onSimulation}
+        onHealth={onHealth}
       />
 
-      <main className="simulation-shell simulation-main glass">
+      <main className="simulation-shell simulation-main">
         <div className="simulation-header-row">
-          <h1>Simulation Engine</h1>
-          <span className="simulation-pill">Illustrative scenario</span>
-        </div>
-
-        <p className="simulation-subtitle">
-          Test how changes in local care capacity could influence modelled child-health outcomes.
-        </p>
-
-        <div className="simulation-assumption-banner">
-          <span>Model assumptions: evidence-based planning estimate, not a forecast</span>
-          <div className="assumption-info-wrap">
-            <button type="button" className="assumption-info-trigger" aria-label="Explain the simulation formula">
-              i
-            </button>
-            <div className="assumption-info-tooltip">
-              <strong>Scenario formula</strong>
-              <p>Estimated vulnerability = baseline vulnerability − (GP access gain × 1.4) − (pharmacy access gain × 0.8) − (hospital access gain × 1.1) − (early-years capacity gain × 0.08)</p>
-              <p>Estimated health outcomes combine AEDC physical-health and social-competence indicators with care-capacity changes.</p>
-              <p>Effects are context-adjusted using care access, projected child demand, and available traffic and industrial context indicators.</p>
-              <p>Values are clamped to realistic ranges to keep the estimate stable and interpretable for planning comparisons.</p>
+          <div className="simulation-title-copy">
+            <div className="simulation-title-line">
+              <h1>Simulation Engine</h1>
+              <div className="simulation-page-info">
+                <button type="button" aria-label="About the Simulation Engine">i</button>
+                <div className="simulation-page-info-tooltip">
+                  <strong>Adjust local care capacity and explore how outcomes may change.</strong>
+                  <span>Planning estimate · Not a forecast</span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
 
-        <div className="simulation-grid">
-          <section className="simulation-panel">
-            <h2>Build a Scenario</h2>
+        <div className={`simulation-grid${baseline && showResults ? ' has-results' : ''}`}>
+          <section className="simulation-panel simulation-builder-panel">
+            <div className="scenario-heading">
+              <h2>Build a Scenario</h2>
+              <div className="method-info-wrap">
+                <button type="button" className="method-info-trigger" aria-label="How the estimate is built">i</button>
+                <div className="method-info-tooltip">
+                  <h3>How the estimate is built</h3>
+                  <ul>
+                    <li>More general practices, pharmacies, and hospitals lower vulnerability.</li>
+                    <li>More approved early-years places support physical-health outlook.</li>
+                    <li>Higher care access amplifies expected gains; projected demand dampens gains.</li>
+                    <li>Traffic and industrial context can further dampen estimated gains.</li>
+                    <li>This is a planning comparison, not a year-by-year forecast.</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
 
             <div className="field-group">
               <label htmlFor="simulation-neighbourhood">Neighbourhood</label>
-              <div className="simulation-search-wrap">
+              <div className="simulation-search-wrap" ref={searchWrapRef}>
                 <form
                   className="glass search-input-shell simulation-search-shell"
                   onSubmit={handleSearchSubmit}
@@ -712,7 +777,7 @@ export default function SimulationPage({
                 </form>
 
                 {showSearchResults && (
-                  <div className="glass simulation-search-results">
+                  <div className="glass search-results simulation-search-results">
                     {searchLoading && (
                       <div className="search-state">Searching neighbourhoods…</div>
                     )}
@@ -753,7 +818,7 @@ export default function SimulationPage({
                     max="20"
                     step="0.01"
                     value={scenarioValues.generalPracticeAccess}
-                    onChange={(event) => setScenarioValues((current) => ({ ...current, generalPracticeAccess: Number(event.target.value) }))}
+                    onChange={(event) => updateScenarioValue('generalPracticeAccess', Number(event.target.value))}
                     aria-label="General practices per 10,000 residents"
                   />
                   <div className="slider-meta">
@@ -775,7 +840,7 @@ export default function SimulationPage({
                     max="20"
                     step="0.01"
                     value={scenarioValues.pharmacyAccess}
-                    onChange={(event) => setScenarioValues((current) => ({ ...current, pharmacyAccess: Number(event.target.value) }))}
+                    onChange={(event) => updateScenarioValue('pharmacyAccess', Number(event.target.value))}
                     aria-label="Pharmacies per 10,000 residents"
                   />
                   <div className="slider-meta">
@@ -797,7 +862,7 @@ export default function SimulationPage({
                     max="300"
                     step="0.1"
                     value={scenarioValues.earlyYearsPlaces}
-                    onChange={(event) => setScenarioValues((current) => ({ ...current, earlyYearsPlaces: Number(event.target.value) }))}
+                    onChange={(event) => updateScenarioValue('earlyYearsPlaces', Number(event.target.value))}
                     aria-label="Approved early-years places per 1,000 children"
                   />
                   <div className="slider-meta">
@@ -819,7 +884,7 @@ export default function SimulationPage({
                     max="20"
                     step="0.01"
                     value={scenarioValues.hospitalAccess}
-                    onChange={(event) => setScenarioValues((current) => ({ ...current, hospitalAccess: Number(event.target.value) }))}
+                    onChange={(event) => updateScenarioValue('hospitalAccess', Number(event.target.value))}
                     aria-label="Hospitals per 10,000 residents"
                   />
                   <div className="slider-meta">
@@ -830,93 +895,25 @@ export default function SimulationPage({
               </div>
             </div>
 
-            <p className="scenario-note">
-              Assumes the current neighbourhood baseline and applies a simple evidence-based sensitivity model to compare health-service options.
-            </p>
-
-            <div className="method-panel">
-              <h3>How the estimate is built</h3>
-              <ul>
-                <li>More general practices, pharmacies, and hospitals lower vulnerability in the scenario model.</li>
-                <li>More approved early-years places support the modelled physical-health outlook.</li>
-                <li>Higher care access amplifies expected gains, while stronger projected demand dampens gains.</li>
-                <li>Higher traffic and industrial context pressure further dampens estimated gains in the scenario output.</li>
-                <li>The output is a planning comparison, not a forecast of a future year-by-year trend.</li>
-              </ul>
-            </div>
-
-            <div className="action-row simulation-actions">
-              <button type="button" className="button button-secondary" onClick={resetScenario} disabled={!baseline}>Reset</button>
-              <button type="button" className="button button-primary" onClick={runSimulation} disabled={!baseline}>Run Simulation</button>
-            </div>
+            {showResults && <div className="action-row simulation-actions">
+              <button type="button" className="button button-tertiary" onClick={() => setShowResults(false)}>Scenario only</button>
+            </div>}
           </section>
 
-          <section className="simulation-panel">
+          {baseline && showResults && <section className="simulation-panel simulation-results-panel">
             <div className="results-header">
               <h2>Simulation Results</h2>
-              <span className="ready-pill">{scenarioResult ? 'Estimate ready' : 'Awaiting data'}</span>
+              {updateStatus !== 'idle' && <span className={`simulation-update-status ${updateStatus}`}>
+                {updateStatus === 'updating' ? 'Updating…' : '✓ Updated'}
+              </span>}
             </div>
 
-            <div className="result-cards">
-              <article className="result-card">
-                <div className="result-card-header">
-                  <span>General practices</span>
-                </div>
-                <div className="result-card-body">
-                  <strong>{baseline ? `${baseline.generalPracticeAccess.toFixed(2)}/10k` : '—'}</strong>
-                  <span className="result-arrow">→</span>
-                  <strong>{scenarioResult ? `${scenarioValues.generalPracticeAccess.toFixed(2)}/10k` : '—'}</strong>
-                </div>
-                <div className="result-status success">{scenarioResult ? scenarioResult.careAccessDirection : 'Select area'}</div>
-              </article>
-
-              <article className="result-card">
-                <div className="result-card-header">
-                  <span>Pharmacies</span>
-                </div>
-                <div className="result-card-body">
-                  <strong>{baseline ? `${baseline.pharmacyAccess.toFixed(2)}/10k` : '—'}</strong>
-                  <span className="result-arrow">→</span>
-                  <strong>{scenarioValues.pharmacyAccess.toFixed(2)}/10k</strong>
-                </div>
-                <div className="result-status success">{baseline ? `+${(scenarioValues.pharmacyAccess - baseline.pharmacyAccess).toFixed(2)}/10k` : '—'}</div>
-              </article>
-
-              <article className="result-card">
-                <div className="result-card-header">
-                  <span>Modelled vulnerability</span>
-                </div>
-                <div className="result-card-body">
-                  <strong>{baseline ? `${baseline.vulnerability.toFixed(1)}%` : '—'}</strong>
-                  <span className="result-arrow">→</span>
-                  <strong>{scenarioResult ? `${scenarioResult.vulnerability.toFixed(1)}%` : '—'}</strong>
-                </div>
-                <div className="result-status success">{scenarioResult ? scenarioResult.vulnerabilityDirection : 'Pending'}</div>
-              </article>
-
-              <article className="result-card">
-                <div className="result-card-header">
-                  <span>Physical-health outlook</span>
-                </div>
-                <div className="result-card-body">
-                  <strong>{baseline ? `${baseline.physicalHealth.toFixed(1)}%` : '—'}</strong>
-                  <span className="result-arrow">→</span>
-                  <strong>{scenarioResult ? `${scenarioResult.physicalHealth.toFixed(1)}%` : '—'}</strong>
-                </div>
-                <div className="result-status success">{scenarioResult ? scenarioResult.physicalHealthDirection : 'Pending'}</div>
-              </article>
-
-              <article className="result-card">
-                <div className="result-card-header">
-                  <span>Social-competence outlook</span>
-                </div>
-                <div className="result-card-body">
-                  <strong>{baseline ? `${baseline.socialCompetence.toFixed(1)}%` : '—'}</strong>
-                  <span className="result-arrow">→</span>
-                  <strong>{scenarioResult ? `${scenarioResult.socialCompetence.toFixed(1)}%` : '—'}</strong>
-                </div>
-                <div className="result-status success">{scenarioResult ? scenarioResult.socialCompetenceDirection : 'Pending'}</div>
-              </article>
+            <div className="outcome-summary-strip" aria-label="Outcome summary">
+              {outcomeSummaries.map((item) => <div className={`outcome-summary-item ${item.tone}`} key={item.label}>
+                <span>{item.label}</span>
+                <b aria-hidden="true">{item.symbol}</b>
+                <small>{item.status}</small>
+              </div>)}
             </div>
 
             <div className="comparison-panel">
@@ -938,56 +935,65 @@ export default function SimulationPage({
                 const simulatedWidth = clamp((metric.simulated / metric.max) * 100, 0, 100)
                 const deltaPrefix = direction.delta > 0 ? '+' : ''
                 return (
-                  <div className="comparison-row" key={metric.id}>
+                  <div className="comparison-row" key={metric.id} tabIndex={0}>
                     <div className="comparison-metric">
                       <span className="comparison-label">{metric.label}</span>
                       <span className="comparison-rule">{metric.lowerIsBetter ? 'Lower is better' : 'Higher is better'}</span>
                     </div>
-                    <div className="comparison-values">
-                      <span className="comparison-value baseline">{formatMetricValue(metric.baseline, metric.unit)}</span>
-                      <span className="comparison-arrow">→</span>
-                      <span className="comparison-value simulated">{formatMetricValue(metric.simulated, metric.unit)}</span>
-                      <span className={`comparison-delta ${direction.tone}`}>
-                        {`${deltaPrefix}${direction.delta.toFixed(1)}${metric.unit} · ${direction.label}`}
-                      </span>
-                    </div>
                     <div className="comparison-track" role="img" aria-label={`${metric.label} baseline ${formatMetricValue(metric.baseline, metric.unit)} simulated ${formatMetricValue(metric.simulated, metric.unit)}`}>
                       <div className="comparison-track-fill baseline" style={{ width: `${baselineWidth}%` }} />
                       <div className="comparison-track-fill simulated" style={{ width: `${simulatedWidth}%` }} />
+                    </div>
+                    <div className="comparison-detail" role="tooltip">
+                      <strong>{metric.label}</strong>
+                      <dl>
+                        <div><dt>Baseline</dt><dd>{formatMetricValue(metric.baseline, metric.unit)}</dd></div>
+                        <div><dt>Simulated</dt><dd>{formatMetricValue(metric.simulated, metric.unit)}</dd></div>
+                      </dl>
+                      <span className={`comparison-delta ${direction.tone}`}>
+                        {`${deltaPrefix}${direction.delta.toFixed(1)}${metric.unit} · ${direction.label}`}
+                      </span>
                     </div>
                   </div>
                 )
               })}
             </div>
 
-            <div className="insight-box">
-              <div className="insight-box-header">
-                <h3>Model Insight</h3>
-                <span className="confidence-pill">Confidence · Medium</span>
-              </div>
-              <p>{scenarioResult ? scenarioResult.insight : 'Select a neighbourhood and run the model to update the scenario estimate. This is an illustrative model output, not a future forecast.'}</p>
-              <div className="projected-change secondary">
-                <span>Model context:</span>
-                <strong>{scenarioResult ? scenarioResult.modelContext : `${baseline?.serviceAccess?.toFixed(1) ?? '50.0'} · ${baseline?.futureDemand?.toFixed(1) ?? '50.0'}`}</strong>
-              </div>
-              <div className="projected-change secondary">
-                <span>AI model:</span>
-                <strong>{scenarioResult ? scenarioResult.aiSummary : 'Awaiting training data from neighbourhood indicators.'}</strong>
-              </div>
-              <div className="projected-change">
-                <span>Vulnerability change:</span>
-                <strong>{scenarioResult ? scenarioResult.projectedChange : `${baseline?.vulnerability ?? 25}% → ${baseline?.vulnerability ?? 25}%`}</strong>
-              </div>
-              <div className="projected-change secondary">
-                <span>Physical-health outlook:</span>
-                <strong>{scenarioResult ? scenarioResult.projectedPhysicalHealthChange : `${baseline?.physicalHealth ?? 68} → ${baseline?.physicalHealth ?? 68}`}</strong>
-              </div>
+            <div className={`insight-box${insightExpanded ? ' is-expanded' : ''}`}>
+              <button
+                type="button"
+                className="insight-summary"
+                aria-label={insightExpanded ? 'Hide Model Insight details' : 'Show Model Insight details'}
+                aria-expanded={insightExpanded}
+                onClick={() => setInsightExpanded((expanded) => !expanded)}
+              >
+                <span><strong>Model Insight</strong><small>Confidence: Medium</small></span>
+                <i aria-hidden="true" />
+              </button>
+              {insightExpanded && <div className="insight-content">
+                <p>{scenarioResult ? scenarioResult.insight : 'Select a neighbourhood and adjust the controls to update the scenario estimate.'}</p>
+                <div className="insight-details">
+                  <div className="projected-change secondary">
+                    <span>Model context:</span>
+                    <strong>{scenarioResult ? scenarioResult.modelContext : `${baseline.serviceAccess.toFixed(1)} · ${baseline.futureDemand.toFixed(1)}`}</strong>
+                  </div>
+                  <div className="projected-change secondary">
+                    <span>AI model:</span>
+                    <strong>{scenarioResult ? scenarioResult.aiSummary : 'Awaiting training data from neighbourhood indicators.'}</strong>
+                  </div>
+                  <div className="projected-change">
+                    <span>Vulnerability change:</span>
+                    <strong>{scenarioResult ? scenarioResult.projectedChange : `${baseline.vulnerability}% → ${baseline.vulnerability}%`}</strong>
+                  </div>
+                  <div className="projected-change secondary">
+                    <span>Physical-health outlook:</span>
+                    <strong>{scenarioResult ? scenarioResult.projectedPhysicalHealthChange : `${baseline.physicalHealth} → ${baseline.physicalHealth}`}</strong>
+                  </div>
+                </div>
+              </div>}
             </div>
 
-            <div className="action-row results-actions">
-              <button type="button" className="button button-primary" onClick={onExploreMap}>Back to Map</button>
-            </div>
-          </section>
+          </section>}
         </div>
       </main>
     </div>

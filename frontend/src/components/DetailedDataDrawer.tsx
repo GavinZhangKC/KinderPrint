@@ -6,6 +6,7 @@ import EarlyChildhoodServicesSection from './detailed-data/EarlyChildhoodService
 import EvidenceSection from './detailed-data/EvidenceSection'
 import IndustrialContextSection from './detailed-data/IndustrialContextSection'
 import PopulationOutlookSection from './detailed-data/PopulationOutlookSection'
+import SectionEvidence from './detailed-data/SectionEvidence'
 import TrafficContextSection from './detailed-data/TrafficContextSection'
 
 interface DetailedDataDrawerProps {
@@ -60,8 +61,12 @@ export default function DetailedDataDrawer({ neighbourhood, onClose, isActive, o
       <div ref={bodyRef} className="data-drawer-scroll">
         <section>
           <h3>Child Development</h3>
-          <div className="drawer-metric"><span>On track on all five domains</span><strong>{display(neighbourhood.childDevelopmentScore, '%')}</strong><IndicatorProvenanceDetails details={neighbourhood.indicatorProvenance.aedc_on_track_five} /></div>
-          <div className="drawer-metric"><span>Developmental vulnerability</span><strong>{display(neighbourhood.developmentalVulnerability, '%')}</strong><IndicatorProvenanceDetails details={neighbourhood.indicatorProvenance.aedc_vulnerable_one_or_more} /></div>
+          <div className="drawer-metric"><span>On track on all five domains</span><strong>{display(neighbourhood.childDevelopmentScore, '%')}</strong></div>
+          <div className="drawer-metric"><span>Developmental vulnerability</span><strong>{display(neighbourhood.developmentalVulnerability, '%')}</strong></div>
+          <SectionEvidence entries={[
+            { label: 'On track', provenance: neighbourhood.indicatorProvenance.aedc_on_track_five },
+            { label: 'Vulnerability', provenance: neighbourhood.indicatorProvenance.aedc_vulnerable_one_or_more },
+          ]} />
         </section>
         <section>
           <h3>Social Context</h3>
@@ -69,9 +74,14 @@ export default function DetailedDataDrawer({ neighbourhood, onClose, isActive, o
         </section>
         <section>
           <h3>Environment</h3>
-          <div className="drawer-metric"><span>Urban heat island effect</span><strong>{display(neighbourhood.heatExposure, '°C')}</strong><IndicatorProvenanceDetails details={neighbourhood.indicatorProvenance.env_urban_heat} /></div>
-          <div className="drawer-metric"><span>Tree canopy</span><strong>{display(neighbourhood.treeCanopy, '%')}</strong><IndicatorProvenanceDetails details={neighbourhood.indicatorProvenance.env_vegetation_cover} /></div>
-          <div className="drawer-metric"><span>Public open space</span><strong>{display(neighbourhood.greenSpaceAccess, '%')}</strong><IndicatorProvenanceDetails details={neighbourhood.indicatorProvenance.env_open_space_access} /></div>
+          <div className="drawer-metric"><span>Urban heat island effect</span><strong>{display(neighbourhood.heatExposure, '°C')}</strong></div>
+          <div className="drawer-metric"><span>Tree canopy</span><strong>{display(neighbourhood.treeCanopy, '%')}</strong></div>
+          <div className="drawer-metric"><span>Public open space</span><strong>{display(neighbourhood.greenSpaceAccess, '%')}</strong></div>
+          <SectionEvidence entries={[
+            { label: 'Urban heat', provenance: neighbourhood.indicatorProvenance.env_urban_heat },
+            { label: 'Tree canopy', provenance: neighbourhood.indicatorProvenance.env_vegetation_cover },
+            { label: 'Open space', provenance: neighbourhood.indicatorProvenance.env_open_space_access },
+          ]} />
         </section>
         <ActiveLivingSection neighbourhood={neighbourhood} />
         <TrafficContextSection neighbourhoodId={neighbourhood.id} />

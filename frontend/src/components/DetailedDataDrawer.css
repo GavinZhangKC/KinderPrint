@@ -56,6 +56,9 @@
 .drawer-metric-provenance .evidence-notice { color: #71809a; }
 .drawer-section-state { margin: 0; padding: 12px 0; border-top: 1px solid rgba(113,137,176,.16); color: #7e8ca6; font-size: 11px; line-height: 1.5; }
 .drawer-section-intro { margin: 0 0 8px; color: #7e8ca6; font-size: 10px; line-height: 1.5; }
+.drawer-section-evidence { padding: 12px 0 14px; border-top: 1px solid rgba(113,137,176,.16); }
+.drawer-section-evidence .drawer-evidence:not([open]) summary span { display: inline; }
+.drawer-section-evidence .drawer-evidence summary { font-size: 11px; }
 .population-projection-list { border-top: 1px solid rgba(113,137,176,.16); }
 .population-projection-year { display: grid; grid-template-columns: 54px minmax(0, 1fr); gap: 12px; padding: 14px 0; border-bottom: 1px solid rgba(113,137,176,.16); }
 .population-projection-year > strong { color: #4f6690; font-size: 13px; }

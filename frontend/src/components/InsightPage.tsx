@@ -10,9 +10,10 @@ interface InsightPageProps {
   onLogoClick: () => void
   onExploreMap: () => void
   onSimulation: () => void
+  onHealth: () => void
 }
 
-export default function InsightPage({ onLogoClick, onExploreMap, onSimulation }: InsightPageProps) {
+export default function InsightPage({ onLogoClick, onExploreMap, onSimulation, onHealth }: InsightPageProps) {
   const { rootRef, journey, chapter, reducedMotion, goToChapter } = useJourney()
   const { state, retry } = useInsightData()
   const sceneRef = useRef<HTMLDivElement>(null)
@@ -87,6 +88,7 @@ export default function InsightPage({ onLogoClick, onExploreMap, onSimulation }:
       onInsight={() => goToChapter(0)}
       onMap={onExploreMap}
       onSimulation={onSimulation}
+      onHealth={onHealth}
     />
     <button
       type="button"

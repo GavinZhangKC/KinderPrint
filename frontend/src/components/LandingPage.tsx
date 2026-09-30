@@ -119,7 +119,7 @@ function ExploreMenuLink({ item, onSelect }: ExploreMenuLinkProps) {
   )
 }
 
-function HomeHeader({ onHome, onInsight, onSimulation, onMap }: HomeHeaderProps) {
+function HomeHeader({ onHome, onInsight, onSimulation, onMap, onHealth }: HomeHeaderProps) {
   return (
     <header className="glass home-header" data-no-ripple>
       <button className="home-brand" type="button" onClick={onHome} aria-label="Go to Vkinder home">
@@ -130,6 +130,7 @@ function HomeHeader({ onHome, onInsight, onSimulation, onMap }: HomeHeaderProps)
         <button type="button" aria-current="page" onClick={onHome}>Home</button>
         <button type="button" onClick={onInsight}>Insight Journey</button>
         <button type="button" onClick={onSimulation}>Simulation</button>
+        <button type="button" onClick={onHealth}>Child Health</button>
       </nav>
       <button className="home-nav-cta" type="button" onClick={onMap}>Explore Map</button>
     </header>
@@ -560,14 +561,11 @@ export default function LandingPage({ onInsight, onSimulation, onMap, onHealth }
               Peel back the layers of a place, from heat and nature<br />to early-years support and observed development patterns.
             </p>
             <div className="home-hero-actions">
-              <button className="button primary home-hero-button" type="button" onClick={onHealth}>
-                Explore child health <span aria-hidden="true">↗</span>
-              </button>
               <button className="button primary home-hero-button" type="button" onClick={onMap}>
                 Explore Melbourne <span aria-hidden="true">↗</span>
               </button>
-              <button className="button secondary home-hero-secondary" type="button" onClick={onInsight}>
-                Explore the Journey
+              <button className="button secondary home-hero-secondary" type="button" onClick={onHealth}>
+                Explore child health <span aria-hidden="true">↗</span>
               </button>
             </div>
           </div>
