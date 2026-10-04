@@ -2,6 +2,7 @@
    Neutral-first (60%), navy structure (30%), one blue accent (10%).
    Semantic colours (good / watch) only ever carry meaning, never decoration. */
 .kp-hub{
+  --kh-shell-width:calc(100vw - clamp(24px,2.5vw,48px));
   --kh-bg:#edf4ff; --kh-bg2:#e7efff; --kh-glass:rgba(255,255,255,.58); --kh-card:rgba(255,255,255,.88); --kh-soft:rgba(235,240,255,.86);
   --kh-ink:#233a63; --kh-ink2:#40577f; --kh-muted:#6b7b9d; --kh-line:rgba(255,255,255,.78);
   --kh-navy:#2c5eaf; --kh-navy-ink:#fff; --kh-blue:#6d78e8; --kh-blue-soft:#e8eaff;
@@ -23,7 +24,12 @@
 .kp-hub img{max-width:100%}
 .kh-sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
 @media (prefers-reduced-motion:reduce){.kp-hub *{animation:none!important;transition:none!important}}
-.kh-shell{max-width:1320px;margin:0 auto;padding:18px 20px 40px}
+.kh-shell{width:var(--kh-shell-width);max-width:none;margin:0 auto;padding:18px 0 40px}
+
+@media (max-width:680px){
+  .kp-hub{--kh-shell-width:calc(100vw - 20px)}
+  .kh-shell{padding-right:10px;padding-left:10px}
+}
 
 /* top bar */
 .kh-top{display:flex;align-items:center;gap:14px;flex-wrap:wrap}

@@ -314,7 +314,7 @@ function HomeThemeStrip() {
   )
 }
 
-function HomeDiscoverySection({ onMap }: Pick<LandingPageProps, 'onMap'>) {
+function HomeDiscoverySection() {
   const [selectedPriority, setSelectedPriority] = useState<string | null>(null)
   const [hasEntered, setHasEntered] = useState(false)
   const sectionRef = useRef<HTMLElement>(null)
@@ -374,34 +374,9 @@ function HomeDiscoverySection({ onMap }: Pick<LandingPageProps, 'onMap'>) {
           ))}
         </div>
 
-        <div className="home-discovery-card-stage">
+        <div className="home-discovery-gallery-stage">
           <InfiniteImageGallery />
 
-          <article className="home-discovery-card" aria-live="polite">
-          <div className="home-discovery-card-status">
-            <span>Locality explorer</span>
-            <small>Live data</small>
-          </div>
-          <h3>{selectedPriority ?? 'All locality layers'}</h3>
-          <p>
-            {selectedPriority
-              ? `Open the map to inspect ${selectedPriority.toLowerCase()} alongside its source, status and limitations.`
-              : 'Choose a focus above to frame your exploration, or enter the map to inspect all available layers.'}
-          </p>
-          <button
-            className="home-discovery-map-preview"
-            type="button"
-            onClick={onMap}
-            aria-label="Explore Melbourne on the interactive map"
-          >
-            <img src="/mapbox-melbourne-preview.png" alt="Mapbox map of Greater Melbourne" loading="lazy" />
-            <span className="home-discovery-map-preview__fog" aria-hidden="true" />
-            <span className="home-discovery-map-preview__prompt">
-              <strong>Let’s Explore Melbourne Now</strong>
-              <span aria-hidden="true">↗</span>
-            </span>
-          </button>
-          </article>
         </div>
       </div>
     </section>
@@ -573,7 +548,7 @@ export default function LandingPage({ onInsight, onSimulation, onMap, onHealth }
 
         <HomeThemeStrip />
 
-        <HomeDiscoverySection onMap={onMap} />
+        <HomeDiscoverySection />
 
         <HomeCompareSection onMap={onMap} />
 

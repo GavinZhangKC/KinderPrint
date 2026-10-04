@@ -1,0 +1,363 @@
+.journey-location-card-layer {
+  position: absolute;
+  z-index: 2;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.journey-location-card {
+  --anchor-x: 0px;
+  --anchor-y: 0px;
+  --card-offset-x: 0px;
+  --card-offset-y: 0px;
+  --card-rise: 12px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: grid;
+  gap: 7px;
+  width: 276px;
+  padding: 17px 19px 16px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, .78);
+  border-radius: 18px;
+  color: #183c55;
+  background: linear-gradient(
+    145deg,
+    rgba(255, 255, 255, .88),
+    rgba(235, 246, 252, .72)
+  );
+  box-shadow:
+    0 15px 38px rgba(30, 65, 91, .18),
+    inset 0 1px 0 rgba(255, 255, 255, .76);
+  opacity: 0;
+  transform:
+    translate3d(
+      calc(var(--anchor-x) + var(--card-offset-x)),
+      calc(var(--anchor-y) + var(--card-offset-y) + var(--card-rise)),
+      0
+    )
+    translate(-50%, -100%);
+  backdrop-filter: blur(15px) saturate(125%);
+  -webkit-backdrop-filter: blur(15px) saturate(125%);
+  cursor: pointer;
+  pointer-events: none;
+  text-align: left;
+  font-family: Manrope, 'Segoe UI', sans-serif;
+  transition:
+    opacity 240ms ease,
+    border-color 180ms ease,
+    box-shadow 180ms ease,
+    background-color 180ms ease;
+  will-change: transform, opacity;
+  backface-visibility: hidden;
+  contain: layout paint;
+}
+
+.journey-location-card::before {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 3px;
+  content: '';
+  background: #64bdd9;
+}
+
+.journey-location-card.is-green-space::before {
+  background: #7eb68a;
+}
+
+.journey-location-card.is-education::before {
+  background: #c09a68;
+}
+
+.journey-location-card[data-visible='true'][data-interactive='true'] {
+  pointer-events: auto;
+}
+
+.journey-location-card:hover,
+.journey-location-card:focus-visible {
+  border-color: rgba(100, 189, 217, .66);
+  background: linear-gradient(
+    145deg,
+    rgba(255, 255, 255, .96),
+    rgba(231, 246, 253, .86)
+  );
+  box-shadow:
+    0 19px 46px rgba(28, 70, 98, .23),
+    0 0 0 3px rgba(100, 189, 217, .14);
+  outline: none;
+}
+
+.journey-location-card-category {
+  color: #568399;
+  font-size: 9.5px;
+  font-weight: 750;
+  letter-spacing: .12em;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.journey-location-card.is-green-space .journey-location-card-category {
+  color: #578367;
+}
+
+.journey-location-card.is-education .journey-location-card-category {
+  color: #8b704d;
+}
+
+.journey-location-card strong {
+  padding-right: 30px;
+  font-size: 16px;
+  font-weight: 720;
+  letter-spacing: -.015em;
+  line-height: 1.2;
+}
+
+.journey-location-card-description {
+  color: #587184;
+  font-size: 11px;
+  font-weight: 520;
+  line-height: 1.42;
+}
+
+.journey-location-card-action {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 3px;
+  color: #377792;
+  font-size: 9.5px;
+  font-weight: 740;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+
+.journey-location-card-action i {
+  font-size: 12px;
+  font-style: normal;
+}
+
+.journey-location-card-chapter {
+  position: absolute;
+  top: 12px;
+  right: 13px;
+  color: rgba(68, 105, 126, .45);
+  font-size: 12px;
+  font-weight: 760;
+}
+
+.journey-location-detail-backdrop {
+  position: absolute;
+  z-index: 5;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgba(25, 53, 72, .2);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  animation: journey-detail-backdrop-in 220ms ease both;
+}
+
+.journey-location-detail {
+  position: relative;
+  width: min(470px, calc(100vw - 40px));
+  padding: clamp(24px, 5vw, 36px);
+  border: 1px solid rgba(255, 255, 255, .82);
+  border-radius: 24px;
+  color: #183c55;
+  background: linear-gradient(
+    145deg,
+    rgba(255, 255, 255, .94),
+    rgba(231, 243, 250, .86)
+  );
+  box-shadow:
+    0 30px 90px rgba(20, 53, 77, .28),
+    inset 0 1px 0 rgba(255, 255, 255, .92);
+  font-family: Manrope, 'Segoe UI', sans-serif;
+  animation: journey-detail-panel-in 260ms cubic-bezier(.2, .78, .25, 1) both;
+}
+
+.journey-location-detail::before {
+  position: absolute;
+  top: 0;
+  right: 26px;
+  left: 26px;
+  height: 3px;
+  border-radius: 0 0 3px 3px;
+  content: '';
+  background: linear-gradient(90deg, transparent, #5abedc, transparent);
+}
+
+.journey-location-detail.is-green-space::before {
+  background: linear-gradient(90deg, transparent, #7eb68a, transparent);
+}
+
+.journey-location-detail.is-education::before {
+  background: linear-gradient(90deg, transparent, #c09a68, transparent);
+}
+
+.journey-location-detail-close {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border: 1px solid rgba(85, 123, 145, .18);
+  border-radius: 50%;
+  color: #45697e;
+  background: rgba(255, 255, 255, .66);
+  cursor: pointer;
+  font: 400 22px/1 Manrope, 'Segoe UI', sans-serif;
+}
+
+.journey-location-detail-close:hover,
+.journey-location-detail-close:focus-visible {
+  color: #1f5570;
+  background: rgba(255, 255, 255, .96);
+  box-shadow: 0 0 0 3px rgba(90, 190, 220, .15);
+  outline: none;
+}
+
+.journey-location-detail-kicker {
+  display: block;
+  padding-right: 44px;
+  color: #568399;
+  font-size: 9px;
+  font-weight: 760;
+  letter-spacing: .13em;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+.journey-location-detail h2 {
+  margin: 9px 40px 10px 0;
+  color: #173b54;
+  font-size: clamp(25px, 5vw, 36px);
+  font-weight: 700;
+  letter-spacing: -.04em;
+  line-height: 1.03;
+}
+
+.journey-location-detail > p {
+  margin: 0;
+  color: #587184;
+  font-size: 12px;
+  font-weight: 520;
+  line-height: 1.55;
+}
+
+.journey-location-detail dl {
+  display: grid;
+  gap: 1px;
+  margin: 22px 0 18px;
+  overflow: hidden;
+  border: 1px solid rgba(79, 120, 145, .13);
+  border-radius: 14px;
+  background: rgba(89, 126, 148, .1);
+}
+
+.journey-location-detail dl div {
+  display: grid;
+  grid-template-columns: 118px 1fr;
+  gap: 12px;
+  padding: 11px 13px;
+  background: rgba(255, 255, 255, .61);
+}
+
+.journey-location-detail dt {
+  color: #668295;
+  font-size: 8px;
+  font-weight: 760;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.journey-location-detail dd {
+  margin: 0;
+  color: #294f67;
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.journey-location-detail > a {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: #347792;
+  font-size: 10px;
+  font-weight: 750;
+  letter-spacing: .035em;
+  text-decoration: none;
+  text-transform: uppercase;
+}
+
+.journey-location-detail > a:hover,
+.journey-location-detail > a:focus-visible {
+  color: #195c79;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+@keyframes journey-detail-backdrop-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes journey-detail-panel-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(.985);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@media (max-width: 720px) {
+  .journey-location-card {
+    gap: 6px;
+    width: 220px;
+    padding: 14px 16px 13px;
+  }
+
+  .journey-location-card strong {
+    font-size: 14px;
+  }
+
+  .journey-location-card-description {
+    display: none;
+  }
+
+  .journey-location-detail-backdrop {
+    align-items: end;
+    padding: 12px;
+  }
+
+  .journey-location-detail {
+    width: calc(100vw - 24px);
+    padding: 25px 22px 24px;
+    border-radius: 22px;
+  }
+
+  .journey-location-detail dl div {
+    grid-template-columns: 96px 1fr;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .journey-location-card,
+  .journey-location-detail-backdrop,
+  .journey-location-detail {
+    animation: none;
+    transition-duration: 0s;
+  }
+}
