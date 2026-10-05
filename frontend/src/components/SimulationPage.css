@@ -1339,41 +1339,126 @@ html:has(.simulation-shell) body::-webkit-scrollbar {
   line-height: 1.5;
 }
 
-.simulation-driver-table {
-  overflow-x: auto;
-  margin-top: 8px;
+.simulation-waterfalls {
+  display: grid;
+  gap: 12px;
+  margin-top: 10px;
 }
 
-.simulation-driver-row {
-  display: grid;
-  grid-template-columns: minmax(180px, 1.5fr) repeat(3, minmax(110px, 1fr));
-  min-width: 570px;
+.simulation-waterfall {
+  padding: 8px 0 10px;
   border-top: 1px solid rgba(109, 120, 232, .1);
 }
 
-.simulation-driver-row > span {
-  padding: 8px 6px;
-  color: #536c90;
-  font-size: 11px;
+.simulation-waterfall > header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: baseline;
+  gap: 4px 12px;
+  margin-bottom: 8px;
 }
 
-.simulation-driver-row > span:not(:first-child) {
-  text-align: right;
+.simulation-waterfall > header strong {
+  color: #395b8c;
+  font-size: 12px;
 }
 
-.simulation-driver-row.header {
-  border-top: 0;
-}
-
-.simulation-driver-row.header > span {
-  color: #7185a3;
-  font-size: 10px;
-  font-weight: 700;
-}
-
-.simulation-driver-row:not(.header) > span:not(:first-child) {
+.simulation-waterfall > header span {
   color: #2e63b5;
-  font-weight: 700;
+  font-size: 11px;
+  font-weight: 750;
+}
+
+.simulation-waterfall > header small {
+  grid-column: 1 / -1;
+  color: #7185a3;
+  font-size: 9px;
+}
+
+.simulation-waterfall-body {
+  display: grid;
+  grid-template-columns: minmax(145px, .75fr) minmax(160px, 1.6fr) 64px;
+  align-items: stretch;
+  gap: 8px;
+}
+
+.simulation-waterfall-labels,
+.simulation-waterfall-values {
+  display: grid;
+  grid-auto-rows: 18px;
+  align-items: center;
+}
+
+.simulation-waterfall-labels span {
+  overflow: hidden;
+  color: #627997;
+  font-size: 9px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.simulation-waterfall-values b {
+  color: #4c668d;
+  font-size: 9px;
+  font-weight: 750;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.simulation-waterfall-track {
+  position: relative;
+  height: 94px;
+  border-bottom: 1px solid rgba(109, 120, 232, .16);
+  background: repeating-linear-gradient(90deg, transparent 0, transparent calc(25% - 1px), rgba(109, 120, 232, .09) calc(25% - 1px), rgba(109, 120, 232, .09) 25%);
+}
+
+.simulation-waterfall-baseline,
+.simulation-waterfall-scenario {
+  position: absolute;
+  z-index: 2;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: #8798b2;
+  pointer-events: none;
+}
+
+.simulation-waterfall-baseline {
+  border-left: 1px dashed #8798b2;
+  background: transparent;
+}
+
+.simulation-waterfall-scenario {
+  width: 2px;
+  background: #596fe2;
+}
+
+.simulation-waterfall-segment {
+  position: absolute;
+  z-index: 1;
+  height: 7px;
+  min-width: 2px;
+  border-radius: 99px;
+}
+
+.simulation-waterfall-segment.favorable {
+  background: #298d75;
+}
+
+.simulation-waterfall-segment.adverse {
+  background: #c8795d;
+}
+
+.simulation-waterfall-segment.neutral {
+  background: #9aa9c1;
+}
+
+.simulation-waterfall-axis {
+  display: flex;
+  justify-content: space-between;
+  margin: 3px 70px 0 153px;
+  color: #8a9bb4;
+  font-size: 8px;
 }
 
 .simulation-driver-caveat {
@@ -2092,6 +2177,16 @@ html:has(.simulation-shell) body::-webkit-scrollbar {
   .comparison-readout {
     grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
     justify-self: stretch;
+  }
+
+  .simulation-waterfall-body {
+    grid-template-columns: minmax(88px, .75fr) minmax(120px, 1fr) 58px;
+    gap: 5px;
+  }
+
+  .simulation-waterfall-axis {
+    margin-left: 96px;
+    margin-right: 64px;
   }
 
   .comparison-detail {

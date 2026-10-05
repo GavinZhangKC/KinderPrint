@@ -104,6 +104,23 @@ interface OutcomeRange {
   high: number
 }
 
+interface WaterfallStep {
+  feature: EnvironmentFeature
+  value: number | null
+  start: number
+  end: number
+  favorable: boolean | null
+}
+
+interface OutcomeWaterfall {
+  id: string
+  label: string
+  baseline: number
+  scenario: number
+  range: OutcomeRange | null
+  steps: WaterfallStep[]
+}
+
 interface AnalogueLocality extends EnvironmentValues {
   id: string
   name: string
@@ -194,6 +211,32 @@ function formatMetricValue(value: number, unit: string) {
 function formatContribution(value: number | null) {
   if (value === null) return 'Unavailable'
   return `${value > 0 ? '+' : ''}${value.toFixed(1)} pp`
+}
+
+function createOutcomeWaterfall(
+  id: string,
+  label: string,
+  baseline: number | null,
+  scenario: number | null,
+  range: OutcomeRange | null,
+  contributions: ScenarioResult['factorContributions'],
+  lowerIsBetter: boolean,
+): OutcomeWaterfall | null {
+  if (baseline === null || scenario === null) return null
+  let cumulativeValue = baseline
+  const steps = contributions.map((contribution): WaterfallStep => {
+    const value = contribution[id as keyof typeof contribution] as number | null
+    const start = cumulativeValue
+    if (value !== null) cumulativeValue += value
+    return {
+      feature: contribution.feature,
+      value,
+      start,
+      end: cumulativeValue,
+      favorable: value === null ? null : lowerIsBetter ? value < 0 : value > 0,
+    }
+  })
+  return { id, label, baseline, scenario, range, steps }
 }
 
 function formatScenarioOutcome(value: number | null, range: OutcomeRange | null) {
@@ -1207,6 +1250,13 @@ export default function SimulationPage({
       saved: savedScenarioComparisons.map((scenario) => ({ id: scenario.id, value: scenario.result.socialCompetence, range: scenario.result.socialCompetenceRange })),
     },
   ] : []
+  const outcomeWaterfalls: OutcomeWaterfall[] = baseline && scenarioResult
+    ? [
+      createOutcomeWaterfall('vulnerability', 'Developmental vulnerability', baseline.vulnerability, scenarioResult.vulnerability, scenarioResult.vulnerabilityRange, scenarioResult.factorContributions, true),
+      createOutcomeWaterfall('physicalHealth', 'Physical health on track', baseline.physicalHealth, scenarioResult.physicalHealth, scenarioResult.physicalHealthRange, scenarioResult.factorContributions, false),
+      createOutcomeWaterfall('socialCompetence', 'Social competence on track', baseline.socialCompetence, scenarioResult.socialCompetence, scenarioResult.socialCompetenceRange, scenarioResult.factorContributions, false),
+    ].filter((row): row is OutcomeWaterfall => row !== null)
+    : []
   const nearestAnalogue = scenarioResult?.nearestAnalogue ?? null
   const analogueOutcomeRows = baseline && nearestAnalogue ? [
     { label: 'Developmental vulnerability', selected: baseline.vulnerability, analogue: nearestAnalogue.vulnerability },
@@ -1561,9 +1611,9 @@ export default function SimulationPage({
                     return <path
                       key={shape.id}
                       d={shape.path}
-                      fill={isSelected ? '#efbd55' : factorMapColor(value, mapFactor, selectedFactorRange)}
+                      fill={factorMapColor(value, mapFactor, selectedFactorRange)}
                       stroke={isSelected ? '#273f72' : isAnalogue ? '#218c78' : 'rgba(255,255,255,.8)'}
-                      strokeWidth={isSelected || isAnalogue ? 1.8 : 0.45}
+                      strokeWidth={isSelected ? 2.4 : isAnalogue ? 1.8 : 0.45}
                       fillRule="evenodd"
                       tabIndex={0}
                       role="button"
@@ -1593,7 +1643,7 @@ export default function SimulationPage({
                 <span>Less favorable</span>
                 <div aria-hidden="true">{MAP_FACTOR_COLORS.map((color) => <i key={color} style={{ backgroundColor: color }} />)}</div>
                 <span>More favorable</span>
-                <b><i />Selected scenario</b>
+                <b><i />Selected area</b>
                 <b><i />Closest observed match</b>
               </div>}
               <p className="simulation-factor-map-note">The map colors non-selected SA2s by observed values; it does not distribute the selected scenario across surrounding areas.</p>
@@ -1739,29 +1789,46 @@ export default function SimulationPage({
             <section className="simulation-driver-breakdown" aria-labelledby="simulation-driver-title">
               <div className="simulation-driver-header">
                 <div>
-                  <h3 id="simulation-driver-title">Estimated contribution by environmental factor</h3>
-                  <p>Modelled association in percentage points, relative to the current locality.</p>
+                  <h3 id="simulation-driver-title">Outcome driver waterfall</h3>
+                  <p>Each segment adds one factor’s fitted association to the baseline outcome.</p>
                 </div>
               </div>
               {!scenarioResult?.predictionsAvailable
                 ? <p className="simulation-driver-empty">Breakdown unavailable outside the model’s observed feature ranges.</p>
-                : <div className="simulation-driver-table" role="table" aria-label="Estimated contribution by factor">
-                  <div className="simulation-driver-row header" role="row">
-                    <span role="columnheader">Environmental factor</span>
-                    <span role="columnheader">Vulnerability</span>
-                    <span role="columnheader">Physical health</span>
-                    <span role="columnheader">Social competence</span>
-                  </div>
-                  {scenarioResult.factorContributions.map((item) => (
-                    <div className="simulation-driver-row" role="row" key={item.feature}>
-                      <span role="rowheader">{ENVIRONMENT_FEATURE_LABELS[item.feature]}</span>
-                      <span role="cell">{formatContribution(item.vulnerability)}</span>
-                      <span role="cell">{formatContribution(item.physicalHealth)}</span>
-                      <span role="cell">{formatContribution(item.socialCompetence)}</span>
+                : <div className="simulation-waterfalls">
+                  {outcomeWaterfalls.map((outcome) => <article className="simulation-waterfall" key={outcome.id}>
+                    <header>
+                      <strong>{outcome.label}</strong>
+                      <span>{outcome.baseline.toFixed(1)}% → {outcome.scenario.toFixed(1)}%</span>
+                      <small>{outcome.range ? `80% held-out range ${outcome.range.low.toFixed(1)}–${outcome.range.high.toFixed(1)}%` : 'Held-out range unavailable'}</small>
+                    </header>
+                    <div className="simulation-waterfall-body" role="img" aria-label={`${outcome.label}: baseline ${outcome.baseline.toFixed(1)} percent to scenario ${outcome.scenario.toFixed(1)} percent, factor contributions shown in percentage points`}>
+                      <div className="simulation-waterfall-labels">
+                        {outcome.steps.map((step) => <span key={step.feature}>{ENVIRONMENT_FEATURE_LABELS[step.feature]}</span>)}
+                      </div>
+                      <div className="simulation-waterfall-track">
+                        <i className="simulation-waterfall-baseline" style={{ left: `${clamp(outcome.baseline, 0, 100)}%` }} />
+                        {outcome.steps.map((step, index) => {
+                          const value = step.value ?? 0
+                          const left = clamp(Math.min(step.start, step.end), 0, 100)
+                          const width = Math.max(Math.min(Math.abs(value), 100 - left), value === 0 ? 0 : 0.35)
+                          return <i
+                            className={`simulation-waterfall-segment ${step.favorable === null ? 'neutral' : step.favorable ? 'favorable' : 'adverse'}`}
+                            key={step.feature}
+                            style={{ left: `${left}%`, width: `${width}%`, top: `${index * 18 + 4}px` }}
+                            title={`${ENVIRONMENT_FEATURE_LABELS[step.feature]} ${formatContribution(step.value)}`}
+                          />
+                        })}
+                        <i className="simulation-waterfall-scenario" style={{ left: `${clamp(outcome.scenario, 0, 100)}%` }} />
+                      </div>
+                      <div className="simulation-waterfall-values">
+                        {outcome.steps.map((step) => <b key={step.feature}>{formatContribution(step.value)}</b>)}
+                      </div>
                     </div>
-                  ))}
+                    <div className="simulation-waterfall-axis"><span>0%</span><span>Outcome level</span><span>100%</span></div>
+                  </article>)}
                 </div>}
-              <p className="simulation-driver-caveat">These contributions decompose the fitted cross-sectional associations; they do not estimate causal effects.</p>
+              <p className="simulation-driver-caveat">These fitted cross-sectional contributions are decompositions, not causal effects.</p>
             </section>
 
             <p className="simulation-evidence-note">
