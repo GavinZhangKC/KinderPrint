@@ -1,10 +1,12 @@
 .infinite-image-gallery {
+  --gallery-gap: clamp(14px, 1.7vw, 26px);
+  --gallery-image-height: clamp(170px, 16vw, 220px);
   position: absolute;
   z-index: 0;
   top: 50%;
   right: calc(-1 * var(--home-section-inline));
   width: 100vw;
-  height: clamp(340px, 36vw, 420px);
+  height: calc(var(--gallery-image-height) + 48px);
   margin-top: 0;
   overflow: hidden;
   transform: translateY(-50%);
@@ -15,56 +17,71 @@
   -webkit-mask-image: linear-gradient(90deg, transparent, #000 5%, #000 95%, transparent);
 }
 
-.infinite-image-gallery__stage,
-.infinite-image-gallery__canvas {
-  width: 100%;
-  height: 100%;
-}
-
-.infinite-image-gallery__canvas {
-  display: block;
-}
-
-.infinite-image-gallery__static {
+.infinite-image-gallery__track {
+  width: max-content;
   height: 100%;
   display: flex;
   align-items: center;
-  gap: 28px;
-  overflow-x: auto;
-  padding: 28px 5%;
-  scrollbar-width: none;
+  animation: infinite-image-gallery-scroll 46s linear infinite;
+  will-change: transform;
 }
 
-.infinite-image-gallery__static::-webkit-scrollbar {
-  display: none;
+.infinite-image-gallery:hover .infinite-image-gallery__track {
+  animation-play-state: paused;
 }
 
-.infinite-image-gallery__static img {
-  flex: 0 0 auto;
-  width: clamp(210px, 25vw, 340px);
-  height: 62%;
+.infinite-image-gallery__group {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: var(--gallery-gap);
+  padding-right: var(--gallery-gap);
+}
+
+.infinite-image-gallery__group img {
+  flex: none;
+  width: auto;
+  height: var(--gallery-image-height);
   object-fit: cover;
+  border-radius: 18px;
   filter: saturate(.9) brightness(1.035);
+  box-shadow: 0 14px 34px rgba(51, 82, 140, .12);
 }
 
-.infinite-image-gallery__static img:nth-child(3n + 1) {
-  width: clamp(170px, 18vw, 230px);
-  height: 78%;
-  translate: 0 -8%;
-}
-
-.infinite-image-gallery__static img:nth-child(3n + 2) {
-  translate: 0 12%;
+@keyframes infinite-image-gallery-scroll {
+  to {
+    transform: translateX(-50%);
+  }
 }
 
 @media (max-width: 680px) {
   .infinite-image-gallery {
-    height: 300px;
-    margin-top: 64px;
+    --gallery-gap: 14px;
+    --gallery-image-height: 160px;
+    height: 208px;
+    margin-top: 0;
   }
 
-  .infinite-image-gallery__static {
-    gap: 18px;
-    padding-inline: 0;
+  .infinite-image-gallery__group img {
+    border-radius: 14px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .infinite-image-gallery {
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .infinite-image-gallery::-webkit-scrollbar {
+    display: none;
+  }
+
+  .infinite-image-gallery__track {
+    animation: none;
+  }
+
+  .infinite-image-gallery__group[aria-hidden='true'] {
+    display: none;
   }
 }

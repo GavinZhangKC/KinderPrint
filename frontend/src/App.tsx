@@ -39,14 +39,40 @@ type View =
 
 type AppPage =
   | 'landing'
-  | 'insight'
+  | 'insight-legacy'
   | 'map'
   | 'simulation'
   | 'health'
 
+function initialAppPage(): AppPage {
+  const pathname = window.location.pathname.replace(/\/+$/, '') || '/'
+  if (pathname === '/insight-journey-legacy') return 'insight-legacy'
+  if (pathname === '/map') return 'map'
+  if (pathname === '/simulation') return 'simulation'
+  if (pathname === '/child-health' || pathname === '/health') return 'health'
+
+  // Keep old shared-page links working while navigation moves to real paths.
+  const requestedPage = new URLSearchParams(window.location.search).get('page')
+  if (requestedPage === 'map' || requestedPage === 'simulation' || requestedPage === 'health') {
+    return requestedPage
+  }
+
+  return 'landing'
+}
+
+function appPagePath(page: Exclude<AppPage, 'insight-legacy'>) {
+  if (page === 'map') return '/map'
+  if (page === 'simulation') return '/simulation'
+  if (page === 'health') return '/child-health'
+  return '/'
+}
+
+function navigateToAppPage(page: Exclude<AppPage, 'insight-legacy'>) {
+  window.location.assign(appPagePath(page))
+}
+
 export default function App() {
-const [appPage, setAppPage] =
-    useState<AppPage>('landing')
+const appPage = initialAppPage()
 
 const [view, setView] =
     useState<View>('map')
@@ -256,23 +282,20 @@ function resetExplore() {
     setShowDataDrawer(false)
   }
 function backToLanding() {
-    resetExplore()
-    setAppPage('landing')
+    navigateToAppPage('landing')
   }
 function openMapPage() {
-    resetExplore()
-    setAppPage('map')
+    navigateToAppPage('map')
   }
 function openSimulationPage() {
-    setAppPage('simulation')
+    navigateToAppPage('simulation')
   }
 function openInsightPage() {
     resetExplore()
-    setAppPage('insight')
+    window.location.assign('/insight-journey')
   }
 function openHealthPage() {
-    resetExplore()
-    setAppPage('health')
+    navigateToAppPage('health')
   }
 function choosePrimary(
     neighbourhood: Neighbourhood,
@@ -460,10 +483,11 @@ if (appPage === 'landing') {
     )
   }
 
-  if (appPage === 'insight') {
+  if (appPage === 'insight-legacy') {
     return (
       <InsightPage
         onLogoClick={backToLanding}
+        onInsight={openInsightPage}
         onExploreMap={openMapPage}
         onSimulation={openSimulationPage}
         onHealth={openHealthPage}

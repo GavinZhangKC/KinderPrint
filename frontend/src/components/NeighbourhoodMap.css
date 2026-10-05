@@ -1,4 +1,4 @@
-.map-shell { position: relative; z-index: 2; width: min(1400px, calc(100vw - 48px)); margin: 30px auto 0; }
+.map-shell { position: relative; z-index: 2; width: calc(100vw - 48px); margin: 30px auto 0; }
 .map-surface { height: calc(100vh - 132px); min-height: 740px; position: relative; border-radius: 28px; overflow: hidden; background: rgba(247,250,255,.42); }
 
 .map-page {
@@ -16,7 +16,7 @@
   display: flex;
   min-height: 0;
   width: 100%;
-  max-width: 1400px;
+  max-width: none;
   margin: clamp(7px, 1.5dvh, 18px) auto 0;
 }
 

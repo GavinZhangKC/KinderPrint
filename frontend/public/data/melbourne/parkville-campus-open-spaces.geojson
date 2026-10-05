@@ -1,0 +1,78 @@
+{
+  "type": "FeatureCollection",
+  "name": "Parkville campus open-space visual approximations",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Royal Children's Hospital landscaped campus",
+        "space_type": "hospital",
+        "source": "Visual approximation from the local building and road context"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [144.94820, -37.79310],
+          [144.95120, -37.79280],
+          [144.95140, -37.79540],
+          [144.94840, -37.79570],
+          [144.94820, -37.79310]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "University High School grounds",
+        "space_type": "education",
+        "source": "Visual approximation from the local building and road context"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [144.95410, -37.79650],
+          [144.95635, -37.79625],
+          [144.95670, -37.79825],
+          [144.95395, -37.79855],
+          [144.95410, -37.79650]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Parkville hospital precinct open ground",
+        "space_type": "hospital",
+        "source": "Visual approximation from the local building and road context"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [144.95320, -37.79880],
+          [144.95720, -37.79830],
+          [144.95790, -37.80070],
+          [144.95360, -37.80120],
+          [144.95320, -37.79880]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "University of Melbourne campus open ground",
+        "space_type": "education",
+        "source": "Visual approximation from the local building and road context"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [144.95880, -37.79640],
+          [144.96320, -37.79600],
+          [144.96470, -37.80010],
+          [144.95820, -37.80080],
+          [144.95880, -37.79640]
+        ]]
+      }
+    }
+  ]
+}

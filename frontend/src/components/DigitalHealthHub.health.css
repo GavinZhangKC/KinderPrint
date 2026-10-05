@@ -366,13 +366,14 @@
 @media(max-width:700px){.dh-question-nav{grid-template-columns:1fr 1fr}.dh-choice-group>div{display:grid;grid-template-columns:1fr 1fr}}
 
 /* Keep the site-wide navigation while the new KinderHub owns health navigation. */
-.health-page-shell{min-height:100vh;padding-top:20px;background:radial-gradient(circle at 18% 22%,rgba(184,178,255,.28),transparent 34%),radial-gradient(circle at 84% 48%,rgba(131,214,255,.25),transparent 35%),linear-gradient(135deg,#eff2ff 0%,#e8f5ff 52%,#e8efff 100%)}
-.health-page-shell>.nav-shell{margin-bottom:8px}
+.health-page-shell{--health-content-width:calc(100vw - clamp(24px,2.5vw,48px));min-height:100vh;padding-top:20px;background:radial-gradient(circle at 18% 22%,rgba(184,178,255,.28),transparent 34%),radial-gradient(circle at 84% 48%,rgba(131,214,255,.25),transparent 35%),linear-gradient(135deg,#eff2ff 0%,#e8f5ff 52%,#e8efff 100%)}
+.health-page-shell>.nav-shell{width:var(--health-content-width);max-width:none;margin-bottom:8px}
 .digital-health-hub.dh-global-shell{display:block;min-height:calc(100vh - 104px);background:transparent}
 .digital-health-hub.dh-global-shell>main{min-width:0}
-.locality-comparison-shell{--navy:#2c5eaf;--navy2:#405fa6;--blue:#6d78e8;--indigo:#7b75f5;--coral:#ff7e75;--mint:#30bfad;--ink:#233a63;--copy:#63779d;--line:rgba(255,255,255,.78);width:min(1440px,100%);margin:14px auto 0;color:var(--ink);font-family:Inter,"Helvetica Neue",Arial,sans-serif}
+.health-page-shell .kh-shell{--kh-shell-width:var(--health-content-width)}
+.locality-comparison-shell{--navy:#2c5eaf;--navy2:#405fa6;--blue:#6d78e8;--indigo:#7b75f5;--coral:#ff7e75;--mint:#30bfad;--ink:#233a63;--copy:#63779d;--line:rgba(255,255,255,.78);width:100%;margin:14px auto 0;color:var(--ink);font-family:Inter,"Helvetica Neue",Arial,sans-serif}
 .locality-comparison-shell *{box-sizing:border-box}.locality-comparison-shell button,.locality-comparison-shell input{font:inherit}.locality-comparison-shell button:focus-visible{outline:3px solid rgba(109,120,232,.35);outline-offset:2px}.locality-comparison-shell>main{min-width:0}.locality-comparison-shell .dh-health-compare-page{min-height:calc(100vh - 130px);border:1px solid rgba(255,255,255,.78);border-radius:24px;background:rgba(255,255,255,.48);box-shadow:0 18px 42px rgba(51,82,140,.13);backdrop-filter:blur(22px)}
-@media(max-width:680px){.health-page-shell{padding-top:10px}.health-page-shell>.nav-shell{margin-bottom:0}.digital-health-hub.dh-global-shell{min-height:calc(100vh - 72px)}}
+@media(max-width:680px){.health-page-shell{--health-content-width:calc(100vw - 20px);padding-top:10px}.health-page-shell>.nav-shell{margin-bottom:0}.health-page-shell .kh-shell{padding-right:10px;padding-left:10px}.digital-health-hub.dh-global-shell{min-height:calc(100vh - 72px)}}
 
 /* Standalone locality comparison uses the site palette and normal page scrolling. */
 .standalone-comparison-page{
