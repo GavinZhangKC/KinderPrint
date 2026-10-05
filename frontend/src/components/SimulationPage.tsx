@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 
 import BrandHeader from './BrandHeader'
 import { useNeighbourhoodSearch } from '../hooks/useNeighbourhoodSearch'
-import { api, type BoundaryGeometry } from '../services/api'
+import { api, type BoundaryFeature, type BoundaryGeometry } from '../services/api'
 
 interface SimulationPageProps {
   onHome: () => void
@@ -69,6 +69,8 @@ interface SavedScenario {
 }
 
 const SAVED_SCENARIOS_STORAGE_KEY = 'kinderprint-simulation-scenarios'
+const GREATER_MELBOURNE_BOUNDARY_BBOX = '144.0,-38.6,145.9,-37.2'
+const MAP_FACTOR_COLORS = ['#b96361', '#d08e6d', '#d9bb70', '#92b49a', '#338b7b']
 
 interface ScenarioResult {
   scenarioSupported: boolean
@@ -114,6 +116,13 @@ interface AnalogueLocality extends EnvironmentValues {
 interface AnalogueBoundaries {
   selected: BoundaryGeometry | null
   match: BoundaryGeometry | null
+}
+
+interface FactorMapShape {
+  id: string
+  name: string
+  geographicUnit: string
+  path: string
 }
 
 interface AiLinearModel {
@@ -192,6 +201,12 @@ function formatScenarioOutcome(value: number | null, range: OutcomeRange | null)
   return range
     ? `${value.toFixed(1)}% (${range.low.toFixed(1)}–${range.high.toFixed(1)})`
     : `${value.toFixed(1)}%`
+}
+
+function formatEnvironmentValue(feature: EnvironmentFeature, value: number) {
+  if (feature === 'urbanHeat') return `${value.toFixed(1)}°C`
+  if (feature === 'trafficIntensity') return `${Math.round(value).toLocaleString()} AADT-road-km/km²`
+  return `${value.toFixed(1)}%`
 }
 
 function formatHeldOutMae(model: AiLinearModel | null | undefined) {
@@ -299,6 +314,57 @@ function createBoundaryPaths(geometries: Array<BoundaryGeometry | null>): string
     const projectedY = height - offsetY - ((y - minY) * scale)
     return `${index === 0 ? 'M' : 'L'}${projectedX.toFixed(1)},${projectedY.toFixed(1)}`
   }).join(' ') + ' Z').join(' '))
+}
+
+function boundaryPositions(geometry: BoundaryGeometry): Array<[number, number]> {
+  const polygons = geometry.type === 'Polygon' ? [geometry.coordinates] : geometry.coordinates
+  return polygons.flatMap((polygon) => polygon.flatMap((ring) =>
+    ring.map(([longitude, latitude]) => [longitude, latitude] as [number, number])))
+}
+
+function createFactorMapShapes(features: BoundaryFeature[]): FactorMapShape[] {
+  const allPositions = features.flatMap((feature) => boundaryPositions(feature.geometry))
+  if (allPositions.length === 0) return []
+  const bounds = allPositions.reduce((current, [longitude, latitude]) => ({
+    minX: Math.min(current.minX, longitude),
+    maxX: Math.max(current.maxX, longitude),
+    minY: Math.min(current.minY, latitude),
+    maxY: Math.max(current.maxY, latitude),
+  }), { minX: Infinity, maxX: -Infinity, minY: Infinity, maxY: -Infinity })
+  const { minX, maxX, minY, maxY } = bounds
+  const width = 900
+  const height = 500
+  const padding = 12
+  const scale = Math.min(
+    (width - padding * 2) / Math.max(maxX - minX, 0.00001),
+    (height - padding * 2) / Math.max(maxY - minY, 0.00001),
+  )
+  const offsetX = (width - ((maxX - minX) * scale)) / 2
+  const offsetY = (height - ((maxY - minY) * scale)) / 2
+  return features.map((feature) => {
+    const polygons = feature.geometry.type === 'Polygon' ? [feature.geometry.coordinates] : feature.geometry.coordinates
+    const path = polygons.flatMap((polygon) => polygon.map((ring) => ring.map(([longitude, latitude], index) => {
+      const x = offsetX + ((longitude - minX) * scale)
+      const y = height - offsetY - ((latitude - minY) * scale)
+      return `${index === 0 ? 'M' : 'L'}${x.toFixed(1)},${y.toFixed(1)}`
+    }).join(' ') + ' Z')).join(' ')
+    return {
+      id: String(feature.properties.id),
+      name: feature.properties.name,
+      geographicUnit: feature.properties.geographic_unit,
+      path,
+    }
+  })
+}
+
+function factorMapColor(value: number | null, feature: EnvironmentFeature, range: { min: number; max: number } | undefined) {
+  if (value === null || !range) return '#d7dfeb'
+  const span = range.max - range.min
+  const rawScore = span === 0 ? 0.5 : clamp((value - range.min) / span, 0, 1)
+  const lowerIsBetter = ENVIRONMENT_RADAR_AXES.find((axis) => axis.feature === feature)?.lowerIsBetter ?? false
+  const favorability = lowerIsBetter ? 1 - rawScore : rawScore
+  const index = Math.min(MAP_FACTOR_COLORS.length - 1, Math.floor(favorability * MAP_FACTOR_COLORS.length))
+  return MAP_FACTOR_COLORS[index]
 }
 
 function readSavedScenarios(): SavedScenario[] {
@@ -658,6 +724,9 @@ export default function SimulationPage({
   const [savedScenarios, setSavedScenarios] = useState<SavedScenario[]>(readSavedScenarios)
   const [scenarioResult, setScenarioResult] = useState<ScenarioResult | null>(null)
   const [analogueBoundaries, setAnalogueBoundaries] = useState<AnalogueBoundaries>({ selected: null, match: null })
+  const [factorMapShapes, setFactorMapShapes] = useState<FactorMapShape[]>([])
+  const [factorMapStatus, setFactorMapStatus] = useState<'loading' | 'available' | 'unavailable'>('loading')
+  const [mapFactor, setMapFactor] = useState<EnvironmentFeature>('treeCanopy')
   const [aiModel, setAiModel] = useState<AiSimulationModel | null>(null)
   const [scenarioLoading, setScenarioLoading] = useState(false)
   const [insightExpanded, setInsightExpanded] = useState(false)
@@ -809,6 +878,24 @@ export default function SimulationPage({
       })
     return () => { cancelled = true }
   }, [baseline?.id, nearestAnalogueId])
+
+  useEffect(() => {
+    let cancelled = false
+    api.getBoundaries(GREATER_MELBOURNE_BOUNDARY_BBOX)
+      .then((response) => {
+        if (cancelled) return
+        if (response.status === 'available' || response.status === 'limited') {
+          setFactorMapShapes(createFactorMapShapes(response.data.features))
+          setFactorMapStatus('available')
+        } else {
+          setFactorMapStatus('unavailable')
+        }
+      })
+      .catch(() => {
+        if (!cancelled) setFactorMapStatus('unavailable')
+      })
+    return () => { cancelled = true }
+  }, [])
 
   useEffect(() => {
     if (!showSearchResults) return
@@ -1007,6 +1094,8 @@ export default function SimulationPage({
       }))
     : []
   const analoguePaths = createBoundaryPaths([analogueBoundaries.selected, analogueBoundaries.match])
+  const observedLocalitiesById = new Map((aiModel?.observedLocalities ?? []).map((locality) => [locality.id, locality]))
+  const selectedFactorRange = aiModel?.environmentRanges?.[mapFactor]
   const comparisonOutcomeRows = baseline ? [
     {
       id: 'vulnerability', label: 'Developmental vulnerability', baseline: baseline.vulnerability,
@@ -1334,6 +1423,72 @@ export default function SimulationPage({
                 <polygon points={environmentRadar.scenario} className="simulation-radar-scenario" />
               </svg>
             </section>}
+
+            <section className="simulation-factor-map" aria-labelledby="simulation-factor-map-title">
+              <div className="simulation-factor-map-header">
+                <div>
+                  <h3 id="simulation-factor-map-title">Greater Melbourne · SA2 environment</h3>
+                  <p>Observed values by locality. The highlighted area shows your scenario value.</p>
+                </div>
+                <label>
+                  <span>Map factor</span>
+                  <select value={mapFactor} onChange={(event) => setMapFactor(event.target.value as EnvironmentFeature)}>
+                    {ENVIRONMENT_FEATURES.map((feature) => <option key={feature} value={feature}>{ENVIRONMENT_FEATURE_LABELS[feature]}</option>)}
+                  </select>
+                </label>
+              </div>
+              {baseline && <p className="simulation-factor-map-selected">
+                {baseline.name}: {formatEnvironmentValue(mapFactor, baseline[mapFactor])} baseline → {formatEnvironmentValue(mapFactor, scenarioValues[mapFactor])} scenario
+              </p>}
+              {factorMapStatus === 'loading' && <p className="simulation-factor-map-state">Loading SA2 boundaries…</p>}
+              {factorMapStatus === 'unavailable' && <p className="simulation-factor-map-state">The SA2 environment map is unavailable.</p>}
+              {factorMapStatus === 'available' && <div className="simulation-factor-map-canvas">
+                <svg viewBox="0 0 900 500" role="img" aria-label={`Greater Melbourne SA2 map showing ${ENVIRONMENT_FEATURE_LABELS[mapFactor]}`}>
+                  {factorMapShapes.map((shape) => {
+                    const observedValue = observedLocalitiesById.get(shape.id)?.[mapFactor] ?? null
+                    const isSelected = shape.id === baseline?.id
+                    const isAnalogue = shape.id === nearestAnalogue?.id
+                    const value = isSelected ? scenarioValues[mapFactor] : observedValue
+                    return <path
+                      key={shape.id}
+                      d={shape.path}
+                      fill={isSelected ? '#efbd55' : factorMapColor(value, mapFactor, selectedFactorRange)}
+                      stroke={isSelected ? '#273f72' : isAnalogue ? '#218c78' : 'rgba(255,255,255,.8)'}
+                      strokeWidth={isSelected || isAnalogue ? 1.8 : 0.45}
+                      fillRule="evenodd"
+                      tabIndex={0}
+                      role="button"
+                      aria-label={`${shape.name}, ${ENVIRONMENT_FEATURE_LABELS[mapFactor]} ${value === null ? 'unavailable' : formatEnvironmentValue(mapFactor, value)}${isSelected ? ', active scenario' : ''}${isAnalogue ? ', closest observed match' : ''}`}
+                      onClick={() => {
+                        if (shape.id === baseline?.id) return
+                        setSelectedNeighbourhood(shape.name)
+                        setSearch(shape.name)
+                        setShowSearchResults(false)
+                        void loadNeighbourhoodScenario(shape.id, shape.name)
+                      }}
+                      onKeyDown={(event) => {
+                        if (event.key === 'Enter' || event.key === ' ') {
+                          event.preventDefault()
+                          if (shape.id === baseline?.id) return
+                          setSelectedNeighbourhood(shape.name)
+                          setSearch(shape.name)
+                          setShowSearchResults(false)
+                          void loadNeighbourhoodScenario(shape.id, shape.name)
+                        }
+                      }}
+                    ><title>{shape.name}: {value === null ? 'data unavailable' : formatEnvironmentValue(mapFactor, value)}</title></path>
+                  })}
+                </svg>
+              </div>}
+              {factorMapStatus === 'available' && <div className="simulation-factor-map-legend">
+                <span>Less favorable</span>
+                <div aria-hidden="true">{MAP_FACTOR_COLORS.map((color) => <i key={color} style={{ backgroundColor: color }} />)}</div>
+                <span>More favorable</span>
+                <b><i />Selected scenario</b>
+                <b><i />Closest observed match</b>
+              </div>}
+              <p className="simulation-factor-map-note">The map colors non-selected SA2s by observed values; it does not distribute the selected scenario across surrounding areas.</p>
+            </section>
 
             <div className="outcome-summary-strip" aria-label="Outcome summary">
               {outcomeSummaries.map((item) => <div className={`outcome-summary-item ${item.tone}`} key={item.label}>
