@@ -46,6 +46,8 @@ from loaders.population import load_population_projections
 from loaders.digital_health import (
     child_health_context,
     immunisation_context,
+    load_bushfire_context,
+    load_transport_context,
     nutrition_context,
     prevention_context,
     child_health_conditions,
@@ -863,6 +865,24 @@ def neighbourhood_indicators() -> dict[str, Any]:
         for profile in profiles
         for item in profile_limitations(profile)
     ]
+    bushfire_rows, bushfire_limitations = load_bushfire_context()
+    transport_rows, transport_limitations = load_transport_context()
+    bushfire_by_sa2 = {row["sa2_code"]: row for row in bushfire_rows or ()}
+    transport_by_sa2 = {row["sa2_code"]: row for row in transport_rows or ()}
+    neighbourhood_rows = [map_indicator_data(profile) for profile in profiles]
+    for neighbourhood_row in neighbourhood_rows:
+        neighbourhood_id = neighbourhood_row["id"]
+        bushfire_value = bushfire_by_sa2.get(neighbourhood_id, {}).get("bushfire_prone_pct")
+        traffic_value = transport_by_sa2.get(neighbourhood_id, {}).get("declared_road_traffic_intensity")
+        neighbourhood_row["indicators"]["env_bushfire_prone_share_pct"] = {
+            "value": bushfire_value,
+            "status": "available" if bushfire_value is not None else "unavailable",
+        }
+        neighbourhood_row["indicators"]["env_declared_road_traffic_intensity"] = {
+            "value": traffic_value,
+            "status": "available" if traffic_value is not None else "unavailable",
+        }
+    collection_limitations.extend([*bushfire_limitations, *transport_limitations])
     if boundary_data_path() is not None:
         features, boundary_limitations = load_boundary_features()
         if features is None:
@@ -874,7 +894,7 @@ def neighbourhood_indicators() -> dict[str, Any]:
         status = "limited"
     return envelope(
         status,
-        {"neighbourhoods": [map_indicator_data(profile) for profile in profiles]},
+        {"neighbourhoods": neighbourhood_rows},
         metadata=profile_collection_metadata(profiles),
         limitations=collection_limitations,
         notices=[AREA_LEVEL_NOTICE],

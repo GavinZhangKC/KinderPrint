@@ -245,6 +245,7 @@ def map_indicator_data(profile: dict[str, Any]) -> dict[str, Any]:
     """Project a validated profile to the lightweight map-indicator shape."""
     return {
         "id": profile["neighbourhood"]["id"],
+        "name": profile["neighbourhood"]["name"],
         "geographic_unit": profile["neighbourhood"]["geographic_unit"],
         "indicators": {
             indicator["id"]: {

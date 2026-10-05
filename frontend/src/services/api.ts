@@ -88,6 +88,7 @@ export interface MapIndicatorValue {
 
 export interface NeighbourhoodMapIndicators {
   id: string
+  name?: string | null
   geographic_unit: string
   indicators: Record<string, MapIndicatorValue>
 }
