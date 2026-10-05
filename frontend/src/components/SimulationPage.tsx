@@ -727,6 +727,8 @@ export default function SimulationPage({
   const [factorMapShapes, setFactorMapShapes] = useState<FactorMapShape[]>([])
   const [factorMapStatus, setFactorMapStatus] = useState<'loading' | 'available' | 'unavailable'>('loading')
   const [mapFactor, setMapFactor] = useState<EnvironmentFeature>('treeCanopy')
+  const [isPlayingScenario, setIsPlayingScenario] = useState(false)
+  const [playbackProgress, setPlaybackProgress] = useState(0)
   const [aiModel, setAiModel] = useState<AiSimulationModel | null>(null)
   const [scenarioLoading, setScenarioLoading] = useState(false)
   const [insightExpanded, setInsightExpanded] = useState(false)
@@ -735,6 +737,8 @@ export default function SimulationPage({
   const [scenarioError, setScenarioError] = useState<string | null>(null)
   const searchWrapRef = useRef<HTMLDivElement>(null)
   const autoRunPendingRef = useRef(false)
+  const playbackFrameRef = useRef<number | null>(null)
+  const playbackTargetRef = useRef<ScenarioValues | null>(null)
 
   const {
     search,
@@ -754,7 +758,26 @@ export default function SimulationPage({
     },
   })
 
+  const cancelScenarioPlayback = (skipToEnd = false) => {
+    if (playbackFrameRef.current !== null) {
+      window.cancelAnimationFrame(playbackFrameRef.current)
+      playbackFrameRef.current = null
+    }
+    const target = playbackTargetRef.current
+    playbackTargetRef.current = null
+    setIsPlayingScenario(false)
+    if (skipToEnd && baseline && aiModel && target) {
+      setScenarioValues(target)
+      setScenarioResult(buildScenarioResult(baseline, target, aiModel))
+      setPlaybackProgress(1)
+      setUpdateStatus('updated')
+    } else {
+      setPlaybackProgress(0)
+    }
+  }
+
   async function loadNeighbourhoodScenario(id: string, name: string) {
+    cancelScenarioPlayback()
     setScenarioLoading(true)
     setScenarioError(null)
     setUpdateStatus('updating')
@@ -853,6 +876,11 @@ export default function SimulationPage({
     return () => window.clearTimeout(timer)
   }, [updateStatus])
 
+  useEffect(() => () => {
+    if (playbackFrameRef.current !== null) window.cancelAnimationFrame(playbackFrameRef.current)
+    playbackTargetRef.current = null
+  }, [])
+
   const nearestAnalogueId = scenarioResult?.nearestAnalogue?.id ?? null
   useEffect(() => {
     if (!baseline || !nearestAnalogueId) {
@@ -918,6 +946,7 @@ export default function SimulationPage({
   }, [showSearchResults])
 
   const updateScenarioValue = (key: keyof ScenarioValues, value: number) => {
+    cancelScenarioPlayback()
     autoRunPendingRef.current = true
     setShowResults(true)
     setUpdateStatus('updating')
@@ -925,7 +954,68 @@ export default function SimulationPage({
     setScenarioValues((current) => ({ ...current, [key]: value }))
   }
 
+  const playScenario = () => {
+    if (!baseline || !aiModel) return
+    if (isPlayingScenario) {
+      cancelScenarioPlayback(true)
+      return
+    }
+    if (playbackFrameRef.current !== null) window.cancelAnimationFrame(playbackFrameRef.current)
+    const target: ScenarioValues = { ...scenarioValues }
+    const start: ScenarioValues = {
+      treeCanopy: baseline.treeCanopy,
+      urbanHeat: baseline.urbanHeat,
+      openSpace: baseline.openSpace,
+      trafficIntensity: baseline.trafficIntensity,
+      bushfireProneShare: baseline.bushfireProneShare,
+    }
+    if (ENVIRONMENT_FEATURES.every((feature) => Math.abs(target[feature] - start[feature]) < 0.01)) return
+    autoRunPendingRef.current = false
+    playbackTargetRef.current = target
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      setScenarioValues(target)
+      setScenarioResult(buildScenarioResult(baseline, target, aiModel))
+      setPlaybackProgress(1)
+      setUpdateStatus('updated')
+      return
+    }
+    setIsPlayingScenario(true)
+    setPlaybackProgress(0)
+    setScenarioValues(start)
+    setScenarioResult(buildScenarioResult(baseline, start, aiModel))
+    setUpdateStatus('updating')
+    let startTime: number | null = null
+    let lastRenderTime = 0
+    const duration = 1700
+    const animate = (time: number) => {
+      if (playbackTargetRef.current === null) return
+      if (startTime === null) startTime = time
+      const linearProgress = clamp((time - startTime) / duration, 0, 1)
+      const easedProgress = 1 - ((1 - linearProgress) ** 3)
+      if (time - lastRenderTime >= 64 || linearProgress === 1) {
+        const values = Object.fromEntries(ENVIRONMENT_FEATURES.map((feature) => [
+          feature,
+          start[feature] + ((target[feature] - start[feature]) * easedProgress),
+        ])) as ScenarioValues
+        setScenarioValues(values)
+        setScenarioResult(buildScenarioResult(baseline, values, aiModel))
+        setPlaybackProgress(linearProgress)
+        lastRenderTime = time
+      }
+      if (linearProgress < 1) {
+        playbackFrameRef.current = window.requestAnimationFrame(animate)
+      } else {
+        playbackFrameRef.current = null
+        playbackTargetRef.current = null
+        setIsPlayingScenario(false)
+        setUpdateStatus('updated')
+      }
+    }
+    playbackFrameRef.current = window.requestAnimationFrame(animate)
+  }
+
   const applyQuickPreset = (preset: QuickPresetId) => {
+    cancelScenarioPlayback()
     setQuickPreset(preset)
     if (!baseline || preset === 'custom') return
     const ranges = aiModel?.environmentRanges
@@ -954,6 +1044,7 @@ export default function SimulationPage({
 
   const resetScenario = () => {
     if (!baseline) return
+    cancelScenarioPlayback()
     autoRunPendingRef.current = true
     setQuickPreset('custom')
     setScenarioValues({
@@ -985,6 +1076,7 @@ export default function SimulationPage({
   }
 
   const loadSavedScenario = (scenario: SavedScenario) => {
+    cancelScenarioPlayback()
     autoRunPendingRef.current = true
     setScenarioValues({ ...scenario.values })
     setQuickPreset('custom')
@@ -1085,6 +1177,8 @@ export default function SimulationPage({
     { label: 'Social competence', ...outcomeModelDirection(baseline.socialCompetence, scenarioResult?.socialCompetence ?? null, scenarioResult?.socialCompetenceRange ?? null) },
     { label: 'Developmental vulnerability', ...outcomeModelDirection(baseline.vulnerability, scenarioResult?.vulnerability ?? null, scenarioResult?.vulnerabilityRange ?? null, true) },
   ] : []
+  const hasScenarioChanges = Boolean(baseline && ENVIRONMENT_FEATURES.some((feature) =>
+    Math.abs(scenarioValues[feature] - baseline[feature]) >= 0.01))
   const savedScenarioComparisons = baseline && aiModel
     ? savedScenarios
       .filter((scenario) => scenario.neighbourhoodId === baseline.id)
@@ -1394,6 +1488,21 @@ export default function SimulationPage({
               {updateStatus !== 'idle' && <span className={`simulation-update-status ${updateStatus}`}>
                 {updateStatus === 'updating' ? 'Updating…' : '✓ Updated'}
               </span>}
+            </div>
+
+            <div className="simulation-playback">
+              <button
+                type="button"
+                disabled={!hasScenarioChanges}
+                onClick={playScenario}
+                aria-label={isPlayingScenario ? 'Finish scenario transition' : 'Play scenario transition'}
+              >
+                {isPlayingScenario ? 'Finish transition' : playbackProgress === 1 ? 'Replay scenario' : 'Play scenario'}
+              </button>
+              <div className="simulation-playback-track" role="progressbar" aria-label="Scenario transition progress" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(playbackProgress * 100)}>
+                <i style={{ width: `${playbackProgress * 100}%` }} />
+              </div>
+              <span>Visual transition · not a future timeline</span>
             </div>
 
             {environmentRadar && <section className="simulation-environment-radar" aria-labelledby="simulation-radar-title">
