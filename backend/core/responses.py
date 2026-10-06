@@ -1,4 +1,4 @@
-"""Core KinderPrint response structures and notices."""
+"""Core VKinder response structures and notices."""
 
 from __future__ import annotations
 
@@ -53,7 +53,7 @@ INDUSTRIAL_EMISSIONS_CONTEXT_NOTICE = {
 def envelope(status: str, data: Any, *, metadata: dict[str, Any] | None = None,
              limitations: list[dict[str, Any]] | None = None,
              notices: list[dict[str, str]] | None = None) -> dict[str, Any]:
-    """Return the shared KinderPrint response envelope."""
+    """Return the shared VKinder response envelope."""
     return {"status": status, "data": data, "metadata": metadata or {},
             "limitations": limitations or [], "notices": notices or []}
 

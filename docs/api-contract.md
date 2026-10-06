@@ -122,14 +122,14 @@ combined locality or aggregate projections without an approved method.
 ### `GET /api/neighbourhoods/{neighbourhood_id}/child-development`
 
 Returns only the approved Child Development domain from the configured profile artefact,
-with AEDC identified as KinderPrint's primary aggregate child-development outcome source.
+with AEDC identified as VKinder's primary aggregate child-development outcome source.
 Social and environmental indicators are not included. Suppressed or unavailable AEDC
 values remain `null` with their source status and a corresponding limitation; the backend
 does not impute, downscale, or replace them.
 
 ### `GET /api/neighbourhoods/{neighbourhood_id}/early-childhood-services`
 
-Returns aggregate ACECQA service counts for a KinderPrint reporting locality using only
+Returns aggregate ACECQA service counts for a VKinderrPrint reporting locality using only
 EXACT or HIGH_CONFIDENCE Open G-NAF matches within the reporting scope. Temporarily closed
 services are excluded. The response never contains service names, addresses, coordinates,
 postcodes, or G-NAF identifiers. These counts describe service availability context, not
@@ -146,7 +146,7 @@ link, publisher, reference year, method, coverage and declared high-traffic thre
 ### `GET /api/neighbourhoods/{neighbourhood_id}/industrial-emissions-context`
 
 Returns precomputed National Pollutant Inventory facility counts and proximity context
-for a supported KinderPrint reporting locality. A zero facility count remains zero and
+for a supported VKinderKinderPrint reporting locality. A zero facility count remains zero and
 missing values remain `null`. Reported emissions and proximity must not be interpreted
 as ambient air quality, personal exposure or health risk.
 Metadata supplies reusable metric names, units and definitions together with the source
