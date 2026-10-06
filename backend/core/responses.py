@@ -1,4 +1,4 @@
-"""Core KinderPrint response structures and notices."""
+"""Core VKinder response structures and notices."""
 
 from __future__ import annotations
 
@@ -6,7 +6,7 @@ from typing import Any
 
 AREA_LEVEL_NOTICE = {
     "code": "area_level_information",
-    "message": "KinderPrint describes communities, not individual children. Every figure is an area-level statistic and cannot be applied to any person living there.",
+    "message": "VKinder describes neighborhoods, not individual children. Every figure is an area-level statistic and cannot be applied to any person living there.",
 }
 INDICATOR_STATUSES = {
     "available", "missing", "suppressed", "incompatible", "unavailable", "limited",
@@ -26,15 +26,15 @@ INVESTIGATION_LEADS_NOTICE = {
 }
 COMPARABLE_NOTICE = {
     "code": "comparable_not_identical",
-    "message": "Matched communities are similar on the socioeconomic and demographic measures used for matching. They are not identical, and unmeasured differences remain.",
+    "message": "Matched neighborhoods are similar on the socioeconomic and demographic measures used for matching. They are not identical, and unmeasured differences remain.",
 }
 MANUAL_COMPARISON_NOTICE = {
     "code": "user_selected_comparison",
-    "message": "These communities were selected by the user and are not necessarily matched or demographically comparable.",
+    "message": "These neighborhoods were selected by the user and are not necessarily matched or demographically comparable.",
 }
 COMPARISON_AREA_NOTICE = {
     "code": "area_level_comparison",
-    "message": "Differences between communities are subject to sampling uncertainty. Where a difference is not statistically significant this is stated explicitly.",
+    "message": "Differences between neighborhoods are subject to sampling uncertainty. Where a difference is not statistically significant this is stated explicitly.",
 }
 STATION_CONTEXT_NOTICE = {
     "code": "station_context_only",
@@ -53,7 +53,7 @@ INDUSTRIAL_EMISSIONS_CONTEXT_NOTICE = {
 def envelope(status: str, data: Any, *, metadata: dict[str, Any] | None = None,
              limitations: list[dict[str, Any]] | None = None,
              notices: list[dict[str, str]] | None = None) -> dict[str, Any]:
-    """Return the shared KinderPrint response envelope."""
+    """Return the shared VKinder response envelope."""
     return {"status": status, "data": data, "metadata": metadata or {},
             "limitations": limitations or [], "notices": notices or []}
 

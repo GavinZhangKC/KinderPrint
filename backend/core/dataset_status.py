@@ -55,7 +55,7 @@ def dataset_statuses() -> list[dict[str, Any]]:
         {
             "id": "aedc_child_development",
             "role": "primary_outcome",
-            "geographic_unit": "KinderPrint reporting locality from approved profile output",
+            "geographic_unit": "VKinder reporting locality from approved profile output",
             "interpretation_status": "approved_output_required",
             "configured": _configured(profile_data_path()),
             "configuration_variable": PROFILE_DATA_PATH_ENV,
@@ -64,7 +64,7 @@ def dataset_statuses() -> list[dict[str, Any]]:
         {
             "id": "aedc_outcome_comparisons",
             "role": "matched_area_outcome_comparison",
-            "geographic_unit": "KinderPrint reporting locality",
+            "geographic_unit": "VKinder reporting locality",
             "interpretation_status": "approved_aggregate_comparison",
             "configured": _configured(outcome_comparison_data_path()),
             "configuration_variable": OUTCOME_COMPARISON_DATA_PATH_ENV,
@@ -83,7 +83,7 @@ def dataset_statuses() -> list[dict[str, Any]]:
         {
             "id": "harmonised_environmental_differences",
             "role": "matched_area_environmental_comparison",
-            "geographic_unit": "KinderPrint reporting locality",
+            "geographic_unit": "VKinder reporting locality",
             "interpretation_status": "approved_aggregate_comparison",
             "configured": _configured(environmental_difference_data_path()),
             "configuration_variable": ENVIRONMENTAL_DIFFERENCE_DATA_PATH_ENV,
@@ -93,7 +93,7 @@ def dataset_statuses() -> list[dict[str, Any]]:
         {
             "id": "pattern_insights",
             "role": "approved_pair_pattern_insight",
-            "geographic_unit": "KinderPrint reporting locality pair",
+            "geographic_unit": "VKinder reporting locality pair",
             "interpretation_status": "approved_output_required",
             "configured": _configured(pattern_insight_data_path()),
             "configuration_variable": PATTERN_INSIGHT_DATA_PATH_ENV,
@@ -103,7 +103,7 @@ def dataset_statuses() -> list[dict[str, Any]]:
         {
             "id": "declared_road_and_industrial_context",
             "role": "provisional_locality_context",
-            "geographic_unit": "KinderPrint reporting locality",
+            "geographic_unit": "VKinder reporting locality",
             "interpretation_status": "context_only",
             "configured": _configured(community_context_data_path()),
             "configuration_variable": COMMUNITY_CONTEXT_DATA_PATH_ENV,
@@ -118,7 +118,7 @@ def dataset_statuses() -> list[dict[str, Any]]:
             "configured": _configured(epa_station_year_data_path()),
             "configuration_variable": EPA_STATION_YEAR_DATA_PATH_ENV,
             "user_facing": False,
-            "boundary": "No SA2 or KinderPrint-locality exposure has been derived.",
+            "boundary": "No SA2 or VKinder-locality exposure has been derived.",
         },
         {
             "id": "phidu_child_health",
@@ -213,7 +213,7 @@ def dataset_statuses() -> list[dict[str, Any]]:
         {
             "id": "acecqa_gnaf_locality_context",
             "role": "early_childhood_service_context",
-            "geographic_unit": "KinderPrint reporting locality",
+            "geographic_unit": "VKinder reporting locality",
             "interpretation_status": "aggregate_context",
             "configured": _configured(acecqa_context_data_path()),
             "configuration_variable": ACECQA_CONTEXT_DATA_PATH_ENV,

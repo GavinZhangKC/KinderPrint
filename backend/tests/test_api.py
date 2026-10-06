@@ -440,14 +440,14 @@ def configure_overview_sources(monkeypatch, tmp_path, *, merged: bool = False) -
     profile_data["neighbourhood"] = {
         "id": "206011106",
         "name": "Brunswick East",
-        "geographic_unit": "KinderPrint reporting locality",
+        "geographic_unit": "VKinder reporting locality",
     }
     profile_data["domains"][1]["indicators"][0].update({
         "value": 5, "status": "available",
     })
     for domain in profile_data["domains"]:
         for item in domain["indicators"]:
-            item["geographic_unit"] = "KinderPrint reporting locality"
+            item["geographic_unit"] = "VKinder reporting locality"
     profile_path = tmp_path / "overview-profiles.json"
     profile_path.write_text(
         json.dumps({"profiles": [profile_data]}), encoding="utf-8")

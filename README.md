@@ -1,4 +1,4 @@
-# KinderPrint
+# VKinder
 
 Minimal project foundation with a React frontend and a FastAPI backend.
 

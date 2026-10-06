@@ -120,7 +120,6 @@ export default function ComparePanel({ source, comparisons, onSelectResult, mapS
     <aside className="glass compare-panel page-enter" aria-labelledby="compare-panel-title">
       <header className="compare-panel__header">
         <h1 id="compare-panel-title">Compare Neighbourhoods</h1>
-        <p className="compare-intro">Keep {source.name} as your starting point, then select one locality for the child-health comparison.</p>
       </header>
 
       <div className="compare-panel-scroll compare-panel__body">
@@ -185,13 +184,6 @@ export default function ComparePanel({ source, comparisons, onSelectResult, mapS
           onClick={onToggleMapSelection}
         >
           <strong>{mapSelectionEnabled ? 'Selecting on the map…' : 'Select directly on the map'}</strong>
-          <p>
-            {maximumReached
-              ? 'Four localities are already selected.'
-              : mapSelectionEnabled
-                ? 'Click a neighbourhood on the map, or click here to cancel.'
-                : 'Click here first to enable neighbourhood selection on the map.'}
-          </p>
         </button>
 
         <section className="similar-section" aria-labelledby="similar-heading">

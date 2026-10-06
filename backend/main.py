@@ -1,4 +1,4 @@
-"""KinderPrint FastAPI application and versioned service routes."""
+"VKinder FastAPI application and versioned service routes."""
 
 from __future__ import annotations
 
@@ -588,7 +588,7 @@ def neighbourhood_early_childhood_services(neighbourhood_id: str) -> dict[str, A
         )], notices=[AREA_LEVEL_NOTICE])
     return envelope("available", result, metadata={
         "source": "ACECQA service register and Open G-NAF August 2026 GDA2020",
-        "geographic_unit": "KinderPrint reporting locality",
+        "geographic_unit": "VKinder reporting locality",
         "match_policy": "EXACT or HIGH_CONFIDENCE within reporting scope",
         "address_fields_exposed": False,
         "interpretation": "Service availability context; not service quality or child outcome.",
