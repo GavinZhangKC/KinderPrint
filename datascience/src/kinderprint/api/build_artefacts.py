@@ -24,7 +24,7 @@ GEO_UNIT = "SA2 (ASGS Edition 3, 2021)"
 
 NOTICES = {
     "area_level_information":
-        "KinderPrint describes communities, not individual children. Every figure is an "
+        "VKinder describes neighborhoods, not individual children. Every figure is an "
         "area-level statistic and cannot be applied to any person living there.",
     "association_not_causation":
         "These are observed associations in area-level data. They do not show that any "

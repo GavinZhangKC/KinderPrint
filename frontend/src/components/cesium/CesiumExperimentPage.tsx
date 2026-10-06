@@ -87,7 +87,7 @@ const journeyNarrative = [
   },
   {
     eyebrow: 'Connected health',
-    intro: 'The Royal Melbourne Hospital expands the view from specialist family services to a wider health precinct serving the whole community.',
+    intro: 'The Royal Melbourne Hospital expands the view from specialist family services to a wider health precinct serving the whole neighbourhood.',
     insight: 'The strength of the precinct comes from proximity: institutions, research and clinical services operate as a connected network.',
   },
   {
