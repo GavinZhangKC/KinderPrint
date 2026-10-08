@@ -43,6 +43,7 @@ import {
 import './KinderHub.css'
 import HealthyDay from './HealthyDay'
 import { TodayParent, TodayPractitioner } from './TodayPage'
+import HealthTopics from './HealthTopics'
 
 /* ------------------------------------------------------------------ types */
 
@@ -75,7 +76,6 @@ type Loaded<T> = { data: T | null; loading: boolean; error: string | null }
 const AUDIENCE_KEY = 'kinderprint-audience'
 const AGE_KEY = 'kinderprint-child-age'
 const PAGE_KEY = 'kinderprint-hub-page'
-const STEP_KEY = 'kinderprint-body-steps'
 const BIRTH_KEY = 'kinderprint-child-birth-month'
 const VACCINE_DONE_KEY = 'kinderprint-vaccines-done'
 const ABORIGINAL_KEY = 'kinderprint-child-aboriginal'
@@ -96,41 +96,7 @@ const NAV: Array<{ id: Page; label: string; icon: ReactNode }> = [
   { id: 'care', label: 'Care nearby', icon: <><circle cx="12" cy="10" r="3" /><path d="M12 21s-7-6.5-7-11a7 7 0 0 1 14 0c0 4.5-7 11-7 11z" /></> },
 ]
 
-const BODIES: Array<{ id: BodyId; label: string; image: string }> = [
-  { id: 'brain', label: 'Brain & development', image: '/health-assets/brain-development.png' },
-  { id: 'lungs', label: 'Lungs & asthma', image: '/health-assets/lungs-asthma.png' },
-  { id: 'metabolic', label: 'Growth & weight', image: '/health-assets/metabolic-health.png' },
-  { id: 'immune', label: 'Immunity', image: '/health-assets/allergy-immune.png' },
-  { id: 'perinatal', label: 'Pregnancy & baby', image: '/health-assets/perinatal-health.png' },
-]
 
-const BODY_STEPS: Record<BodyId, Array<{ text: string; why: string; link: string }>> = {
-  brain: [
-    { text: 'Read together every day', why: 'Builds language and early literacy.', link: OFFICIAL.movement },
-    { text: 'Keep a regular sleep routine', why: '10–13 hours for 3–5 year olds, 9–11 hours for 5–13 year olds.', link: OFFICIAL.movement },
-    { text: 'Talk to the teacher or GP early if something worries you', why: 'Use the preparation plan to organise what you have noticed.', link: OFFICIAL.movement },
-  ],
-  lungs: [
-    { text: 'Written asthma action plan reviewed this year', why: 'The National Asthma Council recommends a written plan for everyone with asthma.', link: OFFICIAL.asthmaPlan },
-    { text: 'Puffer and spacer technique checked by a pharmacist', why: 'Most people use their inhaler incorrectly.', link: OFFICIAL.asthmaPlan },
-    { text: 'Smoke-free home and car', why: 'Protects developing lungs.', link: OFFICIAL.asthmaPlan },
-  ],
-  metabolic: [
-    { text: '60 minutes of active play every day', why: 'Australian 24-hour movement guidelines, 5–17 years.', link: OFFICIAL.movement },
-    { text: 'Water as the everyday drink', why: 'Instead of juice or soft drink.', link: OFFICIAL.serves },
-    { text: 'No more than 2 hours of screen time for fun', why: 'Australian 24-hour movement guidelines, 5–17 years.', link: OFFICIAL.movement },
-  ],
-  immune: [
-    { text: 'Vaccines kept on schedule', why: 'Every National Immunisation Program vaccine is free.', link: OFFICIAL.nipSchedule },
-    { text: 'Flu vaccine every April or May', why: 'Free for children aged 6 months to under 5.', link: OFFICIAL.nipSchedule },
-    { text: 'Missed vaccines caught up', why: 'Catch-up vaccines are free at your GP or council.', link: OFFICIAL.victorianSchedule },
-  ],
-  perinatal: [
-    { text: 'Whooping cough vaccine during pregnancy', why: 'Protects the newborn in the first months.', link: OFFICIAL.nipSchedule },
-    { text: 'RSV protection in pregnancy or after birth', why: 'National and Victorian programs.', link: OFFICIAL.rsv },
-    { text: 'Safe sleep: on the back, in their own cot', why: 'Red Nose safe-sleeping guidance.', link: OFFICIAL.safeSleep },
-  ],
-}
 
 interface Season { id: string; title: string; months: number[]; why: string; actions: string[]; link: string; linkLabel: string }
 const SEASONS: Season[] = [
@@ -427,7 +393,7 @@ export default function KinderHub({ locality, data, onSelectLocality, onOpenPlan
   const visibleNav = NAV.filter(item => parent || item.id !== 'day')
   const orderedNav = [...visibleNav.filter(item => item.id === page), ...visibleNav.filter(item => item.id !== page)]
   const today = page === 'home'
-  const themed = today || page === 'day'
+  const themed = today || page === 'day' || page === 'health'
   const themeClass = themed ? (parent ? ' kt-theme-parent' : ' kt-theme-prac') : ''
 
   return <div className={`kp-hub ${parent ? 'is-parent' : 'is-practitioner'}${themeClass}`} data-page={page}>
@@ -458,7 +424,9 @@ export default function KinderHub({ locality, data, onSelectLocality, onOpenPlan
           ? <TodayParent locality={locality} age={age} controls={<><LocalityPicker locality={locality} onSelect={onSelectLocality} /><AgePicker value={age} onChange={setAge} /></>} onCheckDay={() => go('day')} onGo={go} onPrepareVisit={() => onOpenPlan('brain', age)} onOpenMap={onOpenMap} />
           : <TodayPractitioner locality={locality} controls={<LocalityPicker locality={locality} onSelect={onSelectLocality} />} immunisation={immunisation.data} asthma={figures.sa2('asthma')} asthmaRatio={figures.pha('child_asthma')?.standardised_ratio ?? null} services={data.facilities.length} childcareServices={childcare.data?.active_education_care_services} onOpenMap={onOpenMap} onGo={go} />)}
         {page === 'day' && <HealthyDay age={age} ageControl={<AgePicker value={age} onChange={setAge} />} />}
-        {page === 'health' && <HealthPage {...context} />}
+        {page === 'health' && <HealthTopics parent={parent} locality={locality} age={age} figures={figures} immunisation={immunisation.data} nutrition={nutrition.data} prevention={prevention.data} topic={body} setTopic={setBody}
+          controls={parent ? <><LocalityPicker locality={locality} onSelect={onSelectLocality} /><AgePicker value={age} onChange={setAge} /></> : <LocalityPicker locality={locality} onSelect={onSelectLocality} />}
+          onPrepareVisit={() => onOpenPlan('brain', age)} onOpenMap={onOpenMap} onOpenCare={() => go('care')} />}
         {page === 'vaccines' && <VaccinesPage {...context} />}
         {page === 'food' && <FoodPage {...context} />}
         {page === 'seasons' && <SeasonsPage {...context} />}
@@ -495,53 +463,6 @@ function vaccineRows(birthMonth: string, done: string[], aboriginal: boolean) {
 
 /* ------------------------------------------------------------------ health */
 
-function HealthPage({ parent, body, setBody, figures, immunisation, nutrition, prevention, onOpenPlan, age, locality }: PageContext) {
-  const [done, setDone] = useStored<string[]>(STEP_KEY, [])
-  const selected = BODIES.find(item => item.id === body) ?? BODIES[0]
-  const sa2 = figures.sa2
-  const pha = figures.pha
-  const immune = immunisation.data?.indicators ?? []
-  const weight = (id: string) => nutrition.data?.weight.find(item => item.indicator_id === id)
-  const activity = nutrition.data?.vcams.find(item => item.indicator_id === 'recommended_daily_physical_activity')
-  const tobacco = prevention.data?.vcams.find(item => item.indicator_id === 'tobacco_smoke_exposure_at_home')
-  const facts: Record<BodyId, Array<[string, string]>> = {
-    brain: [[pct(figures.aedc.onTrackAll, 0), 'of children starting school are on track in all five areas of development.'], [oneIn(figures.aedc.vulnerableOne), 'need extra support in at least one area.'], [pct(sa2('mental_health_condition')?.percent), 'of children aged 0–14 have a reported mental-health condition.']],
-    lungs: [[count(sa2('asthma')?.count), `children aged 0–14 here have asthma (${inHundred(sa2('asthma')?.percent)}).`], ['Oct–Dec', 'is thunderstorm asthma season in Victoria.'], [pct(tobacco?.area.percent, 0), `of children in the ${prevention.data?.locality?.department_area ?? 'surrounding'} region are exposed to tobacco smoke at home.`]],
-    metabolic: [[pct(weight('child_obese')?.pha.percent), `of children nearby live with obesity (Victoria ${pct(weight('child_obese')?.victoria?.percent)}).`], [pct(weight('child_overweight_not_obese')?.pha.percent, 0), 'are above a healthy weight, not counting obesity.'], [inHundred(activity?.area.percent), 'children in the region are active for 60 minutes a day.']],
-    immune: immune.map(item => [inHundred(item.pha.percent), `children nearby are fully vaccinated at ${item.age}.`] as [string, string]),
-    perinatal: [[pct(pha('low_birthweight')?.rate_or_percent), 'of babies nearby are born with low birthweight.'], [pct(pha('smoking_during_pregnancy')?.rate_or_percent), 'of mothers smoked during pregnancy.'], [pha('infant_mortality')?.rate_or_percent?.toFixed(1) ?? '—', 'infant deaths per 1,000 births.']],
-  }
-  const row = (label: string, value: string, geo: string) => ({ label, value, geo })
-  const measures: Record<BodyId, Array<{ label: string; value: string; geo: string }>> = {
-    brain: [row('Vulnerable on ≥1 domain', pct(figures.aedc.vulnerableOne), 'SA2 · AEDC 2024'), row('Vulnerable on ≥2 domains', pct(figures.aedc.vulnerableTwo), 'SA2 · AEDC 2024'), ...figures.aedc.domains.map(([label, value]) => row(`${label} on track`, pct(value), 'SA2 · AEDC 2024')), row('Mental-health condition', `${pct(sa2('mental_health_condition')?.percent, 2)} (${count(sa2('mental_health_condition')?.count)}/${count(sa2('mental_health_condition')?.population_denominator)})`, 'SA2 · Census 2021'), row('Mental-health condition', pct(pha('child_mental_health_condition')?.rate_or_percent, 2), `PHA · ${pha('child_mental_health_condition')?.reference_period ?? ''}`)],
-    lungs: [row('Asthma', `${pct(sa2('asthma')?.percent, 2)} (${count(sa2('asthma')?.count)}/${count(sa2('asthma')?.population_denominator)})`, 'SA2 · Census 2021'), row('Asthma', pct(pha('child_asthma')?.rate_or_percent, 2), `PHA · ${pha('child_asthma')?.reference_period ?? ''}`), row('Declared-road traffic percentile', prevention.data?.transport?.traffic_intensity_percentile != null ? `${Math.round(prevention.data.transport.traffic_intensity_percentile)}th of ${prevention.data.transport.sa2_compared}` : '—', 'SA2 · AADT 2019'), row('Tobacco smoke at home', pct(tobacco?.area.percent), `Dept area · VCAMS ${tobacco?.reference_year ?? ''}`)],
-    metabolic: ['child_obese', 'child_overweight_not_obese'].map(id => { const item = weight(id); return row(id === 'child_obese' ? 'Obesity' : 'Overweight, excluding obesity', `${pct(item?.pha.percent, 2)} (95% CI ${item?.pha.lower_95_ci?.toFixed(1) ?? '—'}–${item?.pha.upper_95_ci?.toFixed(1) ?? '—'}) · Vic ${pct(item?.victoria?.percent)}`, `PHA · modelled ${item?.reference_period ?? ''}`) }).concat([row('Active 60 minutes daily', pct(activity?.area.percent), `Dept area · VCAMS ${activity?.reference_year ?? ''}`)]),
-    immune: immune.map(item => row(`Fully immunised, ${item.age}`, `${pct(item.pha.percent, 2)} (${count(item.pha.numerator)}/${count(item.pha.denominator)}) · Vic ${pct(item.victoria?.percent)}`, `PHA · ${item.reference_period}`)),
-    perinatal: [row('Low birthweight', pct(pha('low_birthweight')?.rate_or_percent, 2), `PHA · ${pha('low_birthweight')?.reference_period ?? ''}`), row('Smoking during pregnancy', pct(pha('smoking_during_pregnancy')?.rate_or_percent, 2), `PHA · ${pha('smoking_during_pregnancy')?.reference_period ?? ''}`), row('Infant mortality', `${pha('infant_mortality')?.rate_or_percent?.toFixed(2) ?? '—'} per 1,000`, `PHA · ${pha('infant_mortality')?.reference_period ?? ''}`)],
-  }
-  const toggle = (key: string) => setDone(current => current.includes(key) ? current.filter(item => item !== key) : [...current, key])
-  return <div className="kh-stack">
-    <div className="kh-bodies" role="tablist" aria-label="Body system">{BODIES.map(item => <button key={item.id} type="button" role="tab" aria-selected={item.id === body} onClick={() => setBody(item.id)}>
-      <img src={item.image} alt="" /><span>{item.label}</span>
-    </button>)}</div>
-    {parent ? <div className="kh-body-view">
-      <figure className="kh-hero-figure"><img src={selected.image} alt={`Illustration of ${selected.label.toLowerCase()}`} /><figcaption>{selected.label}</figcaption></figure>
-      <div className="kh-stack">
-        <Card title={`${selected.label} in ${locality.name}`} sub="These describe the area, not your child.">
-          <div className="kh-facts">{facts[body].map(([number, text]) => <article key={text}><strong>{number}</strong><p>{text}</p></article>)}</div>
-        </Card>
-        <Card title="What you can do" sub="Tick as you go. Saved on this device." aside={body === 'brain' ? <button type="button" className="kh-btn primary" onClick={() => onOpenPlan(body, age)}>Prepare for a GP visit</button> : undefined}>
-          <ul className="kh-steps">{BODY_STEPS[body].map((step, index) => { const key = `${body}-${index}`; return <li key={key} className={done.includes(key) ? 'is-done' : undefined}><label><input type="checkbox" checked={done.includes(key)} onChange={() => toggle(key)} /><span><b>{step.text}</b><small>{step.why}</small></span></label></li> })}</ul>
-          <a className="kh-link" href={BODY_STEPS[body][0].link} target="_blank" rel="noreferrer">Official guidance ↗</a>
-        </Card>
-      </div>
-    </div> : <Card title={selected.label} sub="Measure, value and geography. PHA values describe the containing Population Health Area." aside={<button type="button" className="kh-btn" onClick={() => { void navigator.clipboard?.writeText(measures[body].map(item => `${item.label}\t${item.value}\t${item.geo}`).join('\n')) }}>Copy table</button>}>
-      <div className="kh-scroll"><table className="kh-table full"><thead><tr><th>Measure</th><th>Value</th><th>Geography · source</th></tr></thead><tbody>
-        {measures[body].map(item => <tr key={`${item.label}-${item.geo}`}><td>{item.label}</td><td><b>{item.value}</b></td><td><span className={item.geo.startsWith('SA2') ? 'kh-tag geo' : 'kh-tag'}>{item.geo}</span></td></tr>)}
-      </tbody></table></div>
-    </Card>}
-  </div>
-}
 
 /* ------------------------------------------------------------------ vaccines */
 
