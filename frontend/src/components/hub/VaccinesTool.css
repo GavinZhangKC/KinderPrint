@@ -71,9 +71,11 @@
 .vx-bar>b,.vx-bar>i{position:absolute;top:-4px;width:2px;height:17px}
 .vx-bar>b{background:var(--kt-ink)}
 .vx-bar>i{background:#8A5300}
-.vx-cov-bar{flex:2 1 240px;display:flex;align-items:center;gap:14px}
-.vx-cov-bar strong{flex:none;width:84px;font-size:var(--fs-data);font-weight:800;font-variant-numeric:tabular-nums}
-.vx-cov-bar .vx-bar{flex:1 1 auto;margin:0}
+.vx-cov{flex-wrap:wrap}
+.vx-cov-bar{flex:2 1 260px;display:flex;align-items:center;gap:16px;min-width:0}
+/* Value sizes to its own text so large data type never runs into the bar. */
+.vx-cov-bar strong{flex:none;min-width:6.2ch;font-size:var(--fs-data);font-weight:800;line-height:1.1;white-space:nowrap;font-variant-numeric:tabular-nums}
+.vx-cov-bar .vx-bar{flex:1 1 80px;min-width:80px;margin:0}
 
 .vx-dialog{width:min(520px,calc(100vw - 32px));max-height:calc(100vh - 48px);padding:0;border:1px solid var(--kt-line);border-radius:18px;background:var(--kt-cream);color:var(--kt-ink);box-shadow:0 30px 60px -20px rgba(0,0,0,.35)}
 .vx-dialog::backdrop{background:rgba(20,30,25,.45)}
@@ -95,6 +97,5 @@
   .vx-tabs,.vx-filters{flex-wrap:nowrap;overflow-x:auto;max-width:100%;scrollbar-width:none}
   .vx-tabs::-webkit-scrollbar,.vx-filters::-webkit-scrollbar{display:none}
   .vx-facts{grid-template-columns:minmax(0,1fr)}
-  .vx-cov-bar strong{width:auto}
 }
 @media print{.vx-tabs,.vx-filters,.vx-map{display:none}}
