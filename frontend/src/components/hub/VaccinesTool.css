@@ -1,0 +1,85 @@
+/* Vaccines page: Today/Health theme tokens (TodayPage.css) with page-specific pieces. */
+.vx-head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:8px 16px}
+.vx-check{display:flex;gap:10px;align-items:center;margin-top:10px;font-size:15px;cursor:pointer}
+.vx-check input{width:20px;height:20px;accent-color:var(--kt-primary)}
+.vx-schedule{margin:12px 0 0;padding:0;list-style:none}
+.vx-schedule li{display:grid;grid-template-columns:minmax(96px,120px) minmax(0,1fr) auto;gap:4px 16px;align-items:center;padding:14px 0;border-top:1px solid var(--kt-line-soft)}
+.vx-schedule li.is-past{opacity:.7}
+.vx-schedule b{display:block;font-size:15px;line-height:1.4}
+.vx-schedule small{display:block;font-size:13.5px;color:var(--kt-ink2)}
+.vx-act{display:flex;flex-wrap:wrap;justify-content:flex-end;align-items:center;gap:8px}
+.vx .kh-btn.small{min-height:36px;padding:0 12px;font-size:13.5px}
+.vx-tag{padding:3px 10px;border-radius:999px;background:#F3F5E6;color:var(--kt-ink2);font-size:13px;font-weight:800;white-space:nowrap}
+.vx-tag.is-done{background:#E9F2DB;color:#2B4B2E}
+.vx-tag.is-catch{background:#FDF0DD;color:#7A4A00}
+.vx-tag.is-soon{background:var(--kt-primary);color:#fff}
+
+.vx-next{display:flex;flex-direction:column;gap:6px}
+.vx-big{margin-top:6px!important;font-size:30px;font-weight:800;line-height:1.15}
+.vx-when{font-size:15.5px;font-weight:700}
+.vx-next .kh-btn{align-self:flex-start;margin-top:8px}
+.vx-facts{margin:14px 0 0;padding-top:14px;border-top:1px solid rgba(53,92,56,.16)}
+.vx-facts dt{margin-top:10px;font-size:16px;font-weight:800}
+.vx-facts dt:first-child{margin-top:0}
+.vx-facts dd{margin:2px 0 0;font-size:15px}
+
+.vx-near-head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:12px 24px}
+.vx-near-head>div:first-child{flex:1 1 420px}
+.vx-filters{flex:0 1 auto;margin-top:0}
+.vx-filters button{flex:0 0 auto}
+.vx-near{display:grid;grid-template-columns:minmax(260px,5fr) minmax(0,7fr);gap:24px;align-items:start;margin-top:18px}
+.vx-map{margin:0}
+.vx-map svg{display:block;width:100%;max-width:420px;margin:0 auto;aspect-ratio:1/1}
+.vx-map .vx-ring-out{fill:#F5F8EA;stroke:var(--kt-line);stroke-width:.02}
+.vx-map .vx-ring{fill:none;stroke:#C7D0AE;stroke-width:.02;stroke-dasharray:.07 .07}
+.vx-map text{font-size:.13px;fill:var(--kt-ink2)}
+.vx-map .vx-dot{stroke:#fff;stroke-width:.035}
+.vx-map .vx-dot-n{font-size:.13px;font-weight:800;fill:#fff}
+.vx-map .vx-home{fill:var(--kt-ink)}
+.vx-map .vx-home-ring{fill:none;stroke:var(--kt-ink);stroke-width:.025}
+.vx-map figcaption{display:flex;flex-wrap:wrap;justify-content:center;gap:6px 16px;margin-top:8px;font-size:13.5px;color:var(--kt-ink2)}
+.vx-map figcaption i{display:inline-block;width:10px;height:10px;margin-right:6px;border-radius:50%}
+.vx-map figcaption .vx-key-home{border:2px solid var(--kt-ink)}
+.vx-council{padding:16px 18px;border:1px solid #D6DFBE;border-radius:14px;background:var(--kt-tint)}
+.vx-council b{display:block;font-size:16px}
+.vx-council p{margin-top:2px!important;font-size:14.5px;color:var(--kt-ink2)}
+.vx-council-act{display:flex;flex-wrap:wrap;gap:6px 20px;margin-top:8px!important}
+.vx-council-act a{font-size:15px}
+.vx-places{margin:8px 0 12px;padding:0;list-style:none}
+.vx-places li{display:grid;grid-template-columns:28px minmax(0,1fr) auto;gap:2px 12px;align-items:start;padding:12px 0;border-bottom:1px solid var(--kt-line-soft)}
+.vx-num{display:grid;place-items:center;width:24px;height:24px;margin-top:2px;border-radius:50%;color:#fff;font-size:12px;font-weight:800}
+.vx-places li>span:nth-child(2) b{display:block;font-size:15.5px;line-height:1.35}
+.vx-places li>span:nth-child(2) span{display:block;font-size:14px;color:var(--kt-ink2)}
+.vx-places small{display:block;font-size:13.5px;color:var(--kt-ink2)}
+.vx-places small.is-warn{color:#7A4A00}
+.vx-dist{text-align:right}
+.vx-dist b{display:block;font-size:15px;font-variant-numeric:tabular-nums}
+.vx-dist a{font-size:14px}
+
+.vx-start{display:flex;flex-wrap:wrap;align-items:flex-end;gap:12px 20px;margin-top:16px}
+.vx-start label{display:flex;flex-direction:column;gap:4px;font-size:14px;font-weight:700}
+.vx-start input{min-height:44px;padding:0 12px;border:1px solid #C7D0AE;border-radius:10px;background:#fff;color:var(--kt-ink);font:inherit;font-weight:600}
+.vx-ready{display:inline-flex;align-items:center;min-height:44px;padding:0 14px;border-radius:999px;background:#F3F5E6;color:var(--kt-ink2);font-size:15px;font-weight:800}
+.vx-ready.is-ok{background:#E9F2DB;color:#2B4B2E}
+.vx-ready.is-warn{background:#FDF0DD;color:#7A4A00}
+.vx .ht-questions li>span:last-child b{display:block}
+.vx .ht-questions small{display:block;font-size:14.5px;color:var(--kt-ink2)}
+
+.vx-cover{margin-top:14px;padding-top:14px;border-top:1px solid rgba(53,92,56,.16)}
+.vx-cover p{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.vx-cover strong{font-size:20px;font-variant-numeric:tabular-nums}
+.vx-cover small{font-size:14px;color:var(--kt-ink2)}
+.vx-bar{position:relative;height:9px;margin:8px 0 6px;border-radius:999px;background:rgba(255,255,255,.85);box-shadow:inset 0 0 0 1px var(--kt-line)}
+.vx-bar span{display:block;height:100%;border-radius:999px;background:var(--kt-primary)}
+.vx-bar b,.vx-bar i{position:absolute;top:-4px;width:2px;height:17px}
+.vx-bar b{background:var(--kt-ink)}
+.vx-bar i{background:#8A5300}
+.vx-cov-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.3fr);gap:4px 24px;align-items:center;padding:18px 0;border-top:1px solid var(--kt-line-soft)}
+.vx-cov-row small{display:block;font-size:14px;color:var(--kt-ink2)}
+.vx-cov-row p{font-size:14.5px}
+.vx-cov-row .ht-geo{background:#EEF2F5}
+.vx-cov-row .ht-value strong{font-size:28px;font-weight:800;line-height:1.25;font-variant-numeric:tabular-nums}
+
+@media (max-width:860px){.vx-near{grid-template-columns:minmax(0,1fr)}.vx-cov-row{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:640px){.vx-schedule li{grid-template-columns:minmax(0,1fr)}.vx-act{justify-content:flex-start}}
+@media print{.vx-filters,.vx-map,.vx-act .kh-btn{display:none}}

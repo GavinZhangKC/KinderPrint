@@ -291,3 +291,50 @@ def test_nearby_services_sorted_nearest_first(client, monkeypatch, tmp_path):
 def test_new_context_endpoints_unavailable_without_configuration(client):
     for path in ("seasonal-air", "nearby-services"):
         assert client.get(f"/api/digital-health/{path}?sa2_code=206011106").json()["status"] == "unavailable"
+
+
+PLACES_HEADER = ("sa2_code,sa2_name,origin_longitude,origin_latitude,kind,rank,facility_id,name,address,suburb,"
+                 "longitude,latitude,distance_km,source_date,source_id\n")
+COUNCIL_HEADER = "sa2_code,sa2_name,lga_name_2023,council_name,immunisation_url,phone,retrieved,source_id\n"
+
+
+def test_vaccination_places_returns_places_nearest_first_and_the_council(client, monkeypatch, tmp_path):
+    _read.cache_clear()
+    monkeypatch.setenv("KINDERPRINT_VACCINATION_PLACES_DATA_PATH", _write(tmp_path / "p.csv", PLACES_HEADER
+        + "206011106,Brunswick East,144.979,-37.767,pharmacy,1,p1,Choice Pharmacy,14 Village Ave,Brunswick East,144.978,-37.772,0.56,2025-03-07,hd\n"
+        + "206011106,Brunswick East,144.979,-37.767,general_practice,1,g1,East Brunswick MC,212 Blyth St,Brunswick East,144.98,-37.768,0.11,2025-03-07,hd\n"
+        + "206011106,Brunswick East,144.979,-37.767,general_practice,2,g2,Myhealth Brunswick,80 Moreland Rd,Brunswick,144.972,-37.757,1.27,2025-03-07,hd\n"
+        + "206011107,Brunswick West,144.94,-37.76,general_practice,1,g9,Other,x,Brunswick West,144.94,-37.76,0.2,2025-03-07,hd\n"))
+    monkeypatch.setenv("KINDERPRINT_COUNCIL_IMMUNISATION_DATA_PATH", _write(tmp_path / "c.csv", COUNCIL_HEADER
+        + "206011106,Brunswick East,Merri-bek,Merri-bek City Council,https://www.merri-bek.vic.gov.au/imm,(03) 9240 1111,2026-10-08,mvec\n"))
+    body = client.get("/api/digital-health/vaccination-places?sa2_code=206011106").json()
+    assert body["status"] == "available"
+    assert [p["name"] for p in body["data"]["places"]] == ["East Brunswick MC", "Choice Pharmacy", "Myhealth Brunswick"]
+    assert body["data"]["places"][2]["suburb"] == "Brunswick"
+    assert body["data"]["origin"] == {"longitude": 144.979, "latitude": -37.767}
+    assert body["data"]["council"]["phone"] == "(03) 9240 1111"
+    assert "appointment availability" in body["metadata"]["interpretation"]
+
+
+def test_vaccination_places_still_returns_council_when_places_are_unconfigured(client, monkeypatch, tmp_path):
+    _read.cache_clear()
+    monkeypatch.setenv("KINDERPRINT_COUNCIL_IMMUNISATION_DATA_PATH", _write(tmp_path / "c.csv", COUNCIL_HEADER
+        + "206011106,Brunswick East,Merri-bek,Merri-bek City Council,https://www.merri-bek.vic.gov.au/imm,(03) 9240 1111,2026-10-08,mvec\n"))
+    body = client.get("/api/digital-health/vaccination-places?sa2_code=206011106").json()
+    assert body["status"] == "available"
+    assert body["data"]["places"] == [] and body["data"]["origin"] is None
+    assert body["data"]["council"]["council_name"] == "Merri-bek City Council"
+    assert any(item["code"] == "vaccination_places_not_configured" for item in body["limitations"])
+
+
+def test_vaccination_places_rejects_unknown_kind_and_bad_url(client, monkeypatch, tmp_path):
+    _read.cache_clear()
+    monkeypatch.setenv("KINDERPRINT_VACCINATION_PLACES_DATA_PATH", _write(tmp_path / "p.csv", PLACES_HEADER
+        + "206011106,Brunswick East,144.979,-37.767,hospital,1,h1,RCH,50 Flemington Rd,Parkville,144.95,-37.79,4.0,2025-03-07,hd\n"))
+    monkeypatch.setenv("KINDERPRINT_COUNCIL_IMMUNISATION_DATA_PATH", _write(tmp_path / "c.csv", COUNCIL_HEADER
+        + "206011106,Brunswick East,Merri-bek,Merri-bek City Council,javascript:alert(1),(03) 9240 1111,2026-10-08,mvec\n"))
+    assert client.get("/api/digital-health/vaccination-places?sa2_code=206011106").json()["status"] == "unavailable"
+
+
+def test_vaccination_places_unavailable_without_configuration(client):
+    assert client.get("/api/digital-health/vaccination-places?sa2_code=206011106").json()["status"] == "unavailable"

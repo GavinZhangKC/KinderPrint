@@ -99,6 +99,8 @@ Resources:
           KINDERPRINT_TRANSPORT_CONTEXT_DATA_PATH: /var/task/data/transport_context_sa2.csv
           KINDERPRINT_SEASONAL_AIR_DATA_PATH: /var/task/data/seasonal_air_quality_sa2.csv
           KINDERPRINT_NEARBY_SERVICES_DATA_PATH: /var/task/data/nearby_health_services_sa2.csv
+          KINDERPRINT_VACCINATION_PLACES_DATA_PATH: /var/task/data/vaccination_places_sa2.csv
+          KINDERPRINT_COUNCIL_IMMUNISATION_DATA_PATH: /var/task/data/council_immunisation_sa2.csv
           KINDERPRINT_HOSPITAL_CAPABILITY_DATA_PATH: /var/task/data/hospital_capability_vic.csv
           KINDERPRINT_CARE_COMPARE_DATA_PATH: /var/task/data/care_compare_sa2.csv
           KINDERPRINT_URGENT_CARE_CLINICS_DATA_PATH: /var/task/data/urgent_care_clinics_vic.csv

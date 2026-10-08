@@ -19,6 +19,8 @@ from core.data_loader import (
     TRANSPORT_CONTEXT_DATA_PATH_ENV,
     SEASONAL_AIR_DATA_PATH_ENV,
     NEARBY_SERVICES_DATA_PATH_ENV,
+    VACCINATION_PLACES_DATA_PATH_ENV,
+    COUNCIL_IMMUNISATION_DATA_PATH_ENV,
     VCAMS_LGA_DATA_PATH_ENV,
     abs_child_health_data_path,
     bushfire_context_data_path,
@@ -29,6 +31,8 @@ from core.data_loader import (
     transport_context_data_path,
     seasonal_air_data_path,
     nearby_services_data_path,
+    vaccination_places_data_path,
+    council_immunisation_data_path,
     vcams_area_data_path,
     vcams_lga_data_path,
 )
@@ -81,6 +85,16 @@ NEARBY_SERVICE_FIELDS = {
     "nearest_address", "nearest_longitude", "nearest_latitude", "nearest_distance_km",
     "count_within_5km", "source_date",
 }
+VACCINATION_PLACE_FIELDS = {
+    "sa2_code", "sa2_name", "origin_longitude", "origin_latitude", "kind", "rank",
+    "facility_id", "name", "address", "suburb", "longitude", "latitude", "distance_km",
+    "source_date", "source_id",
+}
+COUNCIL_IMMUNISATION_FIELDS = {
+    "sa2_code", "sa2_name", "lga_name_2023", "council_name", "immunisation_url", "phone",
+    "retrieved", "source_id",
+}
+VACCINATION_KINDS = {"general_practice", "pharmacy", "maternal_child_health", "aboriginal_health"}
 REQUIRED_FIELDS = {
     "vcams_area_context": AREA_FIELDS,
     "vcams_lga_context": LGA_FIELDS,
@@ -93,6 +107,8 @@ REQUIRED_FIELDS = {
     "transport_context": TRANSPORT_FIELDS,
     "seasonal_air": SEASONAL_AIR_FIELDS,
     "nearby_services": NEARBY_SERVICE_FIELDS,
+    "vaccination_places": VACCINATION_PLACE_FIELDS,
+    "council_immunisation": COUNCIL_IMMUNISATION_FIELDS,
 }
 UNIQUE_FIELDS = {
     "vcams_area_context": ("reference_year", "area_name", "indicator_id"),
@@ -106,6 +122,8 @@ UNIQUE_FIELDS = {
     "transport_context": ("sa2_code",),
     "seasonal_air": ("sa2_code", "pollutant", "month"),
     "nearby_services": ("sa2_code", "service_type"),
+    "vaccination_places": ("sa2_code", "kind", "rank"),
+    "council_immunisation": ("sa2_code",),
 }
 
 
@@ -261,6 +279,29 @@ def _nearby_service_row(row: dict[str, str]) -> dict[str, Any]:
     return parsed
 
 
+
+def _vaccination_place_row(row: dict[str, str]) -> dict[str, Any]:
+    parsed = _sa2_numeric_row("distance_km")(row)
+    _required_text(row, "kind", "facility_id", "name", "address", "suburb", "source_date", "source_id")
+    if row["kind"] not in VACCINATION_KINDS:
+        raise ValueError
+    parsed["rank"] = _integer(row["rank"])
+    for field in ("origin_longitude", "origin_latitude", "longitude", "latitude"):
+        parsed[field] = _coordinate(row[field])
+    if parsed["rank"] < 1 or parsed["distance_km"] is None:
+        raise ValueError
+    return parsed
+
+
+def _council_immunisation_row(row: dict[str, str]) -> dict[str, Any]:
+    _required_text(row, "sa2_code", "sa2_name", "lga_name_2023", "council_name", "immunisation_url", "phone", "retrieved", "source_id")
+    if not row["sa2_code"].isdigit() or len(row["sa2_code"]) != 9:
+        raise ValueError
+    if not row["immunisation_url"].startswith(("https://", "http://")):
+        raise ValueError
+    return dict(row)
+
+
 ROW_PARSERS = {
     "vcams_area_context": _area_row,
     "vcams_lga_context": _lga_row,
@@ -276,6 +317,8 @@ ROW_PARSERS = {
     ),
     "seasonal_air": _seasonal_air_row,
     "nearby_services": _nearby_service_row,
+    "vaccination_places": _vaccination_place_row,
+    "council_immunisation": _council_immunisation_row,
 }
 
 
@@ -730,3 +773,47 @@ def nearby_services(sa2_code: str) -> tuple[list[dict[str, Any]] | None, list[di
         (row for row in rows if row["sa2_code"] == sa2_code),
         key=lambda row: (row["nearest_distance_km"], row["service_type"]),
     )], limitations
+
+
+def load_vaccination_places() -> tuple[tuple[dict[str, Any], ...] | None, list[dict[str, Any]]]:
+    return _source(vaccination_places_data_path(), VACCINATION_PLACES_DATA_PATH_ENV, "vaccination_places")
+
+
+def load_council_immunisation() -> tuple[tuple[dict[str, Any], ...] | None, list[dict[str, Any]]]:
+    return _source(council_immunisation_data_path(), COUNCIL_IMMUNISATION_DATA_PATH_ENV, "council_immunisation")
+
+
+def vaccination_places(sa2_code: str) -> tuple[dict[str, Any] | None, list[dict[str, Any]]]:
+    """Nearby places for childhood vaccines and advice, plus the local council's immunisation service.
+
+    Places are the nearest listed facilities of each kind to the SA2 label point, including
+    neighbouring suburbs. Either part may be missing on its own; the other is still returned.
+    """
+    place_rows, place_limits = load_vaccination_places()
+    council_rows, council_limits = load_council_immunisation()
+    if place_rows is None and council_rows is None:
+        return None, place_limits + council_limits
+    places = sorted((row for row in place_rows or () if row["sa2_code"] == sa2_code),
+                    key=lambda row: (row["distance_km"], row["kind"], row["rank"]))
+    council = next((row for row in council_rows or () if row["sa2_code"] == sa2_code), None)
+    return {
+        "origin": {"longitude": places[0]["origin_longitude"], "latitude": places[0]["origin_latitude"]} if places else None,
+        "places": [{
+            "kind": row["kind"],
+            "rank": row["rank"],
+            "name": row["name"],
+            "address": row["address"],
+            "suburb": row["suburb"],
+            "longitude": row["longitude"],
+            "latitude": row["latitude"],
+            "distance_km": row["distance_km"],
+            "source_date": row["source_date"],
+        } for row in places],
+        "council": {
+            "lga_name": council["lga_name_2023"],
+            "council_name": council["council_name"],
+            "immunisation_url": council["immunisation_url"],
+            "phone": council["phone"],
+            "retrieved": council["retrieved"],
+        } if council else None,
+    }, place_limits + council_limits

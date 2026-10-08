@@ -54,6 +54,7 @@ CADENCE_DAYS = {  # source refresh cadence + grace
     "osm_overpass_food_outlets_2026": 45, "fsanz_afcd_release_3": 400,
 }
 SA2_TABLES = {"seasonal_air_quality_sa2.csv": "sa2_code", "nearby_health_services_sa2.csv": "sa2_code",
+              "vaccination_places_sa2.csv": "sa2_code", "council_immunisation_sa2.csv": "sa2_code",
               "care_compare_sa2.csv": "sa2_code", "food_access_sa2.csv": "sa2_code"}
 BUILDERS = [  # (script, output files) in dependency order
     ("build_hospital_capability.py", ["hospital_capability_vic.csv"]),
@@ -72,6 +73,8 @@ DISPLAY_COLUMNS = {
     "food_access_sa2.csv": ["within_1km", "within_2km", "nearest_km"],
     "seasonal_air_quality_sa2.csv": ["mean_daily_ug_m3", "valid_days", "station_distance_km"],
     "nearby_health_services_sa2.csv": ["nearest_name", "nearest_distance_km"],
+    "vaccination_places_sa2.csv": ["name", "distance_km"],
+    "council_immunisation_sa2.csv": ["council_name", "immunisation_url"],
 }
 
 

@@ -36,6 +36,8 @@ BUSHFIRE_CONTEXT_DATA_PATH_ENV = "KINDERPRINT_BUSHFIRE_CONTEXT_DATA_PATH"
 TRANSPORT_CONTEXT_DATA_PATH_ENV = "KINDERPRINT_TRANSPORT_CONTEXT_DATA_PATH"
 SEASONAL_AIR_DATA_PATH_ENV = "KINDERPRINT_SEASONAL_AIR_DATA_PATH"
 NEARBY_SERVICES_DATA_PATH_ENV = "KINDERPRINT_NEARBY_SERVICES_DATA_PATH"
+VACCINATION_PLACES_DATA_PATH_ENV = "KINDERPRINT_VACCINATION_PLACES_DATA_PATH"
+COUNCIL_IMMUNISATION_DATA_PATH_ENV = "KINDERPRINT_COUNCIL_IMMUNISATION_DATA_PATH"
 
 
 def boundary_data_path() -> Path | None:
@@ -170,6 +172,16 @@ def seasonal_air_data_path() -> Path | None:
 
 def nearby_services_data_path() -> Path | None:
     value = os.getenv(NEARBY_SERVICES_DATA_PATH_ENV)
+    return Path(value).expanduser() if value else None
+
+
+def vaccination_places_data_path() -> Path | None:
+    value = os.getenv(VACCINATION_PLACES_DATA_PATH_ENV)
+    return Path(value).expanduser() if value else None
+
+
+def council_immunisation_data_path() -> Path | None:
+    value = os.getenv(COUNCIL_IMMUNISATION_DATA_PATH_ENV)
     return Path(value).expanduser() if value else None
 
 

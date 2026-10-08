@@ -51,6 +51,7 @@ from loaders.digital_health import (
     prevention_context,
     seasonal_air,
     nearby_services,
+    vaccination_places,
     child_health_conditions,
     health_facilities,
     vcams_area_context,
@@ -381,6 +382,22 @@ def digital_health_seasonal_air(
         "standard": "24-hour PM2.5 standard of 25 ug/m3, National Environment Protection (Ambient Air Quality) Measure",
         "interpretation": "Record of past seasons at a monitor; not exposure inside the SA2 and not a forecast.",
     }, limitations=limitations, notices=[STATION_CONTEXT_NOTICE])
+
+
+@app.get("/api/digital-health/vaccination-places")
+def digital_health_vaccination_places(
+    sa2_code: str = Query(..., min_length=9, max_length=9, pattern=r"^\d{9}$"),
+) -> dict[str, Any]:
+    """Return nearby GPs, pharmacies and child health services, and the local council's immunisation service."""
+    data, limitations = vaccination_places(sa2_code)
+    if data is None:
+        return envelope("unavailable", {"origin": None, "places": [], "council": None}, limitations=limitations)
+    found = bool(data["places"]) or data["council"] is not None
+    return envelope("available" if found else "missing", data, metadata={
+        "source": "National Health Services Directory via Geoscience Australia, extract dated 7 March 2025; council immunisation pages listed by the Melbourne Vaccine Education Centre, retrieved 8 October 2026",
+        "geographic_unit": "straight-line distance from the SA2 label point; council allocated by the SA2's 2023 LGA",
+        "interpretation": "Listed presence and distance only; not travel time, opening hours, appointment availability or confirmation that a place gives a particular vaccine.",
+    }, limitations=limitations)
 
 
 @app.get("/api/digital-health/nearby-services")

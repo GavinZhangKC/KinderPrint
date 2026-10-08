@@ -304,6 +304,26 @@ export interface SeasonalAir {
   months: SeasonalAirMonth[]
 }
 
+export type VaccinationPlaceKind = 'general_practice' | 'pharmacy' | 'maternal_child_health' | 'aboriginal_health'
+
+export interface VaccinationPlace {
+  kind: VaccinationPlaceKind
+  rank: number
+  name: string
+  address: string
+  suburb: string
+  longitude: number
+  latitude: number
+  distance_km: number
+  source_date: string
+}
+
+export interface VaccinationPlaces {
+  origin: { longitude: number; latitude: number } | null
+  places: VaccinationPlace[]
+  council: { lga_name: string; council_name: string; immunisation_url: string; phone: string; retrieved: string } | null
+}
+
 export interface NearbyService {
   service_type: string
   category: string
@@ -792,6 +812,11 @@ export const api = {
   getSeasonalAir: (sa2Code: string, signal?: AbortSignal) =>
     request<SeasonalAir>(
       `/api/digital-health/seasonal-air?sa2_code=${encodeURIComponent(sa2Code)}`, signal,
+    ),
+
+  getVaccinationPlaces: (sa2Code: string, signal?: AbortSignal) =>
+    request<VaccinationPlaces>(
+      `/api/digital-health/vaccination-places?sa2_code=${encodeURIComponent(sa2Code)}`, signal,
     ),
 
   getNearbyServices: (sa2Code: string, signal?: AbortSignal) =>

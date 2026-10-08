@@ -59,7 +59,7 @@
 .ht-steps .is-done b{text-decoration:line-through;color:var(--kt-ink2)}
 .ht-questions{margin:14px 0 0;padding:0;list-style:none}
 .ht-questions li{display:flex;gap:12px;padding:12px 0;border-bottom:1px solid var(--kt-line-soft);font-size:16px}
-.ht-questions li>span{flex:none;display:grid;place-items:center;width:26px;height:26px;margin-top:1px;border-radius:8px;background:var(--kt-icon-bg);color:var(--kt-primary);font-size:13px;font-weight:800}
+.ht-questions li>span:first-child{flex:none;display:grid;place-items:center;width:26px;height:26px;margin-top:1px;border-radius:8px;background:var(--kt-icon-bg);color:var(--kt-primary);font-size:13px;font-weight:800}
 .ht-actions{display:flex;flex-wrap:wrap;align-items:center;gap:10px 20px;margin-top:16px}
 .ht-care{margin:8px 0 0;padding:0;list-style:none}
 .ht-care li{display:flex;justify-content:space-between;gap:12px;padding:12px 0;border-bottom:1px solid var(--kt-line-soft)}
