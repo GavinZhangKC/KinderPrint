@@ -94,7 +94,7 @@ COUNCIL_IMMUNISATION_FIELDS = {
     "sa2_code", "sa2_name", "lga_name_2023", "council_name", "immunisation_url", "phone",
     "retrieved", "source_id",
 }
-VACCINATION_KINDS = {"general_practice", "pharmacy", "maternal_child_health", "aboriginal_health"}
+VACCINATION_KINDS = {"general_practice", "pharmacy", "maternal_child_health"}
 REQUIRED_FIELDS = {
     "vcams_area_context": AREA_FIELDS,
     "vcams_lga_context": LGA_FIELDS,

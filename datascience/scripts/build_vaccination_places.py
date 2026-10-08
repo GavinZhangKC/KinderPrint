@@ -18,9 +18,8 @@ Method
 ------
 For each SA2, straight-line distance from its ABS label point to every active facility
 of the service types families use for childhood vaccines and advice: general practice,
-pharmacy, maternal and child health, and Aboriginal and Torres Strait Islander health
-services. The nearest facilities of each type within MAX_KM are kept, up to PER_TYPE
-(ABORIGINAL_PER_TYPE for Aboriginal health services). Facilities in neighbouring
+pharmacy, and maternal and child health. The nearest facilities of each type within
+MAX_KM are kept, up to PER_TYPE. Facilities in neighbouring
 suburbs are included on purpose. The label point is a reference point for the area, not
 a family's address, and straight-line distance is not travel time. Listing does not
 confirm that a facility gives a particular vaccine or has appointments available.
@@ -53,10 +52,8 @@ KINDS = {
     "General practice service": "general_practice",
     "Pharmacy service": "pharmacy",
     "Maternal, child and family health service": "maternal_child_health",
-    "Aboriginal and Torres Strait Islander health service": "aboriginal_health",
 }
 PER_TYPE = 6
-ABORIGINAL_PER_TYPE = 2
 MAX_KM = 10.0
 SOURCE_ID = "ga_healthdirect_facilities_2025;abs_sa2_lga_label_point_2023"
 
@@ -88,9 +85,8 @@ def build_places(facilities: pd.DataFrame, points: pd.DataFrame, scope: pd.Serie
     for sa2 in points.itertuples():
         d = distances_km(sa2.label_point_latitude, sa2.label_point_longitude, lats, lons)
         for service_type, idx in groups.items():
-            limit = ABORIGINAL_PER_TYPE if KINDS[service_type] == "aboriginal_health" else PER_TYPE
             near = idx[d[idx] <= MAX_KM]
-            near = near[np.lexsort((facilities.facility_id.to_numpy()[near], d[near]))][:limit]
+            near = near[np.lexsort((facilities.facility_id.to_numpy()[near], d[near]))][:PER_TYPE]
             for rank, i in enumerate(near, start=1):
                 f = facilities.loc[i]
                 rows.append({

@@ -142,7 +142,7 @@ function buildFacets(topic: TopicId, p: Pick<Props, 'figures' | 'immunisation' |
   if (topic === 'brain') {
     const dev = context?.development
     const range = dev && has(dev.expected_vulnerable_pct) && has(dev.expected_range_pct[0]) && has(dev.expected_range_pct[1])
-      ? `Expected ${pct(dev.expected_vulnerable_pct)} for this community (range ${dev.expected_range_pct[0].toFixed(1)}–${pct(dev.expected_range_pct[1])}): ${dev.observed_vulnerable_pct! > dev.expected_range_pct[1] ? 'higher than expected' : dev.observed_vulnerable_pct! < dev.expected_range_pct[0] ? 'lower than expected' : 'within the expected range'}` : ''
+      ? `Expected ${pct(dev.expected_vulnerable_pct)} for this area (range ${dev.expected_range_pct[0].toFixed(1)}–${pct(dev.expected_range_pct[1])}): ${dev.observed_vulnerable_pct! > dev.expected_range_pct[1] ? 'higher than expected' : dev.observed_vulnerable_pct! < dev.expected_range_pct[0] ? 'lower than expected' : 'within the expected range'}` : ''
     const one = aedcFig('AEDC: vulnerable on 1 or more domains', aedc.vulnerableOne, 'need extra support in at least one area.', range, 'A snapshot of children in their first year of school; not a diagnostic assessment of any child.')
     if (one && has(aedc.vulnerableOne)) one.value = oneIn(aedc.vulnerableOne)
     const all = has(aedc.onTrackAll) ? { ...aedcFig('AEDC: on track in all five domains', aedc.onTrackAll, 'of children starting school are on track in all five areas of development.')!, value: pct(aedc.onTrackAll, 0) } : null

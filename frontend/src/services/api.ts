@@ -304,7 +304,7 @@ export interface SeasonalAir {
   months: SeasonalAirMonth[]
 }
 
-export type VaccinationPlaceKind = 'general_practice' | 'pharmacy' | 'maternal_child_health' | 'aboriginal_health'
+export type VaccinationPlaceKind = 'general_practice' | 'pharmacy' | 'maternal_child_health'
 
 export interface VaccinationPlace {
   kind: VaccinationPlaceKind

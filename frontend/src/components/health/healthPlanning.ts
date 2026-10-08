@@ -11,21 +11,14 @@ export interface ScheduleItem {
 /** National Immunisation Program childhood schedule, June 2026. */
 export const NIP_SCHEDULE: ScheduleItem[] = [
   { id: 'nip-birth', ageMonths: 0, when: 'Birth', vaccines: 'Hepatitis B', where: 'Hospital' },
-  { id: 'nip-2m', ageMonths: 2, when: '2 months', vaccines: 'Diphtheria, tetanus, whooping cough, hepatitis B, polio, Hib · Rotavirus · Pneumococcal', where: 'GP, council or community health' },
-  { id: 'nip-4m', ageMonths: 4, when: '4 months', vaccines: 'Diphtheria, tetanus, whooping cough, hepatitis B, polio, Hib · Rotavirus · Pneumococcal', where: 'GP, council or community health' },
-  { id: 'nip-6m', ageMonths: 6, when: '6 months', vaccines: 'Diphtheria, tetanus, whooping cough, hepatitis B, polio, Hib', where: 'GP, council or community health' },
-  { id: 'nip-12m', ageMonths: 12, when: '12 months', vaccines: 'Meningococcal ACWY · Measles, mumps, rubella · Pneumococcal', where: 'GP, council or community health' },
-  { id: 'nip-18m', ageMonths: 18, when: '18 months', vaccines: 'Hib · Measles, mumps, rubella, chickenpox · Diphtheria, tetanus, whooping cough', where: 'GP, council or community health' },
-  { id: 'nip-4y', ageMonths: 48, when: '4 years', vaccines: 'Diphtheria, tetanus, whooping cough, polio', where: 'GP, council or community health' },
+  { id: 'nip-2m', ageMonths: 2, when: '2 months', vaccines: 'Diphtheria, tetanus, whooping cough, hepatitis B, polio, Hib · Rotavirus · Pneumococcal', where: 'GP or council immunisation session' },
+  { id: 'nip-4m', ageMonths: 4, when: '4 months', vaccines: 'Diphtheria, tetanus, whooping cough, hepatitis B, polio, Hib · Rotavirus · Pneumococcal', where: 'GP or council immunisation session' },
+  { id: 'nip-6m', ageMonths: 6, when: '6 months', vaccines: 'Diphtheria, tetanus, whooping cough, hepatitis B, polio, Hib', where: 'GP or council immunisation session' },
+  { id: 'nip-12m', ageMonths: 12, when: '12 months', vaccines: 'Meningococcal ACWY · Measles, mumps, rubella · Pneumococcal', where: 'GP or council immunisation session' },
+  { id: 'nip-18m', ageMonths: 18, when: '18 months', vaccines: 'Hib · Measles, mumps, rubella, chickenpox · Diphtheria, tetanus, whooping cough', where: 'GP or council immunisation session' },
+  { id: 'nip-4y', ageMonths: 48, when: '4 years', vaccines: 'Diphtheria, tetanus, whooping cough, polio', where: 'GP or council immunisation session' },
   { id: 'nip-y7', ageMonths: 150, when: 'Year 7', vaccines: 'HPV · Diphtheria, tetanus, whooping cough', where: 'School immunisation program' },
   { id: 'nip-y10', ageMonths: 180, when: 'Year 10', vaccines: 'Meningococcal ACWY', where: 'School immunisation program' },
-]
-
-/** Additional NIP doses for Aboriginal and Torres Strait Islander children. */
-export const NIP_ABORIGINAL_ADDITIONS: ScheduleItem[] = [
-  { id: 'nip-menb-2m', ageMonths: 2, when: '2 months', vaccines: 'Meningococcal B', where: 'GP, council or community health' },
-  { id: 'nip-menb-4m', ageMonths: 4, when: '4 months', vaccines: 'Meningococcal B', where: 'GP, council or community health' },
-  { id: 'nip-menb-12m', ageMonths: 12, when: '12 months', vaccines: 'Meningococcal B', where: 'GP, council or community health' },
 ]
 
 export type ScheduleStatus = 'done' | 'catch-up' | 'due-soon' | 'upcoming' | 'school'

@@ -140,7 +140,7 @@ function SideNavigation({ current, onChange, onHome }: { current: HealthView; on
       return <button key={item.id} type="button" className={selected ? 'is-active' : undefined} aria-current={selected ? 'page' : undefined} disabled={!item.enabled} title={item.enabled ? undefined : `${item.label} is planned for a later release`} onClick={() => item.enabled && onChange(item.id as HealthView)}><span aria-hidden="true">{item.symbol}</span><b>{item.label}</b>{!item.enabled && <small>Planned</small>}</button>
     })}</nav>
     <footer><span>⌖</span><div><strong>Melbourne</strong><small>SA2 reporting localities</small></div></footer>
-    <div className="dh-community-mark"><i>▥</i><span>Evidence<br />for brighter futures</span></div>
+    <div className="dh-brand-mark"><i>▥</i><span>Evidence<br />for brighter futures</span></div>
   </aside>
 }
 

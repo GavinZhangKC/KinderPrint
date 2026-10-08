@@ -483,7 +483,7 @@ def digital_health_practitioner_context(
                  "out-of-fold (leave-one-SA4-out); bands from an overdispersed funnel (Higher z >= 1.28)",
         "access_source": "Enhanced two-step floating catchment (Gaussian, 5 km) on healthdirect GP practices and "
                          "ACECQA approved places; demand from VIF2023 2026 projections",
-        "geographic_unit": "AEDC community (one or more SA2s) for development; SA2 for access",
+        "geographic_unit": "AEDC reporting area (one or more SA2s) for development; SA2 for access",
         "interpretation": "An area-level shortlist for investigation by practitioners. Not a diagnosis, not a "
                           "prediction for any child, and not a judgement of services. Access uses straight-line "
                           "distance, not travel time or vacancies.",

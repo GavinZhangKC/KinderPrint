@@ -298,7 +298,7 @@ export function TodayPractitioner({ locality, controls, immunisation, asthma, as
   const [lo, hi] = dev?.expected_range_pct ?? [null, null]
   const devStatus = dev?.observed_vulnerable_pct == null || lo == null || hi == null ? null : dev.observed_vulnerable_pct > hi ? 'higher' : dev.observed_vulnerable_pct < lo ? 'lower' : 'within'
   const findings: ReactNode[] = []
-  if (devStatus) findings.push(<>Developmental vulnerability at school entry is <b>{devStatus === 'within' ? 'within the expected range' : `${devStatus} than expected`}</b> for a community like {locality.name}.</>)
+  if (devStatus) findings.push(<>Developmental vulnerability at school entry is <b>{devStatus === 'within' ? 'within the expected range' : `${devStatus} than expected`}</b> for an area like {locality.name}.</>)
   if (twoYear?.pha.percent != null && twoYear.victoria?.percent != null) findings.push(<>Immunisation at 24 months is <b>{twoYear.pha.percent >= twoYear.victoria.percent ? 'above' : 'below'} the Victorian rate</b>{twoYear.pha.percent < 95 ? ' but below the 95% national target' : ' and meets the 95% national target'}.</>)
   if (access?.general_practice.percentile != null && access.early_childhood_education_and_care.percentile != null) {
     const both = access.general_practice.percentile >= 50 && access.early_childhood_education_and_care.percentile >= 50
@@ -337,7 +337,7 @@ export function TodayPractitioner({ locality, controls, immunisation, asthma, as
             <div className="kt-value-row"><strong>{pct(dev.observed_vulnerable_pct)}</strong>{devStatus && devStatus !== 'within' && <span className="kt-badge"><Icon d={devStatus === 'higher' ? 'M12 19V5M6 11l6-6 6 6' : 'M12 5v14M6 13l6 6 6-6'} />{devStatus === 'higher' ? 'Higher' : 'Lower'} than expected</span>}</div>
             {lo != null && hi != null && dev.expected_vulnerable_pct != null && <div className="kt-range" role="img" aria-label={`Observed ${pct(dev.observed_vulnerable_pct)}. Expected ${pct(dev.expected_vulnerable_pct)}, likely range ${pct(lo)} to ${pct(hi)}.`}>
               <div className="kt-track"><i className="band" style={{ left: scale(lo, 0, 30), width: `calc(${scale(hi, 0, 30)} - ${scale(lo, 0, 30)})` }} /><i className="exp" style={{ left: scale(dev.expected_vulnerable_pct, 0, 30) }} /><i className="obs" style={{ left: scale(dev.observed_vulnerable_pct, 0, 30) }} /></div>
-              <span>Expected {pct(dev.expected_vulnerable_pct)} (likely range {pct(lo)}–{pct(hi)}), based on community characteristics.</span>
+              <span>Expected {pct(dev.expected_vulnerable_pct)} (likely range {pct(lo)}–{pct(hi)}), based on the area’s characteristics.</span>
             </div>}
             <p className="kt-meta">AEDC 2024. {locality.name} SA2. {num(dev.children_assessed)} children in their first year of school.</p>
           </>}
