@@ -243,3 +243,13 @@ html[data-kt-theme] .health-page-shell>.nav-shell :focus-visible{outline:3px sol
 @media (max-width:640px){.kt-tabs{flex-wrap:nowrap;overflow-x:auto;max-width:100%;scrollbar-width:none}.kt-tabs::-webkit-scrollbar{display:none}}
 .kt-theme-parent .kh-foot,.kt-theme-prac .kh-foot{font-size:var(--fs-meta);color:var(--kt-ink2)}
 .kt-tabs button,.vx-tabs button,.vx-filters button{white-space:nowrap}
+
+/* One typeface across the Child Health pages: Manrope for titles, headings, body, data and controls.
+   Hierarchy comes from size and weight (the type scale above), not from mixing families. */
+.kp-hub.kt-theme-parent,.kp-hub.kt-theme-prac{--kh-display:var(--kh-body)}
+.kp-hub.kt-theme-parent :is(h1,h2,h3,h4,h5,h6,button,input,select,textarea,label,summary,dialog),
+.kp-hub.kt-theme-prac :is(h1,h2,h3,h4,h5,h6,button,input,select,textarea,label,summary,dialog){font-family:var(--kh-body)}
+.kt h1,.kt-hero h1,.hd-intro h1{font-weight:800;letter-spacing:-.02em}
+.kt h2,.vx-dialog-head h2{font-weight:800;letter-spacing:-.01em}
+.kt h3{font-weight:700;letter-spacing:0}
+.kt .kh-btn,.kt [role=tab],.kp-hub.kt-theme-parent .kh-nav button,.kp-hub.kt-theme-prac .kh-nav button,.kp-hub.kt-theme-parent .kh-seg button,.kp-hub.kt-theme-prac .kh-seg button{font-weight:700}
