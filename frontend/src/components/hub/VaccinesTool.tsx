@@ -250,7 +250,7 @@ function Finder({ places, under5, locality }: { places: Places; under5: boolean;
         </li>)}</ol>
         {filter !== 'council' && visible.length > shown.length && <button type="button" className="kh-btn" onClick={() => setMore(true)}>Show {visible.length - shown.length} more</button>}
         {filter !== 'council' && !visible.length && <p className="kt-empty">No listed {filter === 'all' ? 'places' : KIND[filter as VaccinationPlaceKind].plural.toLowerCase()} within 10 km.</p>}
-        <p className="ht-care-note">Straight-line distances. Call ahead: listed places may not have appointments available.</p>
+        <p className="kt-limit">Call ahead: listed places may not have appointments available. Distances are straight-line.</p>
       </div>
     </div>
     {open === 'council' && council && <Dialog title={`${council.council_name} immunisation sessions`} onClose={() => setOpen(null)}>
@@ -262,7 +262,8 @@ function Finder({ places, under5, locality }: { places: Places; under5: boolean;
       <p className="vx-when">{KIND[open.kind].label} · {open.distance_km.toFixed(1)} km</p>
       <dl className="vx-facts"><dt>Address</dt><dd>{open.address}</dd><dt>For your child</dt><dd className={note(open.kind)[1] ? 'is-warn' : undefined}>{note(open.kind)[0]}</dd></dl>
       <div className="ht-actions"><a className="kh-btn primary" href={directions(open)} target="_blank" rel="noreferrer">Directions</a></div>
-      <p className="ht-care-note">National Health Services Directory, March 2025. Call ahead to check appointments.</p>
+      <p className="kt-limit">Call ahead to check appointments.</p>
+      <p className="ht-care-note">National Health Services Directory, March 2025.</p>
     </Dialog>}
   </>
 }
@@ -321,7 +322,7 @@ function ProximityMap({ places, visible, number, onSelect }: { places: Vaccinati
     <svg viewBox="-2.4 -2.4 4.8 4.8" role="img" aria-label={`Map of ${visible.length} places within ${radius} km of the centre of the area`}>
       {[...rings].reverse().map(r => <g key={r}><circle r={r * scale} className={r === radius ? 'vx-ring-out' : 'vx-ring'} /><text x="0" y={-r * scale - .05} textAnchor="middle">{r} km</text></g>)}
       {[...visible].reverse().map(p => { const [x, y] = pos(p); return <g key={placeKey(p)} transform={`translate(${x.toFixed(3)} ${y.toFixed(3)})`} className="vx-pin" onClick={() => onSelect(p)}>
-        <title>{p.name}</title><circle r=".15" fill={KIND[p.kind].color} className="vx-dot" /><text y=".045" textAnchor="middle" className="vx-dot-n">{number.get(placeKey(p))}</text>
+        <title>{p.name}</title><circle r=".19" fill={KIND[p.kind].color} className="vx-dot" /><text y=".06" textAnchor="middle" className="vx-dot-n">{number.get(placeKey(p))}</text>
       </g> })}
       <circle r=".07" className="vx-home" /><circle r=".13" className="vx-home-ring" />
     </svg>
@@ -375,18 +376,20 @@ function PractitionerVaccines({ locality, controls, immunisation, phaName, onOpe
             </button>
           </li>)}</ol>
           <p className="ht-care-note">Dark tick: Victoria. Amber tick: 95% national target.</p>
+          <p className="kt-limit">Late recording on the Australian Immunisation Register can understate coverage.</p>
           <div className="ht-actions"><button type="button" className="kh-btn" onClick={copy}>{copied ? 'Copied' : 'Copy table'}</button></div>
         </> : <p className="kt-empty">Coverage for this area isn’t published.</p>)}
         {tab === 'measures' && <>
           <p className="kt-sub">A child counts as fully immunised when the doses due before the checkpoint are recorded on the Australian Immunisation Register.</p>
-          <div className="kt-card kt-tint ht-stages">{cover.map(item => <div key={item.indicator_id}><span className="ht-range">{item.age}</span><h3>{MEASURES[item.age] ?? 'Doses due before this age'}</h3></div>)}</div>
+          <div className="ht-stages">{cover.map(item => <div key={item.indicator_id}><span className="ht-range">{item.age}</span><h3>{MEASURES[item.age] ?? 'Doses due before this age'}</h3></div>)}</div>
         </>}
         {tab === 'planning' && <ol className="ht-questions">{QUESTIONS.map((text, index) => <li key={text}><span aria-hidden="true">{index + 1}</span>{text}</li>)}</ol>}
         {tab === 'access' && <>
           {care.length ? <ul className="ht-care">{care.map(place => <li key={place.kind}><span><b>{place.name}</b><span>{KIND[place.kind].label} · {place.suburb}</span></span><b>{place.distance_km.toFixed(1)} km</b></li>)}</ul>
             : <p className="kt-empty">{places.loading ? 'Loading nearby services…' : 'No listed services nearby.'}</p>}
           {places.data?.council && <p className="ht-care-note">Council sessions: <a href={places.data.council.immunisation_url} target="_blank" rel="noreferrer">{places.data.council.council_name}</a>, {places.data.council.phone}.</p>}
-          <p className="ht-care-note">Listed presence does not mean availability, capacity or quality.{gp && has(gp.percentile) ? ` GP access is at the ${ordinal(gp.percentile)} percentile of Victorian SA2s.` : ''}</p>
+          <p className="kt-limit">Listed presence does not mean availability, capacity or quality.</p>
+          {gp && has(gp.percentile) && <p className="ht-care-note">GP access is at the {ordinal(gp.percentile)} percentile of Victorian SA2s.</p>}
           <button type="button" className="kh-btn kt-link-btn" onClick={onOpenCare}>Open care access</button>
         </>}
       </div>
@@ -402,8 +405,9 @@ function PractitionerVaccines({ locality, controls, immunisation, phaName, onOpe
         <dt>95% target</dt><dd>{shortOf(detail.pha.numerator as number, detail.pha.denominator as number) ? `${shortOf(detail.pha.numerator as number, detail.pha.denominator as number)} more children needed` : 'Met'}</dd>
         {has(detail.pha_percentile_in_victoria) && <><dt>Rank</dt><dd>{ordinal(detail.pha_percentile_in_victoria)} percentile of {detail.victoria?.pha_count ?? ''} Victorian PHAs</dd></>}
         <dt>Measures</dt><dd>{MEASURES[detail.age] ?? 'Doses due before this age'}</dd>
-        <dt>Source</dt><dd>Australian Immunisation Register via PHIDU, {detail.reference_period}. Late recording can understate coverage.</dd>
+        <dt>Source</dt><dd>Australian Immunisation Register via PHIDU, {detail.reference_period}</dd>
       </dl>
+      <p className="kt-limit">Late recording can understate coverage.</p>
     </Dialog>}
   </div>
 }

@@ -419,7 +419,7 @@ export default function KinderHub({ locality, data, onSelectLocality, onOpenPlan
         {page === 'seasons' && <SeasonsPage {...context} />}
         {page === 'care' && <CarePage {...context} />}
       </main>
-      <footer className="kh-foot">Area-level evidence. KinderPrint does not diagnose a child or give medical advice. In an emergency call 000.</footer>
+      <footer className="kh-foot">Area-level evidence. Vkinder does not diagnose a child or give medical advice. In an emergency call 000.</footer>
     </div>
   </div>
 }

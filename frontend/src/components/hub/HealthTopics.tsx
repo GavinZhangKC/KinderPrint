@@ -278,16 +278,17 @@ export default function HealthTopics(props: Props) {
         <p className="kt-sub">{facet ? (parent ? `${facet.label}: ${facet.one}` : `${facet.label}: measure, value, comparison, then period and source.`) : ''}</p>
         {facet && facet.figures.length > 0 ? facet.figures.map(item => parent
           ? <div key={item.measure} className="ht-fig"><strong>{item.value}</strong><p>{item.text}</p><small>{item.source}, {item.period}</small></div>
-          : <div key={item.measure} className="ht-fig"><b className="ht-measure">{item.measure}</b><p className="ht-value"><strong>{item.exact ?? item.value}</strong><span className={`ht-geo${item.geo === 'SA2' ? ' is-sa2' : ''}`}>{item.geo}</span></p>{item.cmp && <p>{item.cmp}</p>}<small>{item.period} · {item.source} · {item.where}. {item.limit}</small></div>)
+          : <div key={item.measure} className="ht-fig"><b className="ht-measure">{item.measure}</b><p className="ht-value"><strong>{item.exact ?? item.value}</strong><span className={`ht-geo${item.geo === 'SA2' ? ' is-sa2' : ''}`}>{item.geo}</span></p>{item.cmp && <p>{item.cmp}</p>}<small>{item.period} · {item.source} · {item.where}</small></div>)
           : <p className="kt-empty ht-fig">No published figure for {locality.name} on this focus.</p>}
-        {parent && <p className="ht-note">These describe children in the area, not your child.</p>}
+        {parent ? <p className="kt-limit">These describe children in the area, not your child.</p>
+          : facet && facet.figures.length > 0 && <p className="kt-limit"><span><b>Limitations.</b> {[...new Set(facet.figures.map(item => item.limit))].join(' ')}</span></p>}
       </section>
     </div>
 
     <section aria-labelledby="ht-stages">
       <h2 id="ht-stages">{parent ? 'What matters at each age' : 'Evidence across childhood'}</h2>
       <p className="kt-sub">{parent ? (highlight >= 0 ? 'Your child’s age group is highlighted. Change it in the age selector above.' : 'From pregnancy through the first year.') : 'Which data source describes each life stage for this topic.'}</p>
-      <div className="kt-card kt-tint ht-stages">{stages.map(([range, name, text], index) => <div key={range} className={index === highlight ? 'is-current' : undefined}>
+      <div className="ht-stages">{stages.map(([range, name, text], index) => <div key={range} className={index === highlight ? 'is-current' : undefined}>
         <span className="ht-range">{range}</span><h3>{name}</h3><p>{text}</p>
       </div>)}</div>
     </section>
@@ -317,7 +318,8 @@ export default function HealthTopics(props: Props) {
         <h2 id="ht-care">{parent ? 'Care nearby' : 'Access to care'}</h2>
         {care.length > 0 ? <ul className="ht-care">{care.map(item => <li key={item.name}><span><b>{item.name}</b><span>{item.service_type.replace(/ service$/, '')}</span></span><b>{item.distance_km.toFixed(1)} km</b></li>)}</ul>
           : <p className="kt-empty">{services ? 'No matching services listed near this locality.' : 'Loading nearby services…'}</p>}
-        <p className="ht-care-note">{parent ? 'Listed services may not have appointments available. In an emergency call 000.' : `Listed presence does not mean availability, capacity or quality.${gp && has(gp.percentile) ? ` GP access is at the ${ordinal(gp.percentile)} percentile of Victorian SA2s.` : ''}`} National Health Services Directory{services?.services[0] ? `, ${MONTHS[Number(services.services[0].source_date.slice(5, 7)) - 1]} ${services.services[0].source_date.slice(0, 4)}` : ''}.</p>
+        <p className="kt-limit">{parent ? 'Listed services may not have appointments available. In an emergency call 000.' : 'Listed presence does not mean availability, capacity or quality.'}</p>
+        <p className="ht-care-note">{!parent && gp && has(gp.percentile) ? `GP access is at the ${ordinal(gp.percentile)} percentile of Victorian SA2s. ` : ''}National Health Services Directory{services?.services[0] ? `, ${MONTHS[Number(services.services[0].source_date.slice(5, 7)) - 1]} ${services.services[0].source_date.slice(0, 4)}` : ''}.</p>
         <button type="button" className="kh-btn kt-link-btn" onClick={onOpenCare}>{parent ? 'See all care nearby' : 'Open care access'}</button>
       </section>
     </div>

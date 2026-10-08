@@ -265,6 +265,9 @@ const num = (value: number | null | undefined) => value === null || value === un
 const ordinal = (n: number) => { const r = Math.round(n); const s = r % 100 >= 11 && r % 100 <= 13 ? 'th' : ['th', 'st', 'nd', 'rd', 'th', 'th', 'th', 'th', 'th', 'th'][r % 10]; return `${r}${s}` }
 const scale = (value: number, min: number, max: number) => `${Math.max(0, Math.min(100, (value - min) / (max - min) * 100))}%`
 
+type ContextTab = 'access' | 'air' | 'focus' | 'areas'
+const CONTEXT_TABS: Array<[ContextTab, string]> = [['access', 'Access to care'], ['air', 'Air quality'], ['focus', 'Prevention focus'], ['areas', 'About these areas']]
+
 interface PractitionerProps {
   locality: NeighbourhoodSearchResult
   controls: ReactNode
@@ -295,6 +298,7 @@ export function TodayPractitioner({ locality, controls, immunisation, asthma, as
   const airRows = air.data ? order.map(m => air.data!.months.find(row => row.month === m)).filter((row): row is NonNullable<typeof row> => Boolean(row)) : []
   const worst = air.data && air.data.months.length ? [...air.data.months].sort((a, b) => b.highest_daily_ug_m3 - a.highest_daily_ug_m3)[0] : null
 
+  const [ctxTab, setCtxTab] = useState<ContextTab>('access')
   const [lo, hi] = dev?.expected_range_pct ?? [null, null]
   const devStatus = dev?.observed_vulnerable_pct == null || lo == null || hi == null ? null : dev.observed_vulnerable_pct > hi ? 'higher' : dev.observed_vulnerable_pct < lo ? 'lower' : 'within'
   const findings: ReactNode[] = []
@@ -339,6 +343,7 @@ export function TodayPractitioner({ locality, controls, immunisation, asthma, as
               <div className="kt-track"><i className="band" style={{ left: scale(lo, 0, 30), width: `calc(${scale(hi, 0, 30)} - ${scale(lo, 0, 30)})` }} /><i className="exp" style={{ left: scale(dev.expected_vulnerable_pct, 0, 30) }} /><i className="obs" style={{ left: scale(dev.observed_vulnerable_pct, 0, 30) }} /></div>
               <span>Expected {pct(dev.expected_vulnerable_pct)} (likely range {pct(lo)}–{pct(hi)}), based on the area’s characteristics.</span>
             </div>}
+            <p className="kt-limit">A teacher-completed snapshot of children starting school, not an assessment of any individual child.</p>
             <p className="kt-meta">AEDC 2024. {locality.name} SA2. {num(dev.children_assessed)} children in their first year of school.</p>
           </>}
         </article>
@@ -350,6 +355,7 @@ export function TodayPractitioner({ locality, controls, immunisation, asthma, as
               <div className="kt-track"><i className="fill" style={{ width: scale(twoYear.pha.percent, 80, 98) }} />{twoYear.victoria?.percent != null && <i className="ref" style={{ left: scale(twoYear.victoria.percent, 80, 98) }} />}<i className="target" style={{ left: scale(95, 80, 98) }} /></div>
               <span>Victoria {pct(twoYear.victoria?.percent)}. National target 95%. Higher is better. {num(twoYear.pha.numerator)} of {num(twoYear.pha.denominator)} children.{oneYear?.pha.percent != null && fiveYear?.pha.percent != null ? ` At 12 months: ${pct(oneYear.pha.percent)}; at 5 years: ${pct(fiveYear.pha.percent)}.` : ''}</span>
             </div>
+            <p className="kt-limit">Late recording on the register can understate coverage.</p>
             <p className="kt-meta">Australian Immunisation Register via PHIDU, {twoYear.reference_period}. {phaName ?? 'Containing'} PHA.</p>
           </>}
         </article>
@@ -358,15 +364,18 @@ export function TodayPractitioner({ locality, controls, immunisation, asthma, as
           {asthma?.percent == null ? <p className="kt-empty">Not available for this locality.</p> : <>
             <div className="kt-value-row"><strong>{pct(asthma.percent, 2)}</strong></div>
             <span className="kt-note">{num(asthma.count)} of {num(asthma.population_denominator)} children.{asthmaRatio != null ? ` In the wider PHA, the age-standardised rate is about ${Math.abs(Math.round(100 - asthmaRatio))}% ${asthmaRatio < 100 ? 'below' : 'above'} Australia’s (ratio ${Math.round(asthmaRatio)}).` : ''}</span>
+            <p className="kt-limit">Reported by households in the Census; does not show how severe or well controlled asthma is.</p>
             <p className="kt-meta">ABS Census 2021, {locality.name} SA2{asthmaRatio != null ? '. PHIDU 2021, PHA' : ''}.</p>
           </>}
         </article>
       </div>
     </section>
 
-    <div className="kt-row kt-row-top">
-      <section className="kt-card kt-tint kt-half" aria-labelledby="kt-access">
-        <h2 id="kt-access">Access to care</h2>
+    <section className="kt-card kt-cream kt-context" aria-labelledby="kt-more">
+      <h2 id="kt-more">More context</h2>
+      <div className="kt-tabs" role="tablist" aria-label="More context">{CONTEXT_TABS.map(([id, label]) => <button key={id} type="button" role="tab" id={`kt-tab-${id}`} aria-selected={ctxTab === id} aria-controls="kt-ctx-panel" onClick={() => setCtxTab(id)}>{label}</button>)}</div>
+      <div id="kt-ctx-panel" role="tabpanel" aria-labelledby={`kt-tab-${ctxTab}`} className="kt-ctx-panel">
+        {ctxTab === 'access' && <>
         <table className="kt-table"><tbody>
           {access?.general_practice.percentile != null && <tr><th scope="row"><b>GP access</b><span>Better than {access.general_practice.percentile.toFixed(1)}% of Victorian SA2s. {access.general_practice.access_5km?.toFixed(1) ?? '—'} practices per 10,000 residents within 5 km, distance-weighted.</span></th><td>{ordinal(access.general_practice.percentile)}</td></tr>}
           {access?.early_childhood_education_and_care.percentile != null && <tr><th scope="row"><b>Childcare access</b><span>Better than {access.early_childhood_education_and_care.percentile.toFixed(1)}% of Victorian SA2s. {num(access.early_childhood_education_and_care.access_5km)} approved places per 100 children aged 0–4 within 5 km.</span></th><td>{ordinal(access.early_childhood_education_and_care.percentile)}</td></tr>}
@@ -374,32 +383,29 @@ export function TodayPractitioner({ locality, controls, immunisation, asthma, as
           <tr><th scope="row"><b>Services listed in the SA2</b></th><td className="kt-small">{services} health services · {num(childcareServices)} childcare services</td></tr>
         </tbody></table>
         <p className="kt-meta">Two-step floating catchment (E2SFCA). Healthdirect, March 2025. ACECQA.</p>
-      </section>
-
-      <section className="kt-card kt-tint kt-half" aria-labelledby="kt-air">
-        <h2 id="kt-air">Monthly average PM2.5, October to January</h2>
+        </>}
+        {ctxTab === 'air' && <>
+        <h3>Monthly average PM2.5, October to January</h3>
         {air.data?.station ? <>
-          <p className="kt-sub">{air.data.station.name} monitor, {air.data.station.distance_km.toFixed(1)} km away, {air.data.station.first_year}–{air.data.station.last_year}. Monitor readings, not local exposure.</p>
+          <p className="kt-sub">{air.data.station.name} monitor, {air.data.station.distance_km.toFixed(1)} km away, {air.data.station.first_year}–{air.data.station.last_year}.</p>
+          <p className="kt-limit">Readings at the nearest monitor, not exposure inside {locality.name}.</p>
           <table className="kt-table kt-air"><thead><tr><th scope="col">Month</th><th scope="col">Average daily level</th><th scope="col">Days above standard</th></tr></thead><tbody>
             {airRows.map(row => <tr key={row.month}><th scope="row">{MONTH_FULL[row.month - 1]}</th><td><span className="kt-airbar"><i style={{ width: `${Math.round(row.mean_daily_ug_m3 / 12 * 140)}px` }} />{row.mean_daily_ug_m3.toFixed(1)} µg/m³</span></td><td>{row.days_above_standard}</td></tr>)}
           </tbody></table>
           <p className="kt-meta">Daily standard {air.data.station.standard_ug_m3} µg/m³. Day counts are totals across all years.{worst ? ` Highest: ${worst.highest_daily_ug_m3} µg/m³ on ${new Date(worst.highest_daily_date).toLocaleDateString('en-AU', { day: 'numeric', month: 'long', year: 'numeric' })}.` : ''} EPA Victoria.</p>
         </> : <p className="kt-empty">{air.loading ? 'Loading…' : 'No air monitor data is available for this locality.'}</p>}
-      </section>
-    </div>
-
-    <div className="kt-row kt-row-top">
-      <section className="kt-card kt-tint kt-half" aria-labelledby="kt-focus">
+        </>}
+        {ctxTab === 'focus' && <>
         <span className="kt-pill">{focus.months}</span>
-        <h2 id="kt-focus">Prevention focus: {focus.title.toLowerCase()}</h2>
+        <h3>Prevention focus: {focus.title.toLowerCase()}</h3>
         <ul className="kt-findings kt-one">{focus.questions.map(question => <li key={question}>{question}</li>)}</ul>
         <button type="button" className="kt-inline-link" onClick={() => onGo('seasons')}>Open seasonal prevention</button>
-      </section>
-      <section className="kt-card kt-tint kt-half" aria-labelledby="kt-geo">
-        <h2 id="kt-geo">About these areas</h2>
+        </>}
+        {ctxTab === 'areas' && <>
         <p><b>SA2</b> (Statistical Area Level 2) is the {locality.name} suburb area defined by the ABS.</p>
         <p><b>PHA</b> (Population Health Area){phaName ? ` ${phaName}` : ''} can combine neighbouring suburbs, so its figures may describe a larger population. PHA values are never assigned to the SA2.</p>
-      </section>
-    </div>
+        </>}
+      </div>
+    </section>
   </div>
 }
