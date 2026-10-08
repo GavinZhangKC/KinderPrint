@@ -2204,3 +2204,74 @@ html:has(.simulation-shell) body::-webkit-scrollbar {
     animation: none;
   }
 }
+
+.simulation-results-pager {
+  display: flex;
+  justify-content: center;
+  margin-top: 16px;
+}
+
+.simulation-results-pager > button {
+  position: absolute;
+  top: 50%;
+  z-index: 3;
+  width: 40px;
+  height: 40px;
+  padding: 0 0 4px;
+  border: 0;
+  border-radius: 50%;
+  background: var(--brand);
+  color: #fff;
+  font-size: 26px;
+  line-height: 1;
+  box-shadow: 0 4px 12px rgba(45, 75, 118, .25);
+  transform: translateY(-50%);
+  cursor: pointer;
+}
+
+.simulation-results-pager > button.prev {
+  left: 6px;
+}
+
+.simulation-results-pager > button.next {
+  right: 6px;
+}
+
+.simulation-results-pager > button:disabled {
+  opacity: .35;
+  cursor: default;
+}
+
+.simulation-results-dots {
+  display: flex;
+  gap: 8px;
+}
+
+.simulation-results-dots button {
+  width: 10px;
+  height: 10px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(70, 100, 170, .28);
+  cursor: pointer;
+}
+
+.simulation-results-dots button.active {
+  width: 24px;
+  border-radius: 999px;
+  background: var(--brand);
+}
+
+.simulation-panel.simulation-results-panel {
+  padding-left: 56px;
+  padding-right: 56px;
+}
+
+.simulation-results-pager > button.prev {
+  left: 8px;
+}
+
+.simulation-results-pager > button.next {
+  right: 8px;
+}

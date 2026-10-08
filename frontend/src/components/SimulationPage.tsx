@@ -68,6 +68,7 @@ interface SavedScenario {
   savedAt: string
 }
 
+const RESULTS_PAGES = ['Environment map', 'Outcomes', 'Comparison', 'Drivers']
 const SAVED_SCENARIOS_STORAGE_KEY = 'kinderprint-simulation-scenarios'
 const GREATER_MELBOURNE_BOUNDARY_BBOX = '144.0,-38.6,145.9,-37.2'
 const MAP_FACTOR_COLORS = ['#b96361', '#d08e6d', '#d9bb70', '#92b49a', '#338b7b']
@@ -775,6 +776,7 @@ export default function SimulationPage({
   const [aiModel, setAiModel] = useState<AiSimulationModel | null>(null)
   const [scenarioLoading, setScenarioLoading] = useState(false)
   const [insightExpanded, setInsightExpanded] = useState(false)
+  const [resultsPage, setResultsPage] = useState(0)
   const [updateStatus, setUpdateStatus] = useState<SimulationUpdateStatus>('idle')
   const [showResults, setShowResults] = useState(false)
   const [scenarioError, setScenarioError] = useState<string | null>(null)
@@ -1555,6 +1557,7 @@ export default function SimulationPage({
               <span>Visual transition · not a future timeline</span>
             </div>
 
+            {resultsPage === 0 && <>
             {environmentRadar && <section className="simulation-environment-radar" aria-labelledby="simulation-radar-title">
               <div className="simulation-radar-copy">
                 <h3 id="simulation-radar-title">Environment fingerprint</h3>
@@ -1648,7 +1651,9 @@ export default function SimulationPage({
               </div>}
               <p className="simulation-factor-map-note">The map colors non-selected SA2s by observed values; it does not distribute the selected scenario across surrounding areas.</p>
             </section>
+            </>}
 
+            {resultsPage === 1 && <>
             <div className="outcome-summary-strip" aria-label="Outcome summary">
               {outcomeSummaries.map((item) => <div className={`outcome-summary-item ${item.tone}`} key={item.label}>
                 <span>{item.label}</span>
@@ -1731,7 +1736,9 @@ export default function SimulationPage({
                 )
               })}
             </div>
+            </>}
 
+            {resultsPage === 2 && <>
             <section className="simulation-scenario-comparison" aria-labelledby="simulation-scenario-comparison-title">
               <div className="simulation-driver-header">
                 <div>
@@ -1785,7 +1792,9 @@ export default function SimulationPage({
                   </div>
                 </div>}
             </section>
+            </>}
 
+            {resultsPage === 3 && <>
             <section className="simulation-driver-breakdown" aria-labelledby="simulation-driver-title">
               <div className="simulation-driver-header">
                 <div>
@@ -1868,6 +1877,23 @@ export default function SimulationPage({
                 </div>
               </div>}
             </div>
+            </>}
+
+            <nav className="simulation-results-pager" aria-label="Results pages">
+              <button type="button" className="prev" aria-label="Previous page" disabled={resultsPage === 0} onClick={() => setResultsPage((page) => Math.max(page - 1, 0))}>‹</button>
+              <div className="simulation-results-dots">
+                {RESULTS_PAGES.map((label, index) => <button
+                  type="button"
+                  key={label}
+                  className={index === resultsPage ? 'active' : ''}
+                  aria-label={`${label} (page ${index + 1} of ${RESULTS_PAGES.length})`}
+                  aria-current={index === resultsPage ? 'page' : undefined}
+                  title={label}
+                  onClick={() => setResultsPage(index)}
+                />)}
+              </div>
+              <button type="button" className="next" aria-label={`Next: ${RESULTS_PAGES[Math.min(resultsPage + 1, RESULTS_PAGES.length - 1)]}`} disabled={resultsPage === RESULTS_PAGES.length - 1} onClick={() => setResultsPage((page) => Math.min(page + 1, RESULTS_PAGES.length - 1))}>›</button>
+            </nav>
 
           </section>}
         </div>
