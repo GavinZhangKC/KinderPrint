@@ -197,3 +197,19 @@
   .kt-card{box-shadow:none;break-inside:avoid}
 }
 .kt-findings.kt-one{grid-template-columns:minmax(0,1fr);margin-bottom:12px}
+
+/* Site header and page background around the themed hub pages (set by KinderHub on <html>). */
+html[data-kt-theme=parent] .health-page-shell{background:linear-gradient(180deg,#FCFBF3 0%,#F5F8EA 45%,#FFF8E4 100%)}
+html[data-kt-theme=prac] .health-page-shell{background:linear-gradient(180deg,#F3F8FA 0%,#EEF5F8 100%)}
+html[data-kt-theme] .health-page-shell>.nav-shell{border:1px solid;backdrop-filter:blur(14px)}
+html[data-kt-theme=parent] .health-page-shell>.nav-shell{background:rgba(255,253,246,.9);border-color:#DCE3C8;box-shadow:0 10px 28px -18px rgba(32,63,48,.45)}
+html[data-kt-theme=prac] .health-page-shell>.nav-shell{background:rgba(255,255,255,.92);border-color:#D5E5EA;box-shadow:0 10px 28px -18px rgba(18,49,74,.45)}
+html[data-kt-theme=parent] .health-page-shell>.nav-shell .brand-button{color:#355C38}
+html[data-kt-theme=prac] .health-page-shell>.nav-shell .brand-button{color:#146171}
+html[data-kt-theme=parent] .health-page-shell>.nav-shell .nav-links{color:#465B42}
+html[data-kt-theme=prac] .health-page-shell>.nav-shell .nav-links{color:#466174}
+html[data-kt-theme=parent] .health-page-shell>.nav-shell .nav-links button:hover,html[data-kt-theme=parent] .health-page-shell>.nav-shell .nav-links .active{color:#203F30}
+html[data-kt-theme=prac] .health-page-shell>.nav-shell .nav-links button:hover,html[data-kt-theme=prac] .health-page-shell>.nav-shell .nav-links .active{color:#12314A}
+html[data-kt-theme=parent] .health-page-shell>.nav-shell .nav-links .active::after{background:#536B35}
+html[data-kt-theme=prac] .health-page-shell>.nav-shell .nav-links .active::after{background:#176477}
+html[data-kt-theme] .health-page-shell>.nav-shell :focus-visible{outline:3px solid currentColor;outline-offset:2px}

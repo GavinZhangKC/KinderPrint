@@ -373,6 +373,13 @@ export default function KinderHub({ locality, data, onSelectLocality, onOpenPlan
   const today = page === 'home'
   const themed = today || page === 'day' || page === 'health' || page === 'vaccines'
   const themeClass = themed ? (parent ? ' kt-theme-parent' : ' kt-theme-prac') : ''
+  // Let the site header and page background around the hub take the same audience theme.
+  useEffect(() => {
+    const root = document.documentElement
+    if (themed) root.dataset.ktTheme = parent ? 'parent' : 'prac'
+    else delete root.dataset.ktTheme
+    return () => { delete root.dataset.ktTheme }
+  }, [themed, parent])
 
   return <div className={`kp-hub ${parent ? 'is-parent' : 'is-practitioner'}${themeClass}`} data-page={page}>
     <div className="kh-shell">
