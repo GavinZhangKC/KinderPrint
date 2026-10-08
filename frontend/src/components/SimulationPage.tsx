@@ -69,6 +69,12 @@ interface SavedScenario {
 }
 
 const RESULTS_PAGES = ['Environment map', 'Outcomes', 'Comparison', 'Drivers']
+const QUICK_PRESET_OPTIONS: Array<{ id: QuickPresetId; label: string }> = [
+  { id: 'custom', label: 'Custom' },
+  { id: 'greener-streets', label: 'Greener streets' },
+  { id: 'traffic-calming', label: 'Traffic calming' },
+  { id: 'more-open-space', label: 'More open space' },
+]
 const SAVED_SCENARIOS_STORAGE_KEY = 'kinderprint-simulation-scenarios'
 const GREATER_MELBOURNE_BOUNDARY_BBOX = '144.0,-38.6,145.9,-37.2'
 const MAP_FACTOR_COLORS = ['#b96361', '#d08e6d', '#d9bb70', '#92b49a', '#338b7b']
@@ -206,7 +212,14 @@ type ComparisonMetric = {
 type SimulationUpdateStatus = 'idle' | 'updating' | 'updated'
 
 function formatMetricValue(value: number, unit: string) {
+  if (Math.abs(value) >= 1000) return `${(value / 1000).toFixed(1)}k${unit}`
   return `${value.toFixed(1)}${unit}`
+}
+
+function renderReadoutValue(value: number | null, unit: string, fallback: string) {
+  if (value === null) return <strong>{fallback}</strong>
+  if (unit.trim().length <= 3) return <strong>{formatMetricValue(value, unit)}</strong>
+  return <><strong>{formatMetricValue(value, '')}</strong><span className="comparison-readout-unit">{unit.trim()}</span></>
 }
 
 function formatContribution(value: number | null) {
@@ -253,12 +266,6 @@ function formatEnvironmentValue(feature: EnvironmentFeature, value: number) {
   return `${value.toFixed(1)}%`
 }
 
-function formatHeldOutMae(model: AiLinearModel | null | undefined) {
-  return model?.sa3HeldOutMae === null || model?.sa3HeldOutMae === undefined || model.sa3HeldOutR2 === null
-    ? 'Validation unavailable'
-    : `${model.sa3HeldOutMae.toFixed(1)} pp MAE · R² ${model.sa3HeldOutR2.toFixed(2)}`
-}
-
 function metricDirection(metric: ComparisonMetric) {
   if (metric.baseline === null || metric.simulated === null) {
     return {
@@ -299,27 +306,6 @@ function outcomeDirection(baseline: number, simulated: number, lowerIsBetter = f
   const delta = simulated - baseline
   if (Math.abs(delta) < 0.1) return { status: 'No change', tone: 'neutral' as const, symbol: '→' }
   const improves = lowerIsBetter ? delta < 0 : delta > 0
-  return improves
-    ? { status: 'Improves', tone: 'improves' as const, symbol: '↗' }
-    : { status: 'Worsens', tone: 'worsens' as const, symbol: '↘' }
-}
-
-function outcomeModelDirection(
-  baseline: number | null,
-  simulated: number | null,
-  range: OutcomeRange | null,
-  lowerIsBetter = false,
-) {
-  if (simulated === null || baseline === null) {
-    return { status: 'No estimate', tone: 'neutral' as const, symbol: '—' }
-  }
-  if (range === null) {
-    return { status: 'Validation unavailable', tone: 'neutral' as const, symbol: '—' }
-  }
-  if (range.low <= baseline && range.high >= baseline) {
-    return { status: 'Unclear within held-out range', tone: 'neutral' as const, symbol: '≈' }
-  }
-  const improves = lowerIsBetter ? range.high < baseline : range.low > baseline
   return improves
     ? { status: 'Improves', tone: 'improves' as const, symbol: '↗' }
     : { status: 'Worsens', tone: 'worsens' as const, symbol: '↘' }
@@ -771,6 +757,8 @@ export default function SimulationPage({
   const [factorMapShapes, setFactorMapShapes] = useState<FactorMapShape[]>([])
   const [factorMapStatus, setFactorMapStatus] = useState<'loading' | 'available' | 'unavailable'>('loading')
   const [mapFactor, setMapFactor] = useState<EnvironmentFeature>('treeCanopy')
+  const [mapFactorOpen, setMapFactorOpen] = useState(false)
+  const mapFactorWrapRef = useRef<HTMLDivElement>(null)
   const [isPlayingScenario, setIsPlayingScenario] = useState(false)
   const [playbackProgress, setPlaybackProgress] = useState(0)
   const [aiModel, setAiModel] = useState<AiSimulationModel | null>(null)
@@ -781,6 +769,8 @@ export default function SimulationPage({
   const [showResults, setShowResults] = useState(false)
   const [scenarioError, setScenarioError] = useState<string | null>(null)
   const searchWrapRef = useRef<HTMLDivElement>(null)
+  const presetWrapRef = useRef<HTMLDivElement>(null)
+  const [presetOpen, setPresetOpen] = useState(false)
   const autoRunPendingRef = useRef(false)
   const playbackFrameRef = useRef<number | null>(null)
   const playbackTargetRef = useRef<ScenarioValues | null>(null)
@@ -969,6 +959,42 @@ export default function SimulationPage({
       })
     return () => { cancelled = true }
   }, [])
+
+  useEffect(() => {
+    if (!mapFactorOpen) return
+
+    const handlePointerDown = (event: PointerEvent) => {
+      if (!mapFactorWrapRef.current?.contains(event.target as Node)) setMapFactorOpen(false)
+    }
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setMapFactorOpen(false)
+    }
+
+    document.addEventListener('pointerdown', handlePointerDown)
+    document.addEventListener('keydown', handleKeyDown)
+    return () => {
+      document.removeEventListener('pointerdown', handlePointerDown)
+      document.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [mapFactorOpen])
+
+  useEffect(() => {
+    if (!presetOpen) return
+
+    const handlePointerDown = (event: PointerEvent) => {
+      if (!presetWrapRef.current?.contains(event.target as Node)) setPresetOpen(false)
+    }
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setPresetOpen(false)
+    }
+
+    document.addEventListener('pointerdown', handlePointerDown)
+    document.addEventListener('keydown', handleKeyDown)
+    return () => {
+      document.removeEventListener('pointerdown', handlePointerDown)
+      document.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [presetOpen])
 
   useEffect(() => {
     if (!showSearchResults) return
@@ -1217,11 +1243,6 @@ export default function SimulationPage({
       unavailableReason: scenarioResult?.socialCompetenceUnavailableReason ?? 'Estimate pending',
     },
   ] : []
-  const outcomeSummaries = baseline ? [
-    { label: 'Physical health', ...outcomeModelDirection(baseline.physicalHealth, scenarioResult?.physicalHealth ?? null, scenarioResult?.physicalHealthRange ?? null) },
-    { label: 'Social competence', ...outcomeModelDirection(baseline.socialCompetence, scenarioResult?.socialCompetence ?? null, scenarioResult?.socialCompetenceRange ?? null) },
-    { label: 'Developmental vulnerability', ...outcomeModelDirection(baseline.vulnerability, scenarioResult?.vulnerability ?? null, scenarioResult?.vulnerabilityRange ?? null, true) },
-  ] : []
   const hasScenarioChanges = Boolean(baseline && ENVIRONMENT_FEATURES.some((feature) =>
     Math.abs(scenarioValues[feature] - baseline[feature]) >= 0.01))
   const savedScenarioComparisons = baseline && aiModel
@@ -1385,17 +1406,35 @@ export default function SimulationPage({
               <h3>Environmental factors</h3>
               <div className="simulation-preset-controls">
                 <label htmlFor="simulation-quick-preset">Quick scenario</label>
-                <select
-                  id="simulation-quick-preset"
-                  value={quickPreset}
-                  disabled={!baseline}
-                  onChange={(event) => applyQuickPreset(event.target.value as QuickPresetId)}
-                >
-                  <option value="custom">Custom</option>
-                  <option value="greener-streets">Greener streets</option>
-                  <option value="traffic-calming">Traffic calming</option>
-                  <option value="more-open-space">More open space</option>
-                </select>
+                <div className="simulation-preset-select" ref={presetWrapRef}>
+                  <button
+                    id="simulation-quick-preset"
+                    type="button"
+                    className="simulation-preset-trigger"
+                    aria-haspopup="listbox"
+                    aria-expanded={presetOpen}
+                    disabled={!baseline}
+                    onClick={() => setPresetOpen((open) => !open)}
+                  >
+                    <span>{QUICK_PRESET_OPTIONS.find((option) => option.id === quickPreset)?.label ?? 'Custom'}</span>
+                    <i aria-hidden="true">⌄</i>
+                  </button>
+                  {presetOpen && <div className="glass search-results simulation-search-results" role="listbox" aria-labelledby="simulation-quick-preset">
+                    {QUICK_PRESET_OPTIONS.map((option) => <button
+                      key={option.id}
+                      type="button"
+                      role="option"
+                      aria-selected={option.id === quickPreset}
+                      className={option.id === quickPreset ? 'selected' : ''}
+                      onClick={() => {
+                        applyQuickPreset(option.id)
+                        setPresetOpen(false)
+                      }}
+                    >
+                      <span>{option.label}</span>
+                    </button>)}
+                  </div>}
+                </div>
                 <button type="button" disabled={!baseline} onClick={resetScenario}>Reset to current</button>
               </div>
               <div className="simulation-save-controls">
@@ -1592,12 +1631,37 @@ export default function SimulationPage({
                   <h3 id="simulation-factor-map-title">Greater Melbourne · SA2 environment</h3>
                   <p>Observed values by locality. The highlighted area shows your scenario value.</p>
                 </div>
-                <label>
-                  <span>Map factor</span>
-                  <select value={mapFactor} onChange={(event) => setMapFactor(event.target.value as EnvironmentFeature)}>
-                    {ENVIRONMENT_FEATURES.map((feature) => <option key={feature} value={feature}>{ENVIRONMENT_FEATURE_LABELS[feature]}</option>)}
-                  </select>
-                </label>
+                <div className="simulation-map-factor-field">
+                  <span id="simulation-map-factor-label">Map factor</span>
+                  <div className="simulation-preset-select" ref={mapFactorWrapRef}>
+                    <button
+                      type="button"
+                      className="simulation-preset-trigger"
+                      aria-haspopup="listbox"
+                      aria-expanded={mapFactorOpen}
+                      aria-labelledby="simulation-map-factor-label"
+                      onClick={() => setMapFactorOpen((open) => !open)}
+                    >
+                      <span>{ENVIRONMENT_FEATURE_LABELS[mapFactor]}</span>
+                      <i aria-hidden="true">⌄</i>
+                    </button>
+                    {mapFactorOpen && <div className="glass search-results simulation-search-results" role="listbox" aria-labelledby="simulation-map-factor-label">
+                      {ENVIRONMENT_FEATURES.map((feature) => <button
+                        key={feature}
+                        type="button"
+                        role="option"
+                        aria-selected={feature === mapFactor}
+                        className={feature === mapFactor ? 'selected' : ''}
+                        onClick={() => {
+                          setMapFactor(feature)
+                          setMapFactorOpen(false)
+                        }}
+                      >
+                        <span>{ENVIRONMENT_FEATURE_LABELS[feature]}</span>
+                      </button>)}
+                    </div>}
+                  </div>
+                </div>
               </div>
               {baseline && <p className="simulation-factor-map-selected">
                 {baseline.name}: {formatEnvironmentValue(mapFactor, baseline[mapFactor])} baseline → {formatEnvironmentValue(mapFactor, scenarioValues[mapFactor])} scenario
@@ -1654,26 +1718,6 @@ export default function SimulationPage({
             </>}
 
             {resultsPage === 1 && <>
-            <div className="outcome-summary-strip" aria-label="Outcome summary">
-              {outcomeSummaries.map((item) => <div className={`outcome-summary-item ${item.tone}`} key={item.label}>
-                <span>{item.label}</span>
-                <b aria-hidden="true">{item.symbol}</b>
-                <small>{item.status}</small>
-              </div>)}
-            </div>
-
-            <div className="simulation-model-validation" aria-label="Leave-one-SA3-out model validation">
-              <strong>Leave-one-SA3-out validation</strong>
-              <div className="simulation-model-validation-grid">
-                <div><span>Vulnerability</span><b>{formatHeldOutMae(aiModel?.vulnerabilityModel)}</b></div>
-                <div><span>Physical health</span><b>{formatHeldOutMae(aiModel?.developmentModel)}</b></div>
-                <div><span>Social competence</span><b>{formatHeldOutMae(aiModel?.socialModel)}</b></div>
-              </div>
-            </div>
-            {scenarioResult && !scenarioResult.scenarioSupported && <p className="simulation-support-warning" role="status">
-              This combination is unlike observed localities. Estimates are shown for exploration, but should be treated cautiously.
-            </p>}
-
             <div className="comparison-panel">
               <div className="comparison-header">
                 <h3>Environmental Conditions &amp; Child Outcomes</h3>
@@ -1708,12 +1752,12 @@ export default function SimulationPage({
                     <div className="comparison-readout" aria-label={`${metric.label} values and change`}>
                       <div>
                         <small>Baseline</small>
-                        <strong>{metric.baseline === null ? 'Unavailable' : formatMetricValue(metric.baseline, metric.unit)}</strong>
+                        {renderReadoutValue(metric.baseline, metric.unit, 'Unavailable')}
                       </div>
                       <span className="comparison-readout-arrow" aria-hidden="true">→</span>
                       <div>
                         <small>Scenario</small>
-                        <strong>{metric.simulated === null ? direction.label : formatMetricValue(metric.simulated, metric.unit)}</strong>
+                        {renderReadoutValue(metric.simulated, metric.unit, direction.label)}
                       </div>
                       <span className={`comparison-readout-delta ${direction.tone}`}>
                         {direction.delta === null
@@ -1800,6 +1844,15 @@ export default function SimulationPage({
                 <div>
                   <h3 id="simulation-driver-title">Outcome driver waterfall</h3>
                   <p>Each segment adds one factor’s fitted association to the baseline outcome.</p>
+                </div>
+              </div>
+              <div className="simulation-waterfall-legend" aria-label="How to read the driver chart">
+                <p>Each row shows how much one environmental factor moves the outcome between today and your scenario. Longer bars mean a bigger effect; “pp” means percentage points of children.</p>
+                <div>
+                  <span><i className="key-favorable" />Moves the outcome in a better direction</span>
+                  <span><i className="key-adverse" />Moves the outcome in a worse direction</span>
+                  <span><i className="key-baseline" />Today (baseline)</span>
+                  <span><i className="key-scenario" />Your scenario</span>
                 </div>
               </div>
               {!scenarioResult?.predictionsAvailable

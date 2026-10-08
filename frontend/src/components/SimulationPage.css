@@ -2275,3 +2275,122 @@ html:has(.simulation-shell) body::-webkit-scrollbar {
 .simulation-results-pager > button.next {
   right: 8px;
 }
+
+.simulation-preset-select {
+  position: relative;
+  min-width: 0;
+}
+
+.simulation-preset-controls .simulation-preset-trigger {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  text-align: left;
+}
+
+.simulation-preset-trigger i {
+  font-style: normal;
+  line-height: 1;
+}
+
+.simulation-preset-select .simulation-search-results {
+  margin-top: 6px;
+}
+
+.simulation-preset-select .simulation-search-results button {
+  min-height: 0;
+  padding: 12px 14px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  font-size: 13px;
+}
+
+.simulation-preset-select .simulation-search-results button.selected {
+  background: rgba(119, 154, 255, 0.14);
+  font-weight: 700;
+}
+
+.simulation-map-factor-field {
+  display: grid;
+  gap: 3px;
+  flex: 0 0 auto;
+  color: #7185a3;
+  font-size: 9px;
+  font-weight: 700;
+}
+
+.simulation-map-factor-field .simulation-preset-select {
+  min-width: 190px;
+}
+
+.simulation-map-factor-field .simulation-preset-trigger {
+  width: 100%;
+  min-height: 34px;
+  padding: 5px 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  color: #35557f;
+  border: 1px solid rgba(109, 120, 232, .2);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, .78);
+  font-size: 10px;
+  font-weight: 700;
+  text-align: left;
+  cursor: pointer;
+}
+
+.simulation-map-factor-field .simulation-search-results {
+  left: auto;
+  min-width: 100%;
+  width: max-content;
+  max-width: 260px;
+}
+
+.comparison-readout-unit {
+  color: #7a8fae;
+  font-size: 9px;
+  line-height: 1.2;
+}
+
+.simulation-waterfall-legend {
+  margin: 0 0 14px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: rgba(119, 154, 255, .08);
+  color: #4b6288;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.simulation-waterfall-legend p {
+  margin: 0 0 8px;
+}
+
+.simulation-waterfall-legend > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 16px;
+}
+
+.simulation-waterfall-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.simulation-waterfall-legend i {
+  display: inline-block;
+  width: 18px;
+  height: 6px;
+  border-radius: 999px;
+}
+
+.simulation-waterfall-legend .key-favorable { background: #2a8c74; }
+.simulation-waterfall-legend .key-adverse { background: #c9735a; }
+.simulation-waterfall-legend .key-baseline { width: 0; height: 14px; border-radius: 0; border-left: 2px dashed #8798b2; }
+.simulation-waterfall-legend .key-scenario { width: 2px; height: 14px; border-radius: 0; background: #596fe2; }
