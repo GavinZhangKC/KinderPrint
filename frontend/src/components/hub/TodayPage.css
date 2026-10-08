@@ -242,3 +242,4 @@ html[data-kt-theme] .health-page-shell>.nav-shell :focus-visible{outline:3px sol
 .kt-indicators article .kt-limit{margin-top:4px}
 @media (max-width:640px){.kt-tabs{flex-wrap:nowrap;overflow-x:auto;max-width:100%;scrollbar-width:none}.kt-tabs::-webkit-scrollbar{display:none}}
 .kt-theme-parent .kh-foot,.kt-theme-prac .kh-foot{font-size:var(--fs-meta);color:var(--kt-ink2)}
+.kt-tabs button,.vx-tabs button,.vx-filters button{white-space:nowrap}
