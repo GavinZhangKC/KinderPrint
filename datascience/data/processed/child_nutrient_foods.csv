@@ -1,0 +1,57 @@
+nutrient_id,nutrient,unit,rank,food_key,food_name,food_group,amount_per_100g,source_id
+iron,Iron,mg,1,F001818,"Breakfast cereal, wheat bran, flakes, added vitamins & minerals (Kellogg's Bran Flakes)",Grains and cereals,16.95,fsanz_afcd_release_3
+iron,Iron,mg,2,F002708,"Chicken, liver, fried, added butter","Lean meat, fish, eggs, nuts and legumes",11.06,fsanz_afcd_release_3
+iron,Iron,mg,3,F005021,"Lamb, liver, grilled, no added fat","Lean meat, fish, eggs, nuts and legumes",11.0,fsanz_afcd_release_3
+iron,Iron,mg,4,F005184,"Lentil, red, hulled, dry",Vegetables and legumes,9.1,fsanz_afcd_release_3
+iron,Iron,mg,5,F007972,"Sardine, Australian, whole, fried, no added fat","Lean meat, fish, eggs, nuts and legumes",6.1,fsanz_afcd_release_3
+iron,Iron,mg,6,F008774,"Sprat, blue, wild caught, flesh, skin & bones, fried, no added fat","Lean meat, fish, eggs, nuts and legumes",6.1,fsanz_afcd_release_3
+iron,Iron,mg,7,F005978,"Mutton, boneless dice or strips, shoulder, lean, casseroled, no added fat","Lean meat, fish, eggs, nuts and legumes",5.7,fsanz_afcd_release_3
+iron,Iron,mg,8,F006148,"Octopus, boiled, no added fat","Lean meat, fish, eggs, nuts and legumes",5.59,fsanz_afcd_release_3
+calcium,Calcium,mg,1,F002479,"Cheese, parmesan, fresh, regular fat","Milk, yoghurt and cheese",948.0,fsanz_afcd_release_3
+calcium,Calcium,mg,2,F001720,"Breakfast cereal, mixed grain (rice & wheat), flakes, added vitamins & minerals (Kellogg's Special K)",Grains and cereals,936.0,fsanz_afcd_release_3
+calcium,Calcium,mg,3,F007972,"Sardine, Australian, whole, fried, no added fat","Lean meat, fish, eggs, nuts and legumes",872.0,fsanz_afcd_release_3
+calcium,Calcium,mg,4,F008774,"Sprat, blue, wild caught, flesh, skin & bones, fried, no added fat","Lean meat, fish, eggs, nuts and legumes",872.0,fsanz_afcd_release_3
+calcium,Calcium,mg,5,F009076,"Tahini, sesame seed pulp","Lean meat, fish, eggs, nuts and legumes",330.0,fsanz_afcd_release_3
+calcium,Calcium,mg,6,F004780,"Kale, fried, no added fat",Vegetables and legumes,307.0,fsanz_afcd_release_3
+calcium,Calcium,mg,7,F009491,"Vine leaf, grape, canned",Vegetables and legumes,289.0,fsanz_afcd_release_3
+calcium,Calcium,mg,8,F005582,"Milk, cow, canned, sweetened, condensed, regular","Milk, yoghurt and cheese",268.0,fsanz_afcd_release_3
+fibre,Dietary fibre,g,1,F001829,"Breakfast cereal, wheat bran, pellets, added vitamins & minerals (Kellogg's All Bran)",Grains and cereals,27.3,fsanz_afcd_release_3
+fibre,Dietary fibre,g,2,F007722,"Rye, grain, whole, uncooked",Grains and cereals,17.3,fsanz_afcd_release_3
+fibre,Dietary fibre,g,3,F007593,"Quinoa, black, uncooked",Grains and cereals,16.1,fsanz_afcd_release_3
+fibre,Dietary fibre,g,4,F005178,"Lentil, French, hulled, dry",Vegetables and legumes,15.0,fsanz_afcd_release_3
+fibre,Dietary fibre,g,5,F009076,"Tahini, sesame seed pulp","Lean meat, fish, eggs, nuts and legumes",13.5,fsanz_afcd_release_3
+fibre,Dietary fibre,g,6,F000379,"Barley, pearl, uncooked",Grains and cereals,13.1,fsanz_afcd_release_3
+fibre,Dietary fibre,g,7,F008215,"Seed, sunflower","Lean meat, fish, eggs, nuts and legumes",13.0,fsanz_afcd_release_3
+fibre,Dietary fibre,g,8,F009537,"Wheat, whole, uncooked",Grains and cereals,11.4,fsanz_afcd_release_3
+vitamin_c,Vitamin C,mg,1,F002247,"Capsicum, red, fresh, raw",Vegetables and legumes,240.0,fsanz_afcd_release_3
+vitamin_c,Vitamin C,mg,2,F001914,"Brussels sprout, fresh, raw",Vegetables and legumes,120.0,fsanz_afcd_release_3
+vitamin_c,Vitamin C,mg,3,F004780,"Kale, fried, no added fat",Vegetables and legumes,106.0,fsanz_afcd_release_3
+vitamin_c,Vitamin C,mg,4,F009532,"Watercress, raw",Vegetables and legumes,101.0,fsanz_afcd_release_3
+vitamin_c,Vitamin C,mg,5,F001998,"Cabbage, mustard, raw",Vegetables and legumes,100.0,fsanz_afcd_release_3
+vitamin_c,Vitamin C,mg,6,F001899,"Broccoli, fresh, baked, no added fat",Vegetables and legumes,92.0,fsanz_afcd_release_3
+vitamin_c,Vitamin C,mg,7,F007712,"Rocket, fresh, raw",Vegetables and legumes,83.0,fsanz_afcd_release_3
+vitamin_c,Vitamin C,mg,8,F008952,"Strawberry, raw",Fruit,76.0,fsanz_afcd_release_3
+zinc,Zinc,mg,1,F005138,"Lamb, with bone, shin, lean, casseroled, no added fat","Lean meat, fish, eggs, nuts and legumes",10.0,fsanz_afcd_release_3
+zinc,Zinc,mg,2,F005978,"Mutton, boneless dice or strips, shoulder, lean, casseroled, no added fat","Lean meat, fish, eggs, nuts and legumes",8.9,fsanz_afcd_release_3
+zinc,Zinc,mg,3,F000738,"Beef, rump steak, lean, grilled, no added fat","Lean meat, fish, eggs, nuts and legumes",8.2,fsanz_afcd_release_3
+zinc,Zinc,mg,4,F004239,"Goat, meat, all cuts, lean, casseroled, no added fat","Lean meat, fish, eggs, nuts and legumes",7.84,fsanz_afcd_release_3
+zinc,Zinc,mg,5,F009466,"Venison, mince, premium, baked, roasted, fried, stir-fried, grilled or BBQ'd, no added fat","Lean meat, fish, eggs, nuts and legumes",7.81,fsanz_afcd_release_3
+zinc,Zinc,mg,6,F001807,"Breakfast cereal, puffed or popped rice, cocoa coating, added vitamins & minerals (Kellogg's Coco Pops)",Grains and cereals,7.8,fsanz_afcd_release_3
+zinc,Zinc,mg,7,F009380,"Veal, diced, lean, stir-fried, no added fat ","Lean meat, fish, eggs, nuts and legumes",7.0,fsanz_afcd_release_3
+zinc,Zinc,mg,8,F004792,"Kangaroo, tail, cooked, no added fat","Lean meat, fish, eggs, nuts and legumes",6.83,fsanz_afcd_release_3
+iodine,Iodine,ug,1,F005968,"Mussel, blue, steamed","Lean meat, fish, eggs, nuts and legumes",267.8,fsanz_afcd_release_3
+iodine,Iodine,ug,2,F008165,"Scallop, fried, no added fat","Lean meat, fish, eggs, nuts and legumes",178.1,fsanz_afcd_release_3
+iodine,Iodine,ug,3,F001609,"Bread, gluten free, toasted",Grains and cereals,141.7,fsanz_afcd_release_3
+iodine,Iodine,ug,4,F005823,"Morwong, fillet, grilled, no added fat","Lean meat, fish, eggs, nuts and legumes",130.1,fsanz_afcd_release_3
+iodine,Iodine,ug,5,F003724,"Egg, chicken, whole, omega-3 polyunsaturate enriched, raw","Lean meat, fish, eggs, nuts and legumes",120.0,fsanz_afcd_release_3
+iodine,Iodine,ug,6,F001683,"Breadcrumbs, white",Grains and cereals,86.2,fsanz_afcd_release_3
+iodine,Iodine,ug,7,F002463,"Cheese, goat, soft","Milk, yoghurt and cheese",84.3,fsanz_afcd_release_3
+iodine,Iodine,ug,8,F002559,"Chicken piece, flesh, skin & fat, coated, fast food outlet, fried","Lean meat, fish, eggs, nuts and legumes",82.0,fsanz_afcd_release_3
+vitamin_d,Vitamin D,ug,1,F005948,"Mushroom, common, vitamin D enhanced, fresh, fried, no added fat",Vegetables and legumes,38.86,fsanz_afcd_release_3
+vitamin_d,Vitamin D,ug,2,F007853,"Salmon, pink, canned in brine, drained","Lean meat, fish, eggs, nuts and legumes",20.62,fsanz_afcd_release_3
+vitamin_d,Vitamin D,ug,3,F001720,"Breakfast cereal, mixed grain (rice & wheat), flakes, added vitamins & minerals (Kellogg's Special K)",Grains and cereals,12.03,fsanz_afcd_release_3
+vitamin_d,Vitamin D,ug,4,F009270,"Trout, rainbow, aquacultured, baked, no added fat","Lean meat, fish, eggs, nuts and legumes",10.27,fsanz_afcd_release_3
+vitamin_d,Vitamin D,ug,5,F008258,"Silver perch, aquacultured, baked, no added fat","Lean meat, fish, eggs, nuts and legumes",6.81,fsanz_afcd_release_3
+vitamin_d,Vitamin D,ug,6,F005267,"Mackerel, grilled, no added fat","Lean meat, fish, eggs, nuts and legumes",6.81,fsanz_afcd_release_3
+vitamin_d,Vitamin D,ug,7,F004810,"Kingfish, yellowtail, aquacultured, fillet, with skin, grilled, no added fat","Lean meat, fish, eggs, nuts and legumes",6.81,fsanz_afcd_release_3
+vitamin_d,Vitamin D,ug,8,F002568,"Chicken, barbecued, with skin","Lean meat, fish, eggs, nuts and legumes",6.37,fsanz_afcd_release_3

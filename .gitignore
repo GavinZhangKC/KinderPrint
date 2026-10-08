@@ -31,3 +31,6 @@ __pycache__/
 # Local-only development launchers
 /start-dev.ps1
 /stop-dev.ps1
+
+# Iteration-3 raw source snapshots (hashes are kept in data/reference/iteration3/manifest.json)
+datascience/data/raw/iteration3/

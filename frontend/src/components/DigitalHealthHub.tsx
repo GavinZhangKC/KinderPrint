@@ -536,7 +536,7 @@ export default function DigitalHealthHub({ onHome, onInsight, onSimulation, onMa
   return <div className="health-page-shell">
     {header}
     <div className="digital-health-hub dh-global-shell">
-      <main><KinderHub locality={locality} data={data} onSelectLocality={setLocality} onOpenPlan={(body, age) => setPlan({ body, age })} /></main>
+      <main><KinderHub locality={locality} data={data} onSelectLocality={setLocality} onOpenPlan={(body, age) => setPlan({ body, age })} onOpenMap={onMap} /></main>
       <AnimatePresence>{plan && planCondition && <PreparationPlan condition={planCondition.label} locality={locality.name} age={plan.age} items={conditionGuidance[plan.body].prevention} sourceUrl={conditionSourceLinks[plan.body]} facilities={data.facilities} onClose={() => setPlan(null)} />}</AnimatePresence>
     </div>
   </div>

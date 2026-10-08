@@ -38,6 +38,18 @@ cp "$TASK_PROCESSED_DATA_DIR/phidu_pha_sa2_bridge.csv" "$TASK_PACKAGE_DIR/data/"
 cp "$TASK_PROCESSED_DATA_DIR/sa2_department_area_bridge.csv" "$TASK_PACKAGE_DIR/data/"
 cp "$TASK_PROCESSED_DATA_DIR/bushfire_context_sa2.csv" "$TASK_PACKAGE_DIR/data/"
 cp "$TASK_PROCESSED_DATA_DIR/transport_context_sa2.csv" "$TASK_PACKAGE_DIR/data/"
+cp "$TASK_PROCESSED_DATA_DIR/seasonal_air_quality_sa2.csv" "$TASK_PACKAGE_DIR/data/"
+cp "$TASK_PROCESSED_DATA_DIR/nearby_health_services_sa2.csv" "$TASK_PACKAGE_DIR/data/"
+cp "$TASK_PROCESSED_DATA_DIR/hospital_capability_vic.csv" "$TASK_PACKAGE_DIR/data/"
+cp "$TASK_PROCESSED_DATA_DIR/care_compare_sa2.csv" "$TASK_PACKAGE_DIR/data/"
+cp "$TASK_PROCESSED_DATA_DIR/urgent_care_clinics_vic.csv" "$TASK_PACKAGE_DIR/data/"
+cp "$TASK_PROCESSED_DATA_DIR/primary_care_cost_sa3.csv" "$TASK_PACKAGE_DIR/data/"
+cp "$TASK_PROCESSED_DATA_DIR/seasonal_illness_vic.csv" "$TASK_PACKAGE_DIR/data/"
+cp "$TASK_PROCESSED_DATA_DIR/food_outlets_sa2.csv" "$TASK_PACKAGE_DIR/data/"
+cp "$TASK_PROCESSED_DATA_DIR/food_access_sa2.csv" "$TASK_PACKAGE_DIR/data/"
+cp "$TASK_PROCESSED_DATA_DIR/child_nutrient_foods.csv" "$TASK_PACKAGE_DIR/data/"
+cp "$TASK_PROCESSED_DATA_DIR/../../config/child_nutrient_targets.csv" "$TASK_PACKAGE_DIR/data/"
+cp "$TASK_PROCESSED_DATA_DIR/practitioner_context_sa2.csv" "$TASK_PACKAGE_DIR/data/"
 
 python3 -m pip install \
     --disable-pip-version-check \

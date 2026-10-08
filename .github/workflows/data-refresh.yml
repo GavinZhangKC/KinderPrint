@@ -1,0 +1,95 @@
+name: Data refresh (Iteration 3)
+
+# Live acquisition of the six Iteration-3 sources, QA, rebuild, test gate and KPIs.
+# The workflow never pushes: refreshed files, QA reports and change logs are
+# uploaded as an artifact for a person to review and commit on a feature branch.
+
+on:
+  schedule:
+    - cron: "17 19 * * 0"        # Monday 05:17 Melbourne (AEST)
+  workflow_dispatch:
+    inputs:
+      source:
+        description: "Optional source_id to refresh (blank = all six)"
+        required: false
+        default: ""
+  pull_request:
+    paths:
+      - "datascience/**"
+      - ".github/workflows/data-refresh.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  offline-gate:
+    # On pull requests: no network calls; re-verify committed files, rebuild, test, KPIs.
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: datascience
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: datascience/requirements.txt
+      - run: pip install -r requirements.txt
+      - run: python scripts/refresh_iteration3.py --offline
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: iteration3-offline-reports
+          path: datascience/reports/iteration3/
+
+  live-refresh:
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    defaults:
+      run:
+        working-directory: datascience
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: datascience/requirements.txt
+      - run: pip install -r requirements.txt
+      - name: Refresh
+        run: |
+          if [ -n "${{ github.event.inputs.source }}" ]; then
+            python scripts/refresh_iteration3.py --source "${{ github.event.inputs.source }}"
+          else
+            python scripts/refresh_iteration3.py
+          fi
+      - name: Summarise changes
+        if: always()
+        run: |
+          {
+            echo "## Iteration-3 refresh"
+            echo
+            cat reports/iteration3/pipeline_kpis.md 2>/dev/null || echo "KPIs not produced"
+            echo
+            echo '```'
+            git status --short -- data reports || true
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: iteration3-refresh-${{ github.run_id }}
+          path: |
+            datascience/reports/iteration3/
+            datascience/data/reference/iteration3/
+            datascience/data/processed/hospital_capability_vic.csv
+            datascience/data/processed/primary_care_cost_sa3.csv
+            datascience/data/processed/seasonal_illness_vic.csv
+            datascience/data/processed/child_nutrient_foods.csv
+            datascience/data/processed/food_outlets_sa2.csv
+            datascience/data/processed/food_access_sa2.csv
+            datascience/data/processed/care_compare_sa2.csv
+            datascience/data/processed/urgent_care_clinics_vic.csv

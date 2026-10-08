@@ -14,6 +14,8 @@ from core.data_loader import (  # noqa: E402
     DEPARTMENT_AREA_BRIDGE_DATA_PATH_ENV,
     BUSHFIRE_CONTEXT_DATA_PATH_ENV,
     TRANSPORT_CONTEXT_DATA_PATH_ENV,
+    SEASONAL_AIR_DATA_PATH_ENV,
+    NEARBY_SERVICES_DATA_PATH_ENV,
     ACECQA_CONTEXT_DATA_PATH_ENV,
     ACECQA_GEOCODING_DATA_PATH_ENV,
     BOUNDARY_DATA_PATH_ENV,
@@ -34,6 +36,8 @@ from core.data_loader import (  # noqa: E402
     VCAMS_LGA_DATA_PATH_ENV,
     HEALTH_FACILITY_DATA_PATH_ENV,
 )
+from core.data_loader import CARE_CONTEXT_ENV  # noqa: E402
+from loaders.care_context import _read as load_care_context_csv  # noqa: E402
 from main import app  # noqa: E402
 from loaders.digital_health import _read as load_digital_health_csv  # noqa: E402
 from validation import (  # noqa: E402
@@ -48,6 +52,9 @@ from validation import (  # noqa: E402
 @pytest.fixture(autouse=True)
 def clear_dataset_environment(monkeypatch: pytest.MonkeyPatch) -> None:
     load_digital_health_csv.cache_clear()
+    load_care_context_csv.cache_clear()
+    for variable in CARE_CONTEXT_ENV.values():
+        monkeypatch.delenv(variable, raising=False)
     for loader in (
         load_profiles,
         load_suitability_rankings,
@@ -63,6 +70,8 @@ def clear_dataset_environment(monkeypatch: pytest.MonkeyPatch) -> None:
         DEPARTMENT_AREA_BRIDGE_DATA_PATH_ENV,
         BUSHFIRE_CONTEXT_DATA_PATH_ENV,
         TRANSPORT_CONTEXT_DATA_PATH_ENV,
+        SEASONAL_AIR_DATA_PATH_ENV,
+        NEARBY_SERVICES_DATA_PATH_ENV,
         ACECQA_CONTEXT_DATA_PATH_ENV,
         ACECQA_GEOCODING_DATA_PATH_ENV,
         BOUNDARY_DATA_PATH_ENV,

@@ -1,0 +1,80 @@
+{
+  "file": "nndss_salmonella_vic_monthly.csv",
+  "rows": 3440,
+  "passed": true,
+  "warnings": [],
+  "rules": [
+    {
+      "rule": "schema: required columns present, no extras",
+      "passed": true,
+      "severity": "error",
+      "missing": [],
+      "unexpected": []
+    },
+    {
+      "rule": "volume: at least 2500 rows",
+      "passed": true,
+      "severity": "error",
+      "rows": 3440
+    },
+    {
+      "rule": "volume: row drift within +/-30% of previous file",
+      "passed": true,
+      "severity": "error",
+      "previous": 3440,
+      "drift": 0.0
+    },
+    {
+      "rule": "keys: key columns populated",
+      "passed": true,
+      "severity": "error",
+      "violations": 0
+    },
+    {
+      "rule": "keys: primary key unique",
+      "passed": true,
+      "severity": "error",
+      "violations": 0,
+      "examples": []
+    },
+    {
+      "rule": "year_month is YYYY-MM and notifications are positive integers",
+      "passed": true,
+      "severity": "error",
+      "bad_months": 0,
+      "bad_counts": 0
+    },
+    {
+      "rule": "all seasonal reference years present",
+      "passed": true,
+      "severity": "error",
+      "missing": []
+    },
+    {
+      "rule": "age groups are five-year bands including 0-14",
+      "passed": true,
+      "severity": "error",
+      "groups": [
+        "00-04",
+        "05-09",
+        "10-14",
+        "15-19",
+        "20-24",
+        "25-29",
+        "30-34",
+        "35-39",
+        "40-44",
+        "45-49",
+        "50-54",
+        "55-59",
+        "60-64",
+        "65-69",
+        "70-74",
+        "75-79",
+        "80-84",
+        "85+",
+        "Unknown"
+      ]
+    }
+  ]
+}

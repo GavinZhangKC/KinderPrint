@@ -1,0 +1,37 @@
+{
+  "run_utc": "2026-09-29T151127Z",
+  "mode": "offline",
+  "stages": [
+    {
+      "stage": "1 acquire",
+      "seconds": 0.52,
+      "status": "ok"
+    },
+    {
+      "stage": "2 build",
+      "seconds": 3.23,
+      "status": "ok"
+    },
+    {
+      "stage": "3 gate",
+      "seconds": 2.65,
+      "status": "ok"
+    },
+    {
+      "stage": "4 KPIs",
+      "seconds": 3.84,
+      "status": "ok"
+    }
+  ],
+  "acquire": {
+    "aihw_myhospitals_api_2026": "ok",
+    "aihw_phc_019_mbs_local_areas_2024_25": "ok",
+    "betterhealth_urgent_care_clinics_2026": "ok",
+    "nndss_public_datasets_2025": "ok",
+    "osm_overpass_food_outlets_2026": "ok",
+    "fsanz_afcd_release_3": "ok"
+  },
+  "tests": "266 passed, 28 skipped in 2.47s",
+  "kpis_met": true,
+  "outcome": "published"
+}

@@ -1,0 +1,102 @@
+{
+  "run_utc": "2026-09-29T154334Z",
+  "kpis": [
+    {
+      "kpi": "K1 validity",
+      "value": 1.0,
+      "target": 1.0,
+      "passed": true,
+      "files": 9,
+      "failed": [],
+      "warnings": [
+        "aihw_mbs_local_areas_vic_2024_25.csv: provider fees are not below Medicare benefits (derived gap is nulled where they are)"
+      ]
+    },
+    {
+      "kpi": "K2 join coverage",
+      "value": 1.0,
+      "target": 0.95,
+      "passed": true,
+      "sa2_in_scope": 361,
+      "sa3_in_scope": 40,
+      "by_table": {
+        "seasonal_air_quality_sa2.csv": 1.0,
+        "nearby_health_services_sa2.csv": 1.0,
+        "care_compare_sa2.csv": 1.0,
+        "food_access_sa2.csv": 1.0,
+        "primary_care_cost_sa3.csv (SA3)": 1.0
+      }
+    },
+    {
+      "kpi": "K3 key integrity",
+      "value": 1.0,
+      "target": 1.0,
+      "passed": true,
+      "by_check": {
+        "data items -> reporting units": 1.0,
+        "data items -> reported measures": 1.0,
+        "care compare -> facilities": 1.0
+      }
+    },
+    {
+      "kpi": "K4 lineage",
+      "value": 1.0,
+      "target": 1.0,
+      "passed": true,
+      "processed_files": 60,
+      "problems": []
+    },
+    {
+      "kpi": "K5 reproducibility",
+      "value": 1.0,
+      "target": 1.0,
+      "passed": true,
+      "by_file": {
+        "hospital_capability_vic.csv": "identical",
+        "primary_care_cost_sa3.csv": "identical",
+        "seasonal_illness_vic.csv": "identical",
+        "child_nutrient_foods.csv": "identical",
+        "food_outlets_sa2.csv": "identical",
+        "food_access_sa2.csv": "identical",
+        "care_compare_sa2.csv": "identical",
+        "urgent_care_clinics_vic.csv": "identical",
+        "access_e2sfca_sa2.csv": "identical"
+      }
+    },
+    {
+      "kpi": "K6 freshness",
+      "value": 9,
+      "target": 9,
+      "passed": true,
+      "age_days": {
+        "afcd_r3_selected_per100g.csv": 0,
+        "aihw_mbs_local_areas_vic_2024_25.csv": 0,
+        "myhospitals_reported_measures.csv": 0,
+        "myhospitals_vic_data_items.csv": 0,
+        "myhospitals_vic_hospitals.csv": 0,
+        "nndss_influenza_vic_monthly.csv": 0,
+        "nndss_salmonella_vic_monthly.csv": 0,
+        "osm_food_outlets_melbourne.csv": 0,
+        "urgent_care_clinics_vic.csv": 0
+      },
+      "stale": [],
+      "not_in_manifest": []
+    },
+    {
+      "kpi": "K7 null resolution",
+      "value": 0.9797,
+      "target": 0.9,
+      "passed": true,
+      "by_table": {
+        "hospital_capability_vic.csv": 0.894,
+        "primary_care_cost_sa3.csv": 0.9841,
+        "care_compare_sa2.csv": 1.0,
+        "food_access_sa2.csv": 1.0,
+        "seasonal_air_quality_sa2.csv": 1.0,
+        "nearby_health_services_sa2.csv": 1.0
+      },
+      "note": "Missing values stay missing (suppressed, not published, or no service in range); none imputed."
+    }
+  ],
+  "all_met": true
+}

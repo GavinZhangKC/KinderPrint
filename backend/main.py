@@ -43,11 +43,14 @@ from loaders.community_context import (
 from loaders.early_childhood import load_early_childhood_context
 from loaders.geocoding_quality import load_geocoding_quality
 from loaders.population import load_population_projections
+from loaders.care_context import compare_care, nutrition_report, practitioner_context, seasonal_illness
 from loaders.digital_health import (
     child_health_context,
     immunisation_context,
     nutrition_context,
     prevention_context,
+    seasonal_air,
+    nearby_services,
     child_health_conditions,
     health_facilities,
     vcams_area_context,
@@ -361,6 +364,113 @@ def digital_health_prevention_context(
         "geographic_unit": "SA2 (ASGS Edition 3, 2021); smoke exposure at Victorian Department area",
         "interpretation": "Place context for preparation; not a property risk rating, exposure dose or forecast.",
     }, limitations=limitations, notices=[AREA_LEVEL_NOTICE])
+
+
+@app.get("/api/digital-health/seasonal-air")
+def digital_health_seasonal_air(
+    sa2_code: str = Query(..., min_length=9, max_length=9, pattern=r"^\d{9}$"),
+) -> dict[str, Any]:
+    """Return the month-by-month PM2.5 record at the nearest EPA monitor to the SA2."""
+    data, limitations = seasonal_air(sa2_code)
+    if data is None:
+        return envelope("unavailable", {"station": None, "months": []},
+                        limitations=limitations, notices=[STATION_CONTEXT_NOTICE])
+    return envelope("available" if data["months"] else "missing", data, metadata={
+        "source": "EPA Victoria AirWatch hourly observations 2018-2025",
+        "geographic_unit": "nearest EPA monitoring station to the SA2 label point",
+        "standard": "24-hour PM2.5 standard of 25 ug/m3, National Environment Protection (Ambient Air Quality) Measure",
+        "interpretation": "Record of past seasons at a monitor; not exposure inside the SA2 and not a forecast.",
+    }, limitations=limitations, notices=[STATION_CONTEXT_NOTICE])
+
+
+@app.get("/api/digital-health/nearby-services")
+def digital_health_nearby_services(
+    sa2_code: str = Query(..., min_length=9, max_length=9, pattern=r"^\d{9}$"),
+) -> dict[str, Any]:
+    """Return the nearest listed facility of each official Healthdirect service type."""
+    rows, limitations = nearby_services(sa2_code)
+    if rows is None:
+        return envelope("unavailable", {"services": []}, limitations=limitations)
+    return envelope("available" if rows else "missing", {"services": rows}, metadata={
+        "source": "National Health Services Directory via Geoscience Australia, extract dated 7 March 2025",
+        "geographic_unit": "straight-line distance from the SA2 label point",
+        "interpretation": "Listed presence and distance only; not travel time, opening hours, availability or quality.",
+    }, limitations=limitations)
+
+
+@app.get("/api/digital-health/compare-care")
+def digital_health_compare_care(
+    sa2_code: str = Query(..., min_length=9, max_length=9, pattern=r"^\d{9}$"),
+) -> dict[str, Any]:
+    """Nearby hospitals and Urgent Care Clinics side by side, with area Medicare cost context."""
+    data, limitations = compare_care(sa2_code)
+    if data is None:
+        return envelope("unavailable", {"hospitals": [], "urgent_care_clinics": [], "area_cost": None},
+                        limitations=limitations)
+    has_data = bool(data["hospitals"] or data["urgent_care_clinics"])
+    return envelope("available" if has_data else "missing", data, metadata={
+        "hospital_source": "AIHW MyHospitals Data API, 2024-25 (specialised service units, ED and elective surgery)",
+        "clinic_source": "Better Health Channel Urgent Care Clinics map, captured 29 September 2026",
+        "cost_source": "AIHW Medicare-subsidised care across local areas, 2024-25, by SA3",
+        "geographic_unit": "straight-line distance from the SA2 label point; cost is the SA3 average",
+        "interpretation": "Side-by-side facts for planning a visit. Not a ranking, travel time, live wait, "
+                          "fee quote or recommendation. In an emergency call 000.",
+    }, limitations=limitations)
+
+
+@app.get("/api/digital-health/seasonal-illness")
+def digital_health_seasonal_illness() -> dict[str, Any]:
+    """Month-by-month share of Victorian influenza and salmonella notifications."""
+    data, limitations = seasonal_illness()
+    if data is None:
+        return envelope("unavailable", {"diseases": []}, limitations=limitations)
+    return envelope("available" if data["diseases"] else "missing", data, metadata={
+        "source": "NNDSS public datasets (Australian Centre for Disease Control), data current to May 2025",
+        "geographic_unit": "Victoria",
+        "interpretation": "Average of past seasons (2016-2019, 2022-2024); notifications reflect testing as well "
+                          "as illness. Not a forecast and not a local figure.",
+    }, limitations=limitations)
+
+
+@app.get("/api/digital-health/nutrition-report")
+def digital_health_nutrition_report(
+    sa2_code: str = Query(..., min_length=9, max_length=9, pattern=r"^\d{9}$"),
+) -> dict[str, Any]:
+    """Children's nutrient targets, foods richest in them and fresh-food outlets near the SA2."""
+    data, limitations = nutrition_report(sa2_code)
+    if data is None:
+        return envelope("unavailable", {"targets": [], "foods": [], "outlets": None, "access": None},
+                        limitations=limitations)
+    return envelope("available", data, metadata={
+        "targets_source": "Nutrient Reference Values for Australia and New Zealand (NHMRC)",
+        "foods_source": "FSANZ Australian Food Composition Database Release 3, per 100 g",
+        "outlets_source": "OpenStreetMap contributors (ODbL), Overpass API 29 September 2026",
+        "geographic_unit": "straight-line distance from the SA2 label point",
+        "interpretation": "General guidance for healthy children. Not a diet plan; ask a GP or dietitian about "
+                          "allergies, special diets or growth concerns. Outlet list may be incomplete; no prices.",
+    }, limitations=limitations)
+
+
+@app.get("/api/digital-health/practitioner-context")
+def digital_health_practitioner_context(
+    sa2_code: str = Query(..., min_length=9, max_length=9, pattern=r"^\d{9}$"),
+) -> dict[str, Any]:
+    """Expected vs observed developmental vulnerability (band) and GP / ECEC spatial access for an SA2."""
+    data, limitations = practitioner_context(sa2_code)
+    if data is None:
+        return envelope("unavailable", {"sa2_code": sa2_code, "development": None, "access": None},
+                        limitations=limitations)
+    return envelope("available" if data.get("development") or data.get("access") else "missing", data, metadata={
+        "development_source": "AEDC 2024 (children assessed in their first year of school), ABS Census 2021, SEIFA 2021",
+        "model": "Priority model V2: weighted ridge regression on 10 population characteristics; expectations are "
+                 "out-of-fold (leave-one-SA4-out); bands from an overdispersed funnel (Higher z >= 1.28)",
+        "access_source": "Enhanced two-step floating catchment (Gaussian, 5 km) on healthdirect GP practices and "
+                         "ACECQA approved places; demand from VIF2023 2026 projections",
+        "geographic_unit": "AEDC community (one or more SA2s) for development; SA2 for access",
+        "interpretation": "An area-level shortlist for investigation by practitioners. Not a diagnosis, not a "
+                          "prediction for any child, and not a judgement of services. Access uses straight-line "
+                          "distance, not travel time or vacancies.",
+    }, limitations=limitations)
 
 
 @app.get("/api/air-quality/stations")

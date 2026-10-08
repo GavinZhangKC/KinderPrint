@@ -1,0 +1,44 @@
+{
+  "ecec": {
+    "sa2_count": 361,
+    "catchment_sensitivity_spearman": {
+      "3km_vs_5km": 0.798,
+      "5km_vs_10km": 0.753,
+      "3km_vs_10km": 0.574
+    },
+    "spearman_vs_naive_in_sa2_ratio": 0.413,
+    "sa2_with_zero_supply_inside": 3,
+    "sa2_with_zero_access_5km": 3,
+    "population_weighted_gini_5km": 0.231,
+    "median_access_5km": 88.096,
+    "share_of_demand_in_lowest_access_fifth_by_irsd_quintile": {
+      "1": 0.207,
+      "2": 0.424,
+      "3": 0.421,
+      "4": 0.181,
+      "5": 0.085
+    },
+    "note": "IRSD quintile 1 = most disadvantaged. Equal shares (0.2) would mean low access is not concentrated by disadvantage."
+  },
+  "gp": {
+    "sa2_count": 361,
+    "catchment_sensitivity_spearman": {
+      "3km_vs_5km": 0.806,
+      "5km_vs_10km": 0.682,
+      "3km_vs_10km": 0.581
+    },
+    "spearman_vs_naive_in_sa2_ratio": 0.382,
+    "sa2_with_zero_supply_inside": 27,
+    "sa2_with_zero_access_5km": 12,
+    "population_weighted_gini_5km": 0.233,
+    "median_access_5km": 2.962,
+    "share_of_demand_in_lowest_access_fifth_by_irsd_quintile": {
+      "1": 0.056,
+      "2": 0.364,
+      "3": 0.302,
+      "4": 0.113,
+      "5": 0.189
+    },
+    "note": "IRSD quintile 1 = most disadvantaged. Equal shares (0.2) would mean low access is not concentrated by disadvantage."
+  }
+}

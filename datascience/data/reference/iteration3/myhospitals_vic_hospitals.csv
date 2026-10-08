@@ -1,0 +1,374 @@
+code,name,private,closed,latitude,longitude,lhn,alternative_names
+H0233,Western District Health Service [Hamilton],0,0,-37.736495,142.030606,Western District Health Service (Vic),WDHS; Western District [Hamilton]
+H0234,Western District Health Service [Penshurst],0,0,-37.877275,142.282487,Western District Health Service (Vic),WDHS
+H0235,Colac Area Health,0,0,-38.341201,143.582854,Colac Area Health,
+H0236,Hesse Rural Health Service [Winchelsea],0,0,-38.243369,143.985357,Hesse Rural Health Service (Winchelsea),
+H0237,Otway Health & Community Services [Apollo Bay],0,0,-38.753853,143.664264,Great Ocean Road Health,SWARH
+H0238,University Hospital Geelong,0,0,-38.151533,144.364964,Barwon Health,Geelong
+H0239,Casterton Memorial Hospital,0,0,-37.589989,141.392283,Casterton Memorial Hospital,SWARH
+H0240,Western District Health Service [Coleraine],0,0,-37.599913,141.692018,Western District Health Service (Vic),WDHS
+H0241,South West Healthcare [Warrnambool],0,0,-38.380085,142.472977,South West Healthcare (Vic),South West [Warrnambool]
+H0242,Beaufort & Skipton Health Service [Skipton],0,0,-37.683998,143.367547,Beaufort and Skipton Health Service,
+H0243,Heywood Rural Health,0,0,-38.137788,141.624256,Heywood Rural Health,
+H0244,Timboon & District Healthcare Service,0,0,-38.486231,142.976717,Timboon and District Healthcare Service,
+H0245,Moyne Health Services [Port Fairy],0,0,-38.381599,142.227523,Moyne Health Services (Port Fairy),
+H0246,Portland District Health,0,0,-38.340713,141.606087,Portland District Health,SWARH
+H0247,Lorne Community Hospital,0,0,-38.545513,143.980743,Great Ocean Road Health,SWARH
+H0248,The McKellar Centre,0,0,-38.118795,144.335728,Barwon Health,Grace McKellar Centre
+H0249,South West Healthcare [Camperdown],0,0,-38.237101,143.137714,South West Healthcare (Vic),SWARH
+H0250,Terang & Mortlake Health Service [Terang],0,0,-38.239388,142.902119,Terang and Mortlake Health Service (Terang),SWARH
+H0251,East Grampians Health Service [Ararat],0,0,-37.278816,142.932858,East Grampians Health Service,EGHS
+H0252,East Grampians Health Service [Willaura],0,0,-37.544798,142.74587,East Grampians Health Service,EGHS
+H0253,Rural Northwest Health [Warracknabeal],0,0,-36.252614,142.381609,Rural Northwest Health (Vic),RNH
+H0254,Rural Northwest Health [Hopetoun],0,0,-35.732201,142.366411,Rural Northwest Health (Vic),RNH
+H0255,Ballarat Health Services [Base Hospital],0,0,-37.559658,143.847041,Grampians Health,BHS; Ballarat
+H0256,Ballarat Health Services [Queen Elizabeth Campus],0,0,-37.564276,143.843264,Grampians Health,BHS
+H0257,Wimmera Base Hospital [Horsham],0,0,-36.712441,142.208522,Grampians Health,Wimmera [Horsham]
+H0258,West Wimmera Health Service [Rupanyup],0,0,-36.636571,142.631849,West Wimmera Health Service,
+H0259,Stawell Regional Health,0,0,-37.059577,142.781603,Grampians Health,SRH
+H0260,West Wimmera Health Service [Nhill],0,0,-36.334003,141.655579,West Wimmera Health Service,WWHS
+H0261,West Wimmera Health Service [Kaniva],0,0,-36.381386,141.246006,West Wimmera Health Service,WWHS
+H0262,West Wimmera Health Service [Jeparit],0,0,-36.141132,141.984686,West Wimmera Health Service,WWHS
+H0263,West Wimmera Health Service [Rainbow],0,0,-35.903874,141.995112,West Wimmera Health Service,WWHS
+H0264,East Wimmera Health Service [St Arnaud],0,0,-36.609275,143.246676,East Wimmera Health Service,EWHS
+H0265,Djerriwarrh Health Service [Bacchus Marsh],0,0,-37.678267,144.433264,Western Health (Vic),
+H0266,Beaufort & Skipton Health Service [Beaufort],0,0,-37.431028,143.382284,Beaufort and Skipton Health Service,
+H0267,Dimboola District Hospital,0,0,-36.449887,142.024286,Grampians Health,
+H0268,Edenhope and District Memorial Hospital,0,0,-37.035323,141.288829,Grampians Health,EDMH
+H0269,Melton Health,0,0,-37.686449,144.558284,Western Health (Vic),
+H0270,Daylesford District Hospital,0,0,-37.337365,144.145774,Central Highlands Rural Health,
+H0271,Creswick District Hospital,0,0,-37.421192,143.891533,Central Highlands Rural Health,
+H0272,The Bendigo Hospital,0,0,-36.748727,144.283372,Bendigo Health Care Group,Bendigo
+H0273,Bendigo Health Care Group [Anne Caudle],0,0,-36.750919,144.280399,Bendigo Health Care Group,
+H0274,Goulburn Valley Health [Waranga],0,0,-36.587827,145.008593,Goulburn Valley Health,
+H0275,Kyabram & District Health Service,0,0,-36.315539,145.042705,Kyabram and District Health Service,
+H0276,Kyneton District Health Service,0,0,-37.254431,144.469742,Central Highlands Rural Health,
+H0277,Heathcote Health,0,0,-36.925786,144.709499,Heathcote Health,McIvor Health & Community Services
+H0278,Maryborough District Health Service [Maryborough],0,0,-37.044781,143.737692,Maryborough District Health Service,
+H0279,Maryborough District Health Service [Dunolly],0,0,-36.855269,143.735139,Maryborough District Health Service,
+H0280,Swan Hill District Health [Swan Hill],0,0,-35.340588,143.556514,Swan Hill District Health,Swan Hill
+H0281,Swan Hill District Health [Nyah],0,0,-35.186052,143.355428,Swan Hill District Health,
+H0282,East Wimmera Health Service [Wycheproof],0,0,-36.078447,143.233779,East Wimmera Health Service,EWHS
+H0283,Cohuna District Hospital,0,0,-35.800063,144.214911,Cohuna District Hospital,
+H0284,Echuca Regional Health,0,0,-36.138186,144.748369,Echuca Regional Health,ERH; Echuca
+H0285,Kerang District Health,0,0,-35.724287,143.916563,Kerang District Health,
+H0286,Mildura Base Hospital,0,0,-34.185634,142.143348,Mildura Base Hospital,Mildura
+H0287,Mallee Track Health & Community Service [Ouyen],0,0,-35.074349,142.312345,Mallee Track Health and Community Service,
+H0288,Maldon Hospital,0,0,-36.992672,144.063677,Dhelkaya Health,
+H0289,Manangatang & District Hospital,0,0,-35.050955,142.880512,Robinvale District Health Services,
+H0290,Boort District Health,0,0,-36.111703,143.727285,Boort District Health,
+H0291,Robinvale District Health Services,0,0,-34.584146,142.781367,Robinvale District Health Services,
+H0292,Rochester & Elmore District Health Service,0,0,-36.366579,144.697751,Rochester and Elmore District Health Service,REDHS
+H0293,East Wimmera Health Service [Donald],0,0,-36.366895,142.976583,East Wimmera Health Service,ERH
+H0294,Inglewood & District Health Service,0,0,-36.572147,143.873755,Inglewood and District Health Service,
+H0295,East Wimmera Health Service [Birchip],0,0,-35.980167,142.915891,East Wimmera Health Service,ERH
+H0296,East Wimmera Health Service [Charlton],0,0,-36.271037,143.345889,East Wimmera Health Service,ERH
+H0297,Castlemaine Health,0,0,-37.052539,144.212315,Dhelkaya Health,Mount Alexander Hospital
+H0298,Goulburn Valley Health [Shepparton],0,0,-36.363625,145.404911,Goulburn Valley Health,Goulburn Valley [Shepparton]
+H0299,Goulburn Valley Health [Tatura],0,0,-36.439082,145.225535,Goulburn Valley Health,
+H0300,Northeast Health Wangaratta,0,0,-36.354035,146.313889,Northeast Health Wangaratta,Northeast Health [Wangaratta]
+H0301,Tallangatta Health Service,0,0,-36.213705,147.183709,Tallangatta Health Service,
+H0302,Albury Wodonga Health [Wodonga Campus],0,0,-36.131791,146.879417,Albury Wodonga Health,Wodonga
+H0303,Yarrawonga Health,0,0,-36.011547,146.006584,Yarrawonga District Health Service,YDHS
+H0304,Alpine Health [Myrtleford],0,0,-36.554525,146.728795,Alpine Health (Vic),
+H0305,Alpine Health [Bright],0,0,-36.732701,146.965924,Alpine Health (Vic),
+H0306,Alpine Health [Mount Beauty],0,0,-36.743354,147.169359,Alpine Health (Vic),
+H0307,Corryong Health,0,0,-36.198711,147.902798,Upper Murray Health and Community Services (Corryong),Formerly Upper Murray Health & Community Services [Corryong]
+H0308,Seymour District Memorial Hospital,0,0,-37.018384,145.138771,Seymour District Memorial Hospital,
+H0309,Mansfield District Hospital,0,0,-37.057574,146.086149,Mansfield District Hospital,
+H0310,Alexandra District Hospital,0,0,-37.195065,145.716143,Alexandra District Hospital,
+H0311,Numurkah & District Health Service,0,0,-36.100001,145.443695,NCN Health,
+H0312,The Kilmore & District Hospital,0,0,-37.301794,144.957915,Northern Health (Vic),
+H0313,Yea & District Memorial Hospital,0,0,-37.213634,145.430724,Yea and District Memorial Hospital,
+H0314,Nathalia District Hospital,0,0,-36.054754,145.204324,NCN Health,
+H0315,Benalla & District Memorial Hospital,0,0,-36.555239,145.994675,Benalla and District Memorial Hospital,Benalla Health
+H0316,Beechworth Health Service,0,0,-36.349359,146.690739,Beechworth Health Service,
+H0317,Cobram District Health,0,0,-35.916273,145.651029,NCN Health,Cobram District Hospital
+H0318,Bairnsdale Regional Health Service,0,0,-37.830814,147.607905,Bairnsdale Regional Health Service,Bairnsdale
+H0319,West Gippsland Healthcare Group [Warragul],0,0,-38.173009,145.926804,West Gippsland Healthcare Group,WGHG; West Gippsland [Warragul]
+H0320,Bass Coast Health,0,0,-38.608747,145.580906,Bass Coast Regional Health,BCRH; Bass Coast [Wonthaggi]
+H0321,Yarram & District Health Service,0,0,-38.556975,146.678316,Yarram and District Health Service,YDHS
+H0322,Omeo District Health,0,0,-37.098142,147.597321,Omeo District Health,GHA
+H0323,Central Gippsland Health Service [Sale],0,0,-38.108408,147.080637,Central Gippsland Health Service,GHA; Central Gippsland [Sale]
+H0324,Gippsland Southern Health Service - Korumburra,0,0,-38.430328,145.828249,Gippsland Southern Health Service,
+H0325,Gippsland Southern Health Service - Leongatha,0,0,-38.487171,145.950343,Gippsland Southern Health Service,
+H0326,Latrobe Regional Hospital [Traralgon],0,0,-38.218475,146.471335,Latrobe Regional Hospital,LRH; Latrobe Regional [Traralgon]
+H0327,Central Gippsland Health Service [Maffra],0,0,-37.961032,146.983487,Central Gippsland Health Service,GHA
+H0328,South Gippsland Hospital [Foster],0,0,-38.658319,146.207031,South Gippsland Hospital (Foster),
+H0329,Orbost Regional Health,0,0,-37.701844,148.464957,Orbost Regional Health,
+H0330,Box Hill Hospital,0,0,-37.813682,145.119094,Eastern Health (Vic),Box Hill
+H0331,Monash Medical Centre [Clayton],0,0,-37.9275697,145.1587291,Monash Health,Monash [Clayton]
+H0332,Maroondah Hospital [East Ringwood],0,0,-37.806884,145.254535,Eastern Health (Vic),Maroondah
+H0333,Angliss Hospital,0,0,-37.898663,145.314166,Eastern Health (Vic),Angliss
+H0334,St George's Health Service- Aged Care,0,0,-37.809085,145.052585,St Vincent's Hospital (Melbourne) Limited,
+H0335,Caritas Christi Hospice [Kew],0,0,-37.804706,145.015557,St Vincent's Hospital (Melbourne) Limited,SVHM; St Vincent's Hospital
+H0336,Mercy Health - O'Connell Family Centre,0,0,-37.816688,145.061729,Mercy Public Hospital Inc. (Vic),
+H0337,The Peter James Centre [East Burwood],0,0,-37.852712,145.164542,Eastern Health (Vic),
+H0338,Wantirna Health,0,0,-37.848525,145.225902,Eastern Health (Vic),
+H0339,Royal Talbot Rehabilitation Centre [Kew],0,0,-37.789522,145.023715,Austin Health (Vic),
+H0340,Healesville Hospital and Yarra Valley Health,0,0,-37.646879,145.529032,Eastern Health (Vic),
+H0341,Yarra Ranges Health,0,0,-37.756319,145.351204,Eastern Health (Vic),IECHS
+H0342,Monash Medical Centre [Moorabbin],0,0,-37.920697,145.063197,Monash Health,Monash [Moorabbin]
+H0343,Rosebud Hospital,0,0,-38.362168,144.884899,Peninsula Health (Vic),Rosebud
+H0344,Sandringham Hospital,0,0,-37.961049,145.018157,Alfred Health (Vic),Sandringham
+H0345,Caulfield Hospital,0,0,-37.882707,145.016892,Alfred Health (Vic),
+H0346,Kooweerup Regional Health Service,0,0,-38.200653,145.484433,Kooweerup Regional Health Service,
+H0347,Kingston Centre [Cheltenham],0,0,-37.955018,145.078969,Monash Health,
+H0348,Dandenong Hospital,0,0,-37.976459,145.218529,Monash Health,Dandenong
+H0349,Cranbourne Integrated Care Centre,0,0,-38.113312,145.280832,Monash Health,Cranbourne
+H0350,Frankston Hospital,0,0,-38.150791,145.128428,Peninsula Health (Vic),Frankston
+H0351,Calvary Health Care Bethlehem,0,0,-37.896962,145.013415,Calvary Health Care Bethlehem Limited,
+H0352,Queen Elizabeth Centre [Noble Park],0,0,-37.972053,145.178285,Victoria Virtual Local Hospital Network,QEC
+H0353,Casey Hospital,0,0,-38.045325,145.347181,Monash Health,Casey
+H0354,Mount Eliza Aged Care & Rehabilitation Service,0,1,,,,
+H0355,Rosebud Rehabilitation Unit,0,1,,,,
+H0356,Golf Links Road Rehabilitation Centre,0,0,-38.173447,145.149769,Peninsula Health (Vic),
+H0357,The Mornington Centre,0,0,-38.230174,145.041697,Peninsula Health (Vic),
+H0358,The Alfred,0,0,-37.846087,144.981937,Alfred Health (Vic),The Alfred
+H0359,Austin Hospital [Heidelberg],0,0,-37.756355,145.060236,Austin Health (Vic),Austin
+H0360,Heidelberg Repatriation Hospital [Heidelberg West],0,0,-37.755973,145.04749,Austin Health (Vic),
+H0361,Bundoora Extended Care Centre,0,0,-37.701124,145.055569,Northern Health (Vic),
+H0362,Mercy Hospital for Women,0,0,-37.756075,145.061008,Mercy Public Hospital Inc. (Vic),Mercy Women's VIC
+H0363,Western Hospital [Footscray],0,0,-37.792298,144.887191,Western Health (Vic),WH; Western
+H0364,Royal Children's Hospital [Parkville],0,0,-37.794997,144.950859,Royal Children's Hospital (Melbourne),RCH; Royal Children's VIC
+H0365,Royal Children's Hospital [Travancore Psych],0,1,,,,RCH
+H0366,Royal Women's Hospital [Parkville],0,0,-37.798772,144.954825,Royal Women's Hospital (Melbourne),Royal Women's Hospital [Carlton]; Royal Women's VIC
+H0367,The Royal Victorian Eye & Ear Hospital,0,0,-37.808978,144.976245,Royal Victorian Eye and Ear Hospital,RVEEH; Victorian Eye & Ear
+H0368,The Northern Hospital [Epping],0,0,-37.653417,145.014381,Northern Health (Vic),NH; The Northern
+H0369,Werribee Mercy Hospital,0,0,-37.886587,144.698621,Mercy Public Hospital Inc. (Vic),Mercy Public Hospital [Werribee]; Werribee Mercy Public
+H0370,Orygen Inpatient Unit,0,0,-37.791926,144.886617,Melbourne Health,OYH
+H0371,Royal Melbourne Hospital [City Campus],0,0,-37.799259,144.956864,Melbourne Health,MH; Royal Melbourne
+H0372,Royal Melbourne Hospital [Royal Park Campus],0,0,-37.778813,144.948049,Melbourne Health,
+H0373,Sunshine Hospital,0,0,-37.759179,144.816477,Western Health (Vic),Sunshine
+H0374,St Vincent's Hospital [Melbourne],0,0,-37.806545,144.975231,St Vincent's Hospital (Melbourne) Limited,St Vincent's VIC
+H0375,Williamstown Hospital,0,0,-37.863576,144.892339,Western Health (Vic),Williamstown
+H0376,Peter MacCallum Cancer Centre,0,0,-37.80001,144.956607,Peter MacCallum Cancer Institute (Vic),Peter MacCallum
+H0377,Tweddle Child & Family Health Centre [Footscray],0,0,-37.797407,144.887421,Tweddle Child and Family Health Service,
+H0378,Sunbury Day Hospital,0,0,-37.576998,144.732674,Western Health (Vic),
+H0379,Broadmeadows Health Service,0,0,-37.684321,144.913106,Northern Health (Vic),Broadmeadows
+H0380,Craigieburn Health Service,0,0,-37.596015,144.91928,Northern Health (Vic),
+H0381,The Royal Dental Hospital of Melbourne,0,0,-37.799299,144.964529,Unknown,Dental Health Services Victoria; RDHM
+H0383,Victorian Institute of Forensic Mental Health,0,0,-37.78931,145.012975,Victorian Institute of Forensic Mental Health,VIFMH
+H0384,Victorian Institute of Forensic Mental Health Prison Health Service,0,0,-37.812763,144.950757,Victorian Institute of Forensic Mental Health,VIFMH; Prison Health Service; MAP
+H0749,Women's at Sandringham,0,0,-37.961049,145.018157,Royal Women's Hospital (Melbourne),
+H1005,Careplans Assessment Victoria,0,1,,,,
+H1009,Dame Phyllis Frost Centre - Marmak unit,0,0,-37.781307,144.742309,Unknown,
+H1035,Sydney Road Clinic,0,1,,,,
+H1046,Mallee Track Health & Community Service [Sea Lake],0,0,-35.500395,142.858003,Mallee Track Health and Community Service,MTHCS - Sea Lake Service Centre
+H1047,Ursula Frayne Centre,0,0,-37.791148,144.886747,Mercy Public Hospital Inc. (Vic),
+H1049,St Vincent's On the Park,0,0,-37.81115,144.97784,St Vincent's Hospital (Melbourne) Limited,
+H1054,Victorian Heart Hospital,0,0,-37.91254,145.13984,Monash Health,
+H1055,Blackburn Public Surgical Centre,0,0,-37.83332,145.15611,Eastern Health (Vic),
+H1056,Frankston Public Surgical Centre,0,0,-38.1544,145.13313,Peninsula Health (Vic),
+H1057,Sandringham Monash,0,0,-37.961049,145.018157,Monash Health,
+H1060,Casey Early Parenting Centre,0,0,-38.09400971455602,145.34344614603108,Monash Health,
+H1061,Wyndham Early Parenting Centre,0,0,-37.887658114488794,144.6923555976354,Not stated/inadequately described,
+H1062,Whittlesea Early Parenting Centre,0,0,-37.64895327721592,145.07769055344102,Mercy Public Hospital Inc. (Vic),
+H1065,Barwon Health North,0,0,,,Barwon Health,
+H1066,Wayipunga Early Parenting Centre,0,0,-36.765508992623616,144.29099262505918,Bendigo Health Care Group,
+H1067,Goulburn Valley Health [Euroa],0,0,-36.75912524197217,145.57030258412962,Goulburn Valley Health,
+H5005,Albert Road Clinic,1,0,-37.834246,144.972151,,
+H5017,Beleura Private Hospital,1,0,-38.225484,145.049136,,
+H5018,Bellbird Private Hospital,1,1,,,,
+H5027,Cabrini Brighton,1,0,-37.91165,144.991572,,
+H5028,Cabrini Health Elsternwick Rehabilitation - Glenhuntly Rd,1,0,-37.88543,145.009328,,
+H5029,Cabrini Health Elsternwick Rehabilitation - Hopetoun,1,0,-37.884778,145.01039,,
+H5030,Cabrini Malvern,1,0,-37.861641,145.0335,,
+H5031,Cabrini Prahran,1,0,-37.854034,145.009017,,
+H5058,Cotham Private Hospital,1,1,,,,
+H5063,Donvale Rehabilitation Hospital,1,0,-37.789836,145.171655,,
+H5064,Dorset Rehabilitation Centre,1,0,-37.723402,144.947436,,
+H5068,Epworth Cliveden,1,1,,,,
+H5069,Epworth Eastern,1,0,-37.814678,145.119368,,
+H5070,Epworth Freemasons [Albert Street],1,0,-37.810694,144.984107,,Freemasons
+H5071,Epworth Freemasons [Victoria Parade],1,0,-37.809284,144.98212,,Freemasons
+H5072,Epworth Rehabilitation Brighton,1,0,-37.913689,145.002815,,
+H5073,Epworth Camberwell,1,0,-37.846223,145.054689,,Epworth Rehabilitation Camberwell
+H5074,Epworth Richmond Rehabilitation,1,0,-37.817419,144.993503,,Epworth Rehabilitation Richmond
+H5075,Epworth Richmond,1,0,-37.817433,144.993029,,Epworth Hospital
+H5081,Frances Perry House,1,0,-37.798758,144.955135,,
+H5083,Geelong Private Hospital,1,1,,,,
+H5084,Ramsay Surgical Centre Glenferrie,1,0,-37.819459,145.031544,,
+H5101,John Fawkner Private Hospital,1,0,-37.754369,144.958398,,
+H5107,Knox Private Hospital,1,0,-37.849645,145.228035,,
+H5111,Linacre Private Hospital,1,0,-37.942699,145.003259,,
+H5114,Maryvale Private Hospital,1,0,-38.215028,146.418561,,
+H5115,Masada Private Hospital,1,0,-37.869799,145.003096,,
+H5130,Melbourne Private Hospital,1,0,-37.798272,144.957025,,
+H5132,St Vincent's Private Hospital [East Melbourne],1,0,-37.811733,144.984164,,Mercy Private
+H5135,Mildura Health Private Hospital,1,0,-34.18479,142.145705,,Mildura Private Hospital
+H5136,Mitcham Private Hospital,1,0,-37.810436,145.194808,,
+H5144,Murray Valley Private Hospital,1,0,-36.138419,146.876478,,
+H5151,North Eastern Rehabilitation Centre,1,0,-37.763424,145.031344,,
+H5154,Northpark Private Hospital,1,0,-37.691208,145.061631,,
+H5167,Peninsula Private Hospital Victoria,1,0,-38.157557,145.169552,,
+H5175,Ringwood Private Hospital,1,0,-37.811523,145.243629,,
+H5179,Shepparton Private Hospital,1,0,-36.359183,145.410825,,
+H5182,South Eastern Private Hospital,1,0,-37.966243,145.191922,,South Eastern Private
+H5192,St John of God Ballarat Hospital,1,0,-37.558544,143.847406,,
+H5193,St John of God Bendigo Hospital,1,0,-36.762043,144.263298,,
+H5194,St John of God Berwick Hospital,1,0,-38.034499,145.344974,,
+H5197,St John of God Geelong Hospital,1,0,-38.151567,144.357679,,
+H5202,St John of God Warrnambool Hospital,1,0,-38.371405,142.478749,,
+H5203,St John of God Frankston Rehabilitation Hospital,1,0,-38.153035,145.155926,,St John of God Nepean Rehabilitation Hospital
+H5204,St John of God Pinelodge Clinic,1,1,,,,
+H5209,St Vincent's Private Hospital Fitzroy,1,0,-37.807993,144.976029,,STVPH
+H5222,The Avenue Hospital,1,0,-37.854809,144.998513,,
+H5223,The Bays Hospital,1,0,-38.223524,145.040939,,
+H5226,The Geelong Clinic,1,0,-38.182406,144.393267,,
+H5231,The Melbourne Clinic,1,0,-37.814361,144.998739,,
+H5236,Mulgrave Private Hospital,1,0,-37.938409,145.213122,,Formerly The Valley Private Hospital
+H5237,The Victoria Clinic,1,0,-37.847714,144.997225,,
+H5238,The Victorian Rehabilitation Centre,1,0,-37.898227,145.161425,,
+H5245,Victoria Parade Surgery Centre,1,0,-37.808521,144.97476,,VPSC
+H5246,St Vincent's Private Hospital [Kew],1,0,-37.806567,145.023694,,Vimy Private
+H5248,Wangaratta Private Hospital,1,0,-36.349299,146.312423,,
+H5250,Warringal Private Hospital,1,0,-37.754419,145.060728,,
+H5251,Waverley Private Hospital,1,0,-37.884632,145.145798,,Mt Waverley Private Hospital
+H5255,Western Private Hospital,1,0,-37.793045,144.885932,,
+H5276,Manningham Day Procedure Centre,1,0,-37.773471,145.115662,,MDPC
+H5279,Vision Day Surgery Eastern,1,0,-37.817591,145.119433,,Vision Eye Institute
+H5280,Vision Day Surgery Camberwell,1,0,-37.83252,145.0556,,Vision Eye Institute
+H5281,Vision Day Surgery Footscray,1,0,-37.800508,144.895155,,Vision Eye Institute
+H5286,Vision Eye Institute,1,0,-37.850605,144.980304,,
+H5289,Epworth Hawthorn,1,0,-37.821229,145.023405,,Epworth Rehabilitation Hawthorn
+H5307,Hobsons Bay Endoscopy Centre Werribee,1,0,-37.890649,144.686494,,
+H5308,Altona Endoscopy Centre,1,0,-37.869448,144.828494,,Hobsons Bay Endoscopy Centre Altona
+H5309,Hobsons Bay Endoscopy Centre Sydenham,1,0,-37.693365,144.758677,,
+H5314,Ballarat Day Procedure Centre,1,0,-37.540799,143.83214,,
+H5327,Frankston Private Hospital,1,1,,,,
+H5328,Jessie McPherson Private Hospital,1,0,-37.9201,145.1225,,
+H5337,La Trobe Private Hospital,1,0,-37.716679,145.044334,,
+H5338,Holmesglen Private Hospital,1,0,-37.935738,145.050581,,
+H5339,Epworth Geelong,1,0,-38.193882,144.302472,,
+H5354,Brunswick Private Hospital,1,0,-37.756737,144.972183,,
+H5355,St Vincent's Private Hospital [Werribee],1,0,-37.887905,144.701508,,
+H5371,Bendigo Day Surgery,1,0,-36.761902,144.261673,,
+H5383,Delmont Private Hospital,1,0,-37.856853,145.094055,,
+H5387,Forest Hill Dialysis Clinic,1,0,-37.836281,145.166397,,
+H5408,Malvern Dialysis Clinic,1,0,-37.851421,145.030624,,
+H5413,Monash House Private Hospital,1,0,-37.920898,145.120193,,
+H5416,Neerim District Health Service,1,0,-38.022629,145.953903,,
+H5425,PANCH Day Surgery Centre,1,0,-37.752338,145.006271,,
+H5444,The Glen Endoscopy Centre,1,0,-37.884701,145.165359,,
+H5445,The Melbourne Eastern Private Hospital,1,0,-37.855701,145.269073,,
+H5455,Ballan District Health & Care,1,0,-37.59919,144.2228,,
+H5457,Bayside Endoscopy Day Hospital,1,0,-37.933098,145.036667,,
+H5461,Bayside Day Procedure and Specialist Centre,1,0,-38.148136,145.143524,,
+H5462,Bayswater Day Procedure and Specialist Centre,1,1,,,,
+H5463,Casey Day Hospital,1,0,-38.02488,145.31446,,
+H5466,Eastside Endoscopy Centre,1,0,-37.819901,145.228134,,
+H5467,Euroa Health,1,0,-36.75922,145.570465,,
+H5468,Greensborough Day Surgery,1,0,-37.70393,145.10629,,
+H5469,Heyfield Hospital,1,0,-37.97633,146.784012,,
+H5472,Kew Endoscopy Centre,1,0,-37.79461,145.06255,,
+H5475,Melbourne Endoscopy Monash Day Procedure Centre,1,0,-37.921371,145.120255,,
+H5476,Melbourne Endoscopy,1,0,-37.811069,144.984085,,
+H5490,Toorak Cosmetic Surgery Day Centre,1,0,-37.84138,145.00798,,
+H5515,Chesterville Day Hospital,1,0,-37.96,145.056,,
+H5520,Glen Iris Private,1,0,-37.858,145.093,,
+H5522,Sir John Monash Private Hospital,1,0,-37.918,145.121,,
+VicCH,Vic Children's hospitals,0,0,,,,
+VicL,Vic Large hospitals,0,0,,,,
+VicM,Vic Medium hospitals,0,0,,,,
+VicMJ,Vic Major hospitals,0,0,,,,
+VicS,Vic Small hospitals,0,0,,,,
+VicU,Vic Unpeered,0,0,,,,
+LHN201,Beaufort and Skipton Health Service,0,0,-37.557513,143.3749155,Beaufort & Skipton Health Service [Skipton],
+LHN202,East Grampians Health Service,0,0,-37.411807,142.839364,East Grampians Health Service [Ararat],
+LHN203,Ballarat Health Services,0,1,,,,
+LHN204,Stawell Regional Health,0,1,,,,
+LHN205,East Wimmera Health Service,0,0,-36.2611642,143.1437636,East Wimmera Health Service [St Arnaud],
+LHN206,Hepburn Health Service,0,1,,,,
+LHN207,Maryborough District Health Service,0,0,-36.950025,143.7364155,Maryborough District Health Service [Maryborough],
+LHN208,Djerriwarrh Health Service (Vic),0,1,,,,
+LHN209,Western Health (Vic),0,0,-37.726128,144.7200382,Djerriwarrh Health Service [Bacchus Marsh],
+LHN210,Bendigo Health Care Group,0,0,-36.749823,144.2818855,The Bendigo Hospital,
+LHN211,Heathcote Health,0,0,-36.925786,144.709499,Heathcote Health,
+LHN212,Swan Hill District Health,0,0,-35.26332,143.455971,Swan Hill District Health [Swan Hill],
+LHN213,Cohuna District Hospital,0,0,-35.800063,144.214911,Cohuna District Hospital,
+LHN214,Echuca Regional Health,0,0,-36.138186,144.748369,Echuca Regional Health,
+LHN215,Kerang District Health,0,0,-35.724287,143.916563,Kerang District Health,
+LHN216,Maldon Hospital,0,1,,,,
+LHN218,Boort District Health,0,0,-36.111703,143.727285,Boort District Health,
+LHN219,Rochester and Elmore District Health Service,0,0,-36.366579,144.697751,Rochester & Elmore District Health Service,
+LHN220,Inglewood and District Health Service,0,0,-36.572147,143.873755,Inglewood & District Health Service,
+LHN221,Castlemaine Health,0,1,,,,
+LHN222,Kyneton District Health Service,0,1,,,,
+LHN223,Royal Children's Hospital (Melbourne),0,0,-37.794997,144.950859,Royal Children's Hospital [Parkville],
+LHN224,Royal Women's Hospital (Melbourne),0,0,-37.8799105,144.986491,Royal Women's Hospital [Parkville],
+LHN225,Melbourne Health,0,0,-37.78999933,144.93051,Orygen Inpatient Unit,
+LHN226,Northern Health (Vic),0,0,-37.65871925,144.975584,The Kilmore & District Hospital,
+LHN227,Victorian Institute of Forensic Mental Health,0,0,-37.8010365,144.981866,Victorian Institute of Forensic Mental Health,
+LHN228,Colac Area Health,0,0,-38.341201,143.582854,Colac Area Health,
+LHN229,Hesse Rural Health Service (Winchelsea),0,0,-38.243369,143.985357,Hesse Rural Health Service [Winchelsea],
+LHN230,Otway Health and Community Services (Apollo Bay),0,1,,,,
+LHN231,Barwon Health,0,0,-38.135164,144.350346,University Hospital Geelong,
+LHN232,Lorne Community Hospital,0,1,,,,
+LHN233,Alexandra District Hospital,0,0,-37.195065,145.716143,Alexandra District Hospital,
+LHN234,Eastern Health (Vic),0,0,-37.807123,145.2643231,Box Hill Hospital,
+LHN235,Goulburn Valley Health,0,0,-36.46351133,145.213013,Goulburn Valley Health [Waranga],
+LHN236,Kyabram and District Health Service,0,0,-36.315539,145.042705,Kyabram & District Health Service,
+LHN237,Numurkah and District Health Service,0,1,,,,
+LHN238,Nathalia District Hospital,0,1,,,,
+LHN239,Cobram District Health,0,1,,,,
+LHN240,Seymour District Memorial Hospital,0,0,-37.018384,145.138771,Seymour District Memorial Hospital,
+LHN242,Yea and District Memorial Hospital,0,0,-37.213634,145.430724,Yea & District Memorial Hospital,
+LHN243,Northeast Health Wangaratta,0,0,-36.354035,146.313889,Northeast Health Wangaratta,
+LHN244,Yarrawonga District Health Service,0,0,-36.011547,146.006584,Yarrawonga Health,
+LHN245,Alpine Health (Vic),0,0,-36.67686,146.9546927,Alpine Health [Myrtleford],
+LHN246,Mansfield District Hospital,0,0,-37.057574,146.086149,Mansfield District Hospital,
+LHN247,Benalla and District Memorial Hospital,0,1,,,Benalla & District Memorial Hospital,
+LHN248,Tallangatta Health Service,0,0,-36.213705,147.183709,Tallangatta Health Service,
+LHN249,Albury Wodonga Health,0,0,-36.105096,146.9092815,Albury Wodonga Health [Wodonga Campus],
+LHN250,Upper Murray Health and Community Services (Corryong),0,0,-36.198711,147.902798,Corryong Health,
+LHN251,Beechworth Health Service,0,0,-36.349359,146.690739,Beechworth Health Service,
+LHN252,West Gippsland Healthcare Group,0,0,-38.173009,145.926804,West Gippsland Healthcare Group [Warragul],
+LHN253,Bass Coast Regional Health,0,0,-38.608747,145.580906,Bass Coast Health,
+LHN254,Gippsland Southern Health Service,0,0,-38.4587495,145.889296,Gippsland Southern Health Service - Korumburra,
+LHN255,South Gippsland Hospital (Foster),0,0,-38.658319,146.207031,South Gippsland Hospital [Foster],
+LHN256,Bairnsdale Regional Health Service,0,0,-37.830814,147.607905,Bairnsdale Regional Health Service,
+LHN257,Yarram and District Health Service,0,0,-38.556975,146.678316,Yarram & District Health Service,
+LHN258,Omeo District Health,0,0,-37.098142,147.597321,Omeo District Health,
+LHN259,Central Gippsland Health Service,0,0,-38.03472,147.032062,Central Gippsland Health Service [Sale],
+LHN260,Latrobe Regional Hospital,0,0,-38.218475,146.471335,Latrobe Regional Hospital [Traralgon],
+LHN261,Orbost Regional Health,0,0,-37.701844,148.464957,Orbost Regional Health,
+LHN262,St Vincent's Hospital (Melbourne) Limited,0,0,-37.80677867,145.0144577,St George's Health Service- Aged Care,
+LHN263,Royal Victorian Eye and Ear Hospital,0,0,-37.808978,144.976245,The Royal Victorian Eye & Ear Hospital,
+LHN264,Peter MacCallum Cancer Institute (Vic),0,0,-37.80001,144.956607,Peter MacCallum Cancer Centre,
+LHN266,Austin Health (Vic),0,0,-37.76728333,145.0438137,Royal Talbot Rehabilitation Centre [Kew],
+LHN267,Mercy Public Hospital Inc. (Vic),0,0,-37.8126245,144.9270263,Mercy Health - O'Connell Family Centre,
+LHN268,Alfred Health (Vic),0,0,-37.89661433,145.005662,Sandringham Hospital,
+LHN269,Monash Health,0,0,-37.97779,145.1788109,Monash Medical Centre [Clayton],
+LHN270,Peninsula Health (Vic),0,0,-38.214196,145.0675846,Rosebud Hospital,
+LHN271,Kooweerup Regional Health Service,0,0,-38.200653,145.484433,Kooweerup Regional Health Service,
+LHN274,Rural Northwest Health (Vic),0,0,-35.9924075,142.37401,Rural Northwest Health [Warracknabeal],
+LHN275,Wimmera Health Care Group,0,1,,,,
+LHN276,Dunmunkle Health Services,0,0,-36.5796129333333,142.433499733333,,
+LHN277,West Wimmera Health Service,0,0,-36.2793932,141.9026464,West Wimmera Health Service [Rupanyup],
+LHN278,Edenhope and District Memorial Hospital,0,1,,,,
+LHN279,Mildura Base Hospital,0,0,-34.185634,142.143348,Mildura Base Hospital,
+LHN280,Mallee Track Health and Community Service,0,0,-35.287372,142.585174,Mallee Track Health & Community Service [Ouyen],
+LHN281,Robinvale District Health Services,0,0,-34.8175505,142.8309395,Manangatang & District Hospital,
+LHN282,Western District Health Service (Vic),0,0,-37.73789433,142.0017037,Western District Health Service [Hamilton],
+LHN283,Casterton Memorial Hospital,0,0,-37.589989,141.392283,Casterton Memorial Hospital,
+LHN284,South West Healthcare (Vic),0,0,-38.308593,142.8053455,South West Healthcare [Warrnambool],
+LHN285,Heywood Rural Health,0,0,-38.137788,141.624256,Heywood Rural Health,
+LHN286,Timboon and District Healthcare Service,0,0,-38.486231,142.976717,Timboon & District Healthcare Service,
+LHN287,Moyne Health Services (Port Fairy),0,0,-38.381599,142.227523,Moyne Health Services [Port Fairy],
+LHN288,Portland District Health,0,0,-38.340713,141.606087,Portland District Health,
+LHN289,Terang and Mortlake Health Service (Terang),0,0,-38.239388,142.902119,Terang & Mortlake Health Service [Terang],
+LHN290,Calvary Health Care Bethlehem Limited,0,0,-37.896962,145.013415,Calvary Health Care Bethlehem,
+LHN291,NCN Health,0,0,-35.9982343333333,145.429456333333,Numurkah & District Health Service,
+LHN292,Great Ocean Road Health,0,0,-38.649683,143.8225035,Otway Health & Community Services [Apollo Bay],
+LHN293,Central Highlands Rural Health,0,0,-37.3376626666667,144.169016333333,Daylesford District Hospital,
+LHN294,Grampians Health,0,0,-37.063527,142.6655908,Ballarat Health Services [Base Hospital],
+LHN295,Dhelkaya Health,0,0,-37.022606,144.137996,Maldon Hospital,
+LHN299,Victoria Virtual Local Hospital Network,0,1,,,Queen Elizabeth Centre [Noble Park],
+Vic,Victoria,0,0,,,,
+PHN201,North Western Melbourne,0,0,,,,
+PHN202,Eastern Melbourne,0,0,,,,
+PHN203,South Eastern Melbourne,0,0,,,,
+PHN204,Gippsland,0,0,,,,
+PHN205,Murray,0,0,,,,
+PHN206,Western Victoria,0,0,,,,

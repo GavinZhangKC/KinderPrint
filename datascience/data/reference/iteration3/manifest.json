@@ -1,0 +1,212 @@
+{
+  "files": {
+    "afcd_r3_selected_per100g.csv": {
+      "acquired_utc": "2026-09-29T000000Z",
+      "columns": [
+        "Public Food Key",
+        "Classification",
+        "Food Name",
+        "Energy with dietary fibre, equated (kJ)",
+        "Protein (g)",
+        "Fat, total (g)",
+        "Total dietary fibre (g)",
+        "Total sugars (g)",
+        "Added sugars (g)",
+        "Calcium (Ca) (mg)",
+        "Iodine (I) (ug)",
+        "Iron (Fe) (mg)",
+        "Magnesium (Mg) (mg)",
+        "Potassium (K) (mg)",
+        "Sodium (Na) (mg)",
+        "Zinc (Zn) (mg)",
+        "Vitamin A retinol equivalents (ug)",
+        "Dietary folate equivalents (ug)",
+        "Vitamin C (mg)",
+        "Vitamin D3 equivalents (ug)",
+        "Total long chain omega 3 fatty acids, equated (%T)",
+        "Total long chain omega 3 fatty acids, equated (mg)"
+      ],
+      "content_sha256": "948f4b5f071ee3d09fec046cb159ca798431c1dd4749593126f3bad67afa9ecc",
+      "file_sha256": "ac3783113a79afb580f7b53bdb4d77269dfecce3cd3a0f058ba217dad26198be",
+      "rows": 1588,
+      "source_id": "fsanz_afcd_release_3",
+      "source_url": "https://www.foodstandards.gov.au/science-data/food-nutrient-databases/afcd/data-files",
+      "status": "offline-verified",
+      "verified_utc": "2026-09-29T151127Z"
+    },
+    "aihw_mbs_local_areas_vic_2024_25.csv": {
+      "acquired_utc": "2026-09-29T000000Z",
+      "columns": [
+        "unit",
+        "code",
+        "name",
+        "service",
+        "measure",
+        "demographic",
+        "value",
+        "flag"
+      ],
+      "content_sha256": "aa0fbc2ec66c4abe48b2ae6416f51f84f02156ae202ec5739b64cf12afca9232",
+      "file_sha256": "d3a4d8f5b7927287def784d3c7d66ba2de46fa281a09c3c8814fcc2b04e4cbaa",
+      "rows": 8442,
+      "source_id": "aihw_phc_019_mbs_local_areas_2024_25",
+      "source_url": "https://www.aihw.gov.au/reports/primary-health-care/medicare-subsidised-gp-allied-health-specialist/data",
+      "status": "offline-verified",
+      "verified_utc": "2026-09-29T151127Z"
+    },
+    "myhospitals_reported_measures.csv": {
+      "acquired_utc": "2026-09-29T000000Z",
+      "columns": [
+        "reported_measure_code",
+        "measure_code",
+        "measure_name",
+        "reported_measure_name",
+        "units"
+      ],
+      "content_sha256": "4f252872e1b5d6dcd8051e0030bdd1e88cffb84915883c34213400d4d00769f2",
+      "file_sha256": "4f252872e1b5d6dcd8051e0030bdd1e88cffb84915883c34213400d4d00769f2",
+      "rows": 44,
+      "source_id": "aihw_myhospitals_api_2026",
+      "source_url": "https://myhospitalsapi.aihw.gov.au/api/v1/",
+      "status": "offline-verified",
+      "verified_utc": "2026-09-29T151127Z"
+    },
+    "myhospitals_vic_data_items.csv": {
+      "acquired_utc": "2026-09-29T000000Z",
+      "columns": [
+        "code",
+        "reported_measure_code",
+        "value",
+        "start",
+        "end",
+        "suppressions",
+        "peer_group"
+      ],
+      "content_sha256": "8eb74be95d55b929a592f1f13ad3f804d1e229b5ae42a1bc63ec4a086efb576d",
+      "file_sha256": "611e0d0bb1d6181c16415104044824b2967f4db87eed2ec2a78b4bd3da3cb441",
+      "rows": 1580,
+      "source_id": "aihw_myhospitals_api_2026",
+      "source_url": "https://myhospitalsapi.aihw.gov.au/api/v1/",
+      "status": "offline-verified",
+      "verified_utc": "2026-09-29T151127Z"
+    },
+    "myhospitals_vic_hospitals.csv": {
+      "acquired_utc": "2026-09-29T000000Z",
+      "columns": [
+        "code",
+        "name",
+        "private",
+        "closed",
+        "latitude",
+        "longitude",
+        "lhn",
+        "alternative_names"
+      ],
+      "content_sha256": "f42ff0fe742248237dd2b2b3a6f1f4e13f5fac77487fec20121ecbfd6c8543d4",
+      "file_sha256": "010d4e3b31bac03cd9beca40ab41ae01861a586932a11e7c6ab2227c7bb707f1",
+      "rows": 373,
+      "source_id": "aihw_myhospitals_api_2026",
+      "source_url": "https://myhospitalsapi.aihw.gov.au/api/v1/",
+      "status": "offline-verified",
+      "verified_utc": "2026-09-29T151127Z"
+    },
+    "nndss_influenza_vic_monthly.csv": {
+      "acquired_utc": "2026-09-29T000000Z",
+      "columns": [
+        "year_month",
+        "age_group",
+        "notifications"
+      ],
+      "content_sha256": "0d21235ed4780525d3f3590a538b0ecc7470e26d86005f297ee80c81b74ebd2c",
+      "file_sha256": "0d21235ed4780525d3f3590a538b0ecc7470e26d86005f297ee80c81b74ebd2c",
+      "rows": 3293,
+      "source_id": "nndss_public_datasets_2025",
+      "source_url": "https://www.cdc.gov.au/resources/collections/nndss-public-datasets",
+      "status": "offline-verified",
+      "verified_utc": "2026-09-29T151127Z"
+    },
+    "nndss_salmonella_vic_monthly.csv": {
+      "acquired_utc": "2026-09-29T000000Z",
+      "columns": [
+        "year_month",
+        "age_group",
+        "notifications"
+      ],
+      "content_sha256": "02400c5b6b6ebdfbc236840cc431b3a2919489c3a832ebad7b5c75307e8919f6",
+      "file_sha256": "02400c5b6b6ebdfbc236840cc431b3a2919489c3a832ebad7b5c75307e8919f6",
+      "rows": 3440,
+      "source_id": "nndss_public_datasets_2025",
+      "source_url": "https://www.cdc.gov.au/resources/collections/nndss-public-datasets",
+      "status": "offline-verified",
+      "verified_utc": "2026-09-29T151127Z"
+    },
+    "osm_food_outlets_melbourne.csv": {
+      "acquired_utc": "2026-09-29T000000Z",
+      "columns": [
+        "osm_id",
+        "name",
+        "shop",
+        "amenity",
+        "organic",
+        "brand",
+        "address",
+        "opening_hours",
+        "latitude",
+        "longitude"
+      ],
+      "content_sha256": "39db7b7a5bb01e5317548aad4d829ae332baee91bac7f2b1ebe3d229a5f1fd4c",
+      "file_sha256": "cad69cd6cb8168ac4d20f9b59ea636f16f00fe274a8fe7a826ccc71a28cfe1c6",
+      "rows": 2795,
+      "source_id": "osm_overpass_food_outlets_2026",
+      "source_url": "https://overpass-api.de/api/interpreter",
+      "status": "offline-verified",
+      "verified_utc": "2026-09-29T151127Z"
+    },
+    "urgent_care_clinics_vic.csv": {
+      "acquired_utc": "2026-09-29T000000Z",
+      "columns": [
+        "name",
+        "address",
+        "suburb_postcode",
+        "phone",
+        "listing_url",
+        "latitude",
+        "longitude"
+      ],
+      "content_sha256": "c5ace740c783fd932e71cc369a65eda13765c5c0127599732196cd8a7aa1a7ab",
+      "file_sha256": "4398acc7d56e02c5cdccab774c9918c9750f0bafe15efe1b3501911d99233151",
+      "rows": 37,
+      "source_id": "betterhealth_urgent_care_clinics_2026",
+      "source_url": "https://www.betterhealth.vic.gov.au/map-data?pid=29639",
+      "status": "offline-verified",
+      "verified_utc": "2026-09-29T151127Z"
+    }
+  },
+  "pipeline": "acquire_iteration3.py",
+  "runs": [
+    {
+      "mode": "offline",
+      "run_utc": "2026-09-29T150543Z",
+      "status": {
+        "aihw_myhospitals_api_2026": "ok",
+        "aihw_phc_019_mbs_local_areas_2024_25": "ok",
+        "betterhealth_urgent_care_clinics_2026": "ok",
+        "fsanz_afcd_release_3": "ok",
+        "nndss_public_datasets_2025": "ok",
+        "osm_overpass_food_outlets_2026": "ok"
+      }
+    },
+    {
+      "mode": "offline",
+      "run_utc": "2026-09-29T151127Z",
+      "status": {
+        "aihw_myhospitals_api_2026": "ok",
+        "aihw_phc_019_mbs_local_areas_2024_25": "ok",
+        "betterhealth_urgent_care_clinics_2026": "ok",
+        "fsanz_afcd_release_3": "ok",
+        "nndss_public_datasets_2025": "ok",
+        "osm_overpass_food_outlets_2026": "ok"
+      }
+    }
+  ]
+}

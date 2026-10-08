@@ -1,0 +1,61 @@
+{
+  "file": "myhospitals_vic_hospitals.csv",
+  "rows": 373,
+  "passed": true,
+  "warnings": [],
+  "rules": [
+    {
+      "rule": "schema: required columns present, no extras",
+      "passed": true,
+      "severity": "error",
+      "missing": [],
+      "unexpected": []
+    },
+    {
+      "rule": "volume: at least 300 rows",
+      "passed": true,
+      "severity": "error",
+      "rows": 373
+    },
+    {
+      "rule": "volume: row drift within +/-30% of previous file",
+      "passed": true,
+      "severity": "error",
+      "previous": 373,
+      "drift": 0.0
+    },
+    {
+      "rule": "keys: key columns populated",
+      "passed": true,
+      "severity": "error",
+      "violations": 0
+    },
+    {
+      "rule": "keys: primary key unique",
+      "passed": true,
+      "severity": "error",
+      "violations": 0,
+      "examples": []
+    },
+    {
+      "rule": "geography: coordinates inside the expected envelope",
+      "passed": true,
+      "severity": "error",
+      "outside": 0,
+      "located": 331
+    },
+    {
+      "rule": "private/closed flags are 0/1 and at least 200 hospital units",
+      "passed": true,
+      "severity": "error",
+      "hospitals": 269,
+      "bad_flags": 0
+    },
+    {
+      "rule": "at least 95% of open hospitals have coordinates",
+      "passed": true,
+      "severity": "error",
+      "located_share": 0.9961
+    }
+  ]
+}

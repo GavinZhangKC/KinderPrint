@@ -1,0 +1,7 @@
+legacy_source_id,register_source_ids,reason
+epa_vic_airwatch_hourly_2018_2025,epa_victoria_validated_hourly_air_2018_2025,Iteration-2 acquisition id (config/iteration_2_datasets.json) for the same EPA AirWatch validated hourly files
+phidu_pha_child_health_2026,phidu_child_youth_pha_2026,Iteration-2 acquisition id for the same PHIDU child and youth PHA workbook
+abs_asgs_sa2_lga_label_point_2023,abs_sa2_lga_label_point_2023,Spelling variant of the ABS SA2-LGA label-point file id
+victoria_school_locations_2025_vif2023,victoria_school_locations_2025;vif2023_child_population,Combined id written by integrate_school_and_child_population.py for a table that joins two sources
+dot_aadt_2019_and_ptv_stops_2026,dot_aadt_2019;ptv_public_transport_stops_2026,Combined id written by integrate_transport_context.py for a table that joins two sources
+vif2023_sa2_age_projections,vif2023_child_population,Iteration-2 acquisition id for the same VIF2023 SA2 age projections

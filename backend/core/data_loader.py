@@ -34,6 +34,8 @@ PHIDU_PHA_SA2_BRIDGE_DATA_PATH_ENV = "KINDERPRINT_PHIDU_PHA_SA2_BRIDGE_DATA_PATH
 DEPARTMENT_AREA_BRIDGE_DATA_PATH_ENV = "KINDERPRINT_DEPARTMENT_AREA_BRIDGE_DATA_PATH"
 BUSHFIRE_CONTEXT_DATA_PATH_ENV = "KINDERPRINT_BUSHFIRE_CONTEXT_DATA_PATH"
 TRANSPORT_CONTEXT_DATA_PATH_ENV = "KINDERPRINT_TRANSPORT_CONTEXT_DATA_PATH"
+SEASONAL_AIR_DATA_PATH_ENV = "KINDERPRINT_SEASONAL_AIR_DATA_PATH"
+NEARBY_SERVICES_DATA_PATH_ENV = "KINDERPRINT_NEARBY_SERVICES_DATA_PATH"
 
 
 def boundary_data_path() -> Path | None:
@@ -161,6 +163,16 @@ def transport_context_data_path() -> Path | None:
     return Path(value).expanduser() if value else None
 
 
+def seasonal_air_data_path() -> Path | None:
+    value = os.getenv(SEASONAL_AIR_DATA_PATH_ENV)
+    return Path(value).expanduser() if value else None
+
+
+def nearby_services_data_path() -> Path | None:
+    value = os.getenv(NEARBY_SERVICES_DATA_PATH_ENV)
+    return Path(value).expanduser() if value else None
+
+
 def load_json_source(path: Path | None, env_name: str, resource_name: str) -> tuple[dict[str, Any] | None, list[dict[str, Any]]]:
     """Load an approved JSON source, reporting configuration errors in-band."""
     if path is None:
@@ -183,3 +195,23 @@ def load_json_source(path: Path | None, env_name: str, resource_name: str) -> tu
             f"{resource_name}_dataset_invalid",
             f"The configured {resource_name} dataset must contain a JSON object.", resource_name)]
     return source, []
+
+
+# Iteration 3 care, seasonal and nutrition context: one validated CSV per resource.
+CARE_CONTEXT_ENV = {
+    "hospital_capability": "KINDERPRINT_HOSPITAL_CAPABILITY_DATA_PATH",
+    "care_compare": "KINDERPRINT_CARE_COMPARE_DATA_PATH",
+    "urgent_care_clinics": "KINDERPRINT_URGENT_CARE_CLINICS_DATA_PATH",
+    "primary_care_cost": "KINDERPRINT_PRIMARY_CARE_COST_DATA_PATH",
+    "seasonal_illness": "KINDERPRINT_SEASONAL_ILLNESS_DATA_PATH",
+    "food_outlets": "KINDERPRINT_FOOD_OUTLETS_DATA_PATH",
+    "food_access": "KINDERPRINT_FOOD_ACCESS_DATA_PATH",
+    "child_nutrient_foods": "KINDERPRINT_CHILD_NUTRIENT_FOODS_DATA_PATH",
+    "child_nutrient_targets": "KINDERPRINT_CHILD_NUTRIENT_TARGETS_DATA_PATH",
+    "practitioner_context": "KINDERPRINT_PRACTITIONER_CONTEXT_DATA_PATH",
+}
+
+
+def care_context_path(resource: str) -> Path | None:
+    value = os.getenv(CARE_CONTEXT_ENV[resource])
+    return Path(value).expanduser() if value else None

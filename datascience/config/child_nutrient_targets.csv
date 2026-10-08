@@ -1,0 +1,8 @@
+nutrient_id,nutrient,unit,basis,age_1_3,age_4_8,age_9_13_boys,age_9_13_girls,why_it_matters,source_url
+iron,Iron,mg,RDI,9,10,8,8,"Carries oxygen in the blood; low iron is linked to tiredness and slower learning.",https://www.eatforhealth.gov.au/nutrient-reference-values/nutrients/iron
+calcium,Calcium,mg,RDI,500,700,1000,1000,"Builds bones and teeth during growth. 9-11 years shown; 12-13 years rises to 1300 mg.",https://www.eatforhealth.gov.au/nutrient-reference-values/nutrients/calcium
+fibre,Dietary fibre,g,AI,14,18,24,20,"Keeps bowels regular and feeds healthy gut bacteria.",https://www.eatforhealth.gov.au/nutrient-reference-values/nutrients/dietary-fibre
+vitamin_c,Vitamin C,mg,RDI,35,35,40,40,"Helps the body absorb iron from plant foods and supports healing.",https://www.eatforhealth.gov.au/nutrient-reference-values/nutrients/vitamin-c
+zinc,Zinc,mg,RDI,3,4,6,6,"Needed for growth and for the immune system.",https://www.eatforhealth.gov.au/nutrient-reference-values/nutrients/zinc
+iodine,Iodine,ug,RDI,90,90,120,120,"Needed for thyroid hormones that drive brain development.",https://www.eatforhealth.gov.au/nutrient-reference-values/nutrients/iodine
+vitamin_d,Vitamin D,ug,AI,5,5,5,5,"Helps absorb calcium. Most comes from sunlight; Melbourne winters have less UV, so food sources matter more then.",https://www.eatforhealth.gov.au/nutrient-reference-values/nutrients/vitamin-d

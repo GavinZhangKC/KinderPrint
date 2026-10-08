@@ -1,0 +1,41 @@
+{
+  "file": "myhospitals_reported_measures.csv",
+  "rows": 44,
+  "passed": true,
+  "warnings": [],
+  "rules": [
+    {
+      "rule": "schema: required columns present, no extras",
+      "passed": true,
+      "severity": "error",
+      "missing": [],
+      "unexpected": []
+    },
+    {
+      "rule": "volume: at least 40 rows",
+      "passed": true,
+      "severity": "error",
+      "rows": 44
+    },
+    {
+      "rule": "volume: row drift within +/-25% of previous file",
+      "passed": true,
+      "severity": "error",
+      "previous": 44,
+      "drift": 0.0
+    },
+    {
+      "rule": "keys: key columns populated",
+      "passed": true,
+      "severity": "error",
+      "violations": 0
+    },
+    {
+      "rule": "keys: primary key unique",
+      "passed": true,
+      "severity": "error",
+      "violations": 0,
+      "examples": []
+    }
+  ]
+}

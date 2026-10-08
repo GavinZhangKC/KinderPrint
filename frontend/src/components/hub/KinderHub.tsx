@@ -41,11 +41,13 @@ import {
   type ScheduleStatus,
 } from '../health/healthPlanning'
 import './KinderHub.css'
+import HealthyDay from './HealthyDay'
+import { TodayParent, TodayPractitioner } from './TodayPage'
 
 /* ------------------------------------------------------------------ types */
 
 export type Audience = 'parent' | 'practitioner'
-type Page = 'home' | 'health' | 'vaccines' | 'food' | 'seasons' | 'care'
+type Page = 'home' | 'day' | 'health' | 'vaccines' | 'food' | 'seasons' | 'care'
 export type BodyId = 'brain' | 'lungs' | 'metabolic' | 'immune' | 'perinatal'
 
 export interface HubData {
@@ -62,6 +64,8 @@ interface KinderHubProps {
   data: HubData
   onSelectLocality: (value: NeighbourhoodSearchResult) => void
   onOpenPlan: (body: BodyId, age: string) => void
+  /** Opens the suitability map. */
+  onOpenMap?: () => void
 }
 
 type Loaded<T> = { data: T | null; loading: boolean; error: string | null }
@@ -71,7 +75,6 @@ type Loaded<T> = { data: T | null; loading: boolean; error: string | null }
 const AUDIENCE_KEY = 'kinderprint-audience'
 const AGE_KEY = 'kinderprint-child-age'
 const PAGE_KEY = 'kinderprint-hub-page'
-const TODO_KEY = 'kinderprint-week-done'
 const STEP_KEY = 'kinderprint-body-steps'
 const BIRTH_KEY = 'kinderprint-child-birth-month'
 const VACCINE_DONE_KEY = 'kinderprint-vaccines-done'
@@ -85,6 +88,7 @@ const MONTH_NAMES = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Se
 
 const NAV: Array<{ id: Page; label: string; icon: ReactNode }> = [
   { id: 'home', label: 'Overview', icon: <path d="M3 11l9-7 9 7v9H5z" /> },
+  { id: 'day', label: 'Healthy day check', icon: <><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 2" /></> },
   { id: 'health', label: 'Health', icon: <path d="M12 21s-7-4.5-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 11c0 5.5-7 10-7 10z" /> },
   { id: 'vaccines', label: 'Vaccines', icon: <path d="M18 2l4 4M17 7l-9 9-3 1 1-3 9-9M3 21l3-3" /> },
   { id: 'food', label: 'Food & play', icon: <path d="M12 7c-3-2-8-1-8 5s4 9 6 9c1 0 1.5-.5 2-.5s1 .5 2 .5c2 0 6-3 6-9s-5-7-8-5zM12 7c0-2 1-4 3-4" /> },
@@ -171,7 +175,6 @@ const inHundred = (value: number | null | undefined) => value === null || value 
 const oneIn = (value: number | null | undefined) => value === null || value === undefined || value <= 0 ? '—' : `1 in ${Math.max(2, Math.round(100 / value))}`
 const count = (value: number | null | undefined) => value === null || value === undefined ? '—' : Math.round(value).toLocaleString('en-AU')
 const monthYear = (date: Date) => date.toLocaleDateString('en-AU', { month: 'short', year: 'numeric' })
-const shortDate = (date: Date) => date.toLocaleDateString('en-AU', { day: 'numeric', month: 'short' })
 const slug = (value: string) => value.replace(/\W+/g, '-').replace(/^-|-$/g, '').toLowerCase()
 const mapsLink = (facility: HealthFacility) => `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${facility.name} ${facility.address}`)}`
 
@@ -221,11 +224,6 @@ function Ring({ value, label, caption, good }: { value: number | null; label: st
     </svg>
     <figcaption><b>{label}</b><span>{caption}</span></figcaption>
   </figure>
-}
-
-function People({ value }: { value: number | null | undefined }) {
-  const lit = Math.round((value ?? 0) / 5)
-  return <div className="kh-people" aria-hidden="true">{Array.from({ length: 20 }, (_, index) => <i key={index} className={index < lit ? 'on' : undefined} />)}</div>
 }
 
 function RangeMarker({ item }: { item: DepartmentAreaIndicator }) {
@@ -371,9 +369,9 @@ function MonthPicker({ value, onChange }: { value: string; onChange: (value: str
   </div>
 }
 
-export default function KinderHub({ locality, data, onSelectLocality, onOpenPlan }: KinderHubProps) {
+export default function KinderHub({ locality, data, onSelectLocality, onOpenPlan, onOpenMap }: KinderHubProps) {
   const [audience, setAudience] = useStored<Audience>(AUDIENCE_KEY, 'parent')
-  const [page, setPage] = useStored<Page>(PAGE_KEY, 'home')
+  const [storedPage, setPage] = useStored<Page>(PAGE_KEY, 'home')
   const [navExpanded, setNavExpanded] = useState(false)
   const [age, setAge] = useState(() => { try { return window.localStorage.getItem(AGE_KEY) ?? '5–9 years' } catch { return '5–9 years' } })
   const [body, setBody] = useState<BodyId>('brain')
@@ -386,6 +384,8 @@ export default function KinderHub({ locality, data, onSelectLocality, onOpenPlan
   const childcare = useEndpoint<EarlyChildhoodServices | null>(signal => api.getEarlyChildhoodServices(locality.id, signal), locality.id)
 
   const parent = audience === 'parent'
+  // The Healthy day check is a parent tool; practitioners land on the overview instead.
+  const page: Page = storedPage === 'day' && !parent ? 'home' : storedPage
   const go = (next: Page) => { setPage(next); window.scrollTo({ top: 0, behavior: 'smooth' }) }
   const context: PageContext = { locality, data, figures, immunisation, nutrition, prevention, childcare, parent, age, body, setBody, go, onOpenPlan }
 
@@ -393,6 +393,7 @@ export default function KinderHub({ locality, data, onSelectLocality, onOpenPlan
   const greeting = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening'
   const heading: Record<Page, [string, string]> = parent ? {
     home: [greeting, `Here’s what matters for a ${age.replace(' years', '')} year old in ${locality.name} right now.`],
+    day: ['Healthy day check', 'Describe a typical weekday. See how it compares with the guidelines and the two changes that would help most.'],
     health: ['Your child’s health, area by area', 'Pick a part of the body to see what local numbers mean and what you can do.'],
     vaccines: ['Vaccines', 'Your child’s free vaccines, what’s next, and how protected your area is.'],
     food: ['Food and play', 'Track today’s serves and see how kids in your region eat and play.'],
@@ -400,6 +401,7 @@ export default function KinderHub({ locality, data, onSelectLocality, onOpenPlan
     care: ['Care nearby', `Health and childcare services listed in ${locality.name}.`],
   } : {
     home: [`${locality.name} · child health brief`, 'Population evidence for planning and service conversations. Every value shows its geography and year.'],
+    day: ['Healthy day check', 'Parent planning tool.'],
     health: ['Child health conditions', 'Exact SA2 observations and separately labelled PHA context. No PHA value is assigned to an SA2.'],
     vaccines: ['Immunisation coverage', 'Australian Immunisation Register coverage via PHIDU, with a pooled Victorian reference.'],
     food: ['Nutrition and activity', 'VCAMS Department-area estimates compared across 17 areas, plus PHA weight estimates.'],
@@ -422,9 +424,12 @@ export default function KinderHub({ locality, data, onSelectLocality, onOpenPlan
     ...(!nutrition.loading && nutrition.data?.locality === null && page === 'food'
       ? ['Nutrition context is unavailable because this locality has no supported regional mapping.'] : []),
   ]
-  const orderedNav = [...NAV.filter(item => item.id === page), ...NAV.filter(item => item.id !== page)]
+  const visibleNav = NAV.filter(item => parent || item.id !== 'day')
+  const orderedNav = [...visibleNav.filter(item => item.id === page), ...visibleNav.filter(item => item.id !== page)]
+  const today = page === 'home'
+  const themeClass = today ? (parent ? ' kt-theme-parent' : ' kt-theme-prac') : ''
 
-  return <div className={`kp-hub ${parent ? 'is-parent' : 'is-practitioner'}`}>
+  return <div className={`kp-hub ${parent ? 'is-parent' : 'is-practitioner'}${themeClass}`} data-page={page}>
     <div className="kh-shell">
       <header className="kh-top">
         <nav className={`kh-nav${navExpanded ? ' is-expanded' : ''}`} aria-label="Dashboard sections" onMouseEnter={() => setNavExpanded(true)} onMouseLeave={() => setNavExpanded(false)} onFocus={() => setNavExpanded(true)} onBlur={event => { if (!event.currentTarget.contains(event.relatedTarget as Node)) setNavExpanded(false) }}>{orderedNav.map(item => <button key={item.id} type="button" aria-current={page === item.id ? 'page' : undefined} onClick={event => { go(item.id); setNavExpanded(false); event.currentTarget.blur() }}>
@@ -436,7 +441,7 @@ export default function KinderHub({ locality, data, onSelectLocality, onOpenPlan
         </div>
       </header>
 
-      <section className="kh-hello" key={`${page}-${audience}`}>
+      {!today && <section className="kh-hello" key={`${page}-${audience}`}>
         <div><h1>{heading[page][0]}</h1><p>{heading[page][1]}</p></div>
         <div className="kh-chips">
           <LocalityPicker locality={locality} onSelect={onSelectLocality} />
@@ -444,11 +449,14 @@ export default function KinderHub({ locality, data, onSelectLocality, onOpenPlan
             ? <AgePicker value={age} onChange={setAge} />
             : <span className="kh-chip">SA2 {locality.id}</span>}
         </div>
-      </section>
+      </section>}
 
       {[...new Set([...pageErrors, ...mappingLimitations])].map(message => <p key={message} className="kh-error" role="alert">{message}</p>)}
       <main className="kh-main" key={`${page}-${audience}-${locality.id}`}>
-        {page === 'home' && <HomePage {...context} />}
+        {page === 'home' && (parent
+          ? <TodayParent locality={locality} age={age} controls={<><LocalityPicker locality={locality} onSelect={onSelectLocality} /><AgePicker value={age} onChange={setAge} /></>} onCheckDay={() => go('day')} onGo={go} onPrepareVisit={() => onOpenPlan('brain', age)} onOpenMap={onOpenMap} />
+          : <TodayPractitioner locality={locality} controls={<LocalityPicker locality={locality} onSelect={onSelectLocality} />} immunisation={immunisation.data} asthma={figures.sa2('asthma')} asthmaRatio={figures.pha('child_asthma')?.standardised_ratio ?? null} services={data.facilities.length} childcareServices={childcare.data?.active_education_care_services} onOpenMap={onOpenMap} onGo={go} />)}
+        {page === 'day' && <HealthyDay age={age} />}
         {page === 'health' && <HealthPage {...context} />}
         {page === 'vaccines' && <VaccinesPage {...context} />}
         {page === 'food' && <FoodPage {...context} />}
@@ -482,163 +490,6 @@ function vaccineRows(birthMonth: string, done: string[], aboriginal: boolean) {
   const schedule = [...NIP_SCHEDULE, ...(aboriginal ? NIP_ABORIGINAL_ADDITIONS : [])].sort((a, b) => a.ageMonths - b.ageMonths)
   if (monthsBetween(birthMonth) === null) return schedule.map(item => ({ item, due: null as Date | null, status: null as ScheduleStatus | null }))
   return schedule.map(item => ({ item, due: dueDate(birthMonth, item.ageMonths), status: scheduleStatus(item, birthMonth, done.includes(item.id)) }))
-}
-
-function HomePage(props: PageContext) {
-  return props.parent ? <ParentHome {...props} /> : <PractitionerHome {...props} />
-}
-
-function ParentHome({ locality, figures, immunisation, nutrition, data, childcare, go, onOpenPlan, age, setBody }: PageContext) {
-  const [doneWeek, setDoneWeek] = useStored<string[]>(TODO_KEY, [])
-  const birthMonth = readStored(BIRTH_KEY, '')
-  const rows = vaccineRows(birthMonth, readStored<string[]>(VACCINE_DONE_KEY, []), readStored(ABORIGINAL_KEY, false))
-  const month = new Date().getMonth()
-  const now = SEASONS.find(item => item.months.includes(month)) ?? SEASONS[0]
-  const nextSeason = SEASONS.filter(item => !item.months.includes(month)).map(item => ({ item, start: nextOccurrence(item.months[0], 1) })).sort((a, b) => a.start.getTime() - b.start.getTime())[0]
-  const nextVaccine = rows.find(row => row.status === 'catch-up' || row.status === 'due-soon')
-  const toddler = figures.sa2('asthma')
-  const vegetables = nutrition.data?.vcams.find(item => item.indicator_id === 'minimum_recommended_vegetables')
-  const twoYear = immunisation.data?.indicators.find(item => item.indicator_id === 'immunised_age_2')
-  const services = data.facilities.length
-  const tasks = [
-    { id: `season-${nextSeason.item.id}`, tone: 'watch', icon: <path d="M12 3v18M5 8c3 0 4 2 7 2s4-2 7-2" />, when: `Starts ${shortDate(nextSeason.start)}`, title: nextSeason.item.title, text: nextSeason.item.actions[0], page: 'seasons' as Page },
-    nextVaccine
-      ? { id: `vaccine-${nextVaccine.item.id}`, tone: 'blue', icon: <path d="M18 2l4 4M17 7l-9 9-3 1 1-3 9-9M3 21l3-3" />, when: nextVaccine.status === 'catch-up' ? 'Catch up' : `Due ${nextVaccine.due ? monthYear(nextVaccine.due) : ''}`, title: `${nextVaccine.item.when} vaccines`, text: 'Free at your GP or council immunisation session.', page: 'vaccines' as Page }
-      : { id: 'vaccine-setup', tone: 'blue', icon: <path d="M18 2l4 4M17 7l-9 9-3 1 1-3 9-9M3 21l3-3" />, when: birthMonth ? 'All up to date' : '2 minutes', title: birthMonth ? 'Vaccines on track' : 'Set up vaccine reminders', text: birthMonth ? 'Nothing is due in the next two months.' : 'Add your child’s birth month to see what is due.', page: 'vaccines' as Page },
-    { id: `now-${now.id}`, tone: 'good', icon: <><circle cx="12" cy="12" r="4" /><path d="M12 2v2M12 20v2M2 12h2M20 12h2" /></>, when: 'This month', title: now.title, text: now.actions[0], page: 'seasons' as Page },
-  ]
-  const toggle = (id: string) => setDoneWeek(current => current.includes(id) ? current.filter(item => item !== id) : [...current, id])
-  return <div className="kh-stack">
-    <Card title="Recommended this week" sub="Seasonal, vaccination and health actions worth checking now." aside={<span className="kh-tag">{tasks.filter(task => doneWeek.includes(task.id)).length} of 3 done</span>}>
-      <div className="kh-week">{tasks.map(task => <article key={task.id} className={`kh-todo tone-${task.tone} ${doneWeek.includes(task.id) ? 'is-done' : ''}`}>
-        <span className="kh-todo-ic"><svg viewBox="0 0 24 24" aria-hidden="true">{task.icon}</svg></span>
-        <span className="kh-when">{task.when}</span>
-        <h3>{task.title}</h3>
-        <p>{task.text}</p>
-        <div className="kh-row"><button type="button" className="kh-btn" onClick={() => go(task.page)}>Show me how</button>
-          <button type="button" className={doneWeek.includes(task.id) ? 'kh-btn' : 'kh-btn dark'} onClick={() => toggle(task.id)}>{doneWeek.includes(task.id) ? 'Undo' : 'Done'}</button></div>
-      </article>)}</div>
-    </Card>
-
-    <Card title={`${locality.name} at a glance`} sub="What the local numbers mean for families. Tap a card to learn more.">
-      <div className="kh-tiles">
-        <button type="button" className="kh-tile" onClick={() => { setBody('brain'); go('health') }}>
-          <img src="/health-assets/brain-development.png" alt="" />
-          <span className="kh-tag watch">Development</span>
-          <strong>{oneIn(figures.aedc.vulnerableOne)}</strong>
-          <People value={figures.aedc.vulnerableOne} />
-          <p>children starting school here need extra support in at least one area of development.</p>
-          <span className="kh-go">See what helps →</span>
-        </button>
-        <button type="button" className="kh-tile" onClick={() => go('vaccines')}>
-          <img src="/health-assets/allergy-immune.png" alt="" />
-          <span className="kh-tag good">Vaccines</span>
-          <strong>{inHundred(twoYear?.pha.percent)}</strong>
-          <p>2-year-olds nearby are fully vaccinated{twoYear?.victoria ? `, compared with ${inHundred(twoYear.victoria.percent)} across Victoria` : ''}.</p>
-          <span className="kh-go">Check your child’s schedule →</span>
-        </button>
-        <button type="button" className="kh-tile" onClick={() => go('food')}>
-          <img src="/health-assets/metabolic-health.png" alt="" />
-          <span className="kh-tag watch">Food</span>
-          <strong>{inHundred(vegetables?.area.percent)}</strong>
-          <p>children in the {nutrition.data?.locality?.department_area ?? 'surrounding'} region eat enough vegetables. Most Victorian children fall short too.</p>
-          <span className="kh-go">Track today’s serves →</span>
-        </button>
-        <button type="button" className="kh-tile" onClick={() => { setBody('lungs'); go('health') }}>
-          <img src="/health-assets/lungs-asthma.png" alt="" />
-          <span className="kh-tag geo">Asthma</span>
-          <strong>{inHundred(toddler?.percent)}</strong>
-          <p>children aged 0–14 here have asthma. Thunderstorm asthma season runs October to December.</p>
-          <span className="kh-go">Prepare for spring →</span>
-        </button>
-      </div>
-    </Card>
-
-    <div className="kh-split">
-      <Card title={`Right now: ${now.title}`} sub={now.why} aside={<span className="kh-tag watch">{MONTH_NAMES[new Date().getMonth()]}</span>}>
-        <ul className="kh-steps plain">{now.actions.map(action => <li key={action}><span>{action}</span></li>)}</ul>
-        <a className="kh-link" href={now.link} target="_blank" rel="noreferrer">{now.linkLabel} ↗</a>
-      </Card>
-      <Card title="Worried about something?" sub="Build a one-page summary to take to your GP or teacher.">
-        <p className="kh-note">Answer short questions about hearing, speech, focus, feelings, play, sleep and school. There are no scores and no diagnosis.</p>
-        <div className="kh-row"><button type="button" className="kh-btn primary" onClick={() => onOpenPlan('brain', age)}>Start the questions</button>
-          <button type="button" className="kh-btn" onClick={() => go('care')}>Find care nearby</button></div>
-        <p className="kh-src">{services} health services and {childcare.data?.active_education_care_services ?? '—'} childcare services are listed in {locality.name}.</p>
-      </Card>
-    </div>
-  </div>
-}
-
-function ProjectionChart({ rows }: { rows: PopulationProjection[] }) {
-  if (rows.length < 2) return <p className="kh-empty">No projection is published for this locality.</p>
-  const width = 560, height = 210, pad = 36
-  const series: Array<[keyof PopulationProjection, string, string]> = [
-    ['population_age_0_4_projected', '0–4', 'var(--kh-blue)'],
-    ['population_age_5_9_projected', '5–9', 'var(--kh-coral)'],
-    ['population_age_10_14_projected', '10–14', 'var(--kh-green)'],
-  ]
-  const values = rows.flatMap(row => series.map(([key]) => Number(row[key] ?? 0)))
-  const max = Math.ceil(Math.max(...values, 1) / 100) * 100
-  const x = (index: number) => pad + index * (width - pad * 2) / (rows.length - 1)
-  const y = (value: number) => height - 28 - (value / max) * (height - 56)
-  const ticks = [0, max / 2, max]
-  return <div className="kh-scroll"><svg className="kh-chart" viewBox={`0 0 ${width + 30} ${height}`} role="img" aria-label="Projected children by age group">
-    {ticks.map(tick => <g key={tick}><line x1={pad} x2={width - pad} y1={y(tick)} y2={y(tick)} className="kh-grid" /><text x={pad - 8} y={y(tick) + 4} textAnchor="end">{Math.round(tick)}</text></g>)}
-    {rows.map((row, index) => <text key={row.projection_year} x={x(index)} y={height - 6} textAnchor="middle">{row.projection_year}</text>)}
-    {series.map(([key, label, color]) => {
-      const points = rows.map((row, index) => `${x(index)},${y(Number(row[key] ?? 0))}`).join(' ')
-      const last = rows[rows.length - 1]
-      return <g key={label}>
-        <polyline points={points} fill="none" stroke={color} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
-        {rows.map((row, index) => <circle key={row.projection_year} cx={x(index)} cy={y(Number(row[key] ?? 0))} r={index === rows.length - 1 ? 5 : 3.5} fill={color}><title>{`${label} years, ${row.projection_year}: ${count(Number(row[key]))}`}</title></circle>)}
-        <text x={x(rows.length - 1) + 9} y={y(Number(last[key] ?? 0)) + 4} fill={color} className="kh-direct">{label}</text>
-      </g>
-    })}
-  </svg></div>
-}
-
-function PractitionerHome({ figures, immunisation, data, childcare, prevention, locality }: PageContext) {
-  const asthma = figures.sa2('asthma')
-  const twoYear = immunisation.data?.indicators.find(item => item.indicator_id === 'immunised_age_2')
-  const rows = figures.projections
-  const first = rows[0], last = rows[rows.length - 1]
-  const infantChange = first && last && first.population_age_0_4_projected ? ((Number(last.population_age_0_4_projected) / Number(first.population_age_0_4_projected)) - 1) * 100 : null
-  const categories = (name: string) => data.facilities.filter(item => name === 'mch' ? item.service_type.includes('Maternal') : item.category === name && !item.service_type.includes('Maternal')).length
-  const kpis = [
-    { label: 'Developmentally vulnerable, ≥1 domain', value: pct(figures.aedc.vulnerableOne), note: `${count(figures.aedc.assessed)} children assessed · AEDC 2024`, geo: 'SA2' },
-    { label: 'On track in all five domains', value: pct(figures.aedc.onTrackAll), note: `DV2 ${pct(figures.aedc.vulnerableTwo)} · AEDC 2024`, geo: 'SA2' },
-    { label: 'Fully immunised at 24 months', value: pct(twoYear?.pha.percent), note: `Victoria ${pct(twoYear?.victoria?.percent)} · ${twoYear?.reference_period ?? ''}`, geo: 'PHA' },
-    { label: 'Children reporting asthma', value: pct(asthma?.percent, 2), note: `${count(asthma?.count)} of ${count(asthma?.population_denominator)} · Census 2021`, geo: 'SA2' },
-  ]
-  return <div className="kh-stack">
-    <div className="kh-kpis">{kpis.map(kpi => <article key={kpi.label} className="kh-kpi"><span>{kpi.label}</span><strong>{kpi.value}</strong><small>{kpi.note}</small><Geo>{kpi.geo}</Geo></article>)}</div>
-    <div className="kh-split wide-left">
-      <Card title="Language is the strongest domain" sub={`Share of children on track by AEDC domain, 2024. Small cohort (n = ${count(figures.aedc.assessed)}), so intervals are wide.`} aside={<Geo>SA2 · AEDC 2024</Geo>}>
-        <div className="kh-bars">{figures.aedc.domains.map(([label, value]) => <div key={label} className="kh-bar"><span>{label}</span><span className="kh-track"><i style={{ width: `${value ?? 0}%` }} /></span><b>{pct(value)}</b></div>)}</div>
-        <p className="kh-src">SEIFA IRSD decile {figures.social.seifaDecile ?? '—'} · population {count(figures.social.population)} (Census 2021).</p>
-      </Card>
-      <Card title="Immunisation coverage" sub={`${immunisation.data?.locality?.pha_name ?? figures.phaName} vs pooled Victoria`} aside={<Geo>PHA</Geo>}>
-        <div className="kh-rings">{(immunisation.data?.indicators ?? []).map(item => <Ring key={item.indicator_id} value={item.pha.percent} good={(item.pha.percent ?? 0) >= 95} label={item.age} caption={`Vic ${pct(item.victoria?.percent)} · ${count(item.pha.numerator)}/${count(item.pha.denominator)}`} />)}</div>
-        <p className="kh-src">95% national aspirational target. Victoria pools published numerators and denominators across {immunisation.data?.indicators[0]?.victoria?.pha_count ?? 'all'} PHAs.</p>
-      </Card>
-    </div>
-    <div className="kh-split wide-left">
-      <Card title={infantChange !== null ? `Children aged 0–4 projected to ${infantChange >= 0 ? 'rise' : 'fall'} ${Math.abs(Math.round(infantChange))}% by ${last?.projection_year}` : 'Projected children'} sub="Victoria in Future 2023. Modelled scenario, not a forecast of need." aside={<Geo>SA2 · VIF 2023</Geo>}>
-        <ProjectionChart rows={rows} />
-      </Card>
-      <Card title="Service presence" sub={`Listed inside ${locality.name}. Presence is not capacity.`} aside={<Geo>SA2</Geo>}>
-        <table className="kh-table"><tbody>
-          <tr><td>General practices</td><td>{categories('general_practice')}</td></tr>
-          <tr><td>Maternal and child health</td><td>{categories('mch')}</td></tr>
-          <tr><td>Pharmacies</td><td>{categories('pharmacy')}</td></tr>
-          <tr><td>Hospitals</td><td>{categories('hospital')}</td></tr>
-          <tr><td>Childcare services (approved places)</td><td>{count(childcare.data?.active_education_care_services)} ({count(childcare.data?.total_approved_places)})</td></tr>
-          <tr><td>Public transport stops</td><td>{count(prevention.data?.transport?.public_transport_stop_count)}</td></tr>
-        </tbody></table>
-        <p className="kh-src">Healthdirect March 2025 · ACECQA matched to G-NAF 2026 · DTP stops 2026.</p>
-      </Card>
-    </div>
-  </div>
 }
 
 /* ------------------------------------------------------------------ health */

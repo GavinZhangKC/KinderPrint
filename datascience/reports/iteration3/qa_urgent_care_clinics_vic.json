@@ -1,0 +1,64 @@
+{
+  "file": "urgent_care_clinics_vic.csv",
+  "rows": 37,
+  "passed": true,
+  "warnings": [],
+  "rules": [
+    {
+      "rule": "schema: required columns present, no extras",
+      "passed": true,
+      "severity": "error",
+      "missing": [],
+      "unexpected": []
+    },
+    {
+      "rule": "volume: at least 30 rows",
+      "passed": true,
+      "severity": "error",
+      "rows": 37
+    },
+    {
+      "rule": "volume: row drift within +/-25% of previous file",
+      "passed": true,
+      "severity": "error",
+      "previous": 37,
+      "drift": 0.0
+    },
+    {
+      "rule": "keys: key columns populated",
+      "passed": true,
+      "severity": "error",
+      "violations": 0
+    },
+    {
+      "rule": "keys: primary key unique",
+      "passed": true,
+      "severity": "error",
+      "violations": 0,
+      "examples": []
+    },
+    {
+      "rule": "geography: coordinates inside the expected envelope",
+      "passed": true,
+      "severity": "error",
+      "outside": 0,
+      "located": 37
+    },
+    {
+      "rule": "phone numbers are Australian format; at least 90% of clinics list one",
+      "passed": true,
+      "severity": "error",
+      "invalid": [],
+      "without_phone": [
+        "Royal Children's Hospital Urgent Care Clinic"
+      ]
+    },
+    {
+      "rule": "links are https; at least 90% point to a healthdirect listing",
+      "passed": true,
+      "severity": "error",
+      "healthdirect_share": 0.946,
+      "not_https": 0
+    }
+  ]
+}

@@ -1,0 +1,66 @@
+{
+  "file": "myhospitals_vic_data_items.csv",
+  "rows": 1580,
+  "passed": true,
+  "warnings": [],
+  "rules": [
+    {
+      "rule": "schema: required columns present, no extras",
+      "passed": true,
+      "severity": "error",
+      "missing": [],
+      "unexpected": []
+    },
+    {
+      "rule": "volume: at least 1200 rows",
+      "passed": true,
+      "severity": "error",
+      "rows": 1580
+    },
+    {
+      "rule": "volume: row drift within +/-30% of previous file",
+      "passed": true,
+      "severity": "error",
+      "previous": 1580,
+      "drift": 0.0
+    },
+    {
+      "rule": "keys: key columns populated",
+      "passed": true,
+      "severity": "error",
+      "violations": 0
+    },
+    {
+      "rule": "keys: primary key unique",
+      "passed": true,
+      "severity": "error",
+      "violations": 0,
+      "examples": []
+    },
+    {
+      "rule": "percent measures within 0-100",
+      "passed": true,
+      "severity": "error",
+      "violations": 0
+    },
+    {
+      "rule": "every data item has a value or a suppression code",
+      "passed": true,
+      "severity": "error",
+      "violations": 0,
+      "examples": []
+    },
+    {
+      "rule": "periods are ISO dates with start before end",
+      "passed": true,
+      "severity": "error",
+      "violations": 0
+    },
+    {
+      "rule": "latest period ends on or after 2024-06-30",
+      "passed": true,
+      "severity": "error",
+      "latest": "2025-06-30"
+    }
+  ]
+}
