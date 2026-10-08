@@ -427,7 +427,8 @@ export default function KinderHub({ locality, data, onSelectLocality, onOpenPlan
   const visibleNav = NAV.filter(item => parent || item.id !== 'day')
   const orderedNav = [...visibleNav.filter(item => item.id === page), ...visibleNav.filter(item => item.id !== page)]
   const today = page === 'home'
-  const themeClass = today ? (parent ? ' kt-theme-parent' : ' kt-theme-prac') : ''
+  const themed = today || page === 'day'
+  const themeClass = themed ? (parent ? ' kt-theme-parent' : ' kt-theme-prac') : ''
 
   return <div className={`kp-hub ${parent ? 'is-parent' : 'is-practitioner'}${themeClass}`} data-page={page}>
     <div className="kh-shell">
@@ -441,7 +442,7 @@ export default function KinderHub({ locality, data, onSelectLocality, onOpenPlan
         </div>
       </header>
 
-      {!today && <section className="kh-hello" key={`${page}-${audience}`}>
+      {!themed && <section className="kh-hello" key={`${page}-${audience}`}>
         <div><h1>{heading[page][0]}</h1><p>{heading[page][1]}</p></div>
         <div className="kh-chips">
           <LocalityPicker locality={locality} onSelect={onSelectLocality} />
@@ -456,7 +457,7 @@ export default function KinderHub({ locality, data, onSelectLocality, onOpenPlan
         {page === 'home' && (parent
           ? <TodayParent locality={locality} age={age} controls={<><LocalityPicker locality={locality} onSelect={onSelectLocality} /><AgePicker value={age} onChange={setAge} /></>} onCheckDay={() => go('day')} onGo={go} onPrepareVisit={() => onOpenPlan('brain', age)} onOpenMap={onOpenMap} />
           : <TodayPractitioner locality={locality} controls={<LocalityPicker locality={locality} onSelect={onSelectLocality} />} immunisation={immunisation.data} asthma={figures.sa2('asthma')} asthmaRatio={figures.pha('child_asthma')?.standardised_ratio ?? null} services={data.facilities.length} childcareServices={childcare.data?.active_education_care_services} onOpenMap={onOpenMap} onGo={go} />)}
-        {page === 'day' && <HealthyDay age={age} />}
+        {page === 'day' && <HealthyDay age={age} ageControl={<AgePicker value={age} onChange={setAge} />} />}
         {page === 'health' && <HealthPage {...context} />}
         {page === 'vaccines' && <VaccinesPage {...context} />}
         {page === 'food' && <FoodPage {...context} />}
