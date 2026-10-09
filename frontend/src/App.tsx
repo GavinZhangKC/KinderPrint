@@ -10,12 +10,12 @@ import DigitalHealthHub, { ChildHealthComparisonPage } from './components/Digita
 import InsightPage from './components/InsightPage'
 import Legend from './components/Legend'
 import LandingPage from './components/LandingPage'
-import LocalitySuitabilityPanel from './components/LocalitySuitabilityPanel'
 import NeighbourhoodMap from './components/NeighbourhoodMap'
 import PreferencePanel from './components/PreferencePanel'
 import ProfileModal from './components/ProfileModal'
 import SimulationPage from './components/SimulationPage'
 import WaterRippleBackground from './components/WaterRippleBackground'
+import WhereToLive from './components/where/WhereToLive'
 
 import { useNeighbourhoodSearch } from './hooks/useNeighbourhoodSearch'
 
@@ -43,6 +43,7 @@ type AppPage =
   | 'map'
   | 'simulation'
   | 'health'
+  | 'where'
 
 function initialAppPage(): AppPage {
   const pathname = window.location.pathname.replace(/\/+$/, '') || '/'
@@ -50,6 +51,7 @@ function initialAppPage(): AppPage {
   if (pathname === '/map') return 'map'
   if (pathname === '/simulation') return 'simulation'
   if (pathname === '/child-health' || pathname === '/health') return 'health'
+  if (pathname === '/where-to-live') return 'where'
 
   // Keep old shared-page links working while navigation moves to real paths.
   const requestedPage = new URLSearchParams(window.location.search).get('page')
@@ -64,6 +66,7 @@ function appPagePath(page: Exclude<AppPage, 'insight-legacy'>) {
   if (page === 'map') return '/map'
   if (page === 'simulation') return '/simulation'
   if (page === 'health') return '/child-health'
+  if (page === 'where') return '/where-to-live'
   return '/'
 }
 
@@ -95,118 +98,6 @@ const [view, setView] =
   const [preference, setPreference] =
     useState<PreferenceId | null>(null)
 
-  const [suitabilityCriteria, setSuitabilityCriteria] =
-    useState<string[]>([])
-  const [suitabilityResults, setSuitabilityResults] =
-    useState<Array<{ id: string; name: string; geographic_unit: string; score: number | null; status: string; criteria: string[]; measures: Record<string, number | null>; criterion_scores: Record<string, number | null> }>>([])
-  const [suitabilityLoading, setSuitabilityLoading] = useState(false)
-  const [suitabilityError, setSuitabilityError] = useState<string | null>(null)
-  const [suitabilityNotice, setSuitabilityNotice] = useState<string | null>(null)
-  const [isSuitabilityModalOpen, setIsSuitabilityModalOpen] = useState(false)
-  const suitabilityModalRef = useRef<HTMLDivElement>(null)
-  const suitabilityCloseButtonRef = useRef<HTMLButtonElement>(null)
-
-  useEffect(() => {
-    if (suitabilityCriteria.length === 0) {
-      setSuitabilityResults([])
-      setSuitabilityLoading(false)
-      setSuitabilityError(null)
-      setSuitabilityNotice(null)
-      return
-    }
-
-    let isActive = true
-
-    async function loadSuitableLocalities() {
-      try {
-        setSuitabilityLoading(true)
-        setSuitabilityError(null)
-        setSuitabilityNotice(null)
-
-        const response = await api.getSuitableLocalities(suitabilityCriteria, 5)
-        if (!isActive) {
-          return
-        }
-
-        if (response.status !== 'available' && response.status !== 'limited') {
-          setSuitabilityResults([])
-          setSuitabilityError(response.limitations[0]?.message ?? 'Suitable localities are unavailable.')
-          return
-        }
-
-        setSuitabilityResults(response.data.localities)
-        setSuitabilityNotice(response.limitations[0]?.message ?? null)
-      } catch (error) {
-        if (!isActive) {
-          return
-        }
-
-        setSuitabilityResults([])
-        setSuitabilityNotice(null)
-        setSuitabilityError(error instanceof Error ? error.message : 'Could not load suitability rankings.')
-      } finally {
-        if (isActive) {
-          setSuitabilityLoading(false)
-        }
-      }
-    }
-
-    void loadSuitableLocalities()
-    return () => {
-      isActive = false
-    }
-  }, [suitabilityCriteria])
-
-  useEffect(() => {
-    if (!isSuitabilityModalOpen) {
-      return
-    }
-
-    const previouslyFocused = document.activeElement instanceof HTMLElement
-      ? document.activeElement
-      : null
-
-    suitabilityCloseButtonRef.current?.focus()
-
-    const handleModalKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        setIsSuitabilityModalOpen(false)
-        return
-      }
-
-      if (event.key !== 'Tab' || !suitabilityModalRef.current) {
-        return
-      }
-
-      const focusableElements = Array.from(
-        suitabilityModalRef.current.querySelectorAll<HTMLElement>(
-          'button:not([disabled]), input:not([disabled]), [href], [tabindex]:not([tabindex="-1"])',
-        ),
-      )
-
-      const firstElement = focusableElements[0]
-      const lastElement = focusableElements[focusableElements.length - 1]
-
-      if (!firstElement || !lastElement) {
-        event.preventDefault()
-        return
-      }
-
-      if (event.shiftKey && document.activeElement === firstElement) {
-        event.preventDefault()
-        lastElement.focus()
-      } else if (!event.shiftKey && document.activeElement === lastElement) {
-        event.preventDefault()
-        firstElement.focus()
-      }
-    }
-
-    window.addEventListener('keydown', handleModalKeyDown)
-    return () => {
-      window.removeEventListener('keydown', handleModalKeyDown)
-      previouslyFocused?.focus()
-    }
-  }, [isSuitabilityModalOpen])
 
   const [
     showDataDrawer,
@@ -390,6 +281,16 @@ function choosePrimary(
       }
     }
   }
+  // Deep link from "Where to live": /map?area=<SA2 code> opens that area's profile.
+  const deepLinkedAreaRef = useRef(false)
+  useEffect(() => {
+    if (appPage !== 'map' || deepLinkedAreaRef.current) return
+    deepLinkedAreaRef.current = true
+    const area = new URLSearchParams(window.location.search).get('area')
+    if (area && /^\d{9}$/.test(area)) void handleMapSelect(area, undefined, true)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
 function startComparison() {
     if (!selected) {
       return
@@ -493,6 +394,16 @@ if (appPage === 'landing') {
         onHealth={openHealthPage}
       />
     )
+  }
+
+  if (appPage === 'where') {
+    return <WhereToLive
+      onHome={backToLanding}
+      onInsight={openInsightPage}
+      onMap={openMapPage}
+      onSimulation={openSimulationPage}
+      onHealth={openHealthPage}
+    />
   }
 
   if (appPage === 'health') {
@@ -669,16 +580,9 @@ setMapSelectedId(null)
 
           </div>
 
-          <button
-            type="button"
-            className="glass suitability-launch-button"
-            aria-haspopup="dialog"
-            aria-expanded={isSuitabilityModalOpen}
-            aria-controls="suitability-modal"
-            onClick={() => setIsSuitabilityModalOpen(true)}
-          >
-            Find suitable areas
-          </button>
+          <a className="glass map-where-link" href="/where-to-live">
+            Compare areas for your family
+          </a>
 
 
           <NeighbourhoodMap
@@ -817,50 +721,6 @@ setMapSelectedId(null)
         </section>
       </main>
 
-      {isSuitabilityModalOpen && (
-        <div className="suitability-modal-backdrop">
-          <div
-            id="suitability-modal"
-            ref={suitabilityModalRef}
-            className="suitability-modal-shell page-enter"
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="suitability-title"
-          >
-            <button
-              ref={suitabilityCloseButtonRef}
-              className="icon-close suitability-modal-close"
-              type="button"
-              onClick={() => setIsSuitabilityModalOpen(false)}
-              aria-label="Close locality suitability"
-            >
-              ×
-            </button>
-
-            <LocalitySuitabilityPanel
-              criteria={suitabilityCriteria}
-              onToggle={(criterion) => {
-                setSuitabilityCriteria((current) => {
-                  if (current.includes(criterion)) {
-                    return current.filter((item) => item !== criterion)
-                  }
-
-                  return [...current, criterion]
-                })
-              }}
-              localities={suitabilityResults}
-              loading={suitabilityLoading}
-              error={suitabilityError}
-              notice={suitabilityNotice}
-              onApplyPattern={(nextCriteria) => setSuitabilityCriteria(nextCriteria)}
-              onSelectLocality={(id, name) => {
-                setIsSuitabilityModalOpen(false)
-                void handleMapSelect(id, name, true)
-              }}
-            />
-          </div>
-        </div>
-      )}
     </div>
   )
 }

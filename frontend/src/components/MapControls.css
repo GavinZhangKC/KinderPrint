@@ -14,3 +14,23 @@
 .legend-swatch { width: 16px; height: 16px; border-radius: 4px; background: #f6e7a8; }
 .legend-swatch.risk-low { background: #9adbb8; }.legend-swatch.risk-high { background: #f5b6a8; }
 .legend-swatch.positive-low { background: #f5b6a8; }.legend-swatch.positive-high { background: #9adbb8; }.legend-swatch.mid { background: #f6e7a8; }
+
+/* Link from the map to "Where to live" (replaces the old suitability modal). */
+.map-where-link {
+  position: absolute;
+  left: clamp(16px, 3vw, 42px);
+  top: calc(clamp(14px, 2.6dvh, 28px) + 82px);
+  z-index: 14;
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 16px;
+  border-radius: 12px;
+  color: var(--brand);
+  font-size: 14px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: background .18s ease, box-shadow .18s ease, transform .18s ease;
+}
+.map-where-link:hover { background: rgba(255, 255, 255, .78); box-shadow: 0 12px 28px rgba(51, 82, 140, .13); transform: translateY(-1px); }
+.map-where-link:focus-visible { outline: 3px solid rgba(109, 120, 232, .5); outline-offset: 2px; }

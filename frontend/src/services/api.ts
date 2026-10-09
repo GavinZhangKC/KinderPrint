@@ -686,6 +686,83 @@ function getNeighbourhoodIndicators(refresh = false) {
   return indicatorsCache
 }
 
+
+export type FamilyFitLevel = 'prefer' | 'essential'
+export interface FamilyFitNeed {
+  id: string
+  label: string
+  measures: Array<{ id: string; direction: 1 | -1 }>
+  explains: string
+  does_not_confirm: string
+}
+export interface FamilyFitPlace { id: string; name: string; sa3: string }
+export interface FamilyFitValidation {
+  old_engine_largest_two_measures_share: number
+  new_engine_measure_share_range: [number, number]
+  adjustment_error_reduction_range: [number, number]
+  adjustment_small_area_error_reduction_range: [number, number]
+  gp_border_credit: [number, number]
+  forecast_model: string
+  forecast_skill_vs_persistence: number
+  forecast_holdout_mae_pp: number
+  forecast_holdout_spearman: number
+  forecast_holdout_coverage_80: number
+  areas_scored_on_every_need: number
+  areas: number
+}
+export interface FamilyFitSetup {
+  needs: FamilyFitNeed[]
+  places: FamilyFitPlace[]
+  essential_percentile: number
+  weights: Record<FamilyFitLevel, number>
+  model_version: string
+  built_utc: string
+  radii_km: number[]
+  validation: FamilyFitValidation
+}
+export interface FamilyFitOutlook { pct: number; lower80: number; upper80: number }
+export interface FamilyFitResult {
+  rank: number
+  id: string
+  name: string
+  sa3: string
+  latitude: number
+  longitude: number
+  distance_km: number
+  match: number
+  reasons: Array<{ need: string; label: string; percentile: number; phrase: string }>
+  limitation:
+    | { type: 'weaker_priority'; need: string; label: string; percentile: number; phrase: string }
+    | { type: 'does_not_confirm'; need: string; label: string; text: string }
+  stability: { share: number; label: 'stable' | 'fairly_stable' | 'could_change' } | null
+  school_entry_change: { pp: number | null; flag: 'up' | 'down' | 'no_clear_change' | 'not_available' }
+  outlook_2027: FamilyFitOutlook | null
+}
+export type FamilyFitMapStatus = 'top' | 'match' | 'filtered_out' | 'no_data' | 'outside'
+export interface FamilyFitSearch {
+  anchor: { id: string; name: string; latitude: number; longitude: number }
+  radius_km: number
+  priorities: Record<string, FamilyFitLevel>
+  counts: { within_distance: number; matching: number; below_essential: number; data_unavailable: number }
+  results: FamilyFitResult[]
+  more_available: number
+  map: Array<{ id: string; status: FamilyFitMapStatus }>
+  suggestions: Array<{ type: 'make_preferred'; need: string; label: string; results: number } | { type: 'widen_distance'; radius_km: number; results: number }>
+  confidence: { draws: number; measures_varied: string[] }
+}
+export interface FamilyFitAreaDetail {
+  id: string
+  name: string
+  sa3: string
+  sa4: string
+  latitude: number
+  longitude: number
+  needs: Array<Omit<FamilyFitNeed, 'measures'> & { percentile: number | null; phrase: string | null; measures: Array<{ id: string; direction: 1 | -1; value: number | null; percentile: number | null }> }>
+  children_assessed_2024: number | null
+  school_entry_change: { pp: number | null; flag: 'up' | 'down' | 'no_clear_change' | 'not_available'; years: string; measure: string }
+  outlook_2027: FamilyFitOutlook | null
+}
+
 export const api = {
 
 
@@ -813,6 +890,17 @@ export const api = {
     request<SeasonalAir>(
       `/api/digital-health/seasonal-air?sa2_code=${encodeURIComponent(sa2Code)}`, signal,
     ),
+
+  getFamilyFitSetup: (signal?: AbortSignal) => request<FamilyFitSetup>('/api/family-fit/setup', signal),
+  getFamilyFitShapes: (signal?: AbortSignal) =>
+    request<{ areas: Record<string, Array<Array<[number, number]>>> }>('/api/family-fit/shapes', signal),
+  searchFamilyFit: (anchor: string, radiusKm: number, priorities: Record<string, FamilyFitLevel>, limit = 30, signal?: AbortSignal) =>
+    request<FamilyFitSearch>(
+      `/api/family-fit/search?anchor=${encodeURIComponent(anchor)}&radius_km=${radiusKm}&limit=${limit}&priorities=${encodeURIComponent(Object.entries(priorities).map(([k, v]) => `${k}:${v}`).join(','))}`,
+      signal,
+    ),
+  getFamilyFitArea: (id: string, signal?: AbortSignal) =>
+    request<FamilyFitAreaDetail>(`/api/family-fit/areas/${encodeURIComponent(id)}`, signal),
 
   getVaccinationPlaces: (sa2Code: string, signal?: AbortSignal) =>
     request<VaccinationPlaces>(

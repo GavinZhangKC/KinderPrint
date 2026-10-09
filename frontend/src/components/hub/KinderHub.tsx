@@ -59,7 +59,7 @@ interface KinderHubProps {
   data: HubData
   onSelectLocality: (value: NeighbourhoodSearchResult) => void
   onOpenPlan: (body: BodyId, age: string) => void
-  /** Opens the suitability map. */
+  /** Opens the Melbourne map. */
   onOpenMap?: () => void
 }
 

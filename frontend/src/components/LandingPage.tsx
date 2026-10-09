@@ -47,6 +47,9 @@ const homeDiscoveryPriorities = [
   'Early-childhood support',
 ] as const
 
+/** Keys understood by the Where to live page (?focus=), in the same order as the list above. */
+const homeDiscoveryFocusKeys = ['learning', 'social', 'physical', 'respiratory', 'heat', 'parks', 'healthcare', 'early-childhood'] as const
+
 const exploreItems = [
   { id: 'insight', number: '01', label: 'Insight Journey', videoSrc: '/insight-preview.mp4' },
   { id: 'map', number: '02', label: 'Interactive Map', videoSrc: '/map-preview.mp4' },
@@ -131,6 +134,7 @@ function HomeHeader({ onHome, onInsight, onSimulation, onMap, onHealth }: HomeHe
         <button type="button" onClick={onInsight}>Insight Journey</button>
         <button type="button" onClick={onSimulation}>Simulation</button>
         <button type="button" onClick={onHealth}>Child Health</button>
+        <button type="button" onClick={() => window.location.assign('/where-to-live')}>Where to live</button>
       </nav>
       <button className="home-nav-cta" type="button" onClick={onMap}>Explore Map</button>
     </header>
@@ -373,6 +377,16 @@ function HomeDiscoverySection() {
             </button>
           ))}
         </div>
+
+        <p className="home-discovery-where">
+          <span>Thinking of moving?</span>
+          <a href={selectedPriority
+            ? `/where-to-live?focus=${homeDiscoveryFocusKeys[homeDiscoveryPriorities.indexOf(selectedPriority as typeof homeDiscoveryPriorities[number])]}`
+            : '/where-to-live'}>
+            {selectedPriority ? `Compare areas for ${selectedPriority.toLowerCase()}` : 'Compare areas for your family'}
+            <span aria-hidden="true">→</span>
+          </a>
+        </p>
 
         <div className="home-discovery-gallery-stage">
           <InfiniteImageGallery />
