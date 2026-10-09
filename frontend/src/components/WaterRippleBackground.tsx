@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react'
 import $ from 'jquery'
 import 'jquery.ripples'
+import { useTheme } from '../theme/ThemeProvider'
 
 import './WaterRippleBackground.css'
 
@@ -23,6 +24,7 @@ const TRAIL_FRAGMENT_SHADER = `
   precision highp float;
   uniform sampler2D samplerRipples;
   uniform vec2 delta;
+  uniform vec3 trailColor;
   varying vec2 ripplesCoord;
 
   void main() {
@@ -35,7 +37,7 @@ const TRAIL_FRAGMENT_SHADER = `
     float specular = pow(max(0.0, dot(offset, normalize(vec2(-0.6, 1.0)))), 4.0);
     float trailAlpha = specular * 0.36;
 
-    gl_FragColor = vec4(vec3(0.0), trailAlpha);
+    gl_FragColor = vec4(trailColor * trailAlpha, trailAlpha);
   }
 `
 const EXCLUDED_ELEMENTS = [
@@ -115,6 +117,7 @@ function colourMouseTrail(instance: RippleInstance) {
       samplerBackground: null,
       samplerRipples: gl.getUniformLocation(program, 'samplerRipples'),
       delta: gl.getUniformLocation(program, 'delta'),
+      trailColor: gl.getUniformLocation(program, 'trailColor'),
     },
   }
   gl.useProgram(program)
@@ -125,6 +128,7 @@ function colourMouseTrail(instance: RippleInstance) {
 }
 
 export default function WaterRippleBackground() {
+  const { theme } = useTheme()
   const backgroundRef = useRef<HTMLDivElement | null>(null)
 
   useEffect(() => {
@@ -215,6 +219,24 @@ export default function WaterRippleBackground() {
       if (initialized) $background.ripples('destroy')
     }
   }, [])
+
+  useEffect(() => {
+    const background = backgroundRef.current
+    if (!background || !background.parentElement?.querySelector('.home-page')) return
+    const instance = $(background).data('ripples') as RippleInstance | undefined
+    const location = instance?.renderProgram.locations.trailColor
+    if (!instance || !location) return
+    const gl = instance.context
+    const previousProgram = gl.getParameter(gl.CURRENT_PROGRAM) as WebGLProgram | null
+    gl.useProgram(instance.renderProgram.id)
+    // Keep the original black trail in Light; use the kit's cyan highlight in Midnight.
+    const accent = getComputedStyle(document.documentElement).getPropertyValue('--kp-color-accent-glow').trim()
+    const channels = theme === 'dark'
+      ? [1, 3, 5].map((offset) => parseInt(accent.slice(offset, offset + 2), 16) / 255)
+      : [0, 0, 0]
+    gl.uniform3fv(location, channels)
+    gl.useProgram(previousProgram)
+  }, [theme])
 
   return <div ref={backgroundRef} className="water-ripple-background" aria-hidden="true" />
 }

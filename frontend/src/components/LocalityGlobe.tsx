@@ -3,8 +3,21 @@ import mapboxgl from 'mapbox-gl'
 
 import 'mapbox-gl/dist/mapbox-gl.css'
 import type { ApiEnvelope, BoundaryDetail } from '../services/api'
+import { useTheme } from '../theme/ThemeProvider'
 
 const TOKEN = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN ?? ''
+
+function applyGlobeTheme(map: mapboxgl.Map) {
+  const dark = document.documentElement.dataset.theme === 'dark'
+  const tokens = getComputedStyle(document.documentElement)
+  map.setFog({
+    color: dark ? tokens.getPropertyValue('--kp-color-bg-canvas-end').trim() : 'rgb(222, 235, 255)',
+    'high-color': dark ? tokens.getPropertyValue('--kp-color-bg-canvas-mid').trim() : 'rgb(95, 160, 230)',
+    'horizon-blend': 0.08,
+    'space-color': dark ? tokens.getPropertyValue('--kp-color-bg-canvas-start').trim() : 'rgb(237, 244, 255)',
+    'star-intensity': 0,
+  })
+}
 interface LocalityGlobeProps {
   mode: 'lens' | 'map'
   localityId: string
@@ -12,6 +25,7 @@ interface LocalityGlobeProps {
 }
 
 export default function LocalityGlobe({ mode, localityId, localityName }: LocalityGlobeProps) {
+  const { theme } = useTheme()
   const containerRef = useRef<HTMLDivElement | null>(null)
   const mapRef = useRef<mapboxgl.Map | null>(null)
   const [message, setMessage] = useState(TOKEN ? 'Loading locality geography…' : 'Map unavailable: VITE_MAPBOX_ACCESS_TOKEN is not configured.')
@@ -36,7 +50,7 @@ export default function LocalityGlobe({ mode, localityId, localityName }: Locali
     marker.setAttribute('aria-label', `${localityName}, SA2`)
 
     map.on('load', async () => {
-      map.setFog({ color: 'rgb(222, 235, 255)', 'high-color': 'rgb(95, 160, 230)', 'horizon-blend': 0.08, 'space-color': 'rgb(237, 244, 255)', 'star-intensity': 0 })
+      applyGlobeTheme(map)
       try {
         const response = await fetch(`${import.meta.env.VITE_API_BASE_URL ?? ''}/api/neighbourhoods/${localityId}/boundary`, { headers: { Accept: 'application/json' } })
         if (!response.ok) throw new Error(`Boundary request returned ${response.status}`)
@@ -73,6 +87,15 @@ export default function LocalityGlobe({ mode, localityId, localityName }: Locali
       mapRef.current = null
     }
   }, [localityId, localityName])
+
+  useEffect(() => {
+    const map = mapRef.current
+    if (!map) return
+    const updateAtmosphere = () => applyGlobeTheme(map)
+    if (map.isStyleLoaded()) updateAtmosphere()
+    map.on('style.load', updateAtmosphere)
+    return () => { map.off('style.load', updateAtmosphere) }
+  }, [theme, localityId, localityName])
 
   useEffect(() => {
     const map = mapRef.current

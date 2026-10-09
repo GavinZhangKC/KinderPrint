@@ -1,0 +1,66 @@
+/* Source: KinderPrint Figma, Midnight Glass Concept (125:6), UI Kit (134:2).
+   Light mode deliberately uses the existing styles, not the UI kit's Light mode. */
+:root[data-theme='dark'] {
+  --kp-color-bg-canvas-start: #091525;
+  --kp-color-bg-canvas-mid: #10233e;
+  --kp-color-bg-canvas-end: #172b47;
+  --kp-color-surface-soft: rgba(14, 27, 48, .22);
+  --kp-color-surface-default: rgba(14, 27, 48, .32);
+  --kp-color-surface-strong: rgba(14, 27, 48, .65);
+  --kp-color-text-primary: #f3f7ff;
+  --kp-color-text-secondary: #afc0d9;
+  --kp-color-text-disabled: #8497b6;
+  --kp-color-text-on-accent: #f7faff;
+  --kp-color-action-primary: #7183f3;
+  --kp-color-action-primary-hover: #8292fa;
+  --kp-color-action-secondary: #7b8cf5;
+  --kp-color-accent-glow: #61c8f3;
+  --kp-color-border-default: rgba(14, 27, 48, 0);
+  --kp-color-border-focus: #7183f3;
+  --kp-status-strong-bg: #173d35;
+  --kp-status-strong-text: #8fe0bf;
+  --kp-status-strong-border: #2a6b59;
+  --kp-status-moderate-bg: #4b3d1b;
+  --kp-status-moderate-text: #ffe08a;
+  --kp-status-moderate-border: #7a6228;
+  --kp-status-concern-fill: #ff947c;
+  --kp-status-concern-bg: color-mix(in srgb, var(--kp-status-concern-fill) 16%, var(--kp-color-surface-solid));
+  --kp-status-concern-text: #ffb8ab;
+  --kp-status-concern-border: color-mix(in srgb, var(--kp-status-concern-fill) 55%, var(--kp-color-surface-solid));
+  --kp-glass-blur: 18px;
+  --kp-overlay-blur: 30px;
+  --kp-shadow-glass: 0 8px 24px -6px rgba(4, 6, 17, .13);
+  --kp-shadow-overlay: 0 16px 48px -6px rgba(4, 6, 17, .28);
+
+  /* Readability extensions for native controls, data charts and opaque popovers. */
+  --kp-color-surface-solid: #0e1b30;
+  --kp-color-surface-popover: rgba(14, 27, 48, .96);
+  --kp-color-surface-nav: rgba(14, 27, 48, .5);
+  --kp-color-surface-hover: rgba(113, 131, 243, .12);
+  --kp-color-border-subtle: rgba(175, 192, 217, .12);
+  --kp-color-backdrop: rgba(4, 6, 17, .5);
+  --kp-color-shadow: rgba(4, 6, 17, .28);
+  --kp-color-shadow-ink: #040611;
+  --kp-color-highlight: rgba(175, 192, 217, .08);
+  --kp-canvas: linear-gradient(135deg, var(--kp-color-bg-canvas-start), var(--kp-color-bg-canvas-mid) 55%, var(--kp-color-bg-canvas-end));
+  --kp-canvas-ambient: radial-gradient(circle at 18% 25%, rgba(113, 131, 243, .12), transparent 33%), radial-gradient(circle at 82% 55%, rgba(97, 200, 243, .1), transparent 34%), var(--kp-canvas);
+
+  --brand: var(--kp-color-action-secondary);
+  --primary: var(--kp-color-action-primary);
+  --text: var(--kp-color-text-primary);
+  --muted: var(--kp-color-text-secondary);
+  --glass: var(--kp-color-surface-default);
+  --glass-strong: var(--kp-color-surface-strong);
+  --glass-subtle: var(--kp-color-surface-soft);
+  --border: var(--kp-color-border-default);
+  --shadow: var(--kp-shadow-glass);
+  --positive-bg: var(--kp-status-strong-bg);
+  --positive-text: var(--kp-status-strong-text);
+  --moderate-bg: var(--kp-status-moderate-bg);
+  --moderate-text: var(--kp-status-moderate-text);
+  --concern-bg: var(--kp-status-concern-bg);
+  --concern-text: var(--kp-status-concern-text);
+  color-scheme: dark;
+  color: var(--kp-color-text-primary);
+  background: var(--kp-color-bg-canvas-start);
+}

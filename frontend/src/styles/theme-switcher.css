@@ -1,0 +1,79 @@
+/* Only the new switch is styled in light mode; existing components stay intact. */
+.theme-switcher {
+  --switch-track: rgba(255, 255, 255, .32);
+  --switch-border: rgba(109, 120, 232, .2);
+  --switch-active: rgba(255, 255, 255, .8);
+  --switch-ink: #6b7b9d;
+  --switch-selected: #2c5eaf;
+  position: relative;
+  isolation: isolate;
+  flex: 0 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  width: 72px;
+  height: 36px;
+  padding: 3px;
+  border: 1px solid var(--switch-border);
+  border-radius: 999px;
+  background: var(--switch-track);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+
+.theme-switcher__indicator {
+  position: absolute;
+  z-index: -1;
+  top: 3px;
+  bottom: 3px;
+  left: 3px;
+  width: calc((100% - 6px) / 2);
+  border-radius: inherit;
+  background: var(--switch-active);
+  box-shadow: 0 2px 8px rgba(4, 6, 17, .12);
+  transition: transform .22s cubic-bezier(.22, .72, .2, 1), background-color .18s ease;
+}
+
+.theme-switcher[data-active-theme='dark'] .theme-switcher__indicator { transform: translateX(100%); }
+.theme-switcher button {
+  display: grid;
+  place-items: center;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--switch-ink);
+  cursor: pointer;
+  transition: color .18s ease;
+}
+.theme-switcher button[aria-pressed='true'], .theme-switcher button:hover { color: var(--switch-selected); }
+.theme-switcher button:focus-visible { outline: 2px solid var(--switch-selected); outline-offset: 2px; }
+.theme-switcher svg { width: 16px; height: 16px; pointer-events: none; }
+.home-brand-cluster { display: flex; align-items: center; justify-self: start; gap: 14px; }
+.dc-topbar-actions { display: flex; align-items: center; justify-self: end; gap: 12px; }
+.dc-topbar-actions > span { color: #7786a6; font-size: 12px; }
+html[data-theme='dark'] .dc-topbar-actions > span { color: var(--kp-color-text-secondary); }
+
+html[data-theme='dark'] .theme-switcher {
+  --switch-track: var(--kp-color-surface-strong);
+  --switch-border: var(--kp-color-border-subtle);
+  --switch-active: var(--kp-color-action-primary);
+  --switch-ink: var(--kp-color-text-secondary);
+  --switch-selected: var(--kp-color-text-on-accent);
+}
+
+/* Keep existing navigation positions and header dimensions on small screens.
+   The switch uses the header's trailing edge/fade rather than squeezing links. */
+@media (max-width: 760px) {
+  .dc-topbar-actions { position: absolute; top: calc(100% + 6px); right: 14px; }
+  .dc-topbar-actions > span { display: none; }
+  .nav-shell .brand-cluster > .theme-switcher { position: absolute; top: calc(100% + 6px); right: 12px; }
+  .home-header > .home-brand-cluster { position: static; }
+  .home-brand-cluster > .theme-switcher { position: absolute; top: calc(var(--home-header-bar-height) + 3px); right: 20px; }
+}
+
+::view-transition-old(root), ::view-transition-new(root) { animation-duration: .18s; animation-timing-function: ease-out; }
+@media (prefers-reduced-motion: reduce) {
+  .theme-switcher__indicator, .theme-switcher button { transition: none; }
+  ::view-transition-old(root), ::view-transition-new(root) { animation: none; }
+}

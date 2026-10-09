@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react'
 
 import logo from '../assets/LogoMark.png'
+import ThemeSwitcher from './ThemeSwitcher'
 
 interface BrandHeaderProps {
   activePage: 'home' | 'insight' | 'map' | 'simulation' | 'health' | 'where'
@@ -22,6 +23,7 @@ export default function BrandHeader({ activePage, onHome, onInsight, onMap, onSi
           <img src={logo} alt="" className="brand-logo" />
           <span>Vkinder</span>
         </button>
+        <ThemeSwitcher />
       </div>
       <nav className="nav-links" aria-label="Primary navigation">
         <button className={activePage === 'home' ? 'active' : undefined} aria-current={activePage === 'home' ? 'page' : undefined} type="button" onClick={onHome}>Home</button>
