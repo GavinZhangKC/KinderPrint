@@ -125,3 +125,72 @@ for GPs and 0.41 for ECEC), so the count was misleading.
   Lakes, Fraser Rise, Wyndham Vale, Rockbank, Tarneit, Wollert, Clyde North) and
   the peri-urban fringe. For fringe SA2s the figure is a lower bound, because
   practices outside Greater Melbourne are not in the supply file (edge effect).
+
+## Family Fit ("Where to live")
+
+### S0: suitability finder (Iteration 2)
+
+A modal on the map page. The parent ticked criteria, and the finder averaged
+each area's criterion values into a 0–100 score.
+
+**Problems found (9 October 2026).**
+
+* **Mixed scales.** Raw percentages sat beside percentile ranks. In a "shade +
+  healthcare" search, GP and pharmacy access drove 94.2% of the score variance.
+* **Border effects.** Services were counted only inside each border, so 20
+  areas with no GP inside their border scored 0, even though 16 of them have a
+  GP nearby (median 2.08 km).
+* **Small numbers.** AEDC shares from areas with few children were used raw.
+* **No explanation.** The finder gave no reasons, uncertainty or limitations.
+  Tutor and design feedback: wording ("Ready for school", "Improving") promised
+  more than the data shows.
+
+### S2: Family Fit (shipped, S2.1)
+
+* **Needs.** Eight child-focused needs, two measures each, as
+  direction-aligned percentiles.
+* **AEDC.** Empirical-Bayes shrinkage.
+* **Services.** E2SFCA access across borders.
+* **Essential.** The Melbourne median or better (weight 2). Prefer has weight 1.
+* **Stability.** A Monte Carlo label for shortlist position.
+* **Gates.** Nine blocking gates.
+
+**Evidence.**
+
+* Each measure carries 22.6–29.3% of the variance.
+* Small-numbers backtest: 7.9–9.9% lower error overall, 15–22% lower for small
+  areas.
+* Top-10 Jaccard under threshold and weight changes: 0.67–1.0.
+* The API reproduces the reference rankings exactly.
+
+**Design changes from feedback.**
+
+* Neutral rank circles, with a separate reliability label.
+* "Stable shortlist position", scoped to school-entry measures.
+* "Improving" names the measure and the years (2015 to 2024) and uses a
+  significance test.
+* Childcare is described as capacity, not vacancies.
+* The match score is described as a comparative index, not a probability.
+* Suggestions are always "Prefer". An Essential is never relaxed silently; the
+  no-results state offers named relaxations, each with its result count.
+
+**Out of scope by decision.** Rent and housing cost, which would move the
+product away from its child-health niche.
+
+### Forecast: F0 → F3 (2027 school-entry outlook)
+
+Rolling-origin design: train on 2012→15, 15→18 and 18→21; hold out 21→24.
+
+| Step | Change | Weighted MAE (pp) |
+|---|---|---|
+| F0 | Persistence (last observed share) | 7.56 |
+| F1 | Shrunk persistence | 7.01 |
+| F2 | F1 plus the Melbourne trend | 6.90 |
+| F3 v1 | Ridge on absolute shares | Reverted toward the historical mean; rejected |
+| **F3** | **Ridge on position relative to Melbourne (alpha grid widened to 100,000)** | **6.43 (selected; 14.9% better than F0; Spearman 0.65)** |
+| F4 | Gradient boosting, same features | 6.88 (not selected; worse, and 80% coverage 0.58) |
+
+* Holdout 80% coverage for F3 is 0.70, because Greater Melbourne fell 3.5 pp in
+  2024.
+* The published 2027 intervals add a cycle-shock variance of 1.80 pp, estimated
+  from all four transitions.

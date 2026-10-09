@@ -14,6 +14,34 @@ Vite listens on all network interfaces. The frontend is available locally at
 `http://localhost:5173`, or from another device at
 `http://<this-computer-LAN-IP>:5173`.
 
+### Pages
+
+| Path | Page |
+|---|---|
+| `/` | Home |
+| `/insight-journey` | Insight Journey |
+| `/map` | Melbourne map (`/map?area=<SA2 code>` opens that area's profile) |
+| `/simulation` | Simulation |
+| `/child-health` | Child Health |
+| `/where-to-live` | Where to live: compare areas for a family's priorities (`?focus=<home card key>`, `?anchor=<SA2 code>`) |
+
+## Where to live (Family Fit): handover
+
+* Rebuild the data: `python datascience/scripts/model_school_entry_forecast.py`,
+  then `python datascience/scripts/build_family_fit.py`. Both run inside
+  `datascience/scripts/refresh_iteration3.py`, which also gates on the tests and
+  the pipeline KPIs and restores the previous artefacts on failure.
+* Served files: `datascience/outputs/iteration_3/family_fit.json` and
+  `family_fit_shapes.json`. Set the backend variables
+  `KINDERPRINT_FAMILY_FIT_DATA_PATH` and
+  `KINDERPRINT_FAMILY_FIT_SHAPES_DATA_PATH`.
+* Docs: `datascience/docs/MODEL_CARD_FAMILY_FIT.md`,
+  `datascience/docs/decisions/ADR-009-family-fit-and-forecast.md`,
+  `datascience/docs/FAMILY_FIT_DEPLOYMENT_LOG.md`, and the Family Fit section of
+  `docs/api-contract.md`.
+* Tests: `datascience/tests/test_family_fit.py`,
+  `backend/tests/test_family_fit.py`.
+
 ## Backend
 
 ```bash
