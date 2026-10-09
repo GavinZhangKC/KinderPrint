@@ -432,7 +432,8 @@ function DetailPanel({ id, setup, priorities, result, anchorName, saved, onSave,
       <p className="wl-sub">{data.sa3}{r && anchorName && ` · ${r.distance_km.toFixed(1)} km from ${anchorName}`}</p>
       {r && <p className="wl-score">Match score <b>{Math.round(r.match)}</b>/100 for your priorities <button type="button" className="wl-link" onClick={onHow}>What is this?</button></p>}
       <div className="wl-row"><button type="button" className={`wl-btn ${saved ? 'is-saved' : 'primary'}`} aria-pressed={saved} onClick={() => onSave({ id: data.id, name: data.name })}>{saved ? 'Saved' : 'Save this area'}</button>
-        <a className="wl-btn" href={`/map?area=${encodeURIComponent(data.id)}`}>Open on the main map</a></div>
+        <a className="wl-btn" href={`/child-health?area=${encodeURIComponent(data.id)}&name=${encodeURIComponent(data.name)}`}>See child health here</a>
+        <a className="wl-btn" href={`/map?area=${encodeURIComponent(data.id)}&name=${encodeURIComponent(data.name)}`}>Show on the main map</a></div>
       {chosen.length > 0 && <><h3>Your priorities</h3><ul className="wl-need-list">{chosen.map(need)}</ul></>}
       <h3>Children starting school here</h3>
       <div className="wl-facts">

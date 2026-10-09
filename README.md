@@ -20,9 +20,9 @@ Vite listens on all network interfaces. The frontend is available locally at
 |---|---|
 | `/` | Home |
 | `/insight-journey` | Insight Journey |
-| `/map` | Melbourne map (`/map?area=<SA2 code>` opens that area's profile) |
+| `/map` | Melbourne map. Selecting an area opens its Child Health board; `/map?area=<SA2 code>&name=<name>` highlights an area |
 | `/simulation` | Simulation |
-| `/child-health` | Child Health |
+| `/child-health` | Child Health board, parent and practitioner views (`?area=<SA2 code>&name=<name>`; otherwise the last area chosen on this device, or an area chooser) |
 | `/where-to-live` | Where to live: compare areas for a family's priorities (`?focus=<home card key>`, `?anchor=<SA2 code>`) |
 
 ## Where to live (Family Fit): handover

@@ -15,11 +15,11 @@
 .legend-swatch.risk-low { background: #9adbb8; }.legend-swatch.risk-high { background: #f5b6a8; }
 .legend-swatch.positive-low { background: #f5b6a8; }.legend-swatch.positive-high { background: #9adbb8; }.legend-swatch.mid { background: #f6e7a8; }
 
-/* Link from the map to "Where to live" (replaces the old suitability modal). */
+/* Link from the map to "Where to live", top right so it never sits under the search results. */
 .map-where-link {
   position: absolute;
-  left: clamp(16px, 3vw, 42px);
-  top: calc(clamp(14px, 2.6dvh, 28px) + 82px);
+  right: clamp(16px, 3vw, 42px);
+  top: calc(clamp(14px, 2.6dvh, 28px) + 22px);
   z-index: 14;
   display: inline-flex;
   align-items: center;
@@ -30,7 +30,16 @@
   font-size: 14px;
   font-weight: 700;
   text-decoration: none;
-  transition: background .18s ease, box-shadow .18s ease, transform .18s ease;
+  transition: background .18s ease, box-shadow .18s ease;
 }
-.map-where-link:hover { background: rgba(255, 255, 255, .78); box-shadow: 0 12px 28px rgba(51, 82, 140, .13); transform: translateY(-1px); }
+.map-where-link:hover { background: rgba(255, 255, 255, .78); box-shadow: 0 12px 28px rgba(51, 82, 140, .13); }
 .map-where-link:focus-visible { outline: 3px solid rgba(109, 120, 232, .5); outline-offset: 2px; }
+
+/* The area the map was asked to show, with the way into its child health board. */
+.map-area-card { margin-top: 10px; padding: 14px 16px; border-radius: 16px; background: rgba(255, 255, 255, .86); display: flex; flex-direction: column; gap: 10px; color: #33496f; font-size: 15px; line-height: 1.45; }
+.map-area-card b { color: var(--brand); }
+.map-area-card__open { align-self: flex-start; min-height: 44px; padding: 0 18px; border: 0; border-radius: 12px; background: #2C5EAF; color: #fff; font: inherit; font-weight: 700; cursor: pointer; }
+.map-area-card__open:hover { background: #244f96; }
+.map-area-card__open:focus-visible { outline: 3px solid rgba(109, 120, 232, .6); outline-offset: 2px; }
+.map-click-hint { position: absolute; right: clamp(16px, 3vw, 42px); bottom: calc(clamp(12px, 3.4dvh, 36px) + 34px); z-index: 8; margin: 0; padding: 10px 14px; border-radius: 12px; background: rgba(255, 255, 255, .78); color: #33496f; font-size: 14px; font-weight: 600; pointer-events: none; }
+@media (max-width: 900px) { .map-where-link { top: auto; bottom: calc(clamp(12px, 3.4dvh, 36px) + 230px); } .map-click-hint { display: none; } }

@@ -184,23 +184,63 @@ function RangeMarker({ item }: { item: DepartmentAreaIndicator }) {
   </span>
 }
 
-function LocalityPicker({ locality, onSelect }: { locality: NeighbourhoodSearchResult; onSelect: (value: NeighbourhoodSearchResult) => void }) {
+/** Area chooser: shows the chosen area, opens a search, and offers the map as another way to choose. */
+export function LocalityPicker({ locality, onSelect, autoOpen = false }: { locality: NeighbourhoodSearchResult | null; onSelect: (value: NeighbourhoodSearchResult) => void; autoOpen?: boolean }) {
+  const [open, setOpen] = useState(autoOpen)
   const [query, setQuery] = useState('')
   const [results, setResults] = useState<NeighbourhoodSearchResult[]>([])
+  const [active, setActive] = useState(0)
+  const [state, setState] = useState<'idle' | 'loading' | 'error'>('idle')
+  const rootRef = useRef<HTMLDivElement>(null)
+  const inputRef = useRef<HTMLInputElement>(null)
   useEffect(() => {
-    if (query.trim().length < 2) { setResults([]); return }
+    if (query.trim().length < 2) { setResults([]); setState('idle'); return }
+    setState('loading')
     const timer = window.setTimeout(() => api.searchNeighbourhoods(query)
-      .then(response => setResults(response.data.filter(item => /^\d{9}$/.test(item.id)).slice(0, 8)))
-      .catch(() => setResults([])), 220)
+      .then(response => { setResults(response.data.filter(item => /^\d{9}$/.test(item.id)).slice(0, 8)); setActive(0); setState('idle') })
+      .catch(() => { setResults([]); setState('error') }), 220)
     return () => window.clearTimeout(timer)
   }, [query])
-  return <div className="kh-picker">
-    <label className="kh-chip">
+  useEffect(() => { if (open) inputRef.current?.focus() }, [open])
+  useEffect(() => {
+    if (!open) return
+    const close = (event: PointerEvent) => { if (!rootRef.current?.contains(event.target as Node)) setOpen(false) }
+    document.addEventListener('pointerdown', close)
+    return () => document.removeEventListener('pointerdown', close)
+  }, [open])
+  const choose = (item: NeighbourhoodSearchResult) => { onSelect(item); setQuery(''); setResults([]); setOpen(false) }
+  const mapHref = locality ? `/map?area=${encodeURIComponent(locality.id)}&name=${encodeURIComponent(locality.name)}` : '/map'
+  return <div className={`kh-picker${open ? ' is-open' : ''}`} ref={rootRef}>
+    <button type="button" className="kh-chip kh-picker-trigger" aria-haspopup="dialog" aria-expanded={open} onClick={() => setOpen(value => !value)}>
       <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="10" r="3" /><path d="M12 21s-7-6.5-7-11a7 7 0 0 1 14 0c0 4.5-7 11-7 11z" /></svg>
-      <span className="kh-sr">Change locality</span>
-      <input value={query} placeholder={locality.name} onChange={event => setQuery(event.target.value)} aria-label="Search for a suburb" />
-    </label>
-    {results.length > 0 && <ul role="listbox">{results.map(result => <li key={result.id}><button type="button" onClick={() => { onSelect(result); setQuery(''); setResults([]) }}><b>{result.name}</b><small>SA2 {result.id}</small></button></li>)}</ul>}
+      <span className="kh-picker-label">{locality ? <><span className="kh-sr">Area: </span>{locality.name}</> : 'Choose an area'}</span>
+      <span className="kh-picker-change">{locality ? 'Change' : ''}</span>
+      <i aria-hidden="true" className={open ? 'is-open' : undefined} />
+    </button>
+    {open && <div className="kh-picker-panel" role="dialog" aria-label="Choose an area">
+      <label className="kh-picker-search">
+        <span className="kh-sr">Search for a suburb</span>
+        <input ref={inputRef} value={query} placeholder="Type a suburb, e.g. Box Hill" role="combobox" aria-expanded={results.length > 0} aria-controls="kh-picker-list" aria-autocomplete="list"
+          aria-activedescendant={results[active] ? `kh-picker-${results[active].id}` : undefined}
+          onChange={event => setQuery(event.target.value)}
+          onKeyDown={event => {
+            if (event.key === 'ArrowDown') { event.preventDefault(); setActive(i => Math.min(i + 1, results.length - 1)) }
+            if (event.key === 'ArrowUp') { event.preventDefault(); setActive(i => Math.max(i - 1, 0)) }
+            if (event.key === 'Enter' && results[active]) { event.preventDefault(); choose(results[active]) }
+            if (event.key === 'Escape') setOpen(false)
+          }} />
+      </label>
+      {state === 'loading' && <p className="kh-picker-note" role="status">Searching…</p>}
+      {state === 'error' && <p className="kh-picker-note" role="alert">Search did not work. Check your connection and try again.</p>}
+      {state === 'idle' && query.trim().length >= 2 && results.length === 0 && <p className="kh-picker-note">No Greater Melbourne area matches “{query}”.</p>}
+      {results.length > 0 && <ul id="kh-picker-list" role="listbox">{results.map((result, index) => <li key={result.id} id={`kh-picker-${result.id}`} role="option" aria-selected={index === active}>
+        <button type="button" tabIndex={-1} onMouseEnter={() => setActive(index)} onClick={() => choose(result)}><b>{result.name}</b></button>
+      </li>)}</ul>}
+      <div className="kh-picker-ways">
+        <a href={mapHref}>Choose on the map</a>
+        <a href={locality ? `/where-to-live?anchor=${encodeURIComponent(locality.id)}` : '/where-to-live'}>Compare areas to live in</a>
+      </div>
+    </div>}
   </div>
 }
 
