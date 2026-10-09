@@ -949,3 +949,9 @@ html:has(.health-page-shell) body::-webkit-scrollbar{
 .dh-area-card .kh-picker-panel { position: static; margin-top: 8px; width: min(520px, 100%); box-shadow: none; }
 .dh-area-or { font-size: 15px !important; }
 .dh-area-or a { color: #2C5EAF; font-weight: 700; text-underline-offset: 3px; }
+:root[data-theme='dark'] .dh-area-card { border-color: rgba(175, 192, 217, .2); background: #12223B; box-shadow: 0 20px 48px rgba(4, 6, 17, .45); color: #F3F7FF; }
+:root[data-theme='dark'] .dh-area-kicker { color: #A9B6FF; }
+:root[data-theme='dark'] .dh-area-card > p { color: #B8C7DE; }
+:root[data-theme='dark'] .dh-area-card .kh-picker-trigger { border-color: rgba(175, 192, 217, .28); background: #182B48; color: #F3F7FF; }
+:root[data-theme='dark'] .dh-area-card .kh-picker-panel { background: transparent; border: 0; padding-left: 0; padding-right: 0; }
+:root[data-theme='dark'] .dh-area-card .kh-picker-panel { box-shadow: none; }

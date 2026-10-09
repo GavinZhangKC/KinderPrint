@@ -115,8 +115,8 @@ export default function WhereMap({ shapes, result, selected, onSelect, onOpen, c
         const isSel = r.id === selected
         return <g key={r.id} className="wl-pin" role="button" tabIndex={0} aria-label={`${r.rank}. ${r.name}, match score ${Math.round(r.match)}. Open details`}
           onClick={() => { onSelect(r.id); onOpen(r.id) }} onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onSelect(r.id); onOpen(r.id) } }}>
-          <circle cx={x} cy={y} r={font * (isSel ? 1.25 : 1)} fill={isSel ? 'var(--wl-ink)' : 'var(--wl-brand)'} stroke="var(--wl-surface)" strokeWidth={font / 4} />
-          <text x={x} y={y + font * 0.38} textAnchor="middle" fontSize={font * 1.05} fontWeight={800} fill="#fff">{numbers.get(r.id)}</text>
+          <circle cx={x} cy={y} r={font * (isSel ? 1.25 : 1)} fill={isSel ? 'var(--wl-pin-sel)' : 'var(--wl-pin)'} stroke="var(--wl-surface)" strokeWidth={font / 4} />
+          <text x={x} y={y + font * 0.38} textAnchor="middle" fontSize={font * 1.05} fontWeight={800} fill={isSel ? 'var(--wl-pin-sel-ink)' : 'var(--wl-pin-ink)'}>{numbers.get(r.id)}</text>
           {labelSide.has(r.id) && <text x={labelSide.get(r.id) === 'right' ? x + font * 1.4 : x - font * 1.4} textAnchor={labelSide.get(r.id) === 'right' ? 'start' : 'end'} y={y + font * 0.38} fontSize={font * 0.95} fontWeight={700} fill="var(--wl-ink)" stroke="var(--wl-surface)" strokeWidth={font * 0.3} strokeLinejoin="round" paintOrder="stroke" className="wl-map-label">{r.name}</text>}
         </g>
       })}

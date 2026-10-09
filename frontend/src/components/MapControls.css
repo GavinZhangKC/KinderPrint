@@ -43,3 +43,9 @@
 .map-area-card__open:focus-visible { outline: 3px solid rgba(109, 120, 232, .6); outline-offset: 2px; }
 .map-click-hint { position: absolute; right: clamp(16px, 3vw, 42px); bottom: calc(clamp(12px, 3.4dvh, 36px) + 34px); z-index: 8; margin: 0; padding: 10px 14px; border-radius: 12px; background: rgba(255, 255, 255, .78); color: #33496f; font-size: 14px; font-weight: 600; pointer-events: none; }
 @media (max-width: 900px) { .map-where-link { top: auto; bottom: calc(clamp(12px, 3.4dvh, 36px) + 230px); } .map-click-hint { display: none; } }
+:root[data-theme='dark'] .map-area-card { background: rgba(14, 27, 48, .92); color: #B8C7DE; }
+:root[data-theme='dark'] .map-area-card b { color: #F3F7FF; }
+:root[data-theme='dark'] .map-area-card__open { background: #4E5FD6; }
+:root[data-theme='dark'] .map-area-card__open:hover { background: #5D6EE6; }
+:root[data-theme='dark'] .map-click-hint { background: rgba(14, 27, 48, .88); color: #F3F7FF; }
+:root[data-theme='dark'] .map-where-link { color: #A9B6FF; }
