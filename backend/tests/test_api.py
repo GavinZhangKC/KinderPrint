@@ -8,12 +8,14 @@ from core.data_loader import (
     ACECQA_CONTEXT_DATA_PATH_ENV,
     ACECQA_GEOCODING_DATA_PATH_ENV,
     BOUNDARY_DATA_PATH_ENV,
+    BUSHFIRE_CONTEXT_DATA_PATH_ENV,
     COMMUNITY_CONTEXT_DATA_PATH_ENV,
     COMMUNITY_IDENTITY_DATA_PATH_ENV,
     EPA_STATION_YEAR_DATA_PATH_ENV,
     PHIDU_CHILD_HEALTH_DATA_PATH_ENV,
     PROFILE_DATA_PATH_ENV,
     SUITABILITY_DATA_PATH_ENV,
+    TRANSPORT_CONTEXT_DATA_PATH_ENV,
     VIF_PROJECTION_DATA_PATH_ENV,
 )
 from loaders.early_childhood import _load_early_childhood_context, load_early_childhood_context
@@ -891,6 +893,32 @@ def test_map_indicators_preserve_zero_and_missing_null(client, monkeypatch, writ
     assert result["indicators"]["social"] == {"value": None, "status": "missing"}
     assert body["metadata"]["result_count"] == 1
     assert body["notices"][0]["code"] == "area_level_information"
+
+
+def test_map_indicators_include_sa2_traffic_and_bushfire_context(client, monkeypatch, write_json, tmp_path) -> None:
+    profile_path = write_json("profiles.json", json.dumps({"profiles": [profile("206011106")] }))
+    bushfire_path = tmp_path / "bushfire.csv"
+    bushfire_path.write_text(
+        "sa2_code,sa2_name,area_sqkm,bushfire_prone_sqkm,bushfire_prone_pct\n"
+        "206011106,Brunswick East,2.17,0.05,2.3\n",
+        encoding="utf-8",
+    )
+    transport_path = tmp_path / "transport.csv"
+    transport_path.write_text(
+        "sa2_code,sa2_name,area_sqkm,declared_road_length_km,declared_road_traffic_intensity,public_transport_stop_count\n"
+        "206011106,Brunswick East,2.17,11.0,35331.2,45\n",
+        encoding="utf-8",
+    )
+    monkeypatch.setenv(PROFILE_DATA_PATH_ENV, str(profile_path))
+    monkeypatch.setenv(BUSHFIRE_CONTEXT_DATA_PATH_ENV, str(bushfire_path))
+    monkeypatch.setenv(TRANSPORT_CONTEXT_DATA_PATH_ENV, str(transport_path))
+
+    body = client.get("/api/neighbourhoods/indicators").json()
+
+    result = body["data"]["neighbourhoods"][0]
+    assert result["name"] == "206011106"
+    assert result["indicators"]["env_bushfire_prone_share_pct"] == {"value": 2.3, "status": "available"}
+    assert result["indicators"]["env_declared_road_traffic_intensity"] == {"value": 35331.2, "status": "available"}
 
 
 def test_empty_map_indicator_collection_is_unavailable(client, monkeypatch, write_json) -> None:
