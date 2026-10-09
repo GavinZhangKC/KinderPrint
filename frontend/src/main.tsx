@@ -1,7 +1,10 @@
 import { lazy, StrictMode, Suspense } from 'react'
 import { createRoot } from 'react-dom/client'
 import logo from './assets/LogoMark.png'
+import { ThemeProvider } from './theme/ThemeProvider'
 import './components/cesium/CesiumExperimentPage.css'
+import './styles/midnight-tokens.css'
+import './styles/midnight-glass.css'
 
 const App = lazy(() => import('./App'))
 const CesiumExperimentPage = lazy(
@@ -57,6 +60,6 @@ if (!root) throw new Error('Root element not found')
 
 createRoot(root).render(
   <StrictMode>
-    <RootPage />
+    <ThemeProvider><RootPage /></ThemeProvider>
   </StrictMode>,
 )

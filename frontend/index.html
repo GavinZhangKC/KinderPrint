@@ -4,6 +4,17 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#edf4ff" />
+    <script>
+      // Restore before rendering so refreshes and full-page navigation do not flash light mode.
+      (() => {
+        let theme = 'light';
+        try { if (localStorage.getItem('kinderprint-theme') === 'dark') theme = 'dark'; } catch {}
+        document.documentElement.dataset.theme = theme;
+        document.documentElement.style.colorScheme = theme;
+        document.querySelector('meta[name="theme-color"]').content = theme === 'dark' ? '#091525' : '#edf4ff';
+      })();
+    </script>
+    <style>html[data-theme="dark"], html[data-theme="dark"] body { background: #091525; }</style>
     <meta name="description" content="Vkinder neighbourhood evidence explorer" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />

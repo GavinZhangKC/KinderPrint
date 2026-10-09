@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import type { CSSProperties } from 'react'
 import logo from '../assets/LogoMark.png'
 import InfiniteImageGallery from './InfiniteImageGallery'
+import ThemeSwitcher from './ThemeSwitcher'
 import '../styles/landing.css'
 
 interface LandingPageProps {
@@ -17,14 +18,16 @@ interface HomeHeaderProps extends LandingPageProps {
 
 const heroVideoSources = [
   '/BackgroundVideo.mp4',
+  '/BackgroundVideo1.mp4',
   '/BackgroundVideo2.mp4',
   '/BackgroundVideo3.mp4',
   '/BackgroundVideo4.mp4',
   '/BackgroundVideo5.mp4',
+  '/BackgroundVideo6.mp4',
 ] as const
 
 const heroVideoCrossfadeSeconds = 0.9
-const heroVideoPlaybackRates = [0.9, 0.9, 0.85, 0.85, 0.85] as const
+const heroVideoPlaybackRates = [0.9, 0.9, 0.9, 0.85, 0.85, 0.85, 0.85] as const
 
 const homeThemeStripItems = [
   'Child development',
@@ -122,10 +125,13 @@ function ExploreMenuLink({ item, onSelect }: ExploreMenuLinkProps) {
 function HomeHeader({ onHome, onInsight, onSimulation, onMap, onHealth }: HomeHeaderProps) {
   return (
     <header className="glass home-header" data-no-ripple>
+      <div className="home-brand-cluster">
       <button className="home-brand" type="button" onClick={onHome} aria-label="Go to Vkinder home">
         <img src={logo} alt="" />
         <span>Vkinder</span>
       </button>
+      <ThemeSwitcher />
+      </div>
       <nav className="home-nav" aria-label="Primary navigation">
         <button type="button" aria-current="page" onClick={onHome}>Home</button>
         <button type="button" onClick={onInsight}>Insight Journey</button>
