@@ -1,0 +1,101 @@
+{
+  "run_utc": "2026-09-29T151127Z",
+  "mode": "offline",
+  "sources": {
+    "aihw_myhospitals_api_2026": {
+      "status": "ok",
+      "files": {
+        "myhospitals_vic_hospitals.csv": {
+          "rows": 373,
+          "qa_passed": true,
+          "warnings": [],
+          "failed_rules": [],
+          "changed": false
+        },
+        "myhospitals_reported_measures.csv": {
+          "rows": 44,
+          "qa_passed": true,
+          "warnings": [],
+          "failed_rules": [],
+          "changed": false
+        },
+        "myhospitals_vic_data_items.csv": {
+          "rows": 1580,
+          "qa_passed": true,
+          "warnings": [],
+          "failed_rules": [],
+          "changed": false
+        }
+      }
+    },
+    "aihw_phc_019_mbs_local_areas_2024_25": {
+      "status": "ok",
+      "files": {
+        "aihw_mbs_local_areas_vic_2024_25.csv": {
+          "rows": 8442,
+          "qa_passed": true,
+          "warnings": [
+            "provider fees are not below Medicare benefits (derived gap is nulled where they are)"
+          ],
+          "failed_rules": [],
+          "changed": false
+        }
+      }
+    },
+    "betterhealth_urgent_care_clinics_2026": {
+      "status": "ok",
+      "files": {
+        "urgent_care_clinics_vic.csv": {
+          "rows": 37,
+          "qa_passed": true,
+          "warnings": [],
+          "failed_rules": [],
+          "changed": false
+        }
+      }
+    },
+    "nndss_public_datasets_2025": {
+      "status": "ok",
+      "files": {
+        "nndss_influenza_vic_monthly.csv": {
+          "rows": 3293,
+          "qa_passed": true,
+          "warnings": [],
+          "failed_rules": [],
+          "changed": false
+        },
+        "nndss_salmonella_vic_monthly.csv": {
+          "rows": 3440,
+          "qa_passed": true,
+          "warnings": [],
+          "failed_rules": [],
+          "changed": false
+        }
+      }
+    },
+    "osm_overpass_food_outlets_2026": {
+      "status": "ok",
+      "files": {
+        "osm_food_outlets_melbourne.csv": {
+          "rows": 2795,
+          "qa_passed": true,
+          "warnings": [],
+          "failed_rules": [],
+          "changed": false
+        }
+      }
+    },
+    "fsanz_afcd_release_3": {
+      "status": "ok",
+      "files": {
+        "afcd_r3_selected_per100g.csv": {
+          "rows": 1588,
+          "qa_passed": true,
+          "warnings": [],
+          "failed_rules": [],
+          "changed": false
+        }
+      }
+    }
+  }
+}

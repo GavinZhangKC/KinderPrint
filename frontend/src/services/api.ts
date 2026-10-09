@@ -219,6 +219,7 @@ export interface ChildHealthPhaIndicator {
   rate_or_percent: number | null
   lower_95_ci: number | null
   upper_95_ci: number | null
+  standardised_ratio?: number | null
   publication_status: string
   source_id: string
   geography_warning: string
@@ -281,6 +282,189 @@ export interface PreventionContext {
     sa2_compared: number
   } | null
   vcams: DepartmentAreaIndicator[]
+}
+
+export interface SeasonalAirMonth {
+  month: number
+  valid_days: number
+  mean_daily_ug_m3: number
+  days_above_standard: number
+  highest_daily_ug_m3: number
+  highest_daily_date: string
+}
+
+export interface SeasonalAir {
+  station: {
+    name: string
+    distance_km: number
+    pollutant: string
+    standard_ug_m3: number
+    first_year: number
+    last_year: number
+  } | null
+  months: SeasonalAirMonth[]
+}
+
+export type VaccinationPlaceKind = 'general_practice' | 'pharmacy' | 'maternal_child_health'
+
+export interface VaccinationPlace {
+  kind: VaccinationPlaceKind
+  rank: number
+  name: string
+  address: string
+  suburb: string
+  longitude: number
+  latitude: number
+  distance_km: number
+  source_date: string
+}
+
+export interface VaccinationPlaces {
+  origin: { longitude: number; latitude: number } | null
+  places: VaccinationPlace[]
+  council: { lga_name: string; council_name: string; immunisation_url: string; phone: string; retrieved: string } | null
+}
+
+export interface NearbyService {
+  service_type: string
+  category: string
+  name: string
+  address: string
+  longitude: number
+  latitude: number
+  distance_km: number
+  count_within_5km: number
+  source_date: string
+}
+
+export interface CompareHospital {
+  id: string
+  name: string
+  sector: 'public' | 'private'
+  distance_km: number
+  latitude: number
+  longitude: number
+  specialised_units: string[]
+  has_paediatric_service: boolean
+  has_neonatal_intensive_care: boolean
+  has_obstetric_service: boolean
+  emergency_department: {
+    on_time_pct: { resuscitation: number | null; emergency: number | null; urgent: number | null; semi_urgent: number | null; non_urgent: number | null }
+    departed_within_4h_pct: number | null
+    median_minutes: number | null
+    ninetieth_percentile_minutes: number | null
+    period: string
+  } | null
+  elective_surgery_median_days: { urgent: number | null; semi_urgent: number | null; non_urgent: number | null; period: string } | null
+}
+
+export interface CompareClinic {
+  id: string
+  name: string
+  address: string
+  phone: string
+  listing_url: string
+  cost: string
+  distance_km: number
+  latitude: number
+  longitude: number
+}
+
+export interface AreaCostService {
+  service: string
+  demographic: string
+  patients: number | null
+  services_per_100: number | null
+  percent_people: number | null
+  patient_contribution_per_service: number | null
+  benefit_share_of_fees_pct: number | null
+  national_patient_contribution_per_service: number | null
+  national_services_per_100: number | null
+}
+
+export interface PractitionerDevelopment {
+  community_id: string
+  community_name: string
+  children_assessed: number | null
+  observed_vulnerable_pct: number | null
+  expected_vulnerable_pct: number | null
+  expected_range_pct: [number | null, number | null]
+  priority_band: 'Higher' | 'Moderate' | 'Lower'
+  band_stability: number | null
+  expectation_drivers: string[]
+  model_version: string
+}
+
+export interface SpatialAccess {
+  access_5km: number | null
+  percentile: number | null
+  nearest_km: number | null
+  unit: string
+}
+
+export interface PractitionerContext {
+  sa2_code: string
+  sa2_name?: string
+  development: PractitionerDevelopment | null
+  access: { general_practice: SpatialAccess; early_childhood_education_and_care: SpatialAccess } | null
+}
+
+export interface CompareCare {
+  hospitals: CompareHospital[]
+  urgent_care_clinics: CompareClinic[]
+  area_cost: { sa3_code: string; sa3_name: string; reference_period: string; services: AreaCostService[] } | null
+}
+
+export interface SeasonalIllness {
+  diseases: Array<{
+    id: string
+    label: string
+    reference_years: string
+    months: Array<{ month: number; children_average: number; children_share_pct: number; all_ages_average: number; all_ages_share_pct: number }>
+  }>
+}
+
+export interface NutrientTarget {
+  nutrient_id: string
+  nutrient: string
+  unit: string
+  basis: string
+  age_1_3: number
+  age_4_8: number
+  age_9_13_boys: number
+  age_9_13_girls: number
+  why_it_matters: string
+  source_url: string
+}
+
+export interface NutrientFood {
+  nutrient_id: string
+  nutrient: string
+  unit: string
+  rank: number
+  food_key: string
+  food_name: string
+  food_group: string
+  amount_per_100g: number
+}
+
+export interface FoodOutlet {
+  osm_id: string
+  name: string
+  outlet_type: string
+  organic: boolean
+  address: string
+  opening_hours: string
+  latitude: number
+  longitude: number
+  distance_km: number
+}
+
+export interface NutritionReport {
+  targets: NutrientTarget[]
+  foods: NutrientFood[]
+  outlets: FoodOutlet[] | null
+  access: Array<{ outlet_type: string; within_1km: number; within_2km: number; nearest_km: number | null }> | null
 }
 
 export interface ContextMetric {
@@ -606,6 +790,39 @@ export const api = {
   getPreventionContext: (sa2Code: string, signal?: AbortSignal) =>
     request<PreventionContext>(
       `/api/digital-health/prevention-context?sa2_code=${encodeURIComponent(sa2Code)}`, signal,
+    ),
+
+  getPractitionerContext: (sa2Code: string, signal?: AbortSignal) =>
+    request<PractitionerContext>(
+      `/api/digital-health/practitioner-context?sa2_code=${encodeURIComponent(sa2Code)}`, signal,
+    ),
+
+  getCompareCare: (sa2Code: string, signal?: AbortSignal) =>
+    request<CompareCare>(
+      `/api/digital-health/compare-care?sa2_code=${encodeURIComponent(sa2Code)}`, signal,
+    ),
+
+  getSeasonalIllness: (signal?: AbortSignal) =>
+    request<SeasonalIllness>('/api/digital-health/seasonal-illness', signal),
+
+  getNutritionReport: (sa2Code: string, signal?: AbortSignal) =>
+    request<NutritionReport>(
+      `/api/digital-health/nutrition-report?sa2_code=${encodeURIComponent(sa2Code)}`, signal,
+    ),
+
+  getSeasonalAir: (sa2Code: string, signal?: AbortSignal) =>
+    request<SeasonalAir>(
+      `/api/digital-health/seasonal-air?sa2_code=${encodeURIComponent(sa2Code)}`, signal,
+    ),
+
+  getVaccinationPlaces: (sa2Code: string, signal?: AbortSignal) =>
+    request<VaccinationPlaces>(
+      `/api/digital-health/vaccination-places?sa2_code=${encodeURIComponent(sa2Code)}`, signal,
+    ),
+
+  getNearbyServices: (sa2Code: string, signal?: AbortSignal) =>
+    request<{ services: NearbyService[] }>(
+      `/api/digital-health/nearby-services?sa2_code=${encodeURIComponent(sa2Code)}`, signal,
     ),
 
   getIndustrialContext: (

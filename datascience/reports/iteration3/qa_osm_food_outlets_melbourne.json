@@ -1,0 +1,60 @@
+{
+  "file": "osm_food_outlets_melbourne.csv",
+  "rows": 2795,
+  "passed": true,
+  "warnings": [],
+  "rules": [
+    {
+      "rule": "schema: required columns present, no extras",
+      "passed": true,
+      "severity": "error",
+      "missing": [],
+      "unexpected": []
+    },
+    {
+      "rule": "volume: at least 2000 rows",
+      "passed": true,
+      "severity": "error",
+      "rows": 2795
+    },
+    {
+      "rule": "volume: row drift within +/-25% of previous file",
+      "passed": true,
+      "severity": "error",
+      "previous": 2795,
+      "drift": 0.0
+    },
+    {
+      "rule": "keys: key columns populated",
+      "passed": true,
+      "severity": "error",
+      "violations": 0
+    },
+    {
+      "rule": "keys: primary key unique",
+      "passed": true,
+      "severity": "error",
+      "violations": 0,
+      "examples": []
+    },
+    {
+      "rule": "geography: coordinates inside the expected envelope",
+      "passed": true,
+      "severity": "error",
+      "outside": 0,
+      "located": 2795
+    },
+    {
+      "rule": "every outlet is a food shop, marketplace or tagged organic",
+      "passed": true,
+      "severity": "error",
+      "violations": 0
+    },
+    {
+      "rule": "OSM ids are type/number",
+      "passed": true,
+      "severity": "error",
+      "violations": 0
+    }
+  ]
+}

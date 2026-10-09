@@ -10,6 +10,11 @@ from core.data_loader import (
     ACECQA_CONTEXT_DATA_PATH_ENV,
     ACECQA_GEOCODING_DATA_PATH_ENV,
     BUSHFIRE_CONTEXT_DATA_PATH_ENV,
+    CARE_CONTEXT_ENV,
+    SEASONAL_AIR_DATA_PATH_ENV,
+    NEARBY_SERVICES_DATA_PATH_ENV,
+    VACCINATION_PLACES_DATA_PATH_ENV,
+    COUNCIL_IMMUNISATION_DATA_PATH_ENV,
     COMMUNITY_CONTEXT_DATA_PATH_ENV,
     DEPARTMENT_AREA_BRIDGE_DATA_PATH_ENV,
     EPA_STATION_YEAR_DATA_PATH_ENV,
@@ -28,6 +33,11 @@ from core.data_loader import (
     abs_child_health_data_path,
     acecqa_geocoding_data_path,
     bushfire_context_data_path,
+    care_context_path,
+    seasonal_air_data_path,
+    nearby_services_data_path,
+    vaccination_places_data_path,
+    council_immunisation_data_path,
     community_context_data_path,
     department_area_bridge_data_path,
     epa_station_year_data_path,
@@ -47,6 +57,20 @@ from core.data_loader import (
 
 def _configured(path: Path | None) -> bool:
     return path is not None and path.is_file()
+
+
+CARE_CONTEXT_PRODUCTS = (
+    ("hospital_capability", "hospital", "Reported capability and historical timeliness, not live waits or quality rankings."),
+    ("care_compare", "SA2 label point to facility", "Straight-line distance only, not travel time or a recommendation."),
+    ("urgent_care_clinics", "facility point", "Listed clinic information, not opening hours or appointment availability."),
+    ("primary_care_cost", "SA3 and national", "Area Medicare averages, not an individual fee quote."),
+    ("seasonal_illness", "Victoria", "Past seasonal notifications, not local prevalence or a forecast."),
+    ("food_outlets", "SA2 label point to outlet", "Listed outlet presence, not availability, prices or food quality."),
+    ("food_access", "SA2 label point to outlet", "Distance-based outlet counts, not individual food access."),
+    ("child_nutrient_foods", "not geographic", "Published composition per 100 g, not a personalised diet plan."),
+    ("child_nutrient_targets", "not geographic", "Age-group nutrient guidance, not individual medical advice."),
+    ("practitioner_context", "AEDC reporting area and SA2", "Area-level investigation context; not a diagnosis or prediction for a child."),
+)
 
 
 def dataset_statuses() -> list[dict[str, Any]]:
@@ -230,4 +254,37 @@ def dataset_statuses() -> list[dict[str, Any]]:
             "user_facing": False,
             "boundary": "Only accepted matches may enter spatial analysis; addresses are not exposed.",
         },
+    ] + [
+        {
+            "id": identifier,
+            "role": "child_health_planning_context",
+            "geographic_unit": unit,
+            "interpretation_status": "context_only",
+            "configured": _configured(path_loader()),
+            "configuration_variable": env,
+            "user_facing": True,
+            "boundary": boundary,
+        }
+        for identifier, env, path_loader, unit, boundary in (
+            ("seasonal_air", SEASONAL_AIR_DATA_PATH_ENV, seasonal_air_data_path,
+             "nearest EPA monitoring station", "Historical station readings, not SA2 exposure or a forecast."),
+            ("nearby_services", NEARBY_SERVICES_DATA_PATH_ENV, nearby_services_data_path,
+             "SA2 label point to facility", "Listed services and straight-line distances, not service quality or capacity."),
+            ("vaccination_places", VACCINATION_PLACES_DATA_PATH_ENV, vaccination_places_data_path,
+             "SA2 label point to facility", "Listed facilities, not confirmation that a specific vaccine is provided."),
+            ("council_immunisation", COUNCIL_IMMUNISATION_DATA_PATH_ENV, council_immunisation_data_path,
+             "LGA linked to SA2", "Council service information, not appointment availability."),
+        )
+    ] + [
+        {
+            "id": resource,
+            "role": "child_health_planning_context",
+            "geographic_unit": unit,
+            "interpretation_status": "context_only",
+            "configured": _configured(care_context_path(resource)),
+            "configuration_variable": CARE_CONTEXT_ENV[resource],
+            "user_facing": True,
+            "boundary": boundary,
+        }
+        for resource, unit, boundary in CARE_CONTEXT_PRODUCTS
     ]

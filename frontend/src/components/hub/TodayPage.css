@@ -1,0 +1,255 @@
+/* Today page themes. Applied only while the Today page is open (see KinderHub root classes).
+   Parent: warm ivory, sage-to-butter cards, forest green text and buttons.
+   Practitioner: pale cool teal, mist-teal cards, navy text, deep-teal buttons.
+   All text and button pairs were checked for WCAG AA contrast. */
+
+.kp-hub.kt-theme-parent{
+  --kt-ink:#203F30; --kt-ink2:#465B42; --kt-accent:#536B35; --kt-primary:#355C38; --kt-primary-hover:#2B4B2E;
+  --kt-line:#DCE3C8; --kt-line-soft:#E6EAD3; --kt-cream:#FFFDF6;
+  --kt-tint:linear-gradient(135deg,#E9F2DB 0%,#F1F3D8 55%,#FFF3D2 100%);
+  --kt-icon-bg:#E9F2DB; --kt-overlay:linear-gradient(90deg,rgba(22,48,31,.84) 0%,rgba(22,48,31,.7) 32%,rgba(28,52,36,.32) 52%,rgba(28,52,36,0) 68%);
+  --kt-shadow:0 8px 24px -18px rgba(32,63,48,.35);
+  --kt-focus:#536B35;
+  background:linear-gradient(180deg,#FCFBF3 0%,#F5F8EA 45%,#FFF8E4 100%);
+  color:var(--kt-ink);
+}
+.kp-hub.kt-theme-prac{
+  --kt-ink:#12314A; --kt-ink2:#466174; --kt-accent:#176477; --kt-primary:#146171; --kt-primary-hover:#0F5260;
+  --kt-line:#D5E5EA; --kt-line-soft:#DCEAEE; --kt-cream:#FFFFFF;
+  --kt-tint:linear-gradient(160deg,#EDF5F8 0%,#E5F1F3 100%);
+  --kt-icon-bg:#E5F1F3; --kt-overlay:linear-gradient(90deg,rgba(14,42,63,1) 0%,rgba(14,42,63,.96) 46%,rgba(14,42,63,.55) 58%,rgba(14,42,63,0) 74%);
+  --kt-shadow:0 8px 22px -18px rgba(18,49,74,.35);
+  --kt-focus:#176477;
+  background:linear-gradient(180deg,#F3F8FA 0%,#EEF5F8 100%);
+  color:var(--kt-ink);
+}
+
+/* VKinder type scale. Content reflows across viewports; important health information never drops
+   below these sizes. Hero 40–48, page title 32–36, section 24–28, card heading 18–20, body 16–18,
+   secondary 15–16, controls 15–16, labels and metadata 14, primary data values 28–36. */
+.kp-hub.kt-theme-parent,.kp-hub.kt-theme-prac{
+  --fs-hero:clamp(40px,2.4vw + 14px,48px); --fs-h1:clamp(32px,1.2vw + 20px,36px); --fs-h2:clamp(24px,1vw + 14px,28px);
+  --fs-h3:clamp(18px,.4vw + 14px,20px); --fs-body:clamp(16px,.3vw + 13px,18px); --fs-body2:16px; --fs-control:16px;
+  --fs-label:14px; --fs-meta:14px; --fs-data:clamp(28px,1.2vw + 16px,36px);
+}
+.kt-theme-parent .kh-nav button,.kt-theme-prac .kh-nav button,.kt-theme-parent .kh-seg button,.kt-theme-prac .kh-seg button,
+.kt .kh-chip,.kt .kh-age-trigger,.kt .kh-age-list button,.kt .kh-btn.small{font-size:var(--fs-control)}
+.kt .kh-btn.small{min-height:40px;padding:6px 14px}
+
+/* Limitations and caveats are content, not footnotes: shown at body size with a clear marker. */
+.kt-limit{display:flex;gap:10px;align-items:flex-start;margin:0;padding:12px 14px;border-left:4px solid #8A5300;border-radius:10px;background:#FFF8EC;color:#4A3300;font-size:var(--fs-body2);line-height:1.5}
+.kt-limit::before{content:'!';flex:none;display:grid;place-items:center;width:22px;height:22px;margin-top:1px;border-radius:50%;background:#8A5300;color:#fff;font-size:var(--fs-label);font-weight:800}
+.kt-limit b{font-weight:800}
+
+/* Shared KinderHub controls recoloured for the theme; behaviour and motion stay the same. */
+.kt-theme-parent :focus-visible,.kt-theme-prac :focus-visible{outline:3px solid var(--kt-focus);outline-offset:2px}
+.kt-theme-parent .kh-nav,.kt-theme-prac .kh-nav{border-color:var(--kt-line);background:rgba(255,255,255,.75)}
+.kt-theme-parent .kh-nav button,.kt-theme-prac .kh-nav button{color:var(--kt-ink2)}
+.kt-theme-parent .kh-nav button[aria-current=page],.kt-theme-prac .kh-nav button[aria-current=page]{background:var(--kt-primary);color:#fff}
+.kt-theme-parent .kh-nav button:hover,.kt-theme-prac .kh-nav button:hover{background:var(--kt-icon-bg)}
+.kt-theme-parent .kh-nav .kh-nav-expand,.kt-theme-prac .kh-nav .kh-nav-expand{color:var(--kt-accent)}
+.kt-theme-parent .kh-seg,.kt-theme-prac .kh-seg{border-color:var(--kt-line);background:rgba(255,255,255,.75)}
+.kt-theme-parent .kh-seg button,.kt-theme-prac .kh-seg button{color:var(--kt-ink2)}
+.kt-theme-parent .kh-seg button:hover,.kt-theme-prac .kh-seg button:hover{color:var(--kt-ink);background:var(--kt-icon-bg)}
+.kt-theme-parent .kh-seg button[aria-pressed=true],.kt-theme-prac .kh-seg button[aria-pressed=true],
+.kt-theme-parent .kh-seg button[aria-pressed=true]:hover,.kt-theme-prac .kh-seg button[aria-pressed=true]:hover{background:var(--kt-primary);color:#fff;box-shadow:var(--kt-shadow)}
+.kt .kh-btn{min-height:44px;padding:10px 20px;border-radius:10px;border-color:var(--kt-line);background:#fff;color:var(--kt-accent);font-size:var(--fs-control);font-weight:700;transition:background-color .18s ease,transform .18s ease,box-shadow .18s ease}
+.kt .kh-btn:hover{filter:none;transform:translateY(-1px);box-shadow:var(--kt-shadow)}
+.kt .kh-btn.primary{border-color:var(--kt-primary);background:var(--kt-primary);color:#fff;font-weight:800}
+.kt .kh-btn.primary:hover{background:var(--kt-primary-hover)}
+.kt .kh-chip,.kt .kh-age-trigger{min-height:44px;border-radius:10px;border-color:var(--kt-line);background:#fff;color:var(--kt-ink)}
+.kt .kh-age-trigger:hover{border-color:var(--kt-accent);background:#fff;box-shadow:var(--kt-shadow)}
+.kt .kh-age-list{border-color:var(--kt-line);background:#fff}
+.kt .kh-age-list button:hover,.kt .kh-age-list button:focus-visible{background:var(--kt-icon-bg);color:var(--kt-ink)}
+.kt .kh-age-list button[aria-selected=true]{background:var(--kt-primary);color:#fff;box-shadow:none}
+
+/* Layout */
+.kt{display:flex;flex-direction:column;gap:32px;font-family:var(--kh-body);font-size:var(--fs-body);line-height:1.6;color:var(--kt-ink);animation:kh-in .35s ease both}
+.kt h2,.kt .kt-h2{display:block;margin:0;font-size:var(--fs-h2);font-weight:800;line-height:1.3;color:var(--kt-ink)}
+.kt h3{margin:0;font-size:var(--fs-h3);font-weight:800;color:var(--kt-ink)}
+.kt p{margin:0}
+.kt a,.kt .kt-inline-link{color:var(--kt-accent);font-weight:700;text-underline-offset:3px}
+.kt .kt-inline-link{border:0;background:none;padding:0;font:inherit;font-weight:700;text-decoration:underline;cursor:pointer}
+.kt-sub{display:block;margin-top:2px;font-size:var(--fs-body2);font-weight:500;color:var(--kt-ink2)}
+.kt-row{display:flex;flex-wrap:wrap;gap:24px;align-items:stretch}
+.kt-row-top{align-items:flex-start}
+.kt-wide{flex:999 1 560px;min-width:0}
+.kt-narrow{flex:1 1 320px;min-width:0}
+.kt-half{flex:1 1 420px;min-width:0}
+.kt-col{display:flex;flex-direction:column;gap:32px}
+.kt-card{padding:24px;border:1px solid var(--kt-line);border-radius:18px;box-shadow:var(--kt-shadow)}
+.kt-tint{background:var(--kt-tint)}
+.kt-cream{background:var(--kt-cream)}
+.kt-empty{color:var(--kt-ink2);font-size:var(--fs-body2)}
+.kt-meta{margin-top:auto!important;padding-top:10px;border-top:1px solid var(--kt-line-soft);font-size:var(--fs-meta);color:var(--kt-ink2)}
+.kt-ic{flex:none;display:grid;place-items:center;width:40px;height:40px;border-radius:10px;background:var(--kt-icon-bg);color:var(--kt-accent)}
+.kt-ic svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+
+/* Hero */
+.kt-hero{position:relative;overflow:hidden;min-height:340px;display:flex;align-items:center;border-radius:20px;background:#2E4A33}
+.kt-prac .kt-hero{min-height:290px;background:linear-gradient(120deg,#0E2A3F 0%,#12405A 60%,#155566 100%)}
+.kt-hero-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:72% 30%}
+.kt-prac .kt-hero-img{left:auto;right:0;width:50%;object-position:55% 40%}
+.kt-hero::after{content:'';position:absolute;inset:0;background:var(--kt-overlay)}
+.kt-hero-text{position:relative;z-index:1;max-width:580px;padding:40px clamp(24px,4vw,48px);display:flex;flex-direction:column;gap:10px;color:#fff}
+.kt-hero h1{margin:0;font-family:var(--kh-display);font-size:var(--fs-hero);font-weight:700;line-height:1.12;letter-spacing:-.015em;color:#fff}
+.kt-hero p{max-width:44ch;font-size:var(--fs-body);line-height:1.55;color:#F4F7EA}
+.kt-prac .kt-hero p{color:#E3EEF2}
+.kt-hero-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:8px}
+.kt-prac .kt-hero .kh-btn.primary{border-color:rgba(255,255,255,.35)}
+.kt-hero .kt-ghost{border-color:rgba(255,255,255,.6);background:transparent;color:#fff}
+.kt-hero .kt-ghost:hover{background:rgba(255,255,255,.12)}
+.kt-filters{position:relative;z-index:30;margin:-48px 32px 0;padding:16px 22px;display:flex;flex-wrap:wrap;align-items:center;gap:12px 16px;background:var(--kt-cream);border:1px solid var(--kt-line);border-radius:16px;box-shadow:var(--kt-shadow)}
+.kt-prac .kt-filters{margin-top:-40px}
+.kt-filters>p{flex:1 1 220px;font-size:var(--fs-body2);color:var(--kt-ink2)}
+.kt-filters .kt-link-btn{border:0;box-shadow:none;background:none;padding-inline:4px;text-decoration:underline;text-underline-offset:3px}
+.kt-filters .kt-link-btn:hover{transform:none;box-shadow:none}
+
+/* Parent content */
+.kt-now-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:24px;margin-top:16px}
+.kt-now-item{display:flex;gap:14px;align-items:flex-start}
+.kt-now-item p{margin:2px 0 6px;font-size:var(--fs-body2);color:var(--kt-ink2)}
+.kt-now-item a{font-size:var(--fs-body2)}
+.kt-next{display:flex;flex-direction:column;gap:10px}
+.kt-next p{font-size:var(--fs-body2);color:var(--kt-ink2)}
+.kt-next .kt-cta{align-self:flex-start;margin-top:4px}
+.kt-next small{font-size:var(--fs-meta);color:var(--kt-ink2)}
+.kt-guides{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));margin-top:16px;padding:0}
+.kt-guides>div{padding:24px}
+.kt-guides>div:nth-child(2n){border-left:1px solid var(--kt-line-soft)}
+.kt-guides>div:nth-child(n+3){border-top:1px solid var(--kt-line-soft)}
+.kt-guides h3{font-size:var(--fs-body2);font-weight:700;color:var(--kt-ink2)}
+.kt-guides strong{display:block;margin:2px 0 4px;font-size:var(--fs-data);font-weight:800;line-height:1.25}
+.kt-guides p{font-size:var(--fs-body2);color:var(--kt-ink2)}
+.kt-routine{padding:0}
+.kt-routine-head{width:100%;display:flex;justify-content:space-between;align-items:center;gap:16px;padding:22px 24px;border:0;background:none;text-align:left;color:inherit;font:inherit;cursor:pointer}
+.kt-routine-head .kt-toggle{flex:none;pointer-events:none}
+.kt-routine-body{overflow:hidden}
+.kt-routine-inner{display:flex;flex-wrap:wrap;gap:32px;align-items:center;padding:0 24px 24px}
+.kt-routine-inner ol{flex:999 1 360px;min-width:0;margin:0;padding:0;list-style:none}
+.kt-routine-inner li{display:flex;gap:16px;padding:12px 0;border-top:1px solid var(--kt-line-soft)}
+.kt-routine-inner time{flex:0 0 96px;font-weight:800;color:var(--kt-accent);font-variant-numeric:tabular-nums}
+.kt-routine-inner li span{display:block;font-size:var(--fs-body2);color:var(--kt-ink2)}
+.kt-routine-inner li b{display:block;font-size:var(--fs-body);color:var(--kt-ink)}
+.kt-clock{flex:1 1 200px;margin:0;display:flex;flex-direction:column;align-items:center;gap:10px}
+.kt-clock svg{width:100%;max-width:220px;height:auto;overflow:visible}
+.kt-clock-track{fill:none;stroke:var(--kt-line-soft);stroke-width:40}
+.kt-clock-sleep{fill:none;stroke:#203F30;stroke-width:40}
+.kt-clock-play{fill:none;stroke:#C99A3E;stroke-width:40}
+.kt-clock-label{font:600 22px var(--kh-body);fill:var(--kt-ink2)}
+.kt-clock-value{font:800 40px var(--kh-body);fill:var(--kt-ink)}
+.kt-clock figcaption{display:flex;gap:16px;font-size:var(--fs-meta);font-weight:600;color:var(--kt-ink2)}
+.kt-clock figcaption span{display:inline-flex;align-items:center;gap:6px}
+.kt-clock figcaption i{width:12px;height:12px;border-radius:3px}
+.kt-clock figcaption .sleep{background:#203F30}.kt-clock figcaption .play{background:#C99A3E}
+.kt-help h2{margin-bottom:8px}
+.kt-help-row{padding:12px 0;border-top:1px solid var(--kt-line-soft)}
+.kt-help-row p+p{font-size:var(--fs-meta);color:var(--kt-ink2)}
+.kt-help-row.is-urgent b,.kt-help-row.is-urgent a{color:#A1261F}
+.kt-topics{margin:8px 0 0;padding:0;list-style:none}
+.kt-topics li{border-top:1px solid var(--kt-line)}
+.kt-topics button{width:100%;min-height:64px;display:flex;align-items:center;gap:14px;padding:10px 4px;border:0;border-radius:10px;background:none;text-align:left;font:inherit;color:inherit;cursor:pointer;transition:background-color .18s ease}
+.kt-topics button:hover{background:rgba(255,255,255,.7)}
+.kt-topics b{display:block;font-weight:700;color:var(--kt-accent)}
+.kt-topics small{display:block;font-size:var(--fs-body2);color:var(--kt-ink2)}
+.kt-foot{padding-top:20px;border-top:1px solid var(--kt-line);font-size:var(--fs-meta);color:var(--kt-ink2)}
+
+/* Practitioner content */
+.kt-findings{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px 32px;margin:8px 0 0;padding-left:20px;font-size:var(--fs-body)}
+.kt-indicators{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));margin-top:12px;padding:0;background:#fff}
+.kt-indicators article{display:flex;flex-direction:column;gap:8px;padding:24px}
+.kt-indicators article+article{border-left:1px solid var(--kt-line-soft)}
+.kt-indicators h3{font-size:var(--fs-h3);font-weight:700;color:var(--kt-ink2)}
+.kt-value-row{display:flex;flex-wrap:wrap;align-items:center;gap:12px}
+.kt-value-row strong{font-size:var(--fs-data);font-weight:800;line-height:1.1;font-variant-numeric:tabular-nums}
+.kt-badge{display:inline-flex;align-items:center;gap:4px;padding:2px 10px;border-radius:999px;background:#FDF0DD;color:#7A4A00;font-size:var(--fs-label);font-weight:800}
+.kt-badge svg{width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:2.6;stroke-linecap:round}
+.kt-range{display:flex;flex-direction:column;gap:4px;margin-top:4px}
+.kt-range span,.kt-note{font-size:var(--fs-body2);color:var(--kt-ink2)}
+.kt-track{position:relative;height:10px;border-radius:5px;background:#EAF1F3}
+.kt-track i{position:absolute;top:0;bottom:0;display:block}
+.kt-track .band{border-radius:5px;background:#BFE0E6}
+.kt-track .exp{top:-3px;bottom:auto;width:2px;height:16px;background:#176477}
+.kt-track .obs{top:-4px;bottom:auto;width:4px;height:18px;border-radius:2px;background:#12314A;transform:translateX(-50%)}
+.kt-track .fill{left:0;border-radius:5px;background:#146171}
+.kt-track .ref{top:-4px;bottom:auto;width:3px;height:18px;border-radius:2px;background:#12314A}
+.kt-track .target{top:-4px;bottom:auto;width:3px;height:18px;border-radius:2px;background:#7A4A00}
+.kt-table{width:100%;border-collapse:collapse;font-size:var(--fs-body2)}
+.kt-table th,.kt-table td{padding:12px 0;text-align:left;vertical-align:top;border-top:1px solid var(--kt-line-soft)}
+.kt-table th b{display:block}
+.kt-table th span{display:block;font-weight:500;font-size:var(--fs-meta);color:var(--kt-ink2)}
+.kt-table td{padding-left:12px;text-align:right;white-space:nowrap;font-size:var(--fs-h3);font-weight:800}
+.kt-table td.kt-small{font-size:var(--fs-body2);font-weight:700;white-space:normal}
+.kt-air thead th{padding:8px 0;font-size:var(--fs-label);font-weight:700;color:var(--kt-ink2);border-top:0}
+.kt-air thead th:last-child,.kt-air td:last-child{text-align:right}
+.kt-air td{font-size:var(--fs-body2);font-weight:700}
+.kt-air td:nth-child(2){text-align:left;font-weight:500}
+.kt-airbar{display:flex;align-items:center;gap:10px;font-variant-numeric:tabular-nums}
+.kt-airbar i{display:block;height:8px;border-radius:4px;background:#12314A}
+.kt-pill{display:inline-block;margin-bottom:8px;padding:2px 10px;border-radius:999px;background:#E5F1F3;color:#176477;font-size:var(--fs-label);font-weight:800}
+.kt-prac section>h2+p,.kt-prac .kt-half>p{margin-top:6px}
+
+@media (max-width:900px){
+  .kt-indicators{grid-template-columns:minmax(0,1fr)}
+  .kt-indicators article+article{border-left:0;border-top:1px solid var(--kt-line-soft)}
+  .kt-findings{grid-template-columns:minmax(0,1fr)}
+  .kt-prac .kt-hero-img{width:100%;opacity:.5}
+}
+@media (max-width:640px){
+  .kt-hero{min-height:420px;align-items:flex-end}
+  .kt-hero-img{object-position:70% 20%}
+  .kt-hero::after{background:linear-gradient(0deg,rgba(22,48,31,.88) 0%,rgba(22,48,31,.55) 45%,rgba(22,48,31,0) 75%)}
+  .kt-prac .kt-hero::after{background:linear-gradient(0deg,rgba(14,42,63,.95) 0%,rgba(14,42,63,.6) 55%,rgba(14,42,63,.2) 100%)}
+  .kt-filters{margin:-24px 12px 0}
+  .kt-guides{grid-template-columns:minmax(0,1fr)}
+  .kt-guides>div:nth-child(2n){border-left:0}
+  .kt-guides>div+div{border-top:1px solid var(--kt-line-soft)}
+}
+@media print{
+  .kp-hub.kt-theme-prac{background:#fff}
+  .kt-theme-prac .kh-top,.kt-prac .kt-hero-img,.kt-prac .kt-hero-actions,.kt-prac .kt-filters{display:none}
+  .kt-prac .kt-hero{min-height:0;background:none}
+  .kt-prac .kt-hero::after{display:none}
+  .kt-prac .kt-hero h1,.kt-prac .kt-hero p{color:#12314A}
+  .kt-card{box-shadow:none;break-inside:avoid}
+}
+.kt-findings.kt-one{grid-template-columns:minmax(0,1fr);margin-bottom:12px}
+
+/* Site header and page background around the themed hub pages (set by KinderHub on <html>). */
+html[data-kt-theme=parent] .health-page-shell{background:linear-gradient(180deg,#FCFBF3 0%,#F5F8EA 45%,#FFF8E4 100%)}
+html[data-kt-theme=prac] .health-page-shell{background:linear-gradient(180deg,#F3F8FA 0%,#EEF5F8 100%)}
+html[data-kt-theme] .health-page-shell>.nav-shell{border:1px solid;backdrop-filter:blur(14px)}
+html[data-kt-theme=parent] .health-page-shell>.nav-shell{background:rgba(255,253,246,.9);border-color:#DCE3C8;box-shadow:0 10px 28px -18px rgba(32,63,48,.45)}
+html[data-kt-theme=prac] .health-page-shell>.nav-shell{background:rgba(255,255,255,.92);border-color:#D5E5EA;box-shadow:0 10px 28px -18px rgba(18,49,74,.45)}
+html[data-kt-theme=parent] .health-page-shell>.nav-shell .brand-button{color:#355C38}
+html[data-kt-theme=prac] .health-page-shell>.nav-shell .brand-button{color:#146171}
+html[data-kt-theme=parent] .health-page-shell>.nav-shell .nav-links{color:#465B42}
+html[data-kt-theme=prac] .health-page-shell>.nav-shell .nav-links{color:#466174}
+html[data-kt-theme=parent] .health-page-shell>.nav-shell .nav-links button:hover,html[data-kt-theme=parent] .health-page-shell>.nav-shell .nav-links .active{color:#203F30}
+html[data-kt-theme=prac] .health-page-shell>.nav-shell .nav-links button:hover,html[data-kt-theme=prac] .health-page-shell>.nav-shell .nav-links .active{color:#12314A}
+html[data-kt-theme=parent] .health-page-shell>.nav-shell .nav-links .active::after{background:#536B35}
+html[data-kt-theme=prac] .health-page-shell>.nav-shell .nav-links .active::after{background:#176477}
+html[data-kt-theme] .health-page-shell>.nav-shell :focus-visible{outline:3px solid currentColor;outline-offset:2px}
+
+/* Practitioner "More context": one container with tabs instead of four separate cards. */
+.kt-context{display:flex;flex-direction:column;gap:16px}
+.kt-tabs{display:flex;flex-wrap:wrap;gap:4px;align-self:flex-start;padding:3px;border:1px solid var(--kt-line);border-radius:14px;background:rgba(255,255,255,.6)}
+.kt-tabs button{min-height:44px;padding:0 18px;border:0;border-radius:11px;background:transparent;color:var(--kt-ink2);font:inherit;font-size:var(--fs-control);font-weight:700;cursor:pointer;transition:background-color .18s ease,color .18s ease}
+.kt-tabs button:hover{background:var(--kt-icon-bg);color:var(--kt-ink)}
+.kt-tabs button[aria-selected=true]{background:var(--kt-primary);color:#fff}
+.kt-ctx-panel{display:flex;flex-direction:column;gap:12px;animation:kh-in .25s ease both}
+.kt-ctx-panel .kt-findings{margin-top:0}
+.kt-indicators article .kt-limit{margin-top:4px}
+@media (max-width:640px){.kt-tabs{flex-wrap:nowrap;overflow-x:auto;max-width:100%;scrollbar-width:none}.kt-tabs::-webkit-scrollbar{display:none}}
+.kt-theme-parent .kh-foot,.kt-theme-prac .kh-foot{font-size:var(--fs-meta);color:var(--kt-ink2)}
+.kt-tabs button,.vx-tabs button,.vx-filters button{white-space:nowrap}
+
+/* One typeface across the Child Health pages: Manrope for titles, headings, body, data and controls.
+   Hierarchy comes from size and weight (the type scale above), not from mixing families. */
+.kp-hub.kt-theme-parent,.kp-hub.kt-theme-prac{--kh-display:var(--kh-body)}
+.kp-hub.kt-theme-parent :is(h1,h2,h3,h4,h5,h6,button,input,select,textarea,label,summary,dialog),
+.kp-hub.kt-theme-prac :is(h1,h2,h3,h4,h5,h6,button,input,select,textarea,label,summary,dialog){font-family:var(--kh-body)}
+.kt h1,.kt-hero h1,.hd-intro h1{font-weight:800;letter-spacing:-.02em}
+.kt h2,.vx-dialog-head h2{font-weight:800;letter-spacing:-.01em}
+.kt h3{font-weight:700;letter-spacing:0}
+.kt .kh-btn,.kt [role=tab],.kp-hub.kt-theme-parent .kh-nav button,.kp-hub.kt-theme-prac .kh-nav button,.kp-hub.kt-theme-parent .kh-seg button,.kp-hub.kt-theme-prac .kh-seg button{font-weight:700}

@@ -1,0 +1,66 @@
+{
+  "file": "afcd_r3_selected_per100g.csv",
+  "rows": 1588,
+  "passed": true,
+  "warnings": [],
+  "rules": [
+    {
+      "rule": "schema: required columns present, no extras",
+      "passed": true,
+      "severity": "error",
+      "missing": [],
+      "unexpected": []
+    },
+    {
+      "rule": "volume: at least 1400 rows",
+      "passed": true,
+      "severity": "error",
+      "rows": 1588
+    },
+    {
+      "rule": "volume: row drift within +/-10% of previous file",
+      "passed": true,
+      "severity": "error",
+      "previous": 1588,
+      "drift": 0.0
+    },
+    {
+      "rule": "keys: key columns populated",
+      "passed": true,
+      "severity": "error",
+      "violations": 0
+    },
+    {
+      "rule": "keys: primary key unique",
+      "passed": true,
+      "severity": "error",
+      "violations": 0,
+      "examples": []
+    },
+    {
+      "rule": "nutrients non-negative; energy <= 3,800 kJ and protein + fat <= 100 g per 100 g",
+      "passed": true,
+      "severity": "error",
+      "negatives": {
+        "Energy with dietary fibre, equated (kJ)": 0,
+        "Protein (g)": 0,
+        "Fat, total (g)": 0,
+        "Total dietary fibre (g)": 0,
+        "Calcium (Ca) (mg)": 0,
+        "Iron (Fe) (mg)": 0,
+        "Zinc (Zn) (mg)": 0,
+        "Iodine (I) (ug)": 0,
+        "Vitamin C (mg)": 0,
+        "Vitamin D3 equivalents (ug)": 0
+      },
+      "energy_over": 0,
+      "macro_over": 0
+    },
+    {
+      "rule": "food keys are F + 6 digits",
+      "passed": true,
+      "severity": "error",
+      "violations": 0
+    }
+  ]
+}

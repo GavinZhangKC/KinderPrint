@@ -1,0 +1,45 @@
+reported_measure_code,measure_code,measure_name,reported_measure_name,units
+MYH-RM0015,MYH0005,Percentage of patients who depart the emergency department within four hours of arrival,All patients,%
+MYH-RM0035,MYH0010,Percentage of patients who commenced treatment within the recommended time,Resuscitation,%
+MYH-RM0036,MYH0010,Percentage of patients who commenced treatment within the recommended time,Emergency,%
+MYH-RM0037,MYH0010,Percentage of patients who commenced treatment within the recommended time,Urgent,%
+MYH-RM0038,MYH0010,Percentage of patients who commenced treatment within the recommended time,Semi-Urgent,%
+MYH-RM0039,MYH0010,Percentage of patients who commenced treatment within the recommended time,Non-Urgent,%
+MYH-RM0040,MYH0009,Median waiting time for elective surgery,Urgent elective surgery,days
+MYH-RM0041,MYH0009,Median waiting time for elective surgery,Semi-urgent elective surgery,days
+MYH-RM0042,MYH0009,Median waiting time for elective surgery,Non-urgent elective surgery,days
+MYH-RM0300,MYH0036,Median time (50%) patients departed emergency department,All patients,
+MYH-RM0302,MYH0013,Time until most patients (90%) departed the emergency department,All patients,
+MYH-RM0760,MYH0039,Number of specialised service units,Obstetric services,
+MYH-RM0761,MYH0039,Number of specialised service units,Paediatric service,
+MYH-RM0762,MYH0039,Number of specialised service units,Psychiatric unit,
+MYH-RM0763,MYH0039,Number of specialised service units,Intensive care unit,
+MYH-RM0764,MYH0039,Number of specialised service units,Hospice care unit,
+MYH-RM0765,MYH0039,Number of specialised service units,Nursing home care unit,
+MYH-RM0766,MYH0039,Number of specialised service units,Geriatric assessment unit,
+MYH-RM0767,MYH0039,Number of specialised service units,Domiciliary care service,
+MYH-RM0768,MYH0039,Number of specialised service units,Alcohol and drug unit,
+MYH-RM0769,MYH0039,Number of specialised service units,Acute spinal cord injury unit,
+MYH-RM0770,MYH0039,Number of specialised service units,Coronary care unit,
+MYH-RM0771,MYH0039,Number of specialised service units,Cardiac surgery unit,
+MYH-RM0772,MYH0039,Number of specialised service units,Acute renal dialysis unit,
+MYH-RM0773,MYH0039,Number of specialised service units,Maintenance renal dialysis unit,
+MYH-RM0774,MYH0039,Number of specialised service units,Burns unit,
+MYH-RM0775,MYH0039,Number of specialised service units,Major plastic or reconstructive surgery unit,
+MYH-RM0776,MYH0039,Number of specialised service units,Oncology unit,
+MYH-RM0777,MYH0039,Number of specialised service units,Neonatal intensive care unit,
+MYH-RM0778,MYH0039,Number of specialised service units,In-vitro fertilisation unit,
+MYH-RM0779,MYH0039,Number of specialised service units,Epilepsy centre,
+MYH-RM0780,MYH0039,Number of specialised service units,Bone marrow transplantation unit,
+MYH-RM0781,MYH0039,Number of specialised service units,Renal transplantation unit,
+MYH-RM0782,MYH0039,Number of specialised service units,Heart transplantation unit,
+MYH-RM0783,MYH0039,Number of specialised service units,Liver transplantation unit,
+MYH-RM0784,MYH0039,Number of specialised service units,Pancreas transplantation unit,
+MYH-RM0785,MYH0039,Number of specialised service units,Clinical genetics unit,
+MYH-RM0786,MYH0039,Number of specialised service units,Sleep centre,
+MYH-RM0787,MYH0039,Number of specialised service units,Neurosurgical unit,
+MYH-RM0788,MYH0039,Number of specialised service units,Infectious diseases unit,
+MYH-RM0789,MYH0039,Number of specialised service units,AIDS unit,
+MYH-RM0790,MYH0039,Number of specialised service units,Diabetes unit,
+MYH-RM0791,MYH0039,Number of specialised service units,Rehabilitation unit,
+MYH-RM0800,MYH0039,Number of specialised service units,Clinical pharmacology and/or toxicology service,

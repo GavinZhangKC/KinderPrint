@@ -97,6 +97,20 @@ Resources:
           KINDERPRINT_DEPARTMENT_AREA_BRIDGE_DATA_PATH: /var/task/data/sa2_department_area_bridge.csv
           KINDERPRINT_BUSHFIRE_CONTEXT_DATA_PATH: /var/task/data/bushfire_context_sa2.csv
           KINDERPRINT_TRANSPORT_CONTEXT_DATA_PATH: /var/task/data/transport_context_sa2.csv
+          KINDERPRINT_SEASONAL_AIR_DATA_PATH: /var/task/data/seasonal_air_quality_sa2.csv
+          KINDERPRINT_NEARBY_SERVICES_DATA_PATH: /var/task/data/nearby_health_services_sa2.csv
+          KINDERPRINT_VACCINATION_PLACES_DATA_PATH: /var/task/data/vaccination_places_sa2.csv
+          KINDERPRINT_COUNCIL_IMMUNISATION_DATA_PATH: /var/task/data/council_immunisation_sa2.csv
+          KINDERPRINT_HOSPITAL_CAPABILITY_DATA_PATH: /var/task/data/hospital_capability_vic.csv
+          KINDERPRINT_CARE_COMPARE_DATA_PATH: /var/task/data/care_compare_sa2.csv
+          KINDERPRINT_URGENT_CARE_CLINICS_DATA_PATH: /var/task/data/urgent_care_clinics_vic.csv
+          KINDERPRINT_PRIMARY_CARE_COST_DATA_PATH: /var/task/data/primary_care_cost_sa3.csv
+          KINDERPRINT_SEASONAL_ILLNESS_DATA_PATH: /var/task/data/seasonal_illness_vic.csv
+          KINDERPRINT_FOOD_OUTLETS_DATA_PATH: /var/task/data/food_outlets_sa2.csv
+          KINDERPRINT_FOOD_ACCESS_DATA_PATH: /var/task/data/food_access_sa2.csv
+          KINDERPRINT_CHILD_NUTRIENT_FOODS_DATA_PATH: /var/task/data/child_nutrient_foods.csv
+          KINDERPRINT_CHILD_NUTRIENT_TARGETS_DATA_PATH: /var/task/data/child_nutrient_targets.csv
+          KINDERPRINT_PRACTITIONER_CONTEXT_DATA_PATH: /var/task/data/practitioner_context_sa2.csv
       Events:
         ApiProxy:
           Type: HttpApi

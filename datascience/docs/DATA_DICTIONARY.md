@@ -99,3 +99,12 @@ One row per community x indicator, reference year 2021.
 1. Environmental features are never matching features - matching on them would remove the differences under investigation.
 2. AEDC outcomes are never matching features.
 3. IRSD and raw Census income/education/employment never enter the same distance metric or composite.
+
+## Licence notes for derived files
+
+See `docs/LICENCE_COMPLIANCE.md` for every source. Two licences carry obligations that follow the data:
+
+| Derived file | Licence that follows the data | Why |
+|---|---|---|
+| `phidu_child_health_pha.csv`, `phidu_environment_pha.csv`, `phidu_pha_sa2_bridge.csv`, `child_youth_health_context_pha.csv` | CC BY-NC-SA 3.0 AU (non-commercial, share-alike) | Derived from the PHIDU atlas |
+| `food_outlets_sa2.csv`, `food_access_sa2.csv`, `data/reference/iteration3/osm_food_outlets_melbourne.csv` | ODbL 1.0, "© OpenStreetMap contributors" | Derived databases of OpenStreetMap data |

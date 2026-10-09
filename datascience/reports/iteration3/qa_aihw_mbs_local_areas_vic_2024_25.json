@@ -1,0 +1,72 @@
+{
+  "file": "aihw_mbs_local_areas_vic_2024_25.csv",
+  "rows": 8442,
+  "passed": true,
+  "warnings": [
+    "provider fees are not below Medicare benefits (derived gap is nulled where they are)"
+  ],
+  "rules": [
+    {
+      "rule": "schema: required columns present, no extras",
+      "passed": true,
+      "severity": "error",
+      "missing": [],
+      "unexpected": []
+    },
+    {
+      "rule": "volume: at least 8000 rows",
+      "passed": true,
+      "severity": "error",
+      "rows": 8442
+    },
+    {
+      "rule": "volume: row drift within +/-10% of previous file",
+      "passed": true,
+      "severity": "error",
+      "previous": 8442,
+      "drift": 0.0
+    },
+    {
+      "rule": "keys: key columns populated",
+      "passed": true,
+      "severity": "error",
+      "violations": 0
+    },
+    {
+      "rule": "keys: primary key unique",
+      "passed": true,
+      "severity": "error",
+      "violations": 0,
+      "examples": []
+    },
+    {
+      "rule": "values numeric unless flagged n.p.; none negative",
+      "passed": true,
+      "severity": "error",
+      "non_numeric": 0,
+      "negative": 0
+    },
+    {
+      "rule": "Victorian SA3 codes are 5 digits starting with 2",
+      "passed": true,
+      "severity": "error",
+      "violations": 0,
+      "sa3_count": 66
+    },
+    {
+      "rule": "provider fees are not below Medicare benefits (derived gap is nulled where they are)",
+      "passed": false,
+      "severity": "warn",
+      "violations": 1,
+      "checked": 1187,
+      "examples": [
+        {
+          "unit": "National",
+          "code": "001NAT",
+          "service": "GP attendances (total)",
+          "demographic": "0-24"
+        }
+      ]
+    }
+  ]
+}
