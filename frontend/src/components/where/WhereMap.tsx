@@ -3,7 +3,7 @@
  * stay-near ring, a scale bar and numbered top results. The list view is the text alternative;
  * every top result is also a keyboard-focusable button here.
  */
-import { useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import type { FamilyFitMapStatus, FamilyFitSearch } from '../../services/api'
 
 interface Props {
@@ -30,6 +30,14 @@ export default function WhereMap({ shapes, result, selected, onSelect, onOpen, c
   const px = (lon: number) => (lon - anchor.longitude) * 111.32 * k
   const py = (lat: number) => (anchor.latitude - lat) * 110.57
   const half = result.radius_km * 1.25
+  const [full, setFull] = useState(false)
+  useEffect(() => {
+    if (!full) return
+    const esc = (e: KeyboardEvent) => { if (e.key === 'Escape') setFull(false) }
+    window.addEventListener('keydown', esc)
+    document.body.style.overflow = 'hidden'
+    return () => { window.removeEventListener('keydown', esc); document.body.style.overflow = '' }
+  }, [full])
   const status = useMemo(() => new Map(result.map.map(m => [m.id, m.status])), [result])
   const numbers = useMemo(() => new Map(result.results.slice(0, 10).map(r => [r.id, r.rank])), [result])
 
@@ -43,7 +51,11 @@ export default function WhereMap({ shapes, result, selected, onSelect, onOpen, c
   const scaleKm = result.radius_km <= 5 ? 1 : result.radius_km <= 10 ? 2 : 5
   const top = result.results.slice(0, 10)
   const sel = result.results.find(r => r.id === selected)
-  const font = half / (compact ? 17 : 26)
+  // Narrow screens: bigger labels; a full-screen portrait map also shows more north-south.
+  const narrow = typeof window !== 'undefined' && window.matchMedia('(max-width: 700px)').matches
+  const tall = full && typeof window !== 'undefined' && window.innerHeight > window.innerWidth
+  const vh = tall ? 1.25 : 0.82   // half-height of the view, as a share of `half`
+  const font = half / (narrow ? 12 : compact ? 17 : 26)
   // Spread pins that would overlap (areas whose centres are close), so every number stays readable.
   const pins = new Map<string, [number, number]>()
   for (const r of top) {
@@ -59,18 +71,26 @@ export default function WhereMap({ shapes, result, selected, onSelect, onOpen, c
   // Label the top 3 and the selected area. Put each label right of its pin, else left, else
   // leave it out (the list names every area), so labels never cover another pin.
   const labelSide = new Map<string, 'right' | 'left'>()
-  for (const r of top) {
-    if (!(r.id === selected || r.rank <= 3)) continue
+  // Placed label boxes [x0, x1, y]; the anchor's own label is reserved first.
+  const boxes: Array<[number, number, number]> = [[-font * 0.6, font * 1.1 + anchor.name.length * font * 0.62, 0]]
+  const ordered = [...top].sort((a, b) => Number(b.id === selected) - Number(a.id === selected) || a.rank - b.rank)
+  for (const r of ordered) {
+    // Full map: try to name every numbered area. Narrow split view: top 3 and the selected one.
+    if (!(r.id === selected || r.rank <= 3 || (!compact && r.rank <= 10))) continue
     const [x, y] = pins.get(r.id)!
     const w = r.name.length * font * 0.58 + font * 1.4
-    const free = (x0: number, x1: number) => [...pins.entries()].every(([id, [qx, qy]]) =>
+    const free = (x0: number, x1: number) => x0 > -half + font * 0.3 && x1 < half - font * 0.3 && [...pins.entries()].every(([id, [qx, qy]]) =>
       id === r.id || Math.abs(qy - y) > font * 1.6 || qx + font < x0 || qx - font > x1)
-    if (free(x, x + w)) labelSide.set(r.id, 'right')
-    else if (free(x - w, x)) labelSide.set(r.id, 'left')
+      && boxes.every(([bx0, bx1, by]) => Math.abs(by - y) > font * 1.3 || bx1 < x0 || bx0 > x1)
+    if (free(x, x + w)) { labelSide.set(r.id, 'right'); boxes.push([x, x + w, y]) }
+    else if (free(x - w, x)) { labelSide.set(r.id, 'left'); boxes.push([x - w, x, y]) }
   }
 
-  return <figure className="wl-map">
-    <svg viewBox={`${-half} ${-half * 0.82} ${2 * half} ${1.64 * half}`} role="group"
+  return <figure className={`wl-map ${full ? 'is-full' : ''}`} aria-label={full ? 'Map, full screen' : undefined}>
+    <div className="wl-map-tools">
+      <button type="button" className="wl-btn small" aria-pressed={full} onClick={() => setFull(f => !f)}>{full ? 'Exit full screen' : 'Full screen map'}</button>
+    </div>
+    <svg viewBox={`${-half} ${-half * vh} ${2 * half} ${2 * vh * half}`} role="group"
       aria-label={`Map of areas within ${result.radius_km} km of ${anchor.name}. ${result.counts.matching} areas match; the top ${top.length} are numbered. The list view gives the same information as text.`}>
       <defs>
         <pattern id="wl-hatch" width={half / 40} height={half / 40} patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
@@ -100,7 +120,7 @@ export default function WhereMap({ shapes, result, selected, onSelect, onOpen, c
           {labelSide.has(r.id) && <text x={labelSide.get(r.id) === 'right' ? x + font * 1.4 : x - font * 1.4} textAnchor={labelSide.get(r.id) === 'right' ? 'start' : 'end'} y={y + font * 0.38} fontSize={font * 0.95} fontWeight={700} fill="var(--wl-ink)" stroke="var(--wl-surface)" strokeWidth={font * 0.3} strokeLinejoin="round" paintOrder="stroke" className="wl-map-label">{r.name}</text>}
         </g>
       })}
-      <g transform={`translate(${-half + half * 0.06} ${half * 0.82 - half * 0.08})`}>
+      <g transform={`translate(${-half + half * 0.06} ${half * vh - half * 0.08})`}>
         <rect x={-font * 0.4} y={-font * 1.6} width={scaleKm + font * 4.4} height={font * 2.3} rx={font * 0.3} fill="var(--wl-surface)" opacity={0.92} />
         <line x1={0} y1={0} x2={scaleKm} y2={0} stroke="var(--wl-ink)" strokeWidth={half / 160} />
         <line x1={0} y1={-font * 0.3} x2={0} y2={font * 0.3} stroke="var(--wl-ink)" strokeWidth={half / 200} />

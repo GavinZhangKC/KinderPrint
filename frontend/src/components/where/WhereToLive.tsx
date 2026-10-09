@@ -69,6 +69,7 @@ export default function WhereToLive(props: Props) {
   const [result, setResult] = useState<FamilyFitSearch | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [errorCode, setErrorCode] = useState<string | null>(null)
   const [shown, setShown] = useState(PAGE_SIZE)
   const [view, setView] = useState<View>('list')
   const [selected, setSelected] = useState<string | null>(null)
@@ -101,11 +102,11 @@ export default function WhereToLive(props: Props) {
 
   const runSearch = useCallback((criteria: Criteria) => {
     if (!criteria.anchor) return
-    setLoading(true); setError(null)
+    setLoading(true); setError(null); setErrorCode(null)
     const controller = new AbortController()
     api.searchFamilyFit(criteria.anchor, criteria.radius, criteria.priorities, 30, controller.signal)
       .then(r => {
-        if (r.status === 'unavailable') { setResult(null); setError(r.limitations[0]?.message ?? 'Results are unavailable right now.') }
+        if (r.status === 'unavailable') { setResult(null); setErrorCode(r.limitations[0]?.code ?? null); setError(r.limitations[0]?.message ?? 'Results are unavailable right now.') }
         else { setResult(r.data); setShown(PAGE_SIZE) }
       })
       .catch(() => { if (!controller.signal.aborted) setError('We could not load results. Check your connection and try again.') })
@@ -227,6 +228,7 @@ export default function WhereToLive(props: Props) {
             <div>
               <h2 id="wl-results-title">{result ? `${result.counts.matching} ${result.counts.matching === 1 ? 'area matches' : 'areas match'}` : 'Matching areas'}</h2>
               {result && <p className="wl-sub">Within {result.radius_km} km of {result.anchor.name}. {result.counts.below_essential > 0 && `${result.counts.below_essential} did not meet an Essential priority. `}{result.counts.data_unavailable > 0 && `${result.counts.data_unavailable} lack data for a chosen priority.`}</p>}
+              {result && result.results.length > 0 && saved.length === 0 && <p className="wl-help">Save up to {MAX_SAVED} areas to compare them side by side and build a visit checklist.</p>}
             </div>
             {result && result.results.length > 0 && <div className="wl-seg wl-view" role="radiogroup" aria-label="Show results as">
               {(['list', 'map', 'both'] as View[]).map(v => <button key={v} type="button" role="radio" aria-checked={view === v} className={v === 'both' ? 'wl-wide-only' : undefined} onClick={() => setView(v)}>{v === 'list' ? 'List' : v === 'map' ? 'Map' : 'List and map'}</button>)}
@@ -236,7 +238,9 @@ export default function WhereToLive(props: Props) {
           {restored && applied && <p className="wl-notice" role="status">We restored your last search on this device. <button type="button" className="wl-link" onClick={startOver}>Start a new search</button></p>}
           {!applied ? <div className="wl-state"><h3>Start with a suburb</h3><p>Choose where you would like to live near, such as work, family or a school. Then choose what matters most and select “Show matching areas”.</p></div>
             : loading && !result ? <div className="wl-skeleton list" aria-label="Loading results"><i /><i /><i /></div>
-            : error ? <div className="wl-state" role="alert"><h3>Results did not load</h3><p>{error}</p><button type="button" className="wl-btn primary" onClick={() => runSearch(applied)}>Try again</button></div>
+            : error ? <div className="wl-state" role="alert"><h3>{errorCode === 'unknown_area' ? 'That suburb is not available' : 'Results did not load'}</h3><p>{error}</p>{errorCode === 'unknown_area'
+              ? <button type="button" className="wl-btn primary" onClick={startOver}>Start a new search</button>
+              : <button type="button" className="wl-btn primary" onClick={() => runSearch(applied)}>Try again</button>}</div>
             : result && Object.keys(result.priorities).length === 0 ? <div className="wl-state"><h3>Choose at least one priority</h3><p>Set one or more priorities to Prefer or Essential, then update results.</p></div>
             : result && result.results.length === 0 ? <NoMatches result={result} needLabel={needLabel} onApply={applySuggestion} />
             : result && <div className={`wl-views view-${view}`}>
@@ -272,7 +276,7 @@ export default function WhereToLive(props: Props) {
 
     {detail && setup && <DetailPanel id={detail} setup={setup} priorities={applied?.priorities ?? {}} result={result} anchorName={result?.anchor.name}
       saved={saved.some(s => s.id === detail)} onSave={toggleSave} onClose={() => setDetail(null)} onHow={() => setDialog('how')} />}
-    {dialog === 'compare' && setup && <CompareDialog ids={saved.map(s => s.id)} setup={setup} priorities={applied?.priorities ?? {}} matching={matchingIds} onClose={() => setDialog(null)} />}
+    {dialog === 'compare' && setup && <CompareDialog ids={saved.map(s => s.id)} setup={setup} priorities={applied?.priorities ?? {}} matching={result ? matchingIds : null} onClose={() => setDialog(null)} />}
     {dialog === 'checklist' && <ChecklistDialog saved={saved} priorities={applied?.priorities ?? draft.priorities} needLabel={needLabel} say={say} onClose={() => setDialog(null)} />}
     {dialog === 'how' && setup && <HowDialog setup={setup} onClose={() => setDialog(null)} />}
   </div>
@@ -444,22 +448,28 @@ function DetailPanel({ id, setup, priorities, result, anchorName, saved, onSave,
   </Modal>
 }
 
-function CompareDialog({ ids, setup, priorities, matching, onClose }: { ids: string[]; setup: FamilyFitSetup; priorities: Record<string, FamilyFitLevel>; matching: Set<string>; onClose: () => void }) {
+function CompareDialog({ ids, setup, priorities, matching, onClose }: { ids: string[]; setup: FamilyFitSetup; priorities: Record<string, FamilyFitLevel>; matching: Set<string> | null; onClose: () => void }) {
   const [areas, setAreas] = useState<FamilyFitAreaDetail[] | null>(null)
   const [failed, setFailed] = useState(false)
   const [diffOnly, setDiffOnly] = useState(false)
+  const [missing, setMissing] = useState(0)
   useEffect(() => {
     const c = new AbortController()
-    Promise.all(ids.map(id => api.getFamilyFitArea(id, c.signal))).then(rs => setAreas(rs.map(r => r.data)))
+    Promise.all(ids.map(id => api.getFamilyFitArea(id, c.signal))).then(rs => {
+      const ok = rs.filter(r => r.status === 'available' && r.data).map(r => r.data as FamilyFitAreaDetail)
+      setMissing(rs.length - ok.length); setAreas(ok)
+    })
       .catch(() => { if (!c.signal.aborted) setFailed(true) })
     return () => c.abort()
   }, [ids])
   const order = setup.needs.map(n => n.id).sort((a, b) => Number(Boolean(priorities[b])) - Number(Boolean(priorities[a])))
   return <Modal title="Compare saved areas" wide onClose={onClose}>
     {failed ? <p role="alert">The comparison could not be loaded. Close this window and try again.</p> : !areas ? <div className="wl-skeleton list"><i /><i /></div> : <>
+      {missing > 0 && <p className="wl-notice" role="status">{missing === 1 ? 'One saved area is' : `${missing} saved areas are`} no longer in the data and {missing === 1 ? 'is' : 'are'} left out. Remove {missing === 1 ? 'it' : 'them'} from your saved areas.</p>}
+      {areas.length === 0 ? <p>None of your saved areas could be loaded.</p> : <>
       <div className="wl-row"><label className="wl-check"><input type="checkbox" checked={diffOnly} onChange={e => setDiffOnly(e.target.checked)} /> Show differences only (10 or more percentile points apart, or data missing)</label></div>
       <div className="wl-table-wrap" tabIndex={0} role="region" aria-label="Comparison table, scrolls if wide"><table className="wl-table">
-        <thead><tr><th scope="col">Measure</th>{areas.map(a => <th key={a.id} scope="col" className="num">{a.name}{!matching.has(a.id) && <span className="wl-tag warn">Not in current results</span>}</th>)}</tr></thead>
+        <thead><tr><th scope="col">Measure</th>{areas.map(a => <th key={a.id} scope="col" className="num">{a.name}{matching && !matching.has(a.id) && <span className="wl-tag warn">Not in current results</span>}</th>)}</tr></thead>
         <tbody>
           {order.map(nid => {
             const rows = areas.map(a => a.needs.find(n => n.id === nid)!)
@@ -478,7 +488,7 @@ function CompareDialog({ ids, setup, priorities, matching, onClose }: { ids: str
         </tbody>
       </table></div>
       <p className="wl-caveat">Area-level figures. They do not confirm childcare vacancies, GP appointments or school enrolment.</p>
-    </>}
+    </>}</>}
   </Modal>
 }
 

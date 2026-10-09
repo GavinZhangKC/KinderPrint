@@ -1723,7 +1723,7 @@ def family_fit_search_endpoint(
         return envelope("unavailable", {"results": []}, limitations=limitations)
     if data.get("error") == "unknown_anchor":
         return JSONResponse(status_code=404, content=envelope("unavailable", None, limitations=[limitation(
-            "unknown_area", "No reporting area has that id.", "anchor")]))
+            "unknown_area", "We could not find that suburb. Choose another one from the list.", "anchor")]))
     status = "available" if data["results"] else "missing"
     if chosen and data["counts"]["data_unavailable"]:
         limitations = limitations + [limitation(
@@ -1746,7 +1746,7 @@ def family_fit_area(area_id: str = FastAPIPath(..., max_length=80, pattern=FAMIL
         return envelope("unavailable", None, limitations=limitations)
     if data.get("error") == "unknown_area":
         return JSONResponse(status_code=404, content=envelope("unavailable", None, limitations=[limitation(
-            "unknown_area", "No reporting area has that id.", "area_id")]))
+            "unknown_area", "We could not find that area. It may have been removed in a data update.", "area_id")]))
     return envelope("available", data, metadata={"source": FAMILY_FIT_SOURCE},
                     notices=[FAMILY_FIT_NOTICE, AREA_LEVEL_NOTICE])
 

@@ -669,6 +669,18 @@ async function request<T>(
   >
 }
 
+/** Like request(), but a 4xx that carries an envelope (e.g. an unknown area) is returned, not thrown,
+ *  so the page can show the server's plain-language reason. */
+async function requestEnvelope<T>(path: string, signal?: AbortSignal): Promise<ApiEnvelope<T>> {
+  const response = await fetch(`${API_BASE}${path}`, { method: 'GET', signal, headers: { Accept: 'application/json' } })
+  if (response.ok) return response.json() as Promise<ApiEnvelope<T>>
+  if (response.status >= 400 && response.status < 500) {
+    const body = await response.json().catch(() => null) as ApiEnvelope<T> | null
+    if (body && typeof body === 'object' && 'status' in body && Array.isArray(body.limitations)) return body
+  }
+  throw new Error(`Request failed with status ${response.status}`)
+}
+
 // The map and Insight share this small collection, including in-flight requests.
 let indicatorsCache: Promise<ApiEnvelope<NeighbourhoodIndicatorsCollection>> | null = null
 let indicatorsCachedAt = 0
@@ -895,12 +907,12 @@ export const api = {
   getFamilyFitShapes: (signal?: AbortSignal) =>
     request<{ areas: Record<string, Array<Array<[number, number]>>> }>('/api/family-fit/shapes', signal),
   searchFamilyFit: (anchor: string, radiusKm: number, priorities: Record<string, FamilyFitLevel>, limit = 30, signal?: AbortSignal) =>
-    request<FamilyFitSearch>(
+    requestEnvelope<FamilyFitSearch>(
       `/api/family-fit/search?anchor=${encodeURIComponent(anchor)}&radius_km=${radiusKm}&limit=${limit}&priorities=${encodeURIComponent(Object.entries(priorities).map(([k, v]) => `${k}:${v}`).join(','))}`,
       signal,
     ),
   getFamilyFitArea: (id: string, signal?: AbortSignal) =>
-    request<FamilyFitAreaDetail>(`/api/family-fit/areas/${encodeURIComponent(id)}`, signal),
+    requestEnvelope<FamilyFitAreaDetail>(`/api/family-fit/areas/${encodeURIComponent(id)}`, signal),
 
   getVaccinationPlaces: (sa2Code: string, signal?: AbortSignal) =>
     request<VaccinationPlaces>(
