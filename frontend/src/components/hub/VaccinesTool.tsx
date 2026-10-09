@@ -60,8 +60,8 @@ const ordinal = (n: number) => { const r = Math.round(n); const s = r % 100 >= 1
 const shortOf = (num: number, den: number) => Math.max(0, Math.ceil(0.95 * den - 1e-9) - num)
 const placeKey = (p: VaccinationPlace) => `${p.kind}-${p.rank}`
 
-function useStoredState<T>(key: string, fallback: T): [T, (value: T | ((current: T) => T)) => void] {
-  const [value, setValue] = useState<T>(() => readStored(key, fallback))
+function useStoredState<T>(key: string, fallback: T, validate?: (value: unknown) => value is T): [T, (value: T | ((current: T) => T)) => void] {
+  const [value, setValue] = useState<T>(() => readStored(key, fallback, validate))
   useEffect(() => writeStored(key, value), [key, value])
   return [value, setValue]
 }
@@ -123,7 +123,8 @@ function Hero({ parent, title, text }: { parent: boolean; title: string; text: s
 type ParentTab = 'schedule' | 'where' | 'kinder' | 'area'
 
 function ParentVaccines({ locality, controls, birthMonth, immunisation, onOpenMap, places }: Props & { places: Places }) {
-  const [done, setDone] = useStoredState<string[]>(DONE_KEY, [])
+  const [done, setDone] = useStoredState<string[]>(DONE_KEY, [],
+    (value): value is string[] => Array.isArray(value) && value.every(item => typeof item === 'string'))
   const [start, setStart] = useStoredState(START_KEY, '')
   const [tab, setTab] = useState<ParentTab>('schedule')
   const [fullSchedule, setFullSchedule] = useState(false)

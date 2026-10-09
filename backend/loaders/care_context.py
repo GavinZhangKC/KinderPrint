@@ -35,6 +35,7 @@ SPECS: dict[str, dict[str, Any]] = {
         "booleans": ("has_paediatric_service", "has_neonatal_intensive_care", "has_obstetric_service",
                      "has_emergency_department_data"),
         "integers": ("private",),
+        "integer_bounds": {"private": (0, 1)},
     },
     "care_compare": {
         "required": {"sa2_code", "sa2_name", "kind", "facility_id", "distance_km"},
@@ -54,6 +55,7 @@ SPECS: dict[str, dict[str, Any]] = {
                      "share_of_year_pct", "reference_years"},
         "key": ("disease", "age_band", "month"), "numbers": ("average_notifications", "share_of_year_pct"),
         "integers": ("month",),
+        "integer_bounds": {"month": (1, 12)},
     },
     "food_outlets": {
         "required": {"sa2_code", "osm_id", "name", "outlet_type", "organic", "address", "opening_hours",
@@ -69,6 +71,7 @@ SPECS: dict[str, dict[str, Any]] = {
         "required": {"nutrient_id", "nutrient", "unit", "rank", "food_key", "food_name", "food_group",
                      "amount_per_100g"},
         "key": ("nutrient_id", "rank"), "numbers": ("amount_per_100g",), "integers": ("rank",),
+        "integer_bounds": {"rank": (1, None)},
     },
     "practitioner_context": {
         "required": {"sa2_code", "sa2_name", "community_id", "community_name", "n_children", "observed_pct",
@@ -109,6 +112,15 @@ def _boolean(value: str) -> bool:
     raise ValueError
 
 
+def _integer(value: str, minimum: int = 0, maximum: int | None = None) -> int:
+    number = _number(value)
+    if number is None or not number.is_integer() or number < minimum:
+        raise ValueError
+    if maximum is not None and number > maximum:
+        raise ValueError
+    return int(number)
+
+
 @lru_cache(maxsize=16)
 def _read(path: Path, resource: str) -> tuple[dict[str, Any], ...]:
     spec = SPECS[resource]
@@ -122,7 +134,8 @@ def _read(path: Path, resource: str) -> tuple[dict[str, Any], ...]:
             for field in spec.get("numbers", ()):
                 row[field] = _number(raw[field])
             for field in spec.get("integers", ()):
-                row[field] = int(float(raw[field]))
+                minimum, maximum = spec.get("integer_bounds", {}).get(field, (0, None))
+                row[field] = _integer(raw[field], minimum, maximum)
             for field in spec.get("booleans", ()):
                 row[field] = _boolean(raw[field])
             key = tuple(row[field] for field in spec["key"])
@@ -142,7 +155,7 @@ def load(resource: str) -> tuple[tuple[dict[str, Any], ...] | None, list[dict[st
         return None, [limitation(f"{resource}_unavailable", "The configured dataset could not be found.", resource)]
     try:
         return _read(path, resource), []
-    except (OSError, UnicodeError, csv.Error, KeyError, TypeError, ValueError):
+    except (OSError, UnicodeError, csv.Error, KeyError, TypeError, ValueError, OverflowError):
         return None, [limitation(f"{resource}_invalid", "The configured dataset failed schema or value validation.",
                                  resource)]
 

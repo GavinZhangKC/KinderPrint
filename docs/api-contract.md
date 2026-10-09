@@ -2,9 +2,9 @@
 
 **Version:** 0.3
 
-**Status:** Working Iteration 1 contract with provisional Iteration 2 extensions
+**Status:** Working Iteration 1 contract with provisional Iteration 2 and Child Health Today extensions
 
-**Last updated:** 14 September 2026
+**Last updated:** 9 October 2026
 
 ## BE-0 — Dataset readiness service
 
@@ -17,10 +17,15 @@ It reports only readiness states, record counts, and limitation codes—not sour
 addresses, environment values, or filesystem paths. This is distinct from the minimal
 process-liveness endpoint at `GET /api/health`.
 
+Child Health Today runtime checks also cover seasonal air, nearby services,
+vaccination places, council immunisation and all ten care-context CSV resources
+listed in `backend/.env.example`. Each dataset is checked separately, so a missing
+optional input is visible even when its endpoint can return the other inputs.
+
 ### `GET /api/datasets/status`
 
 Returns the configured state, intended role, geographic unit, interpretation status,
-and user-facing eligibility of each Iteration 2 data product. It never returns local
+and user-facing eligibility of each Iteration 2 and Child Health Today data product. It never returns local
 filesystem paths. A configured dataset is not automatically approved for user-facing
 interpretation: EPA observations remain station context only, PHIDU child-health
 outcomes remain research only, and ACECQA/G-NAF output remains a quality-control input.
@@ -926,6 +931,55 @@ The current scoring formula, weights, indicator transformations, ranking size,
 criteria vocabulary, and approval status remain provisional/TBC. Results are
 area-level investigation aids, not assessments of individual children or proof
 that one neighbourhood is better than another.
+
+## Child Health Today — existing runtime extensions
+
+These endpoints reuse the shared `status`, `data`, `metadata`, `limitations` and
+`notices` envelope. They expose published or precomputed data; the backend does not
+introduce a matching, priority, nutrition or health-assessment algorithm.
+
+Except for `seasonal-illness`, all endpoints below require `sa2_code`, a nine-digit
+SA2 identifier, for example `?sa2_code=206011106`. Request validation failures use
+the existing HTTP 422 envelope with `invalid_request`. A syntactically valid ID
+without local records does not manufacture a result. Global nutrient guidance
+may still be returned when local outlet data are absent.
+
+| GET endpoint | `data` fields | Interpretation boundary |
+| --- | --- | --- |
+| `/api/digital-health/seasonal-air` | `station`, `months` | Historical monthly PM2.5 at the nearest EPA monitor, not SA2 exposure or a forecast. |
+| `/api/digital-health/nearby-services` | `services` | Nearest listed facility by service type and straight-line distance, not quality, capacity or live availability. |
+| `/api/digital-health/vaccination-places` | `origin`, `places`, `council` | Listed facilities and council immunisation information, not confirmation that a particular vaccine is provided. |
+| `/api/digital-health/compare-care` | `hospitals`, `urgent_care_clinics`, `area_cost` | Published facility facts and SA3 Medicare cost averages, not rankings, live waits, travel times or fee quotes. |
+| `/api/digital-health/seasonal-illness` | `diseases` | Victorian historical seasonal notifications; grouped by disease and month with child/all-age figures, not local prevalence or a forecast. |
+| `/api/digital-health/nutrition-report` | `targets`, `foods`, `outlets`, `access` | Published nutrient targets/composition and listed food outlets, not an individual diet plan. |
+| `/api/digital-health/practitioner-context` | `sa2_code`, optional `sa2_name`, `development`, `access` | Precomputed DS priority bands/evidence and GP/ECEC access, not a diagnosis or a prediction for an individual child. |
+
+The current endpoint states remain unchanged: missing required datasets return
+`unavailable`; loaded datasets without relevant records return `missing` where
+applicable; populated results return `available`. Partially usable results retain
+their endpoint's existing state and include limitations for absent or invalid
+components. Missing numeric values remain `null`, never zero or inferred values.
+
+In `compare-care`, each hospital includes its identifier/name, sector, distance,
+coordinates, specialised units, service-presence flags, optional emergency
+department measures and optional elective-surgery measures. `area_cost` contains
+SA3 identity, reference period and service/demographic cost context. Cost data can
+be absent while facility data remain usable.
+
+In `practitioner-context`, `development` contains the existing DS-produced band,
+observed/expected values, range, stability, drivers and model version; `access`
+contains the existing GP and ECEC access measures. The API exposes no numeric
+priority score and does not recompute or redefine DS bands.
+
+Metadata retains each endpoint's existing source, period and geographic framing.
+The runtime CSV paths are configured through `KINDERPRINT_*_DATA_PATH` variables
+documented in `backend/.env.example` and packaged/configured by the existing Lambda
+script and `template.yaml`. These resources are included in `/api/health/data`
+and `/api/datasets/status`; neither endpoint exposes local paths or source rows.
+
+Static CSV parsing and validation are cached per process. Updated packaged data
+require a backend redeployment; an existing warm process does not reload changed
+files automatically. This documentation does not approve or change the DS methods.
 
 ## Error handling
 
