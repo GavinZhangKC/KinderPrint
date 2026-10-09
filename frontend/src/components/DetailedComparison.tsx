@@ -4,6 +4,7 @@ import type {
   MultiComparisonField, MultiNeighbourhoodComparison, OutcomeComparison, PatternInsight,
 } from '../services/api'
 import './DetailedComparison.css'
+import ThemeSwitcher from './ThemeSwitcher'
 
 interface DetailedComparisonProps {
   comparisonResult: MultiNeighbourhoodComparison
@@ -197,7 +198,7 @@ export default function DetailedComparison({ comparisonResult, limitations, outc
       <a className="is-active" href="#comparison-overview"><span>⌂</span>Overview</a><a href="#comparison-development"><span>▥</span>Child development</a><a href="#comparison-environment"><span>◒</span>Environment</a><a href="#comparison-context"><span>◉</span>Locality context</a><a href="#comparison-evidence"><span>▤</span>Evidence</a>
     </nav></aside>
     <div className="dc-main">
-      <header className="dc-topbar"><button type="button" onClick={onBack} aria-label="Back to map">←</button><div className="dc-breadcrumb">Locality explorer <span>/</span> Detailed comparison</div><span>{names[0]} and {names[1]}</span></header>
+      <header className="dc-topbar"><button type="button" onClick={onBack} aria-label="Back to map">←</button><div className="dc-breadcrumb">Locality explorer <span>/</span> Detailed comparison</div><div className="dc-topbar-actions"><span>{names[0]} and {names[1]}</span><ThemeSwitcher /></div></header>
       <section className="dc-overview" id="comparison-overview">
         <div className="dc-title-row"><div><h1>Detailed comparison</h1><p>Locality-level evidence shown side by side.</p></div><button className="dc-download" type="button" onClick={() => window.print()}>Download report</button></div>
         <div className="dc-locality-bar"><div><small>Locality A</small><strong><i className="dc-pin dc-pin-a" />{names[0]}</strong></div><span>⇄</span><div><small>Locality B</small><strong><i className="dc-pin dc-pin-b" />{names[1]}</strong></div></div>

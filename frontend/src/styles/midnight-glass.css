@@ -1,0 +1,133 @@
+/* Scoped adaptations of existing components; no layout or asset replacement. */
+@import './midnight-components.css';
+
+/* Status backplates and chart fills have separate contrast needs. */
+:root[data-theme='dark'] { --concern-bg: var(--kp-status-concern-bg); }
+html[data-theme='dark'] body { color: var(--kp-color-text-primary); background: var(--kp-color-bg-canvas-start); }
+html[data-theme='dark'] :is(.app-background, .home-page, .health-page-shell, .kp-hub, .digital-health-hub, .detailed-background, .insight-page, .cesium-experiment-stage, .cesium-experiment-loading, .cesium-loading-overlay) {
+  background: var(--kp-canvas-ambient);
+  color: var(--kp-color-text-primary);
+}
+
+html[data-theme='dark'] :is(.glass, .glass-subtle, .map-control) {
+  background: var(--kp-color-surface-default);
+  border-color: var(--kp-color-border-default);
+  box-shadow: var(--kp-shadow-glass);
+  backdrop-filter: blur(var(--kp-glass-blur));
+  -webkit-backdrop-filter: blur(var(--kp-glass-blur));
+}
+html[data-theme='dark'] .glass-subtle { background: var(--kp-color-surface-soft); }
+html[data-theme='dark'] .nav-shell { background: var(--kp-color-surface-nav); }
+html[data-theme='dark'] .home-header { background: transparent; box-shadow: none; backdrop-filter: none; -webkit-backdrop-filter: none; }
+html[data-theme='dark'] .home-header::before {
+  background: linear-gradient(180deg, var(--kp-color-surface-strong), var(--kp-color-surface-default) 48%, transparent);
+  box-shadow: inset 0 1px 0 var(--kp-color-highlight);
+  backdrop-filter: blur(var(--kp-glass-blur));
+  -webkit-backdrop-filter: blur(var(--kp-glass-blur));
+}
+html[data-theme='dark'] :is(.home-brand, .home-nav button) { text-shadow: none; }
+html[data-theme='dark'] .home-hero::after {
+  background: linear-gradient(90deg, color-mix(in srgb, var(--kp-color-bg-canvas-start) 96%, transparent), color-mix(in srgb, var(--kp-color-bg-canvas-start) 88%, transparent) 28%, color-mix(in srgb, var(--kp-color-bg-canvas-start) 62%, transparent) 48%, color-mix(in srgb, var(--kp-color-bg-canvas-start) 20%, transparent) 68%, transparent 84%), linear-gradient(180deg, color-mix(in srgb, var(--kp-color-surface-solid) 8%, transparent), color-mix(in srgb, var(--kp-color-bg-canvas-mid) 18%, transparent));
+}
+
+/* Full-page sections cover the sticky hero; glass translucency belongs to panels. */
+html[data-theme='dark'] .home-theme-strip {
+  background: var(--kp-color-surface-solid);
+}
+html[data-theme='dark'] :is(.home-insight, .home-about, .home-explore) {
+  background: var(--kp-color-bg-canvas-start);
+}
+html[data-theme='dark'] :is(.home-insight, .home-about, .home-explore)::before {
+  background:
+    radial-gradient(circle at 18% 24%, color-mix(in srgb, var(--kp-color-action-primary) 5%, transparent), transparent 34%),
+    radial-gradient(circle at 84% 54%, color-mix(in srgb, var(--kp-color-accent-glow) 4%, transparent), transparent 36%),
+    linear-gradient(135deg, var(--kp-color-bg-canvas-start), var(--kp-color-surface-solid));
+}
+html[data-theme='dark'] .home-compare-story {
+  background: linear-gradient(135deg, var(--kp-color-bg-canvas-start), var(--kp-color-bg-canvas-mid) 54%, var(--kp-color-surface-solid));
+}
+html[data-theme='dark'] .home-compare-story::before {
+  background: radial-gradient(circle at 38% 42%, color-mix(in srgb, var(--kp-color-action-primary) 6%, transparent), transparent 72%);
+}
+html[data-theme='dark'] .home-compare-story::after {
+  background: radial-gradient(circle at 52% 48%, color-mix(in srgb, var(--kp-color-accent-glow) 4%, transparent), transparent 73%);
+}
+html[data-theme='dark'] .home-compare-lines {
+  border-top-color: color-mix(in srgb, var(--kp-color-text-secondary) 32%, transparent);
+}
+html[data-theme='dark'] .home-compare-lines span {
+  color: var(--kp-color-text-primary);
+}
+html[data-theme='dark'] .home-compare-lines i {
+  background: linear-gradient(90deg, var(--kp-color-action-primary-hover), color-mix(in srgb, var(--kp-color-accent-glow) 65%, var(--kp-color-bg-canvas-mid)));
+}
+
+html[data-theme='dark'] :is(.profile-modal, .compare-panel, .data-drawer, .child-health-drawer, .locality-suitability-panel, .suitability-modal, .suitability-modal-shell .suitability-card, .dh-plan-panel, .dh-plan-sheet.dh-plan-workflow, .journey-location-detail, .cesium-loading-panel) {
+  background: var(--kp-color-surface-strong);
+  border-color: var(--kp-color-border-default);
+  box-shadow: var(--kp-shadow-overlay);
+  backdrop-filter: blur(var(--kp-overlay-blur));
+  -webkit-backdrop-filter: blur(var(--kp-overlay-blur));
+}
+html[data-theme='dark'] :is(.search-results, .neighbourhood-search-results, .simulation-search-results, .kh-age-list, .kh-month-popover, .kh-picker ul, .priority-explanation-popover, .simulation-page-info-tooltip, .assumption-info-tooltip, .method-info-tooltip, .insight-page .insight-nav-tooltip, .dh-organ-stage .dh-organ-tooltip, .mapboxgl-popup-content, [role='listbox']) {
+  background: var(--kp-color-surface-popover);
+  color: var(--kp-color-text-primary);
+  border-color: var(--kp-color-border-subtle);
+  box-shadow: var(--kp-shadow-overlay);
+}
+html[data-theme='dark'] :is(.button.primary, .home-page .button.primary) { background: var(--kp-color-action-primary); color: var(--kp-color-text-on-accent); }
+html[data-theme='dark'] :is(.button.primary, .home-page .button.primary):hover:not(:disabled) { background: var(--kp-color-action-primary-hover); }
+html[data-theme='dark'] .button.secondary { background: var(--kp-color-surface-strong); color: var(--kp-color-text-primary); }
+html[data-theme='dark'] .button.secondary:hover:not(:disabled) { background: var(--kp-color-surface-hover); }
+html[data-theme='dark'] .status-strong { background: var(--kp-status-strong-bg); color: var(--kp-status-strong-text); border-color: var(--kp-status-strong-border); }
+html[data-theme='dark'] .status-moderate { background: var(--kp-status-moderate-bg); color: var(--kp-status-moderate-text); border-color: var(--kp-status-moderate-border); }
+html[data-theme='dark'] .status-concern { background: var(--kp-status-concern-bg); color: var(--kp-status-concern-text); border-color: var(--kp-status-concern-border); }
+html[data-theme='dark'] :is(.metric-ring::before, .dc-ring::before) { background: var(--kp-color-surface-solid); }
+html[data-theme='dark'] :is(input, textarea, select) { color: var(--kp-color-text-primary); accent-color: var(--kp-color-action-primary); }
+html[data-theme='dark'] :is(input, textarea)::placeholder { color: var(--kp-color-text-disabled); }
+html[data-theme='dark'] option { color: var(--kp-color-text-primary); background: var(--kp-color-surface-solid); }
+html[data-theme='dark'] :focus-visible { outline-color: var(--kp-color-border-focus); }
+html[data-theme='dark'] :is(input, textarea, select):focus-visible { outline: 2px solid var(--kp-color-border-focus); outline-offset: 2px; }
+html[data-theme='dark'] :is(.search-input-shell, .select-shell) { background: var(--kp-color-surface-strong); border-color: var(--kp-color-border-default); }
+html[data-theme='dark'] :is(.search-input-shell, .select-shell):focus-within { outline: 2px solid var(--kp-color-border-focus); outline-offset: 2px; }
+html[data-theme='dark'] :is(input, textarea, select):disabled { color: var(--kp-color-text-disabled); }
+
+/* Elevation follows the kit; the original card geometry and interactions remain. */
+html[data-theme='dark'] :is(.dc-sidebar, .dc-topbar, .dc-locality-bar, .kh-card, .dh-card, .dh-board-card, .dh-context-strip, .dh-env-dashboard > article, .dh-review-list, .dh-source-document) {
+  background: var(--kp-color-surface-default);
+  border-color: var(--kp-color-border-default);
+  box-shadow: var(--kp-shadow-glass);
+  backdrop-filter: blur(var(--kp-glass-blur));
+  -webkit-backdrop-filter: blur(var(--kp-glass-blur));
+}
+html[data-theme='dark'] .dc-report-section { background: var(--kp-color-surface-soft); border-color: var(--kp-color-border-default); }
+html[data-theme='dark'] .dc-card { background: var(--kp-color-surface-default); border-color: var(--kp-color-border-default); box-shadow: var(--kp-shadow-glass); }
+html[data-theme='dark'] .journey-location-card { background: var(--kp-color-surface-strong); border-color: var(--kp-color-border-default); box-shadow: var(--kp-shadow-glass); }
+html[data-theme='dark'] .journey-location-card:hover,
+html[data-theme='dark'] .journey-location-card:focus-visible { background: var(--kp-color-surface-popover); border-color: var(--kp-color-border-focus); box-shadow: var(--kp-shadow-overlay); }
+html[data-theme='dark'] :is(.suitability-modal-backdrop, .dh-plan-backdrop, .journey-location-detail-backdrop) { background: var(--kp-color-backdrop); }
+
+/* Preserve distinct series and status meanings instead of flattening chart colours. */
+html[data-theme='dark'] .dc-dashboard { --a: var(--kp-color-action-primary); --b: var(--kp-status-concern-text); --ink: var(--kp-color-text-primary); --muted: var(--kp-color-text-secondary); --line: var(--kp-color-border-subtle); }
+html[data-theme='dark'] .digital-health-hub { --blue: var(--kp-color-action-primary); --indigo: var(--kp-color-action-secondary); --coral: var(--kp-status-concern-text); --mint: var(--kp-status-strong-text); --ink: var(--kp-color-text-primary); --copy: var(--kp-color-text-secondary); --line: var(--kp-color-border-subtle); }
+html[data-theme='dark'] :is(.dh-care-hero, .dh-demand-hero) { background: linear-gradient(130deg, var(--kp-color-bg-canvas-start), var(--kp-color-bg-canvas-mid) 55%, var(--kp-color-bg-canvas-end)); }
+html[data-theme='dark'] .dh-projection-chart span { background: var(--kp-color-action-primary); }
+html[data-theme='dark'] .dh-projection-chart span:nth-of-type(2) { background: var(--kp-color-accent-glow); }
+html[data-theme='dark'] .dh-projection-chart span:nth-of-type(3) { background: var(--kp-status-concern-fill); }
+html[data-theme='dark'] .dh-age-outlook footer span:nth-child(1) { color: var(--kp-color-action-primary); }
+html[data-theme='dark'] .dh-age-outlook footer span:nth-child(2) { color: var(--kp-color-accent-glow); }
+html[data-theme='dark'] .dh-age-outlook footer span:nth-child(3) { color: var(--kp-status-concern-fill); }
+html[data-theme='dark'] .dh-access-rings > div > span::after { background: var(--kp-color-surface-solid); }
+html[data-theme='dark'] .kh-range i { background: color-mix(in srgb, var(--kp-color-text-secondary) 24%, var(--kp-color-surface-solid)); }
+html[data-theme='dark'] .kh-range em { background: var(--kp-color-text-primary); box-shadow: 0 0 0 2px var(--kp-color-bg-canvas-start); }
+
+/* The terrain, imagery, data layers and camera behavior are intentionally retained. */
+html[data-theme='dark'] :is(.mapboxgl-ctrl-group, .mapboxgl-ctrl-attrib) { background: var(--kp-color-surface-popover); color: var(--kp-color-text-secondary); border-color: var(--kp-color-border-subtle); }
+html[data-theme='dark'] .mapboxgl-ctrl-group button { background: transparent; }
+html[data-theme='dark'] .mapboxgl-ctrl-group button:hover { background: var(--kp-color-surface-hover); }
+html[data-theme='dark'] .mapboxgl-ctrl-icon { filter: brightness(0) saturate(100%) invert(90%) sepia(7%) saturate(784%) hue-rotate(182deg); }
+html[data-theme='dark'] :is(.mapboxgl-popup-anchor-bottom, .mapboxgl-popup-anchor-bottom-left, .mapboxgl-popup-anchor-bottom-right) .mapboxgl-popup-tip { border-top-color: var(--kp-color-surface-popover); }
+html[data-theme='dark'] :is(.mapboxgl-popup-anchor-top, .mapboxgl-popup-anchor-top-left, .mapboxgl-popup-anchor-top-right) .mapboxgl-popup-tip { border-bottom-color: var(--kp-color-surface-popover); }
+html[data-theme='dark'] .mapboxgl-popup-anchor-left .mapboxgl-popup-tip { border-right-color: var(--kp-color-surface-popover); }
+html[data-theme='dark'] .mapboxgl-popup-anchor-right .mapboxgl-popup-tip { border-left-color: var(--kp-color-surface-popover); }
+html[data-theme='dark'] .mapboxgl-popup-close-button { color: var(--kp-color-text-secondary); }

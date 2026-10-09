@@ -1,0 +1,3901 @@
+
+
+/* Midnight-only semantic adaptations. Original light CSS, layout declarations, imagery and animations remain unchanged. Palette: Figma 125:6 / 134:2. */
+
+/* styles/global.css */
+
+:root[data-theme="dark"] {
+  color: var(--kp-color-text-primary);
+  background: var(--kp-color-bg-canvas-start);
+  --brand: var(--kp-color-accent-glow);
+  --primary: var(--kp-color-action-secondary);
+  --text: var(--kp-color-text-primary);
+  --muted: var(--kp-color-text-secondary);
+  --glass: var(--kp-color-surface-default);
+  --glass-strong: var(--kp-color-surface-default);
+  --glass-subtle: var(--kp-color-surface-default);
+  --border: color-mix(in srgb, var(--kp-color-border-subtle) 76%, transparent);
+  --positive-bg: var(--kp-status-strong-bg);
+  --positive-text: var(--kp-status-strong-text);
+  --moderate-bg: var(--kp-color-bg-canvas-start);
+  --moderate-text: var(--kp-status-moderate-text);
+  --concern-bg: var(--kp-color-bg-canvas-start);
+  --concern-text: var(--kp-status-concern-text);
+  --shadow: 0 18px 42px color-mix(in srgb, var(--kp-color-shadow-ink) 16%, transparent)
+}
+
+html[data-theme="dark"] body {
+  background: var(--kp-color-bg-canvas-start)
+}
+
+html[data-theme="dark"] .app-background {
+  background: radial-gradient(circle at 18% 25%, var(--kp-color-surface-default), transparent 33%),
+    radial-gradient(circle at 82% 55%, var(--kp-color-surface-default), transparent 34%),
+    linear-gradient(135deg, var(--kp-color-bg-canvas-start) 0%, var(--kp-color-bg-canvas-start) 52%, var(--kp-color-bg-canvas-start) 100%)
+}
+
+html[data-theme="dark"] .ambient-one {
+  background: var(--kp-color-surface-default)
+}
+
+html[data-theme="dark"] .ambient-two {
+  background: var(--kp-color-surface-default)
+}
+
+html[data-theme="dark"] .glass {
+  backdrop-filter: blur(var(--kp-glass-blur));
+  -webkit-backdrop-filter: blur(var(--kp-glass-blur))
+}
+
+html[data-theme="dark"] .glass-subtle {
+  border: 1px solid color-mix(in srgb, var(--kp-color-border-subtle) 78%, transparent);
+  box-shadow: 0 12px 30px color-mix(in srgb, var(--kp-color-shadow-ink) 10%, transparent)
+}
+
+/* components/BrandHeader.css */
+
+html[data-theme="dark"] .nav-shell {
+  background: var(--kp-color-surface-default);
+  box-shadow: 0 12px 36px color-mix(in srgb, var(--kp-color-shadow-ink) 11%, transparent)
+}
+
+html[data-theme="dark"] .nav-links {
+  color: var(--kp-color-text-secondary)
+}
+
+/* components/NeighbourhoodMap.css */
+
+html[data-theme="dark"] .map-surface {
+  background: var(--kp-color-surface-default)
+}
+
+html[data-theme="dark"] .map-cold-start-overlay {
+  background: color-mix(in srgb, var(--kp-color-accent-glow) 18%, transparent);
+  backdrop-filter: blur(var(--kp-glass-blur)) saturate(78%);
+  -webkit-backdrop-filter: blur(var(--kp-glass-blur)) saturate(78%)
+}
+
+html[data-theme="dark"] .map-cursor-orb {
+  border: 1px solid color-mix(in srgb, var(--kp-color-border-subtle) 26%, transparent);
+  background: var(--kp-color-surface-soft);
+  box-shadow: 0 0 4px color-mix(in srgb, var(--kp-color-shadow-ink) 20%, transparent), inset 0 0 5px color-mix(in srgb, var(--kp-color-shadow-ink) 7%, transparent);
+  backdrop-filter: blur(var(--kp-glass-blur)) saturate(108%);
+  -webkit-backdrop-filter: blur(var(--kp-glass-blur)) saturate(108%)
+}
+
+html[data-theme="dark"] .map-cursor-orb::before {
+  background: conic-gradient(from 135deg, var(--kp-color-surface-soft) 0deg, var(--kp-color-surface-default) 82deg, var(--kp-color-surface-default) 150deg, var(--kp-color-surface-soft) 245deg, var(--kp-color-surface-soft) 310deg, var(--kp-color-surface-soft) 360deg);
+  box-shadow: -1px -1px 4px color-mix(in srgb, var(--kp-color-shadow-ink) 24%, transparent), 1px 1px 4px color-mix(in srgb, var(--kp-color-shadow-ink) 8%, transparent)
+}
+
+html[data-theme="dark"] .map-cursor-orb::after {
+  background: radial-gradient(circle at 30% 22%, var(--kp-color-surface-soft), var(--kp-color-surface-soft) 34%, transparent 66%);
+  box-shadow: inset -1px -1px 3px color-mix(in srgb, var(--kp-color-shadow-ink) 3.5%, transparent)
+}
+
+html[data-theme="dark"] .real-map .mapboxgl-ctrl-group {
+  border: 1px solid color-mix(in srgb, var(--kp-color-border-subtle) 75%, transparent);
+  background: var(--kp-color-surface-default);
+  box-shadow: 0 10px 26px color-mix(in srgb, var(--kp-color-shadow-ink) 14%, transparent);
+  backdrop-filter: blur(var(--kp-glass-blur));
+  -webkit-backdrop-filter: blur(var(--kp-glass-blur))
+}
+
+html[data-theme="dark"] .map-hover-label {
+  border: 1px solid color-mix(in srgb, var(--kp-color-border-subtle) 72%, transparent);
+  background: var(--kp-color-surface-default);
+  box-shadow: 0 12px 30px
+    color-mix(in srgb, var(--kp-color-shadow-ink) 16%, transparent);
+  backdrop-filter: blur(var(--kp-glass-blur));
+  -webkit-backdrop-filter: blur(var(--kp-glass-blur));
+  color: var(--kp-color-text-secondary)
+}
+
+html[data-theme="dark"] .map-loading {
+  background: var(--kp-color-surface-strong);
+  color: var(--kp-color-text-secondary)
+}
+
+html[data-theme="dark"] .map-error {
+  border: 1px solid color-mix(in srgb, var(--kp-status-moderate-border) 80%, transparent);
+  background: var(--kp-color-surface-strong);
+  color: var(--kp-status-concern-text);
+  box-shadow: 0 14px 30px color-mix(in srgb, var(--kp-color-shadow-ink) 12%, transparent)
+}
+
+html[data-theme="dark"] .map-caption {
+  background: var(--kp-color-surface-default);
+  color: var(--kp-color-text-secondary)
+}
+
+html[data-theme="dark"] .neighbourhood-search-block > label {
+  color: var(--kp-color-text-secondary)
+}
+
+html[data-theme="dark"] .search-input-shell {
+  background: var(--kp-color-surface-default)
+}
+
+html[data-theme="dark"] .search-input-shell input::placeholder {
+  color: var(--kp-color-text-secondary)
+}
+
+html[data-theme="dark"] .search-submit-button {
+  color: var(--kp-color-text-secondary)
+}
+
+html[data-theme="dark"] .search-submit-button:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--kp-color-action-primary) 9%, transparent);
+  color: var(--kp-color-action-secondary)
+}
+
+html[data-theme="dark"] .search-results {
+  background: var(--kp-color-surface-strong);
+  border: 1px solid color-mix(in srgb, var(--kp-color-border-subtle) 88%, transparent);
+  box-shadow: 0 18px 42px color-mix(in srgb, var(--kp-color-shadow-ink) 15%, transparent);
+  backdrop-filter: blur(var(--kp-glass-blur));
+  -webkit-backdrop-filter: blur(var(--kp-glass-blur))
+}
+
+html[data-theme="dark"] .search-results button span {
+  color: var(--kp-color-text-primary)
+}
+
+html[data-theme="dark"] .search-results button small {
+  color: var(--kp-color-text-secondary)
+}
+
+html[data-theme="dark"] .search-results button:hover {
+  background: color-mix(in srgb, var(--kp-color-action-secondary) 10%, transparent)
+}
+
+html[data-theme="dark"] .search-state {
+  color: var(--kp-color-text-secondary)
+}
+
+html[data-theme="dark"] .search-state--error {
+  color: var(--kp-status-concern-text)
+}
+
+html[data-theme="dark"] .map-request-error {
+  color: var(--kp-status-concern-text);
+  background: var(--kp-color-surface-strong)
+}
+
+/* components/MapControls.css */
+
+html[data-theme="dark"] .map-control {
+  background: var(--kp-color-surface-default)
+}
+
+html[data-theme="dark"] .preference-option {
+  color: var(--kp-color-text-primary)
+}
+
+html[data-theme="dark"] .custom-radio {
+  border: 1.5px solid var(--kp-color-border-subtle);
+  background: var(--kp-color-surface-default)
+}
+
+html[data-theme="dark"] .legend-card p {
+  color: var(--kp-color-text-secondary)
+}
+
+html[data-theme="dark"] .legend-row {
+  color: var(--kp-color-text-primary)
+}
+
+html[data-theme="dark"] .legend-swatch {
+  background: var(--kp-status-moderate-bg)
+}
+
+html[data-theme="dark"] .legend-swatch.risk-low {
+  background: var(--kp-status-strong-bg)
+}
+
+html[data-theme="dark"] .legend-swatch.risk-high {
+  background: var(--kp-status-moderate-bg)
+}
+
+html[data-theme="dark"] .legend-swatch.positive-low {
+  background: var(--kp-status-moderate-bg)
+}
+
+html[data-theme="dark"] .legend-swatch.positive-high {
+  background: var(--kp-status-strong-bg)
+}
+
+html[data-theme="dark"] .legend-swatch.mid {
+  background: var(--kp-status-moderate-bg)
+}
+
+/* components/LocalitySuitabilityPanel.css */
+
+html[data-theme="dark"] .suitability-help {
+  background: color-mix(in srgb, var(--kp-color-action-primary) 12%, transparent)
+}
+
+html[data-theme="dark"] .suitability-help::after {
+  background: var(--kp-color-surface-default);
+  color: var(--kp-color-text-primary);
+  box-shadow: 0 10px 25px color-mix(in srgb, var(--kp-color-shadow-ink) 18%, transparent)
+}
+
+html[data-theme="dark"] .suitability-intro {
+  color: var(--kp-color-text-primary)
+}
+
+html[data-theme="dark"] .suitability-patterns {
+  border: 1px solid color-mix(in srgb, var(--kp-color-border-subtle) 14%, transparent);
+  background: color-mix(in srgb, var(--kp-color-action-primary) 4.5%, transparent)
+}
+
+html[data-theme="dark"] .suitability-patterns > strong {
+  color: var(--kp-color-text-primary)
+}
+
+html[data-theme="dark"] .suitability-patterns > p {
+  color: var(--kp-color-text-secondary)
+}
+
+html[data-theme="dark"] .suitability-patterns button {
+  border: 1px solid color-mix(in srgb, var(--kp-color-border-subtle) 18%, transparent);
+  background: var(--kp-color-surface-default);
+  color: var(--kp-color-text-primary)
+}
+
+html[data-theme="dark"] .suitability-patterns button:hover,
+html[data-theme="dark"] .suitability-patterns button[aria-pressed='true'] {
+  border-color: color-mix(in srgb, var(--kp-color-border-focus) 45%, transparent);
+  background: color-mix(in srgb, var(--kp-color-action-primary) 12%, transparent)
+}
+
+html[data-theme="dark"] .suitability-group {
+  border: 1px solid color-mix(in srgb, var(--kp-color-border-subtle) 16%, transparent);
+  background: var(--kp-color-surface-default)
+}
+
+html[data-theme="dark"] .suitability-group summary {
+  color: var(--kp-color-text-primary)
+}
+
+html[data-theme="dark"] .suitability-group summary:hover {
+  background: color-mix(in srgb, var(--kp-color-action-primary) 5%, transparent)
+}
+
+html[data-theme="dark"] .suitability-group[open] summary {
+  background: color-mix(in srgb, var(--kp-color-action-primary) 4.5%, transparent)
+}
+
+html[data-theme="dark"] .suitability-group summary small {
+  background: color-mix(in srgb, var(--kp-color-action-primary) 8%, transparent);
+  color: var(--kp-color-text-secondary)
+}
+
+html[data-theme="dark"] .suitability-group-content {
+  border-top: 1px solid color-mix(in srgb, var(--kp-color-border-subtle) 10%, transparent)
+}
+
+html[data-theme="dark"] .suitability-group-content > p {
+  color: var(--kp-color-text-secondary)
+}
+
+html[data-theme="dark"] .suitability-option {
+  color: var(--kp-color-text-primary)
+}
+
+html[data-theme="dark"] .suitability-option:hover {
+  background: color-mix(in srgb, var(--kp-color-action-primary) 5%, transparent)
+}
+
+html[data-theme="dark"] .suitability-option-copy strong {
+  color: var(--kp-color-text-primary)
+}
+
+html[data-theme="dark"] .suitability-option-copy small {
+  color: var(--kp-color-text-secondary)
+}
+
+html[data-theme="dark"] .suitability-option-copy em {
+  color: var(--kp-color-text-secondary)
+}
+
+html[data-theme="dark"] .suitability-results {
+  border: 1px solid color-mix(in srgb, var(--kp-color-border-subtle) 18%, transparent);
+  background: var(--kp-color-surface-default)
+}
+
+html[data-theme="dark"] .suitability-results p {
+  color: var(--kp-color-text-primary)
+}
+
+html[data-theme="dark"] .suitability-result-button:hover {
+  background: color-mix(in srgb, var(--kp-color-action-primary) 8%, transparent)
+}
+
+html[data-theme="dark"] .suitability-result-button:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--kp-color-border-focus) 28%, transparent)
+}
+
+html[data-theme="dark"] .suitability-result-measures {
+  color: var(--kp-color-text-primary) !important
+}
+
+html[data-theme="dark"] .suitability-results strong {
+  color: var(--kp-color-text-primary)
+}
+
+html[data-theme="dark"] .suitability-results small {
+  color: var(--kp-color-text-secondary)
+}
+
+html[data-theme="dark"] .score {
+  background: color-mix(in srgb, var(--kp-color-action-primary) 10%, transparent)
+}
+
+html[data-theme="dark"] .suitability-error {
+  color: var(--kp-status-concern-text)
+}
+
+html[data-theme="dark"] .suitability-notice {
+  color: var(--kp-status-moderate-text) !important
+}
+
+html[data-theme="dark"] .suitability-score-note {
+  color: var(--kp-color-text-secondary) !important
+}
+
+html[data-theme="dark"] .suitability-launch-button:hover {
+  background: var(--kp-color-surface-default);
+  box-shadow: 0 12px 28px color-mix(in srgb, var(--kp-color-shadow-ink) 13%, transparent)
+}
+
+html[data-theme="dark"] .suitability-launch-button:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--kp-color-border-focus) 32%, transparent)
+}
+
+html[data-theme="dark"] .suitability-modal-backdrop {
+  background: var(--kp-color-surface-default);
+  backdrop-filter: blur(var(--kp-glass-blur));
+  -webkit-backdrop-filter: blur(var(--kp-glass-blur))
+}
+
+html[data-theme="dark"] .suitability-modal-shell .suitability-card {
+  background: var(--kp-color-surface-default)
+}
+
+html[data-theme="dark"] .suitability-modal-shell .suitability-card::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--kp-color-action-secondary) 18%, transparent)
+}
+
+html[data-theme="dark"] .suitability-modal-shell .suitability-card::-webkit-scrollbar-thumb:hover {
+  background: color-mix(in srgb, var(--kp-color-action-primary) 52%, transparent)
+}
+
+/* components/ProfileModal.css */
+
+html[data-theme="dark"] .profile-interaction-lock {
+  background: var(--kp-color-surface-default);
+  backdrop-filter: blur(var(--kp-glass-blur));
+  -webkit-backdrop-filter: blur(var(--kp-glass-blur))
+}
+
+html[data-theme="dark"] .profile-modal {
+  background: var(--kp-color-surface-default)
+}
+
+html[data-theme="dark"] .icon-close {
+  background: var(--kp-color-surface-default);
+  color: var(--kp-color-text-secondary)
+}
+
+html[data-theme="dark"] .profile-meta {
+  color: var(--kp-color-text-secondary)
+}
+
+html[data-theme="dark"] .priority-inline {
+  color: var(--kp-color-text-primary)
+}
+
+html[data-theme="dark"] .priority-explanation-trigger {
+  border: 1px solid color-mix(in srgb, var(--kp-color-border-subtle) 28%, transparent);
+  background: var(--kp-color-surface-default);
+  color: var(--kp-color-text-primary);
+  box-shadow: 0 4px 12px color-mix(in srgb, var(--kp-color-shadow-ink) 10%, transparent)
+}
+
+html[data-theme="dark"] .priority-explanation-trigger::after {
+  border: 1px solid color-mix(in srgb, var(--kp-color-border-subtle) 18%, transparent);
+  background: var(--kp-color-surface-strong);
+  color: var(--kp-color-text-primary);
+  box-shadow: 0 8px 20px color-mix(in srgb, var(--kp-color-shadow-ink) 12%, transparent)
+}
+
+html[data-theme="dark"] .priority-explanation-trigger:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--kp-color-border-focus) 32%, transparent)
+}
+
+html[data-theme="dark"] .priority-explanation-popover {
+  background: var(--kp-color-surface-strong);
+  color: var(--kp-color-text-primary);
+  box-shadow: 0 18px 42px color-mix(in srgb, var(--kp-color-shadow-ink) 18%, transparent)
+}
+
+html[data-theme="dark"] .priority-explanation-domain > strong {
+  color: var(--kp-color-text-primary)
+}
+
+html[data-theme="dark"] .priority-explanation-domain ul {
+  color: var(--kp-color-text-primary)
+}
+
+html[data-theme="dark"] .priority-explanation-note {
+  border-top: 1px solid color-mix(in srgb, var(--kp-color-border-subtle) 18%, transparent)
+}
+
+html[data-theme="dark"] .priority-explanation-note > strong {
+  color: var(--kp-color-text-primary)
+}
+
+html[data-theme="dark"] .priority-explanation-messages {
+  border-top: 1px solid color-mix(in srgb, var(--kp-color-border-subtle) 18%, transparent);
+  color: var(--kp-color-text-secondary)
+}
+
+html[data-theme="dark"] .indicator-meta-line {
+  color: var(--kp-color-text-secondary)
+}
+
+html[data-theme="dark"] .environment-row {
+  border-top: 1px solid color-mix(in srgb, var(--kp-color-border-subtle) 16%, transparent)
+}
+
+html[data-theme="dark"] .environment-row strong {
+  color: var(--kp-color-text-primary)
+}
+
+html[data-theme="dark"] .key-insight-card p {
+  color: var(--kp-color-text-primary)
+}
+
+/* styles/shared.css */
+
+html[data-theme="dark"] .status-badge {
+  border: 1px solid color-mix(in srgb, var(--kp-color-border-subtle) 72%, transparent)
+}
+
+html[data-theme="dark"] .status-strong {
+  background: var(--kp-status-strong-bg);
+  color: var(--kp-status-strong-text);
+  border-color: var(--kp-status-strong-border)
+}
+
+html[data-theme="dark"] .status-moderate {
+  background: var(--kp-status-moderate-bg);
+  color: var(--kp-status-moderate-text);
+  border-color: var(--kp-color-border-subtle)
+}
+
+html[data-theme="dark"] .status-concern {
+  background: var(--kp-status-moderate-bg);
+  color: var(--kp-status-concern-text);
+  border-color: var(--kp-status-moderate-border)
+}
+
+html[data-theme="dark"] .metric-ring {
+  background: conic-gradient(var(--ring-color) 0 var(--ring-value), color-mix(in srgb, var(--kp-color-action-secondary) 18%, transparent) var(--ring-value) 360deg)
+}
+
+html[data-theme="dark"] .metric-ring::before {
+  background: var(--kp-color-surface-strong)
+}
+
+html[data-theme="dark"] .ring-primary {
+  --ring-color: var(--kp-color-action-secondary)
+}
+
+html[data-theme="dark"] .ring-positive {
+  --ring-color: var(--kp-status-strong-text)
+}
+
+html[data-theme="dark"] .ring-concern {
+  --ring-color: var(--kp-status-concern-text)
+}
+
+html[data-theme="dark"] .button {
+  border: 1px solid color-mix(in srgb, var(--kp-color-border-subtle) 78%, transparent)
+}
+
+html[data-theme="dark"] .button:hover:not(:disabled) {
+  box-shadow: 0 10px 24px color-mix(in srgb, var(--kp-color-shadow-ink) 14%, transparent)
+}
+
+html[data-theme="dark"] .button.primary {
+  background: linear-gradient(135deg, var(--kp-color-surface-default), var(--kp-color-surface-default));
+  color: var(--kp-color-text-primary)
+}
+
+html[data-theme="dark"] .button.secondary {
+  background: var(--kp-color-surface-default);
+  color: var(--kp-color-text-secondary)
+}
+
+/* components/ComparePanel.css */
+
+html[data-theme="dark"] .compare-panel {
+  background: var(--kp-color-surface-default)
+}
+
+html[data-theme="dark"] .compare-panel::before,
+html[data-theme="dark"] .data-drawer::before {
+  background: linear-gradient(to bottom, var(--kp-color-surface-default), transparent)
+}
+
+html[data-theme="dark"] .compare-panel::after,
+html[data-theme="dark"] .data-drawer::after {
+  background: linear-gradient(to bottom, transparent, var(--kp-color-surface-default))
+}
+
+html[data-theme="dark"] .panel-label {
+  color: var(--kp-color-text-secondary)
+}
+
+html[data-theme="dark"] .selected-pill {
+  background: var(--kp-color-surface-strong);
+  color: var(--kp-color-text-secondary)
+}
+
+html[data-theme="dark"] .selected-remove:hover {
+  background: var(--kp-color-surface-strong)
+}
+
+html[data-theme="dark"] .compare-search-wrap {
+  background: var(--kp-color-surface-default);
+  border: 1px solid color-mix(in srgb, var(--kp-color-border-subtle) 80%, transparent);
+  box-shadow: 0 10px 24px color-mix(in srgb, var(--kp-color-shadow-ink) 8%, transparent)
+}
+
+html[data-theme="dark"] .search-glyph {
+  color: var(--kp-color-text-secondary)
+}
+
+html[data-theme="dark"] .search-popover button:hover {
+  background: color-mix(in srgb, var(--kp-color-action-secondary) 9%, transparent)
+}
+
+html[data-theme="dark"] .search-popover .search-error {
+  color: var(--kp-status-concern-text)
+}
+
+html[data-theme="dark"] .similar-row.is-picked {
+  outline: 2px solid color-mix(in srgb, var(--kp-color-border-focus) 42%, transparent)
+}
+
+html[data-theme="dark"] .similar-row button {
+  border: 1px solid color-mix(in srgb, var(--kp-color-border-subtle) 25%, transparent);
+  background: var(--kp-color-surface-default);
+  color: var(--kp-color-text-secondary)
+}
+
+html[data-theme="dark"] .comparable-detail > span {
+  color: var(--kp-color-text-secondary)
+}
+
+html[data-theme="dark"] .comparable-basis summary {
+  color: var(--kp-color-text-secondary)
+}
+
+html[data-theme="dark"] .comparable-limitations {
+  border-top: 1px solid color-mix(in srgb, var(--kp-color-border-subtle) 14%, transparent)
+}
+
+html[data-theme="dark"] .similar-pagination button {
+  background: var(--kp-color-surface-strong);
+  color: var(--kp-color-text-secondary)
+}
+
+html[data-theme="dark"] .no-similar-state {
+  color: var(--kp-color-text-secondary)
+}
+
+html[data-theme="dark"] .or-divider {
+  color: var(--kp-color-text-secondary)
+}
+
+html[data-theme="dark"] .or-divider i {
+  background: color-mix(in srgb, var(--kp-color-action-secondary) 18%, transparent)
+}
+
+html[data-theme="dark"] .select-map-card {
+  border: 1px solid color-mix(in srgb, var(--kp-color-border-subtle) 18%, transparent)
+}
+
+html[data-theme="dark"] .select-map-card:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--kp-color-border-focus) 28%, transparent)
+}
+
+html[data-theme="dark"] .select-map-card.is-active {
+  border-color: var(--kp-color-border-focus);
+  background: var(--kp-color-surface-strong);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--kp-color-shadow-ink) 12%, transparent)
+}
+
+html[data-theme="dark"] .select-map-card:hover:not(:disabled),
+html[data-theme="dark"] .select-map-card:focus-visible:not(:disabled) {
+  border-color: color-mix(in srgb, var(--kp-color-border-subtle) 78%, transparent);
+  background: linear-gradient(135deg, var(--kp-color-surface-default), var(--kp-color-surface-default));
+  color: var(--kp-color-text-primary);
+  box-shadow: 0 10px 24px color-mix(in srgb, var(--kp-color-shadow-ink) 14%, transparent)
+}
+
+html[data-theme="dark"] .map-selection-banner {
+  background: var(--kp-color-surface-strong)
+}
+
+html[data-theme="dark"] .map-selection-banner button {
+  background: var(--kp-color-surface-strong);
+  color: var(--kp-color-text-secondary)
+}
+
+html[data-theme="dark"] .map-selection-banner button:hover {
+  background: var(--kp-color-surface-strong)
+}
+
+html[data-theme="dark"] .selection-hint {
+  background: var(--kp-color-surface-default);
+  color: var(--kp-color-text-secondary)
+}
+
+/* components/DetailedDataDrawer.css */
+
+html[data-theme="dark"] .data-drawer {
+  background: var(--kp-color-surface-strong)
+}
+
+html[data-theme="dark"] .compare-panel-scroll::-webkit-scrollbar-thumb,
+html[data-theme="dark"] .data-drawer-scroll::-webkit-scrollbar-thumb,
+html[data-theme="dark"] .search-results::-webkit-scrollbar-thumb,
+html[data-theme="dark"] .profile-modal::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--kp-color-action-secondary) 18%, transparent)
+}
+
+html[data-theme="dark"] .compare-panel-scroll::-webkit-scrollbar-thumb:hover,
+html[data-theme="dark"] .data-drawer-scroll::-webkit-scrollbar-thumb:hover,
+html[data-theme="dark"] .search-results::-webkit-scrollbar-thumb:hover,
+html[data-theme="dark"] .profile-modal::-webkit-scrollbar-thumb:hover {
+  background: color-mix(in srgb, var(--kp-color-action-primary) 52%, transparent)
+}
+
+html[data-theme="dark"] .drawer-header {
+  background: var(--kp-color-surface-default);
+  backdrop-filter: blur(var(--kp-glass-blur));
+  -webkit-backdrop-filter: blur(var(--kp-glass-blur))
+}
+
+html[data-theme="dark"] .data-drawer h3 {
+  color: var(--kp-color-text-primary)
+}
+
+html[data-theme="dark"] .drawer-metric {
+  border-top: 1px solid color-mix(in srgb, var(--kp-color-border-subtle) 16%, transparent)
+}
+
+html[data-theme="dark"] .drawer-evidence {
+  color: var(--kp-color-text-secondary)
+}
+
+html[data-theme="dark"] .drawer-evidence summary {
+  color: var(--kp-color-text-secondary)
+}
+
+html[data-theme="dark"] .drawer-metric-provenance {
+  color: var(--kp-color-text-secondary)
+}
+
+html[data-theme="dark"] .drawer-evidence summary {
+  color: var(--kp-color-text-secondary)
+}
+
+html[data-theme="dark"] .drawer-metric-provenance .evidence-limitation {
+  color: var(--kp-status-moderate-text)
+}
+
+html[data-theme="dark"] .drawer-metric-provenance .evidence-notice {
+  color: var(--kp-color-text-secondary)
+}
+
+html[data-theme="dark"] .drawer-section-state {
+  border-top: 1px solid color-mix(in srgb, var(--kp-color-border-subtle) 16%, transparent);
+  color: var(--kp-color-text-secondary)
+}
+
+html[data-theme="dark"] .drawer-section-intro {
+  color: var(--kp-color-text-secondary)
+}
+
+html[data-theme="dark"] .drawer-section-evidence {
+  border-top: 1px solid color-mix(in srgb, var(--kp-color-border-subtle) 16%, transparent)
+}
+
+html[data-theme="dark"] .population-projection-list {
+  border-top: 1px solid color-mix(in srgb, var(--kp-color-border-subtle) 16%, transparent)
+}
+
+html[data-theme="dark"] .population-projection-year {
+  border-bottom: 1px solid color-mix(in srgb, var(--kp-color-border-subtle) 16%, transparent)
+}
+
+html[data-theme="dark"] .population-projection-year > strong {
+  color: var(--kp-color-text-primary)
+}
+
+html[data-theme="dark"] .population-projection-year dt {
+  color: var(--kp-color-text-secondary)
+}
+
+html[data-theme="dark"] .population-projection-year dd {
+  color: var(--kp-color-text-primary)
+}
+
+html[data-theme="dark"] .drawer-info small {
+  color: var(--kp-color-text-secondary)
+}
+
+/* components/DetailedComparison.css */
+
+html[data-theme="dark"] .dc-dashboard {
+  --a: var(--kp-color-action-secondary);
+  --b: var(--kp-status-concern-text);
+  --ink: var(--kp-color-text-primary);
+  --muted: var(--kp-color-text-secondary);
+  --line: var(--kp-color-border-subtle)
+}
+
+html[data-theme="dark"] .dc-sidebar {
+  border: 1px solid color-mix(in srgb, var(--kp-color-border-subtle) 88%, transparent);
+  background: var(--kp-color-surface-strong);
+  box-shadow: 0 12px 34px color-mix(in srgb, var(--kp-color-shadow-ink) 9%, transparent);
+  backdrop-filter: blur(var(--kp-glass-blur))
+}
+
+html[data-theme="dark"] .dc-sidebar nav {
+  border-top: 1px solid color-mix(in srgb, var(--kp-color-border-subtle) 70%, transparent)
+}
+
+html[data-theme="dark"] .dc-sidebar nav a {
+  color: var(--kp-color-text-primary)
+}
+
+html[data-theme="dark"] .dc-sidebar nav a span {
+  color: var(--kp-color-text-disabled)
+}
+
+html[data-theme="dark"] .dc-sidebar nav a:hover,
+html[data-theme="dark"] .dc-sidebar nav a.is-active {
+  background: var(--kp-color-surface-strong);
+  box-shadow: 0 5px 16px color-mix(in srgb, var(--kp-color-shadow-ink) 8%, transparent)
+}
+
+html[data-theme="dark"] .dc-topbar {
+  border: 1px solid color-mix(in srgb, var(--kp-color-border-subtle) 90%, transparent);
+  background: var(--kp-color-surface-strong);
+  box-shadow: 0 10px 28px color-mix(in srgb, var(--kp-color-shadow-ink) 8%, transparent);
+  backdrop-filter: blur(var(--kp-glass-blur))
+}
+
+html[data-theme="dark"] .dc-search {
+  border: 1px solid var(--kp-color-border-subtle);
+  background: var(--kp-color-surface-default);
+  color: var(--kp-color-text-secondary)
+}
+
+html[data-theme="dark"] .dc-topbar>span {
+  color: var(--kp-color-text-secondary)
+}
+
+html[data-theme="dark"] .dc-download {
+  color: var(--kp-color-text-primary);
+  box-shadow: 0 8px 20px color-mix(in srgb, var(--kp-color-shadow-ink) 20%, transparent)
+}
+
+html[data-theme="dark"] .dc-locality-bar {
+  border: 1px solid color-mix(in srgb, var(--kp-color-border-subtle) 90%, transparent);
+  background: var(--kp-color-surface-default)
+}
+
+html[data-theme="dark"] .dc-locality-bar>div {
+  border: 1px solid var(--kp-color-border-subtle);
+  background: var(--kp-color-surface-default)
+}
+
+html[data-theme="dark"] .dc-locality-bar small {
+  color: var(--kp-color-text-secondary)
+}
+
+html[data-theme="dark"] .dc-card {
+  border: 1px solid color-mix(in srgb, var(--kp-color-border-subtle) 94%, transparent);
+  background: var(--kp-color-surface-default);
+  box-shadow: 0 10px 26px color-mix(in srgb, var(--kp-color-shadow-ink) 7.5%, transparent);
+  backdrop-filter: blur(var(--kp-glass-blur))
+}
+
+html[data-theme="dark"] .dc-kpi-card h2 {
+  color: var(--kp-color-text-primary)
+}
+
+html[data-theme="dark"] .dc-kpi-card>div>i {
+  background: var(--kp-color-surface-strong)
+}
+
+html[data-theme="dark"] .dc-kpi-card p {
+  color: var(--kp-color-text-secondary)
+}
+
+html[data-theme="dark"] .dc-basis-card dt {
+  color: var(--kp-color-text-secondary)
+}
+
+html[data-theme="dark"] .dc-basis-card dd {
+  color: var(--kp-color-text-primary)
+}
+
+html[data-theme="dark"] .dc-legend {
+  color: var(--kp-color-text-secondary)
+}
+
+html[data-theme="dark"] .dc-dumbbell-row {
+  border-top: 1px solid var(--kp-color-border-subtle)
+}
+
+html[data-theme="dark"] .dc-chart-label strong {
+  color: var(--kp-color-text-primary)
+}
+
+html[data-theme="dark"] .dc-chart-label small {
+  color: var(--kp-color-text-secondary)
+}
+
+html[data-theme="dark"] .dc-dumbbell-track {
+  background: var(--kp-color-surface-strong)
+}
+
+html[data-theme="dark"] .dc-dumbbell-line {
+  background: var(--kp-color-surface-strong)
+}
+
+html[data-theme="dark"] .dc-point {
+  border: 2px solid var(--kp-color-border-subtle);
+  box-shadow: 0 1px 5px color-mix(in srgb, var(--kp-color-shadow-ink) 18%, transparent)
+}
+
+html[data-theme="dark"] .dc-difference {
+  color: var(--kp-color-text-primary)
+}
+
+html[data-theme="dark"] .dc-report-section {
+  border: 1px solid color-mix(in srgb, var(--kp-color-border-subtle) 72%, transparent);
+  background: var(--kp-color-surface-default)
+}
+
+html[data-theme="dark"] .dc-report-heading>span {
+  background: var(--kp-color-surface-strong)
+}
+
+html[data-theme="dark"] .dc-insight-card p {
+  color: var(--kp-color-text-primary)
+}
+
+html[data-theme="dark"] .dc-insight-card small {
+  color: var(--kp-color-text-secondary)
+}
+
+html[data-theme="dark"] .dc-card-heading>strong {
+  color: var(--kp-color-text-primary)
+}
+
+html[data-theme="dark"] .dc-environment-card footer,
+html[data-theme="dark"] .dc-context-card footer {
+  color: var(--kp-color-text-secondary)
+}
+
+html[data-theme="dark"] .dc-column-item span {
+  color: var(--kp-color-text-secondary)
+}
+
+html[data-theme="dark"] .dc-column-well {
+  border-bottom: 1px solid var(--kp-color-border-subtle)
+}
+
+html[data-theme="dark"] .dc-temperature-values span {
+  color: var(--kp-color-text-secondary)
+}
+
+html[data-theme="dark"] .dc-temperature-values strong {
+  color: var(--kp-color-text-primary)
+}
+
+html[data-theme="dark"] .dc-temperature-scale {
+  background: linear-gradient(90deg,var(--kp-color-surface-strong),var(--kp-color-surface-strong),var(--kp-status-moderate-bg))
+}
+
+html[data-theme="dark"] .dc-temp-marker {
+  border: 3px solid var(--kp-color-border-subtle);
+  box-shadow: 0 2px 7px color-mix(in srgb, var(--kp-color-shadow-ink) 16%, transparent)
+}
+
+html[data-theme="dark"] .dc-scale-labels {
+  color: var(--kp-color-text-secondary)
+}
+
+html[data-theme="dark"] .dc-lollipop-row>div {
+  background: var(--kp-color-surface-strong)
+}
+
+html[data-theme="dark"] .dc-lollipop-row i:after {
+  border: 2px solid var(--kp-color-border-subtle)
+}
+
+html[data-theme="dark"] .dc-context-bars span {
+  color: var(--kp-color-text-secondary)
+}
+
+html[data-theme="dark"] .dc-context-bars>div>div {
+  background: var(--kp-color-surface-strong)
+}
+
+html[data-theme="dark"] .dc-context-rings>div>span {
+  color: var(--kp-color-text-secondary)
+}
+
+html[data-theme="dark"] .dc-ring:before {
+  background: var(--kp-color-surface-strong)
+}
+
+html[data-theme="dark"] .dc-ring-a {
+  background: conic-gradient(var(--a) var(--ring-value),var(--kp-color-surface-strong) 0)
+}
+
+html[data-theme="dark"] .dc-ring-b {
+  background: conic-gradient(var(--b) var(--ring-value),var(--kp-color-surface-strong) 0)
+}
+
+html[data-theme="dark"] .dc-context-range>div {
+  background: var(--kp-color-surface-strong)
+}
+
+html[data-theme="dark"] .dc-context-marker {
+  border: 2px solid var(--kp-color-border-subtle)
+}
+
+html[data-theme="dark"] .dc-context-range p {
+  color: var(--kp-color-text-secondary)
+}
+
+html[data-theme="dark"] .dc-context-range p strong {
+  color: var(--kp-color-text-primary)
+}
+
+html[data-theme="dark"] .dc-pattern summary small {
+  background: var(--kp-color-surface-strong);
+  color: var(--kp-color-text-secondary)
+}
+
+html[data-theme="dark"] .dc-pattern>p {
+  color: var(--kp-color-text-primary)
+}
+
+html[data-theme="dark"] .dc-pattern>div {
+  color: var(--kp-color-text-secondary)
+}
+
+html[data-theme="dark"] .dc-pattern>div strong {
+  color: var(--kp-color-text-primary)
+}
+
+html[data-theme="dark"] .dc-limitations {
+  color: var(--kp-color-text-secondary)
+}
+
+html[data-theme="dark"] .dc-empty {
+  color: var(--kp-color-text-secondary)
+}
+
+html[data-theme="dark"] .detailed-background.detailed-comparison-scene {
+  background: radial-gradient(circle at 14% 20%,var(--kp-color-surface-default),transparent 30%),radial-gradient(circle at 88% 18%,var(--kp-color-surface-default),transparent 32%),linear-gradient(135deg,var(--kp-color-bg-canvas-start),var(--kp-color-bg-canvas-start))
+}
+
+html[data-theme="dark"] .dc-breadcrumb {
+  color: var(--kp-color-text-secondary)
+}
+
+html[data-theme="dark"] .dc-breadcrumb span {
+  color: var(--kp-color-text-disabled)
+}
+
+html[data-theme="dark"] .dc-compact-state {
+  border: 1px dashed var(--kp-color-border-subtle);
+  background: var(--kp-color-surface-default);
+  color: var(--kp-color-text-secondary)
+}
+
+html[data-theme="dark"] .dc-evidence-note {
+  color: var(--kp-color-text-secondary)
+}
+
+/* components/cesium/CesiumExperimentPage.css */
+
+html[data-theme="dark"] .cesium-experiment {
+  --brand: var(--kp-color-accent-glow);
+  --primary: var(--kp-color-action-secondary);
+  --text: var(--kp-color-text-primary);
+  --muted: var(--kp-color-text-secondary);
+  --border: color-mix(in srgb, var(--kp-color-border-subtle) 76%, transparent);
+  background: var(--kp-color-bg-canvas-start)
+}
+
+html[data-theme="dark"] .cesium-experiment-stage {
+  background: radial-gradient(circle at 18% 16%, var(--kp-color-surface-soft), transparent 36%),
+    linear-gradient(180deg, var(--kp-color-bg-canvas-start) 0%, var(--kp-color-bg-canvas-start) 100%)
+}
+
+html[data-theme="dark"] .cesium-experiment-stage::after {
+  background: linear-gradient(180deg, var(--kp-color-surface-soft), transparent 30%),
+    radial-gradient(ellipse at 50% 46%, transparent 48%, color-mix(in srgb, var(--kp-color-accent-glow) 5.5%, transparent) 100%)
+}
+
+html[data-theme="dark"] .cesium-loading-overlay {
+  background: radial-gradient(circle at 18% 18%, var(--kp-color-surface-default), transparent 34%),
+    radial-gradient(circle at 82% 70%, var(--kp-color-surface-default), transparent 36%),
+    linear-gradient(135deg, var(--kp-color-bg-canvas-start) 0%, var(--kp-color-bg-canvas-start) 52%, var(--kp-color-bg-canvas-start) 100%)
+}
+
+html[data-theme="dark"] .cesium-loading-glow-one {
+  background: color-mix(in srgb, var(--kp-color-action-secondary) 18%, transparent)
+}
+
+html[data-theme="dark"] .cesium-loading-glow-two {
+  background: color-mix(in srgb, var(--kp-color-action-primary) 24%, transparent)
+}
+
+html[data-theme="dark"] .cesium-loading-panel {
+  border: 1px solid color-mix(in srgb, var(--kp-color-border-subtle) 82%, transparent);
+  background: var(--kp-color-surface-default);
+  box-shadow: 0 24px 70px color-mix(in srgb, var(--kp-color-shadow-ink) 14%, transparent);
+  backdrop-filter: blur(var(--kp-glass-blur)) saturate(125%);
+  -webkit-backdrop-filter: blur(var(--kp-glass-blur)) saturate(125%)
+}
+
+html[data-theme="dark"] .cesium-loading-track {
+  background: color-mix(in srgb, var(--kp-color-action-secondary) 14%, transparent)
+}
+
+html[data-theme="dark"] .cesium-loading-track i {
+  box-shadow: 0 0 12px color-mix(in srgb, var(--kp-color-shadow-ink) 28%, transparent)
+}
+
+html[data-theme="dark"] .cesium-loading-meta strong {
+  color: var(--kp-color-text-secondary)
+}
+
+html[data-theme="dark"] .cesium-loading-error button {
+  border: 1px solid color-mix(in srgb, var(--kp-color-border-subtle) 24%, transparent);
+  color: var(--kp-color-text-primary);
+  box-shadow: 0 10px 24px color-mix(in srgb, var(--kp-color-shadow-ink) 20%, transparent)
+}
+
+html[data-theme="dark"] .cesium-loading-error button:hover {
+  box-shadow: 0 13px 28px color-mix(in srgb, var(--kp-color-shadow-ink) 26%, transparent)
+}
+
+html[data-theme="dark"] .cesium-loading-error button:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--kp-color-border-focus) 32%, transparent)
+}
+
+html[data-theme="dark"] .journey-chapter {
+  border: 1px solid color-mix(in srgb, var(--kp-color-border-subtle) 48%, transparent);
+  background: linear-gradient(132deg, var(--kp-color-surface-default), var(--kp-color-surface-default));
+  box-shadow: 0 16px 48px color-mix(in srgb, var(--kp-color-shadow-ink) 12%, transparent);
+  backdrop-filter: blur(var(--kp-glass-blur)) saturate(118%);
+  -webkit-backdrop-filter: blur(var(--kp-glass-blur)) saturate(118%)
+}
+
+html[data-theme="dark"] .journey-chapter-kicker > span {
+  background: color-mix(in srgb, var(--kp-color-accent-glow) 10%, transparent)
+}
+
+html[data-theme="dark"] .journey-chapter h1 {
+  color: var(--kp-color-text-primary)
+}
+
+html[data-theme="dark"] .journey-chapter-intro {
+  color: color-mix(in srgb, var(--kp-color-text-primary) 88%, transparent)
+}
+
+html[data-theme="dark"] .journey-chapter-evidence {
+  border-top: 1px solid color-mix(in srgb, var(--kp-color-border-subtle) 12%, transparent)
+}
+
+html[data-theme="dark"] .journey-chapter-example {
+  color: var(--kp-color-text-primary)
+}
+
+html[data-theme="dark"] .journey-chapter-example span {
+  color: var(--kp-color-text-primary)
+}
+
+html[data-theme="dark"] .journey-chapter-evidence > p:not(.journey-chapter-example) {
+  color: var(--kp-color-text-primary)
+}
+
+html[data-theme="dark"] .journey-chapter-evidence cite {
+  color: var(--kp-color-text-primary)
+}
+
+html[data-theme="dark"] .journey-progress {
+  background: color-mix(in srgb, var(--kp-color-action-secondary) 14%, transparent)
+}
+
+html[data-theme="dark"] .journey-progress i {
+  box-shadow: 0 0 12px color-mix(in srgb, var(--kp-color-shadow-ink) 24%, transparent)
+}
+
+html[data-theme="dark"] .cesium-experiment-stage > .nav-shell {
+  border: 1px solid color-mix(in srgb, var(--kp-color-border-subtle) 76%, transparent);
+  backdrop-filter: blur(var(--kp-glass-blur)) saturate(120%);
+  -webkit-backdrop-filter: blur(var(--kp-glass-blur)) saturate(120%)
+}
+
+html[data-theme="dark"] .cesium-journey-skip {
+  color: var(--kp-color-text-primary);
+  background: var(--kp-color-surface-strong)
+}
+
+html[data-theme="dark"] .cesium-journey-nav-mark {
+  background: var(--kp-color-surface-default)
+}
+
+html[data-theme="dark"] .cesium-journey-nav [aria-current] .cesium-journey-nav-mark {
+  background: var(--kp-color-surface-default);
+  box-shadow: 0 0 10px color-mix(in srgb, var(--kp-color-shadow-ink) 50%, transparent)
+}
+
+html[data-theme="dark"] .cesium-journey-nav-tooltip {
+  border: 1px solid color-mix(in srgb, var(--kp-color-border-subtle) 50%, transparent);
+  color: var(--kp-color-text-primary);
+  background: var(--kp-color-surface-default);
+  box-shadow: 0 5px 20px color-mix(in srgb, var(--kp-color-shadow-ink) 9%, transparent);
+  backdrop-filter: blur(var(--kp-glass-blur));
+  -webkit-backdrop-filter: blur(var(--kp-glass-blur))
+}
+
+html[data-theme="dark"] .cesium-scroll-hint {
+  color: color-mix(in srgb, var(--kp-color-text-primary) 92%, transparent);
+  text-shadow: 0 1px 10px color-mix(in srgb, var(--kp-color-shadow-ink) 82%, transparent)
+}
+
+html[data-theme="dark"] .cesium-scroll-arrow {
+  color: color-mix(in srgb, var(--kp-color-text-primary) 78%, transparent)
+}
+
+html[data-theme="dark"] .cesium-experiment-attribution {
+  border: 1px solid color-mix(in srgb, var(--kp-color-border-subtle) 58%, transparent);
+  color: color-mix(in srgb, var(--kp-color-text-primary) 72%, transparent);
+  background: var(--kp-color-surface-default);
+  backdrop-filter: blur(var(--kp-glass-blur));
+  -webkit-backdrop-filter: blur(var(--kp-glass-blur))
+}
+
+html[data-theme="dark"] .verification-toggle {
+  box-shadow: 0 12px 34px color-mix(in srgb, var(--kp-color-shadow-ink) 14%, transparent);
+  backdrop-filter: blur(var(--kp-glass-blur)) saturate(120%);
+  -webkit-backdrop-filter: blur(var(--kp-glass-blur)) saturate(120%)
+}
+
+html[data-theme="dark"] .verification-toggle:hover {
+  box-shadow: 0 15px 38px color-mix(in srgb, var(--kp-color-shadow-ink) 18%, transparent)
+}
+
+html[data-theme="dark"] .verification-toggle:focus-visible,
+html[data-theme="dark"] .verification-location-list button:focus-visible,
+html[data-theme="dark"] .verification-stops button:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--kp-color-border-focus) 35%, transparent)
+}
+
+html[data-theme="dark"] .verification-toggle.is-active {
+  color: var(--kp-color-text-primary);
+  background: color-mix(in srgb, var(--kp-color-action-primary) 94%, transparent)
+}
+
+html[data-theme="dark"] .verification-toggle-dot {
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--kp-color-shadow-ink) 14%, transparent)
+}
+
+html[data-theme="dark"] .verification-toggle.is-active .verification-toggle-dot {
+  background: var(--kp-color-surface-strong)
+}
+
+html[data-theme="dark"] .verification-panel {
+  background: var(--kp-color-surface-strong);
+  box-shadow: 0 24px 70px color-mix(in srgb, var(--kp-color-shadow-ink) 18%, transparent);
+  backdrop-filter: blur(var(--kp-glass-blur)) saturate(120%);
+  -webkit-backdrop-filter: blur(var(--kp-glass-blur)) saturate(120%)
+}
+
+html[data-theme="dark"] .verification-legend {
+  border-top: 1px solid color-mix(in srgb, var(--kp-color-border-subtle) 13%, transparent);
+  border-bottom: 1px solid color-mix(in srgb, var(--kp-color-border-subtle) 13%, transparent)
+}
+
+html[data-theme="dark"] .verification-legend .is-approximate,
+html[data-theme="dark"] .verification-stops .is-approximate {
+  background: var(--kp-status-moderate-bg)
+}
+
+html[data-theme="dark"] .verification-section h3,
+html[data-theme="dark"] .verification-detail h3 {
+  color: var(--kp-color-text-primary)
+}
+
+html[data-theme="dark"] .verification-location-list button {
+  color: var(--kp-color-text-primary);
+  background: var(--kp-color-surface-default)
+}
+
+html[data-theme="dark"] .verification-location-list button:hover,
+html[data-theme="dark"] .verification-location-list button.is-selected {
+  border-color: color-mix(in srgb, var(--kp-color-border-focus) 24%, transparent);
+  background: var(--kp-color-surface-strong);
+  box-shadow: 0 6px 18px color-mix(in srgb, var(--kp-color-shadow-ink) 7%, transparent)
+}
+
+html[data-theme="dark"] .verification-location-list em {
+  color: var(--kp-color-text-secondary)
+}
+
+html[data-theme="dark"] .verification-detail {
+  border: 1px solid color-mix(in srgb, var(--kp-color-border-subtle) 14%, transparent);
+  background: var(--kp-color-surface-default)
+}
+
+html[data-theme="dark"] .verification-detail > div span {
+  background: var(--kp-color-surface-default)
+}
+
+html[data-theme="dark"] .verification-detail .verification-status {
+  color: var(--kp-color-text-secondary);
+  background: var(--kp-color-surface-default)
+}
+
+html[data-theme="dark"] .verification-detail dd {
+  color: var(--kp-color-text-primary)
+}
+
+html[data-theme="dark"] .verification-stops button {
+  color: var(--kp-color-text-primary);
+  background: var(--kp-color-surface-default)
+}
+
+html[data-theme="dark"] .verification-stops button:hover {
+  background: var(--kp-color-surface-strong);
+  box-shadow: 0 6px 18px color-mix(in srgb, var(--kp-color-shadow-ink) 7%, transparent)
+}
+
+html[data-theme="dark"] .verification-stops button > span {
+  color: var(--kp-color-text-primary)
+}
+
+html[data-theme="dark"] .verification-stops em {
+  color: var(--kp-color-text-primary)
+}
+
+html[data-theme="dark"] .cesium-experiment-loading {
+  --brand: var(--kp-color-accent-glow);
+  --primary: var(--kp-color-action-secondary);
+  --text: var(--kp-color-text-primary);
+  --muted: var(--kp-color-text-secondary);
+  background: radial-gradient(circle at 18% 18%, var(--kp-color-surface-default), transparent 34%),
+    radial-gradient(circle at 82% 70%, var(--kp-color-surface-default), transparent 36%),
+    linear-gradient(135deg, var(--kp-color-bg-canvas-start) 0%, var(--kp-color-bg-canvas-start) 52%, var(--kp-color-bg-canvas-start) 100%)
+}
+
+@media (max-width: 760px) {
+
+html[data-theme="dark"] .journey-chapter {
+  background: linear-gradient(132deg, var(--kp-color-surface-strong), var(--kp-color-surface-default))
+}
+}
+
+/* components/cesium/JourneyLocationCards.css */
+
+html[data-theme="dark"] .journey-location-card {
+  border: 1px solid color-mix(in srgb, var(--kp-color-border-subtle) 78%, transparent);
+  color: var(--kp-color-text-primary);
+  background: linear-gradient(
+    145deg,
+    var(--kp-color-surface-strong),
+    var(--kp-color-surface-default)
+  );
+  box-shadow: 0 15px 38px color-mix(in srgb, var(--kp-color-shadow-ink) 18%, transparent),
+    inset 0 1px 0 color-mix(in srgb, var(--kp-color-shadow-ink) 76%, transparent);
+  backdrop-filter: blur(var(--kp-glass-blur)) saturate(125%);
+  -webkit-backdrop-filter: blur(var(--kp-glass-blur)) saturate(125%)
+}
+
+html[data-theme="dark"] .journey-location-card::before {
+  background: var(--kp-color-surface-default)
+}
+
+html[data-theme="dark"] .journey-location-card.is-green-space::before {
+  background: var(--kp-status-strong-bg)
+}
+
+html[data-theme="dark"] .journey-location-card.is-education::before {
+  background: var(--kp-status-moderate-bg)
+}
+
+html[data-theme="dark"] .journey-location-card:hover,
+html[data-theme="dark"] .journey-location-card:focus-visible {
+  border-color: color-mix(in srgb, var(--kp-color-border-focus) 66%, transparent);
+  background: linear-gradient(
+    145deg,
+    var(--kp-color-surface-strong),
+    var(--kp-color-surface-strong)
+  );
+  box-shadow: 0 19px 46px color-mix(in srgb, var(--kp-color-shadow-ink) 23%, transparent),
+    0 0 0 3px color-mix(in srgb, var(--kp-color-shadow-ink) 14%, transparent)
+}
+
+html[data-theme="dark"] .journey-location-card-category {
+  color: var(--kp-color-text-secondary)
+}
+
+html[data-theme="dark"] .journey-location-card.is-green-space .journey-location-card-category {
+  color: var(--kp-status-strong-text)
+}
+
+html[data-theme="dark"] .journey-location-card.is-education .journey-location-card-category {
+  color: var(--kp-status-moderate-text)
+}
+
+html[data-theme="dark"] .journey-location-card-description {
+  color: var(--kp-color-text-primary)
+}
+
+html[data-theme="dark"] .journey-location-card-action {
+  color: var(--kp-color-text-secondary)
+}
+
+html[data-theme="dark"] .journey-location-card-chapter {
+  color: color-mix(in srgb, var(--kp-color-text-primary) 45%, transparent)
+}
+
+html[data-theme="dark"] .journey-location-detail-backdrop {
+  background: color-mix(in srgb, var(--kp-color-accent-glow) 18%, transparent);
+  backdrop-filter: blur(var(--kp-glass-blur));
+  -webkit-backdrop-filter: blur(var(--kp-glass-blur))
+}
+
+html[data-theme="dark"] .journey-location-detail {
+  border: 1px solid color-mix(in srgb, var(--kp-color-border-subtle) 82%, transparent);
+  color: var(--kp-color-text-primary);
+  background: linear-gradient(
+    145deg,
+    var(--kp-color-surface-strong),
+    var(--kp-color-surface-strong)
+  );
+  box-shadow: 0 30px 90px color-mix(in srgb, var(--kp-color-shadow-ink) 28%, transparent),
+    inset 0 1px 0 color-mix(in srgb, var(--kp-color-shadow-ink) 92%, transparent)
+}
+
+html[data-theme="dark"] .journey-location-detail::before {
+  background: linear-gradient(90deg, transparent, var(--kp-color-action-primary), transparent)
+}
+
+html[data-theme="dark"] .journey-location-detail.is-green-space::before {
+  background: linear-gradient(90deg, transparent, var(--kp-status-strong-bg), transparent)
+}
+
+html[data-theme="dark"] .journey-location-detail.is-education::before {
+  background: linear-gradient(90deg, transparent, var(--kp-status-moderate-bg), transparent)
+}
+
+html[data-theme="dark"] .journey-location-detail-close {
+  border: 1px solid color-mix(in srgb, var(--kp-color-border-subtle) 18%, transparent);
+  color: var(--kp-color-text-primary);
+  background: var(--kp-color-surface-default)
+}
+
+html[data-theme="dark"] .journey-location-detail-close:hover,
+html[data-theme="dark"] .journey-location-detail-close:focus-visible {
+  color: var(--kp-color-text-primary);
+  background: var(--kp-color-surface-strong);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--kp-color-shadow-ink) 15%, transparent)
+}
+
+html[data-theme="dark"] .journey-location-detail-kicker {
+  color: var(--kp-color-text-secondary)
+}
+
+html[data-theme="dark"] .journey-location-detail h2 {
+  color: var(--kp-color-text-primary)
+}
+
+html[data-theme="dark"] .journey-location-detail > p {
+  color: var(--kp-color-text-primary)
+}
+
+html[data-theme="dark"] .journey-location-detail dl {
+  border: 1px solid color-mix(in srgb, var(--kp-color-border-subtle) 13%, transparent);
+  background: color-mix(in srgb, var(--kp-color-accent-glow) 10%, transparent)
+}
+
+html[data-theme="dark"] .journey-location-detail dl div {
+  background: var(--kp-color-surface-default)
+}
+
+html[data-theme="dark"] .journey-location-detail dt {
+  color: var(--kp-color-text-secondary)
+}
+
+html[data-theme="dark"] .journey-location-detail dd {
+  color: var(--kp-color-text-primary)
+}
+
+html[data-theme="dark"] .journey-location-detail > a {
+  color: var(--kp-color-text-secondary)
+}
+
+html[data-theme="dark"] .journey-location-detail > a:hover,
+html[data-theme="dark"] .journey-location-detail > a:focus-visible {
+  color: var(--kp-color-text-primary)
+}
+
+/* components/ChildHealthDrawer.css */
+
+html[data-theme="dark"] .child-health-menu-button {
+  border: 1px solid color-mix(in srgb, var(--kp-color-border-subtle) 18%, transparent);
+  background: var(--kp-color-surface-default)
+}
+
+html[data-theme="dark"] .child-health-menu-button:hover,
+html[data-theme="dark"] .child-health-menu-button[aria-expanded='true'] {
+  border-color: color-mix(in srgb, var(--kp-color-border-subtle) 32%, transparent);
+  background: var(--kp-color-surface-default)
+}
+
+html[data-theme="dark"] .child-health-menu-button:focus-visible,
+html[data-theme="dark"] .child-health-drawer button:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--kp-color-border-focus) 28%, transparent)
+}
+
+html[data-theme="dark"] .child-health-drawer-backdrop {
+  background: color-mix(in srgb, var(--kp-color-accent-glow) 16%, transparent)
+}
+
+html[data-theme="dark"] .child-health-drawer {
+  border: 1px solid color-mix(in srgb, var(--kp-color-border-subtle) 18%, transparent);
+  background: var(--kp-color-surface-strong);
+  box-shadow: 0 16px 40px color-mix(in srgb, var(--kp-color-shadow-ink) 16%, transparent)
+}
+
+html[data-theme="dark"] .child-health-drawer > header {
+  border-bottom: 1px solid color-mix(in srgb, var(--kp-color-border-subtle) 14%, transparent)
+}
+
+html[data-theme="dark"] .child-health-drawer > header button {
+  color: var(--kp-color-text-secondary)
+}
+
+html[data-theme="dark"] .child-health-drawer > header button:hover {
+  background: color-mix(in srgb, var(--kp-color-action-secondary) 8%, transparent)
+}
+
+html[data-theme="dark"] .child-health-drawer nav button {
+  color: var(--kp-color-text-secondary)
+}
+
+html[data-theme="dark"] .child-health-drawer nav button:hover {
+  background: color-mix(in srgb, var(--kp-color-action-secondary) 7%, transparent)
+}
+
+html[data-theme="dark"] .child-health-drawer nav button.is-active {
+  border-color: color-mix(in srgb, var(--kp-color-border-focus) 14%, transparent);
+  background: color-mix(in srgb, var(--kp-color-action-secondary) 10%, transparent)
+}
+
+html[data-theme="dark"] .child-health-drawer footer {
+  color: var(--kp-color-text-secondary);
+  border-top: 1px solid color-mix(in srgb, var(--kp-color-border-subtle) 14%, transparent)
+}
+
+/* components/DetailedComparisonWeather.css */
+
+html[data-theme="dark"] .detailed-background.detailed-comparison-scene {
+  background: var(--kp-color-bg-canvas-start)
+}
+
+html[data-theme="dark"] .detailed-comparison-scene[data-state='good'] {
+  background-color: var(--kp-color-surface-strong)
+}
+
+html[data-theme="dark"] .detailed-comparison-scene[data-state='medium'] {
+  background-color: var(--kp-color-surface-strong)
+}
+
+html[data-theme="dark"] .detailed-comparison-scene[data-state='poor'] {
+  background-color: var(--kp-color-surface-solid)
+}
+
+html[data-theme="dark"] .detailed-comparison-scene > .nav-shell {
+  border: 1px solid color-mix(in srgb, var(--kp-color-border-subtle) 72%, transparent);
+  background: var(--kp-color-surface-default);
+  box-shadow: 0 12px 36px color-mix(in srgb, var(--kp-color-shadow-ink) 18%, transparent), inset 0 1px 0 color-mix(in srgb, var(--kp-color-shadow-ink) 50%, transparent);
+  backdrop-filter: blur(var(--kp-glass-blur)) saturate(118%);
+  -webkit-backdrop-filter: blur(var(--kp-glass-blur)) saturate(118%)
+}
+
+html[data-theme="dark"] .detailed-comparison-scene > .nav-shell .brand-button,
+html[data-theme="dark"] .detailed-comparison-scene > .nav-shell .nav-links {
+  color: var(--kp-color-text-primary);
+  text-shadow: 0 1px 9px color-mix(in srgb, var(--kp-color-shadow-ink) 34%, transparent), 0 0 2px color-mix(in srgb, var(--kp-color-shadow-ink) 22%, transparent)
+}
+
+html[data-theme="dark"] .detailed-comparison-scene > .nav-shell .nav-links .active,
+html[data-theme="dark"] .detailed-comparison-scene > .nav-shell .nav-links button:hover {
+  color: var(--kp-color-accent-glow)
+}
+
+html[data-theme="dark"] .detailed-comparison-scene[data-state='good'] .weather-atmosphere {
+  background: radial-gradient(ellipse at 72% 10%, var(--kp-color-surface-default), transparent 24%),
+    linear-gradient(180deg, var(--kp-color-surface-soft), var(--kp-color-surface-soft))
+}
+
+html[data-theme="dark"] .detailed-comparison-scene[data-state='medium'] .weather-atmosphere {
+  background: linear-gradient(180deg, var(--kp-color-surface-default), color-mix(in srgb, var(--kp-color-accent-glow) 18%, transparent)),
+    linear-gradient(90deg, var(--kp-color-surface-soft), transparent 45%, color-mix(in srgb, var(--kp-color-accent-glow) 8%, transparent))
+}
+
+html[data-theme="dark"] .detailed-comparison-scene[data-state='poor'] .weather-atmosphere {
+  background: linear-gradient(180deg, color-mix(in srgb, var(--kp-color-accent-glow) 18%, transparent), color-mix(in srgb, var(--kp-color-accent-glow) 18%, transparent)),
+    radial-gradient(circle at 32% 30%, var(--kp-color-surface-soft), transparent 34%)
+}
+
+html[data-theme="dark"] .weather-cloud-layer::before,
+html[data-theme="dark"] .weather-cloud-layer::after {
+  background: radial-gradient(ellipse at 32% 56%, var(--kp-color-surface-default), transparent 48%),
+    radial-gradient(ellipse at 68% 48%, var(--kp-color-surface-default), transparent 52%)
+}
+
+html[data-theme="dark"] .weather-vignette {
+  background: radial-gradient(ellipse at center, transparent 46%, color-mix(in srgb, var(--kp-color-accent-glow) 12%, transparent) 100%)
+}
+
+/* components/DigitalHealthHub.css */
+
+html[data-theme="dark"] .digital-health-hub {
+  --navy: var(--kp-color-surface-solid);
+  --navy2: var(--kp-color-surface-solid);
+  --blue: var(--kp-color-accent-glow);
+  --indigo: var(--kp-color-action-secondary);
+  --coral: var(--kp-status-concern-text);
+  --mint: var(--kp-status-strong-text);
+  --ink: var(--kp-color-text-primary);
+  --copy: var(--kp-color-text-secondary);
+  --line: var(--kp-color-border-subtle);
+  --page: var(--kp-color-bg-canvas-start);
+  background: linear-gradient(135deg,var(--kp-color-bg-canvas-start),var(--kp-color-bg-canvas-start))
+}
+
+html[data-theme="dark"] .digital-health-hub button:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--kp-color-border-focus) 35%, transparent)
+}
+
+html[data-theme="dark"] .dh-sidebar {
+  color: var(--kp-color-text-primary);
+  background: linear-gradient(155deg,var(--kp-color-surface-solid),var(--kp-color-surface-solid) 73%,var(--kp-color-surface-solid))
+}
+
+html[data-theme="dark"] .dh-brand {
+  color: var(--kp-color-text-primary)
+}
+
+html[data-theme="dark"] .dh-brand span {
+  color: var(--kp-color-accent-glow)
+}
+
+html[data-theme="dark"] .dh-sidebar nav button {
+  color: var(--kp-color-text-disabled)
+}
+
+html[data-theme="dark"] .dh-sidebar nav button.is-active {
+  color: var(--kp-color-text-primary);
+  background: linear-gradient(90deg,var(--kp-color-surface-solid),var(--kp-color-action-primary));
+  box-shadow: 0 8px 24px color-mix(in srgb, var(--kp-color-shadow-ink) 18%, transparent)
+}
+
+html[data-theme="dark"] .dh-sidebar footer {
+  border-top: 1px solid color-mix(in srgb, var(--kp-color-border-subtle) 16%, transparent)
+}
+
+html[data-theme="dark"] .dh-sidebar footer small {
+  color: var(--kp-color-text-disabled)
+}
+
+html[data-theme="dark"] .dh-community-mark {
+  color: var(--kp-color-text-disabled)
+}
+
+html[data-theme="dark"] .dh-static-search {
+  color: var(--kp-color-text-primary);
+  background: var(--kp-color-surface-strong)
+}
+
+html[data-theme="dark"] .dh-static-search span {
+  color: var(--kp-color-text-secondary)
+}
+
+html[data-theme="dark"] .dh-top-actions>span,
+html[data-theme="dark"] .dh-top-actions button {
+  background: var(--kp-color-surface-strong)
+}
+
+html[data-theme="dark"] .dh-lens-tabs {
+  background: var(--kp-color-surface-strong)
+}
+
+html[data-theme="dark"] .dh-lens-tabs button[aria-selected=true] {
+  color: var(--kp-color-text-primary);
+  box-shadow: 0 8px 18px color-mix(in srgb, var(--kp-color-shadow-ink) 22%, transparent)
+}
+
+html[data-theme="dark"] .dh-view-button {
+  background: var(--kp-color-surface-strong)
+}
+
+html[data-theme="dark"] .dh-card,
+html[data-theme="dark"] .dh-pathway-card,
+html[data-theme="dark"] .dh-detail-list,
+html[data-theme="dark"] .dh-evidence-drawer {
+  background: var(--kp-color-surface-strong);
+  box-shadow: 0 12px 32px color-mix(in srgb, var(--kp-color-shadow-ink) 6%, transparent)
+}
+
+html[data-theme="dark"] .dh-age-grid i {
+  color: var(--kp-color-accent-glow);
+  background: var(--kp-color-surface-strong)
+}
+
+html[data-theme="dark"] .dh-age-grid>div:nth-child(2) i {
+  background: var(--kp-color-surface-strong)
+}
+
+html[data-theme="dark"] .dh-age-grid>div:nth-child(3) i {
+  background: var(--kp-color-surface-strong)
+}
+
+html[data-theme="dark"] .dh-source {
+  color: var(--kp-color-action-secondary)
+}
+
+html[data-theme="dark"] .dh-development-wheel:before {
+  background: conic-gradient(var(--coral) 0 18%,var(--kp-color-action-primary) 18% 37%,var(--kp-status-concern-fill) 37% 57%,var(--mint) 57% 78%,var(--indigo) 78%);
+  box-shadow: inset 0 0 0 34px var(--kp-color-shadow-ink)
+}
+
+html[data-theme="dark"] .dh-development-wheel>b {
+  color: var(--kp-color-accent-glow)
+}
+
+html[data-theme="dark"] .dh-development-wheel .domain {
+  color: var(--kp-color-text-primary)
+}
+
+html[data-theme="dark"] .dh-development-wheel .domain small {
+  color: var(--kp-color-text-primary)
+}
+
+html[data-theme="dark"] .dh-development-wheel .language {
+  background: var(--kp-color-action-primary)
+}
+
+html[data-theme="dark"] .dh-development-wheel .communication {
+  background: var(--kp-status-concern-fill)
+}
+
+html[data-theme="dark"] .dh-map-marker {
+  border: 4px solid var(--kp-color-border-subtle);
+  box-shadow: 0 5px 17px color-mix(in srgb, var(--kp-color-shadow-ink) 35%, transparent)
+}
+
+html[data-theme="dark"] .dh-map-marker:after {
+  background: var(--kp-color-surface-strong)
+}
+
+html[data-theme="dark"] .dh-locality-label {
+  background: var(--kp-color-surface-strong);
+  box-shadow: 0 8px 24px color-mix(in srgb, var(--kp-color-shadow-ink) 18%, transparent)
+}
+
+html[data-theme="dark"] .dh-map-story {
+  color: var(--kp-color-text-primary)
+}
+
+html[data-theme="dark"] .dh-map-story span {
+  border: 1px solid color-mix(in srgb, var(--kp-color-border-subtle) 65%, transparent);
+  background: var(--kp-color-surface-default)
+}
+
+html[data-theme="dark"] .dh-map-story i {
+  border-left: 2px dotted color-mix(in srgb, var(--kp-color-border-subtle) 80%, transparent)
+}
+
+html[data-theme="dark"] .dh-map-message {
+  color: var(--kp-color-text-primary);
+  background: var(--kp-color-surface-strong)
+}
+
+html[data-theme="dark"] .dh-service-grid>div {
+  border: 1px solid var(--kp-color-border-subtle)
+}
+
+html[data-theme="dark"] .dh-service-grid i {
+  background: var(--kp-color-surface-strong)
+}
+
+html[data-theme="dark"] .dh-service-grid span {
+  color: var(--kp-color-text-primary)
+}
+
+html[data-theme="dark"] .dh-service-grid .coral i {
+  background: var(--kp-color-surface-strong)
+}
+
+html[data-theme="dark"] .dh-service-grid .mint i {
+  color: var(--kp-status-strong-text);
+  background: var(--kp-color-surface-strong)
+}
+
+html[data-theme="dark"] .dh-service-grid .slate i {
+  color: var(--kp-color-text-disabled);
+  background: var(--kp-color-surface-strong)
+}
+
+html[data-theme="dark"] .dh-overview-actions button {
+  background: var(--kp-color-surface-strong)
+}
+
+html[data-theme="dark"] .dh-overview-actions i {
+  background: var(--kp-color-surface-strong)
+}
+
+html[data-theme="dark"] .dh-eyebrow {
+  color: var(--kp-color-action-secondary)
+}
+
+html[data-theme="dark"] .dh-organ-stage {
+  background: radial-gradient(circle,var(--kp-color-surface-strong),transparent 62%)
+}
+
+html[data-theme="dark"] .dh-organ-stage>span {
+  border: 1px solid color-mix(in srgb, var(--kp-color-border-subtle) 90%, transparent);
+  background: var(--kp-color-surface-strong);
+  box-shadow: 0 12px 34px color-mix(in srgb, var(--kp-color-shadow-ink) 15%, transparent)
+}
+
+html[data-theme="dark"] .dh-organ-stage>span:before {
+  background: var(--kp-color-surface-strong)
+}
+
+html[data-theme="dark"] .hotspot {
+  border: 3px solid var(--kp-color-border-subtle);
+  background: color-mix(in srgb, var(--kp-color-action-primary) 22%, transparent);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--kp-color-shadow-ink) 55%, transparent),0 7px 18px color-mix(in srgb, var(--kp-color-shadow-ink) 27%, transparent)
+}
+
+html[data-theme="dark"] .hotspot i {
+  background: var(--kp-color-surface-strong)
+}
+
+html[data-theme="dark"] .dh-condition-picker button {
+  background: var(--kp-color-surface-strong)
+}
+
+html[data-theme="dark"] .dh-condition-picker button[aria-pressed=true] {
+  box-shadow: 0 8px 20px color-mix(in srgb, var(--kp-color-shadow-ink) 12%, transparent)
+}
+
+html[data-theme="dark"] .dh-condition-detail {
+  background: var(--kp-color-surface-strong);
+  box-shadow: 0 12px 35px color-mix(in srgb, var(--kp-color-shadow-ink) 5%, transparent)
+}
+
+html[data-theme="dark"] .dh-condition-heading>span {
+  background: var(--kp-color-surface-strong)
+}
+
+html[data-theme="dark"] .dh-topic-tabs button {
+  color: var(--kp-color-text-primary);
+  background: var(--kp-color-surface-strong)
+}
+
+html[data-theme="dark"] .dh-topic-tabs button[aria-selected=true] {
+  color: var(--kp-color-text-primary)
+}
+
+html[data-theme="dark"] .dh-pathway-ribbon:before {
+  background: linear-gradient(90deg,var(--kp-color-surface-strong),var(--kp-color-action-primary),var(--kp-color-surface-default),var(--kp-status-concern-fill))
+}
+
+html[data-theme="dark"] .dh-pathway-ribbon i {
+  background: var(--kp-color-surface-strong)
+}
+
+html[data-theme="dark"] .dh-life-stages i {
+  color: var(--kp-color-accent-glow);
+  background: var(--kp-color-surface-strong)
+}
+
+html[data-theme="dark"] .dh-life-stages small {
+  color: var(--kp-color-text-secondary)
+}
+
+html[data-theme="dark"] .dh-detail-list li b {
+  background: var(--kp-color-surface-strong)
+}
+
+html[data-theme="dark"] .dh-detail-list>p,
+html[data-theme="dark"] .dh-evidence-drawer>p {
+  background: var(--kp-color-surface-strong)
+}
+
+html[data-theme="dark"] .dh-unavailable {
+  color: var(--kp-color-text-primary);
+  background: var(--kp-color-surface-strong)
+}
+
+/* components/DigitalHealthHub.health.css */
+
+html[data-theme="dark"] .dh-development-wheel::before {
+  box-shadow: inset 0 0 0 24px var(--kp-color-shadow-ink)
+}
+
+html[data-theme="dark"] .dh-development-visual li {
+  color: var(--kp-color-text-primary)
+}
+
+html[data-theme="dark"] .dh-development-visual li i {
+  color: var(--kp-color-text-primary)
+}
+
+html[data-theme="dark"] .dh-development-visual li.language i {
+  background: var(--kp-color-action-primary)
+}
+
+html[data-theme="dark"] .dh-development-visual li.communication i {
+  background: var(--kp-status-concern-fill)
+}
+
+html[data-theme="dark"] .dh-organ-stage:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--kp-color-border-focus) 30%, transparent)
+}
+
+html[data-theme="dark"] .dh-health-panel {
+  background: var(--kp-color-surface-strong);
+  box-shadow: 0 12px 35px color-mix(in srgb, var(--kp-color-shadow-ink) 5%, transparent)
+}
+
+html[data-theme="dark"] .dh-health-panel header > span {
+  background: var(--kp-color-surface-strong)
+}
+
+html[data-theme="dark"] .dh-health-metrics > div {
+  background: linear-gradient(145deg, var(--kp-color-surface-strong), var(--kp-color-surface-strong))
+}
+
+html[data-theme="dark"] .dh-health-metrics small {
+  color: var(--kp-color-text-primary)
+}
+
+html[data-theme="dark"] .dh-health-note {
+  color: var(--kp-color-text-secondary);
+  background: var(--kp-color-surface-strong)
+}
+
+html[data-theme="dark"] .dh-guidance-panel li b {
+  color: var(--kp-color-text-primary)
+}
+
+html[data-theme="dark"] .dh-guidance-panel li span {
+  color: var(--kp-color-text-primary)
+}
+
+html[data-theme="dark"] .dh-care-list i {
+  background: var(--kp-color-surface-strong)
+}
+
+html[data-theme="dark"] .dh-care-list em {
+  color: var(--kp-color-text-secondary)
+}
+
+html[data-theme="dark"] .dh-data-state {
+  color: var(--kp-color-accent-glow);
+  background: var(--kp-color-surface-strong)
+}
+
+html[data-theme="dark"] .dh-board-card,
+html[data-theme="dark"] .dh-feature-card {
+  background: var(--kp-color-surface-strong);
+  box-shadow: 0 18px 45px color-mix(in srgb, var(--kp-color-shadow-ink) 8%, transparent)
+}
+
+html[data-theme="dark"] .dh-feature-card {
+  color: var(--kp-color-text-primary)
+}
+
+html[data-theme="dark"] .dh-feature-card>small {
+  color: color-mix(in srgb, var(--kp-color-text-primary) 78%, transparent)
+}
+
+html[data-theme="dark"] .dh-care-hero {
+  background: linear-gradient(125deg,var(--kp-color-surface-solid),var(--kp-color-action-primary) 62%,var(--kp-color-action-primary))
+}
+
+html[data-theme="dark"] .dh-care-orbit {
+  border: 1px solid color-mix(in srgb, var(--kp-color-border-subtle) 22%, transparent)
+}
+
+html[data-theme="dark"] .dh-care-orbit:before,
+html[data-theme="dark"] .dh-care-orbit:after {
+  border: 1px solid color-mix(in srgb, var(--kp-color-border-subtle) 17%, transparent)
+}
+
+html[data-theme="dark"] .dh-care-orbit i,
+html[data-theme="dark"] .dh-care-orbit span,
+html[data-theme="dark"] .dh-care-orbit b {
+  background: var(--kp-color-surface-strong);
+  color: var(--kp-color-accent-glow);
+  box-shadow: 0 12px 25px color-mix(in srgb, var(--kp-color-shadow-ink) 18%, transparent)
+}
+
+html[data-theme="dark"] .dh-access-rings>div>span {
+  background: conic-gradient(var(--kp-color-action-primary) var(--ring),var(--kp-color-surface-strong) 0)
+}
+
+html[data-theme="dark"] .dh-access-rings>div>span:after {
+  background: var(--kp-color-surface-strong)
+}
+
+html[data-theme="dark"] .dh-access-rings small {
+  color: var(--kp-color-text-secondary)
+}
+
+html[data-theme="dark"] .dh-service-directory header>span {
+  color: var(--kp-color-accent-glow);
+  background: var(--kp-color-surface-strong)
+}
+
+html[data-theme="dark"] .dh-service-directory article>i {
+  color: var(--kp-color-accent-glow);
+  background: var(--kp-color-surface-strong)
+}
+
+html[data-theme="dark"] .dh-service-directory article>b {
+  color: var(--kp-status-strong-text)
+}
+
+html[data-theme="dark"] .dh-access-boundary li b {
+  color: var(--kp-color-accent-glow)
+}
+
+html[data-theme="dark"] .dh-access-boundary li span {
+  color: var(--kp-color-text-secondary)
+}
+
+html[data-theme="dark"] .dh-demand-hero {
+  background: linear-gradient(130deg,var(--kp-color-surface-solid),var(--kp-color-action-primary) 55%,var(--kp-color-surface-default))
+}
+
+html[data-theme="dark"] .dh-demand-wave i {
+  background: linear-gradient(var(--kp-status-strong-bg),var(--kp-color-surface-strong));
+  box-shadow: 0 7px 20px color-mix(in srgb, var(--kp-color-shadow-ink) 12%, transparent)
+}
+
+html[data-theme="dark"] .dh-demand-wave span {
+  color: var(--kp-color-text-primary)
+}
+
+html[data-theme="dark"] .dh-demand-change>strong {
+  color: var(--kp-color-accent-glow)
+}
+
+html[data-theme="dark"] .dh-demand-change p {
+  color: var(--kp-color-text-secondary)
+}
+
+html[data-theme="dark"] .dh-demand-change span {
+  color: var(--kp-status-concern-text);
+  background: var(--kp-color-surface-strong)
+}
+
+html[data-theme="dark"] .dh-projection-chart {
+  background: repeating-linear-gradient(to top,transparent 0,transparent 49px,var(--kp-color-surface-strong) 50px)
+}
+
+html[data-theme="dark"] .dh-projection-chart span {
+  background: var(--kp-color-action-primary)
+}
+
+html[data-theme="dark"] .dh-projection-chart span:nth-of-type(2) {
+  background: var(--kp-color-surface-default)
+}
+
+html[data-theme="dark"] .dh-projection-chart span:nth-of-type(3) {
+  background: var(--kp-status-concern-fill)
+}
+
+html[data-theme="dark"] .dh-age-outlook footer {
+  color: var(--kp-color-text-secondary)
+}
+
+html[data-theme="dark"] .dh-age-outlook footer span:nth-child(1) {
+  color: var(--kp-color-accent-glow)
+}
+
+html[data-theme="dark"] .dh-age-outlook footer span:nth-child(2) {
+  color: var(--kp-color-text-disabled)
+}
+
+html[data-theme="dark"] .dh-age-outlook footer span:nth-child(3) {
+  color: var(--kp-status-concern-text)
+}
+
+html[data-theme="dark"] .dh-health-demand i {
+  color: var(--kp-status-strong-text)
+}
+
+html[data-theme="dark"] .dh-health-demand p {
+  color: var(--kp-color-text-secondary)
+}
+
+html[data-theme="dark"] .dh-context-strip {
+  background: var(--kp-color-surface-strong);
+  box-shadow: 0 18px 45px color-mix(in srgb, var(--kp-color-shadow-ink) 6%, transparent)
+}
+
+html[data-theme="dark"] .dh-context-strip header>span {
+  color: var(--kp-color-accent-glow);
+  background: var(--kp-color-surface-strong)
+}
+
+html[data-theme="dark"] .dh-context-strip article {
+  background: linear-gradient(145deg,var(--kp-color-surface-strong),var(--kp-color-surface-strong))
+}
+
+html[data-theme="dark"] .dh-context-strip article small {
+  color: var(--kp-color-text-primary)
+}
+
+html[data-theme="dark"] .dh-context-strip article i {
+  color: var(--kp-status-strong-text)
+}
+
+html[data-theme="dark"] .dh-board-error {
+  color: var(--kp-status-concern-text);
+  background: var(--kp-color-surface-strong)
+}
+
+html[data-theme="dark"] .dh-env-dashboard>article,
+html[data-theme="dark"] .dh-review-list,
+html[data-theme="dark"] .dh-source-document {
+  background: var(--kp-color-surface-strong);
+  box-shadow: 0 18px 45px color-mix(in srgb, var(--kp-color-shadow-ink) 8%, transparent)
+}
+
+html[data-theme="dark"] .dh-env-insights header>span,
+html[data-theme="dark"] .dh-env-comparison header>span {
+  color: var(--kp-color-accent-glow);
+  background: var(--kp-color-surface-strong)
+}
+
+html[data-theme="dark"] .dh-insight-table .head {
+  color: var(--kp-color-text-secondary)
+}
+
+html[data-theme="dark"] .dh-insight-table p {
+  color: var(--kp-color-text-primary)
+}
+
+html[data-theme="dark"] .dh-insight-table i {
+  color: var(--kp-status-strong-text)
+}
+
+html[data-theme="dark"] .dh-env-insights>footer {
+  color: var(--kp-color-text-secondary)
+}
+
+html[data-theme="dark"] .dh-env-score span {
+  color: var(--kp-color-text-primary)
+}
+
+html[data-theme="dark"] .dh-env-metric small {
+  color: var(--kp-color-text-secondary)
+}
+
+html[data-theme="dark"] .dh-env-metric>i {
+  background: linear-gradient(90deg,var(--kp-color-action-primary),var(--kp-color-surface-default))
+}
+
+html[data-theme="dark"] .dh-env-comparison article header small {
+  color: var(--kp-color-text-secondary)
+}
+
+html[data-theme="dark"] .dh-env-comparison article span small {
+  color: var(--kp-color-text-secondary)
+}
+
+html[data-theme="dark"] .dh-env-comparison article>div>i {
+  background: var(--kp-color-surface-strong)
+}
+
+html[data-theme="dark"] .dh-env-comparison article>div>i b {
+  background: var(--kp-color-action-primary)
+}
+
+html[data-theme="dark"] .dh-env-comparison article footer {
+  color: var(--kp-color-accent-glow)
+}
+
+html[data-theme="dark"] .dh-needs-attention li>i {
+  color: var(--kp-status-concern-text);
+  background: var(--kp-color-surface-strong)
+}
+
+html[data-theme="dark"] .dh-needs-attention li:last-child>i {
+  color: var(--kp-status-strong-text);
+  background: var(--kp-color-surface-strong)
+}
+
+html[data-theme="dark"] .dh-needs-attention li small {
+  color: var(--kp-color-text-secondary)
+}
+
+html[data-theme="dark"] .dh-review-list label {
+  color: var(--kp-color-text-secondary)
+}
+
+html[data-theme="dark"] .dh-review-list select {
+  background: var(--kp-color-surface-strong)
+}
+
+html[data-theme="dark"] .dh-review-list>div small {
+  color: var(--kp-color-text-secondary)
+}
+
+html[data-theme="dark"] .dh-review-list>div>strong {
+  color: var(--kp-status-moderate-text)
+}
+
+html[data-theme="dark"] .dh-review-list>div>button {
+  color: var(--kp-color-text-primary);
+  background: var(--kp-color-action-primary)
+}
+
+html[data-theme="dark"] .dh-review-list>div>button:disabled {
+  color: var(--kp-status-strong-text);
+  background: var(--kp-color-surface-strong)
+}
+
+html[data-theme="dark"] .dh-source-document>span {
+  color: var(--kp-color-accent-glow)
+}
+
+html[data-theme="dark"] .dh-source-document dt {
+  color: var(--kp-color-text-secondary)
+}
+
+html[data-theme="dark"] .dh-source-document p {
+  color: var(--kp-color-text-secondary);
+  background: var(--kp-color-surface-strong)
+}
+
+html[data-theme="dark"] .dh-locality-search>div {
+  border: 1px solid var(--kp-color-border-subtle);
+  background: var(--kp-color-surface-strong);
+  box-shadow: 0 12px 30px color-mix(in srgb, var(--kp-color-shadow-ink) 12%, transparent)
+}
+
+html[data-theme="dark"] .dh-locality-search input {
+  color: var(--kp-color-text-primary)
+}
+
+html[data-theme="dark"] .dh-locality-search ul {
+  border: 1px solid var(--kp-color-border-subtle);
+  background: var(--kp-color-surface-strong);
+  box-shadow: 0 18px 42px color-mix(in srgb, var(--kp-color-shadow-ink) 18%, transparent)
+}
+
+html[data-theme="dark"] .dh-locality-search li button:hover,
+html[data-theme="dark"] .dh-locality-search li button:focus {
+  background: var(--kp-color-surface-strong)
+}
+
+html[data-theme="dark"] .dh-locality-search li small {
+  color: var(--kp-color-text-secondary)
+}
+
+html[data-theme="dark"] .dh-geography-title {
+  color: var(--kp-color-action-secondary)
+}
+
+html[data-theme="dark"] .dh-health-empty {
+  color: var(--kp-color-text-secondary);
+  border: 1px dashed var(--kp-color-border-subtle);
+  background: var(--kp-color-surface-strong)
+}
+
+html[data-theme="dark"] .dh-health-compare-page {
+  background: linear-gradient(145deg,var(--kp-color-surface-strong),var(--kp-color-surface-strong))
+}
+
+html[data-theme="dark"] .dh-compare-topbar {
+  border: 1px solid var(--kp-color-border-subtle);
+  background: var(--kp-color-surface-strong)
+}
+
+html[data-theme="dark"] .dh-compare-topbar>button {
+  color: var(--kp-color-action-secondary);
+  border: 1px solid var(--kp-color-border-subtle);
+  background: var(--kp-color-surface-strong)
+}
+
+html[data-theme="dark"] .dh-compare-topbar>div:nth-child(2) span,
+html[data-theme="dark"] .dh-compare-topbar>div:nth-child(2) i {
+  color: var(--kp-color-text-secondary)
+}
+
+html[data-theme="dark"] .dh-audience-toggle {
+  background: var(--kp-color-surface-strong)
+}
+
+html[data-theme="dark"] .dh-audience-toggle button {
+  color: var(--kp-color-text-primary)
+}
+
+html[data-theme="dark"] .dh-audience-toggle button[aria-selected=true] {
+  color: var(--kp-color-text-primary);
+  background: var(--kp-color-action-primary);
+  box-shadow: 0 5px 14px color-mix(in srgb, var(--kp-color-shadow-ink) 20%, transparent)
+}
+
+html[data-theme="dark"] .dh-compare-intro p {
+  color: var(--kp-color-text-secondary)
+}
+
+html[data-theme="dark"] .dh-compare-intro aside {
+  border: 1px solid var(--kp-status-moderate-border);
+  background: var(--kp-color-surface-strong);
+  color: var(--kp-status-moderate-text)
+}
+
+html[data-theme="dark"] .dh-compare-condition-tabs button {
+  color: var(--kp-color-text-primary);
+  border: 1px solid var(--kp-color-border-subtle);
+  background: var(--kp-color-surface-strong)
+}
+
+html[data-theme="dark"] .dh-compare-condition-tabs button[aria-pressed=true] {
+  color: var(--kp-color-accent-glow);
+  border-color: var(--kp-color-border-focus);
+  box-shadow: 0 8px 22px color-mix(in srgb, var(--kp-color-shadow-ink) 12%, transparent)
+}
+
+html[data-theme="dark"] .dh-compare-summary article {
+  border: 1px solid var(--kp-color-border-subtle);
+  background: var(--kp-color-surface-strong)
+}
+
+html[data-theme="dark"] .dh-compare-summary small {
+  color: var(--kp-color-text-secondary)
+}
+
+html[data-theme="dark"] .dh-compare-summary strong {
+  color: var(--kp-color-text-primary)
+}
+
+html[data-theme="dark"] .dh-compare-summary span {
+  color: var(--kp-color-text-secondary)
+}
+
+html[data-theme="dark"] .dh-compare-evidence,
+html[data-theme="dark"] .dh-audience-panel {
+  border: 1px solid var(--kp-color-border-subtle);
+  background: var(--kp-color-surface-strong)
+}
+
+html[data-theme="dark"] .dh-compare-evidence header p {
+  color: var(--kp-color-text-secondary)
+}
+
+html[data-theme="dark"] .dh-compare-evidence header>span {
+  color: var(--kp-color-accent-glow);
+  background: var(--kp-color-surface-strong)
+}
+
+html[data-theme="dark"] .dh-health-comparison-table {
+  border: 1px solid var(--kp-color-border-subtle)
+}
+
+html[data-theme="dark"] .dh-health-comparison-table>div {
+  border-bottom: 1px solid var(--kp-color-border-subtle)
+}
+
+html[data-theme="dark"] .dh-health-comparison-table .head {
+  color: var(--kp-color-text-secondary);
+  background: var(--kp-color-surface-strong)
+}
+
+html[data-theme="dark"] .dh-health-comparison-table small {
+  color: var(--kp-color-text-secondary)
+}
+
+html[data-theme="dark"] .dh-compare-evidence>footer {
+  color: var(--kp-color-text-secondary)
+}
+
+html[data-theme="dark"] .dh-audience-panel li {
+  color: var(--kp-color-text-primary)
+}
+
+html[data-theme="dark"] .dh-audience-panel li b {
+  color: var(--kp-color-accent-glow);
+  background: var(--kp-color-surface-strong)
+}
+
+html[data-theme="dark"] .dh-audience-panel>div {
+  background: var(--kp-color-surface-strong)
+}
+
+html[data-theme="dark"] .dh-audience-panel>div p {
+  color: var(--kp-color-text-primary)
+}
+
+html[data-theme="dark"] .dh-audience-panel dl div {
+  border-bottom: 1px solid var(--kp-color-border-subtle)
+}
+
+html[data-theme="dark"] .dh-audience-panel dt {
+  color: var(--kp-color-text-secondary)
+}
+
+html[data-theme="dark"] .dh-audience-panel dd {
+  color: var(--kp-color-text-primary)
+}
+
+html[data-theme="dark"] .dh-child-context select,
+html[data-theme="dark"] .dh-child-context button {
+  background: var(--kp-color-surface-strong)
+}
+
+html[data-theme="dark"] .dh-child-context button[aria-pressed=true] {
+  color: var(--kp-color-text-primary)
+}
+
+html[data-theme="dark"] .dh-primary-action {
+  color: var(--kp-color-text-primary);
+  box-shadow: 0 8px 18px color-mix(in srgb, var(--kp-color-shadow-ink) 18%, transparent)
+}
+
+html[data-theme="dark"] .dh-live-grid>a {
+  background: linear-gradient(145deg,var(--kp-color-surface-strong),var(--kp-color-surface-strong))
+}
+
+html[data-theme="dark"] .dh-live-grid>a:hover,
+html[data-theme="dark"] .dh-live-grid>a:focus-visible {
+  border-color: var(--kp-color-border-subtle);
+  box-shadow: 0 12px 26px color-mix(in srgb, var(--kp-color-shadow-ink) 11%, transparent)
+}
+
+html[data-theme="dark"] .dh-live-grid b {
+  color: var(--kp-color-text-primary)
+}
+
+html[data-theme="dark"] .dh-seasonal-panel ol li {
+  background: var(--kp-color-surface-strong)
+}
+
+html[data-theme="dark"] .dh-seasonal-panel ol li>b {
+  background: var(--kp-color-surface-strong)
+}
+
+html[data-theme="dark"] .dh-plan-backdrop {
+  background: var(--kp-color-surface-default);
+  backdrop-filter: blur(var(--kp-glass-blur))
+}
+
+html[data-theme="dark"] .dh-plan-sheet {
+  background: var(--kp-color-surface-strong);
+  box-shadow: -22px 0 60px color-mix(in srgb, var(--kp-color-shadow-ink) 24%, transparent)
+}
+
+html[data-theme="dark"] .dh-plan-sheet>header button {
+  background: var(--kp-color-surface-strong)
+}
+
+html[data-theme="dark"] .dh-plan-progress {
+  background: var(--kp-color-surface-strong)
+}
+
+html[data-theme="dark"] .dh-plan-done {
+  color: var(--kp-color-text-primary)
+}
+
+html[data-theme="dark"] .dh-plan-steps button {
+  background: var(--kp-color-surface-strong)
+}
+
+html[data-theme="dark"] .dh-plan-steps button b {
+  background: var(--kp-color-surface-strong)
+}
+
+html[data-theme="dark"] .dh-plan-steps button[aria-current=step] {
+  color: var(--kp-color-text-primary)
+}
+
+html[data-theme="dark"] .dh-plan-steps button[aria-current=step] b {
+  background: var(--kp-color-surface-strong)
+}
+
+html[data-theme="dark"] .dh-plan-explainer article>b {
+  color: var(--kp-color-text-primary)
+}
+
+html[data-theme="dark"] .dh-plan-panel>aside {
+  background: var(--kp-color-surface-strong)
+}
+
+html[data-theme="dark"] .dh-observation-list label span {
+  color: var(--kp-color-text-primary)
+}
+
+html[data-theme="dark"] .dh-observation-list label input:checked+span {
+  color: var(--kp-color-text-primary)
+}
+
+html[data-theme="dark"] .dh-summary-preview {
+  background: var(--kp-color-surface-strong)
+}
+
+html[data-theme="dark"] .dh-summary-preview>div {
+  border-bottom: 1px solid var(--kp-color-border-subtle)
+}
+
+html[data-theme="dark"] .dh-summary-preview footer {
+  color: var(--kp-color-text-secondary)
+}
+
+html[data-theme="dark"] .dh-plan-actions button {
+  background: var(--kp-color-surface-strong)
+}
+
+html[data-theme="dark"] .dh-plan-service-note {
+  background: var(--kp-color-surface-strong)
+}
+
+@media print {
+
+html[data-theme="dark"] .dh-plan-backdrop {
+  background: var(--kp-color-surface-strong)
+}
+}
+
+html[data-theme="dark"] .dh-choice-group label span {
+  color: var(--kp-color-text-primary)
+}
+
+html[data-theme="dark"] .dh-choice-group label input:checked+span {
+  color: var(--kp-color-text-primary)
+}
+
+html[data-theme="dark"] .dh-question-nav>button:first-child {
+  background: var(--kp-color-surface-strong)
+}
+
+html[data-theme="dark"] .health-page-shell {
+  background: radial-gradient(circle at 18% 22%,var(--kp-color-surface-default),transparent 34%),radial-gradient(circle at 84% 48%,var(--kp-color-surface-soft),transparent 35%),linear-gradient(135deg,var(--kp-color-bg-canvas-start) 0%,var(--kp-color-bg-canvas-start) 52%,var(--kp-color-bg-canvas-start) 100%)
+}
+
+html[data-theme="dark"] .locality-comparison-shell {
+  --navy: var(--kp-color-action-primary);
+  --navy2: var(--kp-color-action-primary);
+  --blue: var(--kp-color-action-secondary);
+  --indigo: var(--kp-color-action-secondary);
+  --coral: var(--kp-status-concern-text);
+  --mint: var(--kp-status-strong-text);
+  --ink: var(--kp-color-text-primary);
+  --copy: var(--kp-color-text-secondary);
+  --line: color-mix(in srgb, var(--kp-color-border-subtle) 78%, transparent)
+}
+
+html[data-theme="dark"] .locality-comparison-shell button:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--kp-color-border-focus) 35%, transparent)
+}
+
+html[data-theme="dark"] .locality-comparison-shell .dh-health-compare-page {
+  border: 1px solid color-mix(in srgb, var(--kp-color-border-subtle) 78%, transparent);
+  background: var(--kp-color-surface-default);
+  box-shadow: 0 18px 42px color-mix(in srgb, var(--kp-color-shadow-ink) 13%, transparent);
+  backdrop-filter: blur(var(--kp-glass-blur))
+}
+
+html[data-theme="dark"] .locality-comparison-shell .dh-audience-toggle {
+  border: 1px solid color-mix(in srgb, var(--kp-color-border-subtle) 14%, transparent);
+  background: var(--kp-color-surface-default)
+}
+
+html[data-theme="dark"] .locality-comparison-shell .dh-audience-toggle button[aria-selected=true] {
+  color: var(--kp-color-text-primary);
+  background: var(--kp-color-surface-default);
+  box-shadow: 0 7px 18px color-mix(in srgb, var(--kp-color-shadow-ink) 24%, transparent)
+}
+
+html[data-theme="dark"] .locality-comparison-shell .dh-compare-topbar {
+  border-bottom: 1px solid color-mix(in srgb, var(--kp-color-border-subtle) 18%, transparent)
+}
+
+html[data-theme="dark"] .locality-comparison-shell .dh-compare-topbar>button {
+  color: var(--kp-color-accent-glow)
+}
+
+html[data-theme="dark"] .locality-comparison-shell .dh-compare-topbar>button:hover {
+  color: var(--kp-color-text-disabled)
+}
+
+html[data-theme="dark"] .locality-comparison-shell .dh-compare-condition-tabs {
+  border-bottom: 1px solid color-mix(in srgb, var(--kp-color-border-subtle) 16%, transparent)
+}
+
+html[data-theme="dark"] .locality-comparison-shell .dh-compare-condition-tabs button[aria-pressed=true] {
+  background: var(--kp-color-surface-default)
+}
+
+html[data-theme="dark"] .locality-comparison-shell .dh-compare-summary {
+  border-bottom: 1px solid color-mix(in srgb, var(--kp-color-border-subtle) 16%, transparent)
+}
+
+html[data-theme="dark"] .locality-comparison-shell .dh-compare-summary article {
+  border-left: 1px solid color-mix(in srgb, var(--kp-color-border-subtle) 16%, transparent)
+}
+
+html[data-theme="dark"] .locality-comparison-shell .dh-compare-summary small {
+  color: var(--kp-color-text-primary)
+}
+
+html[data-theme="dark"] .locality-comparison-shell .dh-compare-summary strong {
+  color: var(--kp-color-action-secondary)
+}
+
+html[data-theme="dark"] .locality-comparison-shell .dh-compare-summary span {
+  color: var(--kp-color-text-primary)
+}
+
+@media (max-width:700px) {
+
+html[data-theme="dark"] .locality-comparison-shell .dh-compare-summary article,
+html[data-theme="dark"] .locality-comparison-shell .dh-compare-summary article:first-child {
+  border-top: 1px solid color-mix(in srgb, var(--kp-color-border-subtle) 16%, transparent)
+}
+}
+
+html[data-theme="dark"] .locality-comparison-shell .dh-condition-comparison-card {
+  border: 1px solid color-mix(in srgb, var(--kp-color-border-subtle) 82%, transparent);
+  background: var(--kp-color-surface-default);
+  box-shadow: 0 16px 38px color-mix(in srgb, var(--kp-color-shadow-ink) 11%, transparent);
+  backdrop-filter: blur(var(--kp-glass-blur))
+}
+
+html[data-theme="dark"] .locality-comparison-shell .dh-condition-comparison-card .dh-audience-panel {
+  border-left: 1px solid color-mix(in srgb, var(--kp-color-border-subtle) 16%, transparent)
+}
+
+@media (max-width:1100px) {
+
+html[data-theme="dark"] .locality-comparison-shell .dh-condition-comparison-card .dh-audience-panel {
+  border-top: 1px solid color-mix(in srgb, var(--kp-color-border-subtle) 16%, transparent)
+}
+}
+
+html[data-theme="dark"] .locality-comparison-shell .dh-health-comparison-table .head {
+  color: var(--kp-color-text-primary)
+}
+
+html[data-theme="dark"] .dh-plan-backdrop {
+  background: color-mix(in srgb, var(--kp-color-accent-glow) 18%, transparent);
+  backdrop-filter: blur(var(--kp-glass-blur))
+}
+
+html[data-theme="dark"] .dh-plan-sheet.dh-plan-workflow {
+  --plan-primary: var(--kp-color-action-secondary);
+  --plan-primary-deep: var(--kp-color-action-secondary);
+  --plan-ink: var(--kp-color-text-primary);
+  --plan-copy: var(--kp-color-text-secondary);
+  border: 1px solid color-mix(in srgb, var(--kp-color-border-subtle) 82%, transparent);
+  background: radial-gradient(circle at 8% 4%,var(--kp-color-surface-default),transparent 29%),
+    radial-gradient(circle at 100% 36%,var(--kp-color-surface-soft),transparent 35%),
+    linear-gradient(145deg,var(--kp-color-surface-strong),var(--kp-color-surface-strong));
+  box-shadow: -24px 22px 70px color-mix(in srgb, var(--kp-color-shadow-ink) 24%, transparent)
+}
+
+html[data-theme="dark"] .dh-plan-sheet.dh-plan-workflow>header {
+  border-bottom: 1px solid color-mix(in srgb, var(--kp-color-border-subtle) 16%, transparent)
+}
+
+html[data-theme="dark"] .dh-plan-sheet.dh-plan-workflow>header button {
+  border-color: color-mix(in srgb, var(--kp-color-border-subtle) 20%, transparent);
+  background: var(--kp-color-surface-default);
+  color: var(--kp-color-text-primary);
+  box-shadow: 0 8px 20px color-mix(in srgb, var(--kp-color-shadow-ink) 8%, transparent)
+}
+
+html[data-theme="dark"] .dh-plan-sheet.dh-plan-workflow .dh-plan-steps {
+  border: 1px solid color-mix(in srgb, var(--kp-color-border-subtle) 12%, transparent);
+  background: var(--kp-color-surface-default)
+}
+
+html[data-theme="dark"] .dh-plan-sheet.dh-plan-workflow .dh-plan-steps button {
+  color: var(--kp-color-text-secondary)
+}
+
+html[data-theme="dark"] .dh-plan-sheet.dh-plan-workflow .dh-plan-steps button b {
+  background: var(--kp-color-surface-default);
+  color: var(--kp-color-text-secondary)
+}
+
+html[data-theme="dark"] .dh-plan-sheet.dh-plan-workflow .dh-plan-steps button[aria-current=step] {
+  background: linear-gradient(135deg,var(--kp-color-surface-default),var(--kp-color-surface-default));
+  color: var(--kp-color-text-primary);
+  box-shadow: 0 8px 20px color-mix(in srgb, var(--kp-color-shadow-ink) 24%, transparent)
+}
+
+html[data-theme="dark"] .dh-plan-sheet.dh-plan-workflow .dh-plan-steps button[aria-current=step] b {
+  background: var(--kp-color-surface-strong)
+}
+
+html[data-theme="dark"] .dh-plan-sheet.dh-plan-workflow .dh-plan-explainer article {
+  border-bottom: 1px solid color-mix(in srgb, var(--kp-color-border-subtle) 16%, transparent)
+}
+
+html[data-theme="dark"] .dh-plan-sheet.dh-plan-workflow .dh-plan-explainer article>b {
+  background: linear-gradient(135deg,var(--kp-color-surface-default),var(--kp-color-surface-default));
+  box-shadow: 0 7px 16px color-mix(in srgb, var(--kp-color-shadow-ink) 20%, transparent)
+}
+
+html[data-theme="dark"] .dh-plan-sheet.dh-plan-workflow .dh-plan-panel>aside {
+  border: 1px solid color-mix(in srgb, var(--kp-color-border-subtle) 13%, transparent);
+  background: linear-gradient(135deg,var(--kp-color-surface-default),var(--kp-color-surface-default))
+}
+
+html[data-theme="dark"] .dh-plan-sheet.dh-plan-workflow .dh-plan-done {
+  background: linear-gradient(135deg,var(--kp-color-action-primary),var(--kp-color-surface-default) 56%,var(--kp-color-surface-default));
+  box-shadow: 0 12px 26px color-mix(in srgb, var(--kp-color-shadow-ink) 24%, transparent)
+}
+
+html[data-theme="dark"] .dh-plan-sheet.dh-plan-workflow .dh-observation-list fieldset,
+html[data-theme="dark"] .dh-plan-sheet.dh-plan-workflow .dh-summary-preview,
+html[data-theme="dark"] .dh-plan-sheet.dh-plan-workflow .dh-multi-check>label,
+html[data-theme="dark"] .dh-plan-sheet.dh-plan-workflow .dh-action-checklist label,
+html[data-theme="dark"] .dh-plan-sheet.dh-plan-workflow .dh-plan-services article {
+  border-color: color-mix(in srgb, var(--kp-color-border-subtle) 16%, transparent);
+  background: var(--kp-color-surface-default)
+}
+
+html[data-theme="dark"] .dh-plan-sheet.dh-plan-workflow .dh-plan-notes input,
+html[data-theme="dark"] .dh-plan-sheet.dh-plan-workflow .dh-plan-notes textarea,
+html[data-theme="dark"] .dh-plan-sheet.dh-plan-workflow .dh-choice-group label span,
+html[data-theme="dark"] .dh-plan-sheet.dh-plan-workflow .dh-observation-list label span,
+html[data-theme="dark"] .dh-plan-sheet.dh-plan-workflow .dh-plan-actions button,
+html[data-theme="dark"] .dh-plan-sheet.dh-plan-workflow .dh-question-nav>button:first-child {
+  border-color: color-mix(in srgb, var(--kp-color-border-subtle) 20%, transparent);
+  background: var(--kp-color-surface-default);
+  color: var(--kp-color-text-primary)
+}
+
+html[data-theme="dark"] .dh-plan-sheet.dh-plan-workflow .dh-choice-group label input:checked+span,
+html[data-theme="dark"] .dh-plan-sheet.dh-plan-workflow .dh-observation-list label input:checked+span {
+  color: var(--kp-color-text-primary)
+}
+
+html[data-theme="dark"] .dh-plan-sheet.dh-plan-workflow .dh-summary-preview {
+  background: var(--kp-color-surface-default);
+  box-shadow: 0 12px 28px color-mix(in srgb, var(--kp-color-shadow-ink) 7%, transparent)
+}
+
+html[data-theme="dark"] .dh-plan-sheet.dh-plan-workflow .dh-plan-service-note {
+  background: var(--kp-color-surface-default)
+}
+
+@media print {
+
+html[data-theme="dark"] .dh-plan-backdrop {
+  background: var(--kp-color-surface-strong)
+}
+
+html[data-theme="dark"] .dh-plan-sheet.dh-plan-workflow {
+  background: var(--kp-color-surface-strong)
+}
+}
+
+html[data-theme="dark"] .dh-child-context .dh-child-age-trigger {
+  border: 1px solid color-mix(in srgb, var(--kp-color-border-subtle) 82%, transparent);
+  background: var(--kp-color-surface-default);
+  color: var(--kp-color-text-primary);
+  box-shadow: 0 10px 28px color-mix(in srgb, var(--kp-color-shadow-ink) 8%, transparent);
+  backdrop-filter: blur(var(--kp-glass-blur))
+}
+
+html[data-theme="dark"] .dh-child-age-trigger strong {
+  color: var(--kp-color-text-primary)
+}
+
+html[data-theme="dark"] .dh-child-age-trigger i {
+  border-right: 2px solid var(--kp-color-border-subtle);
+  border-bottom: 2px solid var(--kp-color-border-subtle)
+}
+
+html[data-theme="dark"] .dh-child-age-menu {
+  border: 1px solid color-mix(in srgb, var(--kp-color-border-subtle) 16%, transparent);
+  background: var(--kp-color-surface-strong);
+  box-shadow: 0 18px 42px color-mix(in srgb, var(--kp-color-shadow-ink) 18%, transparent);
+  backdrop-filter: blur(var(--kp-glass-blur))
+}
+
+html[data-theme="dark"] .dh-child-context .dh-child-age-menu button {
+  color: var(--kp-color-text-primary)
+}
+
+html[data-theme="dark"] .dh-child-context .dh-child-age-menu button:hover,
+html[data-theme="dark"] .dh-child-context .dh-child-age-menu button:focus-visible {
+  background: var(--kp-color-surface-default);
+  color: var(--kp-color-action-secondary)
+}
+
+html[data-theme="dark"] .dh-child-context .dh-child-age-menu button[aria-selected=true] {
+  background: linear-gradient(135deg,color-mix(in srgb, var(--kp-color-action-secondary) 16%, transparent),color-mix(in srgb, var(--kp-color-accent-glow) 14%, transparent));
+  color: var(--kp-color-action-secondary)
+}
+
+html[data-theme="dark"] .dh-child-age-menu button b {
+  color: var(--kp-color-text-disabled)
+}
+
+html[data-theme="dark"] .locality-comparison-shell .dh-audience-toggle button:hover {
+  color: var(--kp-color-action-secondary);
+  background: color-mix(in srgb, var(--kp-color-action-secondary) 10%, transparent)
+}
+
+html[data-theme="dark"] .locality-comparison-shell .dh-audience-toggle button[aria-selected=true]:hover {
+  color: var(--kp-color-text-primary);
+  background: var(--kp-color-action-primary)
+}
+
+html[data-theme="dark"] .dh-plan-sheet.dh-plan-workflow::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--kp-color-action-secondary) 18%, transparent)
+}
+
+html[data-theme="dark"] .dh-plan-sheet.dh-plan-workflow::-webkit-scrollbar-thumb:hover {
+  background: color-mix(in srgb, var(--kp-color-action-primary) 52%, transparent)
+}
+
+html[data-theme="dark"] .dh-child-context .dh-child-age-menu button:hover,
+html[data-theme="dark"] .dh-child-context .dh-child-age-menu button:focus-visible {
+  background: color-mix(in srgb, var(--kp-color-action-secondary) 12%, transparent);
+  color: var(--kp-color-action-secondary)
+}
+
+html[data-theme="dark"] .dh-child-context .dh-child-age-menu button[aria-selected=true] {
+  background: linear-gradient(135deg,var(--kp-color-surface-default),var(--kp-color-surface-default));
+  color: var(--kp-color-text-primary);
+  box-shadow: 0 7px 16px color-mix(in srgb, var(--kp-color-shadow-ink) 22%, transparent)
+}
+
+/* components/hub/KinderHub.css */
+
+html[data-theme="dark"] .kp-hub {
+  --kh-bg: var(--kp-color-bg-canvas-start);
+  --kh-bg2: var(--kp-color-bg-canvas-start);
+  --kh-glass: var(--kp-color-surface-default);
+  --kh-card: var(--kp-color-surface-strong);
+  --kh-soft: var(--kp-color-surface-strong);
+  --kh-ink: var(--kp-color-text-primary);
+  --kh-ink2: var(--kp-color-text-primary);
+  --kh-muted: var(--kp-color-text-secondary);
+  --kh-line: color-mix(in srgb, var(--kp-color-border-subtle) 78%, transparent);
+  --kh-navy: var(--kp-color-action-primary);
+  --kh-navy-ink: var(--kp-color-text-on-accent);
+  --kh-blue: var(--kp-color-action-secondary);
+  --kh-blue-soft: var(--kp-color-bg-canvas-start);
+  --kh-green: var(--kp-status-strong-text);
+  --kh-green-soft: var(--kp-color-bg-canvas-start);
+  --kh-coral: var(--kp-status-concern-text);
+  --kh-amber: var(--kp-status-concern-text);
+  --kh-amber-soft: var(--kp-color-bg-canvas-start);
+  --kh-season: var(--kp-status-moderate-text);
+  --kh-grid: var(--kp-color-border-subtle);
+  --kh-shadow: 0 18px 42px color-mix(in srgb, var(--kp-color-shadow-ink) 13%, transparent);
+  background: radial-gradient(circle at 18% 22%,var(--kp-color-surface-default),transparent 34%),
+    radial-gradient(circle at 84% 48%,var(--kp-color-surface-soft),transparent 35%),
+    linear-gradient(135deg,var(--kp-color-bg-canvas-start) 0%,var(--kp-color-bg-canvas-start) 52%,var(--kp-color-bg-canvas-start) 100%)
+}
+
+html[data-theme="dark"] .kh-nav {
+  backdrop-filter: blur(var(--kp-glass-blur))
+}
+
+html[data-theme="dark"] .kh-nav.is-expanded {
+  box-shadow: 0 12px 30px color-mix(in srgb, var(--kp-color-shadow-ink) 12%, transparent)
+}
+
+html[data-theme="dark"] .kh-seg button:hover {
+  color: var(--kp-color-action-secondary);
+  background: color-mix(in srgb, var(--kp-color-action-secondary) 10%, transparent)
+}
+
+html[data-theme="dark"] .kh-seg button[aria-pressed=true]:hover {
+  color: var(--kp-color-text-primary);
+  background: var(--kp-color-surface-default);
+  box-shadow: 0 8px 20px color-mix(in srgb, var(--kp-color-shadow-ink) 24%, transparent)
+}
+
+html[data-theme="dark"] .kh-age-trigger:hover {
+  border-color: color-mix(in srgb, var(--kp-color-border-subtle) 28%, transparent);
+  background: var(--kp-color-surface-strong);
+  box-shadow: 0 10px 24px color-mix(in srgb, var(--kp-color-shadow-ink) 12%, transparent)
+}
+
+html[data-theme="dark"] .kh-age-list {
+  border: 1px solid color-mix(in srgb, var(--kp-color-border-subtle) 18%, transparent);
+  background: var(--kp-color-surface-strong);
+  box-shadow: 0 18px 42px color-mix(in srgb, var(--kp-color-shadow-ink) 18%, transparent);
+  backdrop-filter: blur(var(--kp-glass-blur))
+}
+
+html[data-theme="dark"] .kh-age-list button:hover,
+html[data-theme="dark"] .kh-age-list button:focus-visible {
+  background: color-mix(in srgb, var(--kp-color-action-secondary) 12%, transparent);
+  color: var(--kp-color-action-secondary)
+}
+
+html[data-theme="dark"] .kh-age-list button[aria-selected=true] {
+  background: linear-gradient(135deg,var(--kp-color-surface-default),var(--kp-color-surface-default));
+  color: var(--kp-color-text-primary);
+  box-shadow: 0 7px 16px color-mix(in srgb, var(--kp-color-shadow-ink) 22%, transparent)
+}
+
+html[data-theme="dark"] .kh-month-trigger:hover {
+  border-color: color-mix(in srgb, var(--kp-color-border-subtle) 28%, transparent);
+  background: var(--kp-color-surface-strong);
+  box-shadow: 0 10px 24px color-mix(in srgb, var(--kp-color-shadow-ink) 12%, transparent)
+}
+
+html[data-theme="dark"] .kh-month-popover {
+  border: 1px solid color-mix(in srgb, var(--kp-color-border-subtle) 18%, transparent);
+  background: var(--kp-color-surface-strong);
+  box-shadow: 0 22px 52px color-mix(in srgb, var(--kp-color-shadow-ink) 20%, transparent);
+  backdrop-filter: blur(var(--kp-glass-blur))
+}
+
+html[data-theme="dark"] .kh-month-popover header {
+  background: var(--kp-color-surface-default)
+}
+
+html[data-theme="dark"] .kh-month-popover header button:hover:not(:disabled) {
+  background: var(--kp-color-surface-default)
+}
+
+html[data-theme="dark"] .kh-month-grid button:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--kp-color-action-secondary) 11%, transparent);
+  color: var(--kp-color-action-secondary)
+}
+
+html[data-theme="dark"] .kh-month-grid button[aria-pressed=true] {
+  background: linear-gradient(135deg,var(--kp-color-surface-default),var(--kp-color-surface-default));
+  color: var(--kp-color-text-primary);
+  box-shadow: 0 7px 16px color-mix(in srgb, var(--kp-color-shadow-ink) 20%, transparent)
+}
+
+html[data-theme="dark"] .kh-month-popover footer {
+  border-top: 1px solid color-mix(in srgb, var(--kp-color-border-subtle) 13%, transparent)
+}
+
+html[data-theme="dark"] .kh-month-popover footer button:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--kp-color-action-secondary) 10%, transparent)
+}
+
+html[data-theme="dark"] .kh-card {
+  backdrop-filter: blur(var(--kp-glass-blur))
+}
+
+html[data-theme="dark"] .kh-btn.primary {
+  color: var(--kp-color-text-primary)
+}
+
+html[data-theme="dark"] .kh-todo .kh-btn {
+  border-color: color-mix(in srgb, var(--kp-color-border-subtle) 18%, transparent);
+  background: var(--kp-color-surface-default);
+  color: var(--kp-color-action-secondary)
+}
+
+html[data-theme="dark"] .kh-todo .kh-btn:hover {
+  background: var(--kp-color-surface-strong)
+}
+
+html[data-theme="dark"] .kh-todo .kh-btn.dark {
+  color: var(--kp-color-text-primary);
+  box-shadow: 0 8px 18px color-mix(in srgb, var(--kp-color-shadow-ink) 20%, transparent)
+}
+
+html[data-theme="dark"] .kh-todo .kh-btn.dark:hover {
+  background: var(--kp-color-action-primary)
+}
+
+html[data-theme="dark"] .kh-bodies button:hover {
+  border-color: color-mix(in srgb, var(--kp-color-border-subtle) 52%, transparent);
+  background: var(--kp-color-surface-strong);
+  box-shadow: 0 12px 26px color-mix(in srgb, var(--kp-color-shadow-ink) 14%, transparent)
+}
+
+html[data-theme="dark"] .kh-bodies button[aria-selected=true]:hover {
+  border-color: var(--kp-color-border-focus);
+  background: var(--kp-color-surface-strong);
+  box-shadow: 0 12px 28px color-mix(in srgb, var(--kp-color-shadow-ink) 20%, transparent)
+}
+
+html[data-theme="dark"] .kh-serve-slider:before {
+  background: linear-gradient(to right,var(--kh-blue) 0,var(--kh-blue) var(--serve-progress),color-mix(in srgb, var(--kp-color-action-secondary) 13%, transparent) var(--serve-progress),color-mix(in srgb, var(--kp-color-action-secondary) 13%, transparent) 100%)
+}
+
+html[data-theme="dark"] .kh-serve-slider input::-webkit-slider-thumb {
+  border: 3px solid var(--kp-color-border-subtle);
+  box-shadow: 0 3px 10px color-mix(in srgb, var(--kp-color-shadow-ink) 30%, transparent)
+}
+
+html[data-theme="dark"] .kh-serve-slider input::-moz-range-thumb {
+  border: 3px solid var(--kp-color-border-subtle);
+  box-shadow: 0 3px 10px color-mix(in srgb, var(--kp-color-shadow-ink) 30%, transparent)
+}
+
+html[data-theme="dark"] .kh-serve-ticks i {
+  background: color-mix(in srgb, var(--kp-color-accent-glow) 18%, transparent)
+}
+
+html[data-theme="dark"] .kh-serve-ticks i.major {
+  background: var(--kp-color-surface-default)
+}
+
+html[data-theme="dark"] .kh-range i {
+  background: color-mix(in srgb, var(--kp-color-action-secondary) 12%, transparent)
+}
+
+html[data-theme="dark"] .kh-range b {
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--kp-color-shadow-ink) 18%, transparent)
+}
+
+html[data-theme="dark"] .kh-range.is-below b {
+  background: var(--kp-status-concern-fill)
+}
+
+html[data-theme="dark"] .kh-range em {
+  background: var(--kp-color-surface-solid);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--kp-color-shadow-ink) 72%, transparent)
+}
+
+/* components/InfiniteImageGallery.css */
+
+html[data-theme="dark"] .infinite-image-gallery {
+  background: radial-gradient(circle at 18% 40%, var(--kp-color-surface-soft), transparent 28%),
+    radial-gradient(circle at 82% 58%, var(--kp-color-surface-soft), transparent 30%)
+}
+
+html[data-theme="dark"] .infinite-image-gallery__group img {
+  box-shadow: 0 14px 34px color-mix(in srgb, var(--kp-color-shadow-ink) 12%, transparent)
+}
+
+/* components/InsightPage.css */
+
+html[data-theme="dark"] .insight-page {
+  background: var(--kp-color-bg-canvas-start)
+}
+
+html[data-theme="dark"] .insight-page .insight-backdrop {
+  background: var(--kp-color-surface-strong)
+}
+
+html[data-theme="dark"] .insight-page .insight-sky {
+  background: linear-gradient(180deg, var(--kp-color-surface-default) 0%, var(--kp-color-surface-strong) 45%, var(--kp-color-surface-strong) 100%)
+}
+
+html[data-theme="dark"] .insight-page .insight-sky::after {
+  background: linear-gradient(var(--kp-color-surface-default), var(--kp-color-surface-strong) 52%, var(--kp-color-surface-strong))
+}
+
+html[data-theme="dark"] .insight-page .insight-sun {
+  background: radial-gradient(circle, var(--kp-color-surface-strong) 0%, var(--kp-color-surface-strong) 6%, color-mix(in srgb, var(--kp-status-moderate-bg) 61.2%, transparent) 12%, color-mix(in srgb, var(--kp-status-moderate-bg) 22%, transparent) 31%, transparent 63%)
+}
+
+html[data-theme="dark"] .insight-page .insight-atmosphere {
+  background: linear-gradient(0deg, var(--kp-color-surface-soft), transparent 15%)
+}
+
+html[data-theme="dark"] .insight-page .nav-shell {
+  background: var(--kp-color-surface-default);
+  box-shadow: 0 12px 36px color-mix(in srgb, var(--kp-color-shadow-ink) 11%, transparent);
+  backdrop-filter: blur(var(--kp-glass-blur));
+  -webkit-backdrop-filter: blur(var(--kp-glass-blur))
+}
+
+html[data-theme="dark"] .insight-page .insight-audio-control {
+  color: var(--kp-color-text-primary);
+  background: var(--kp-color-surface-default);
+  border: 1px solid color-mix(in srgb, var(--kp-color-border-subtle) 38%, transparent);
+  box-shadow: 0 8px 32px color-mix(in srgb, var(--kp-color-shadow-ink) 7%, transparent), inset 0 1px 0 color-mix(in srgb, var(--kp-color-shadow-ink) 18%, transparent);
+  backdrop-filter: blur(var(--kp-glass-blur)) saturate(115%);
+  -webkit-backdrop-filter: blur(var(--kp-glass-blur)) saturate(115%)
+}
+
+html[data-theme="dark"] .insight-page .insight-audio-control:hover {
+  background: var(--kp-color-surface-default);
+  box-shadow: 0 10px 30px color-mix(in srgb, var(--kp-color-shadow-ink) 12%, transparent), inset 0 1px 0 color-mix(in srgb, var(--kp-color-shadow-ink) 24%, transparent)
+}
+
+html[data-theme="dark"] .insight-page .insight-panel {
+  border: 1px solid color-mix(in srgb, var(--kp-color-border-subtle) 44%, transparent);
+  background: linear-gradient(132deg, var(--kp-color-surface-soft) * .12)), var(--kp-color-surface-soft) * .14)));
+  box-shadow: 0 16px 48px color-mix(in srgb, var(--kp-color-shadow-ink) 9%, transparent);
+  backdrop-filter: blur(var(--kp-glass-blur)) saturate(118%);
+  -webkit-backdrop-filter: blur(var(--kp-glass-blur)) saturate(118%)
+}
+
+html[data-theme="dark"] .insight-page .insight-kicker > span {
+  background: color-mix(in srgb, var(--kp-color-accent-glow) 8%, transparent)
+}
+
+html[data-theme="dark"] .insight-page h1,
+html[data-theme="dark"] .insight-page h2 {
+  color: var(--kp-color-text-primary)
+}
+
+html[data-theme="dark"] .insight-page .insight-intro {
+  color: color-mix(in srgb, var(--kp-color-text-primary) 88%, transparent)
+}
+
+html[data-theme="dark"] .insight-page .insight-evidence {
+  border-top: 1px solid color-mix(in srgb, var(--kp-color-border-subtle) 10%, transparent)
+}
+
+html[data-theme="dark"] .insight-page .insight-example {
+  color: var(--kp-color-text-primary)
+}
+
+html[data-theme="dark"] .insight-page .insight-example span {
+  color: var(--kp-color-text-primary)
+}
+
+html[data-theme="dark"] .insight-page cite {
+  color: var(--kp-color-text-primary)
+}
+
+html[data-theme="dark"] .insight-page .insight-priority strong {
+  color: var(--kp-color-accent-glow);
+  background: var(--kp-color-surface-soft);
+  border: 1px solid color-mix(in srgb, var(--kp-color-border-subtle) 30%, transparent)
+}
+
+html[data-theme="dark"] .insight-page .insight-loading-dot {
+  background: var(--kp-color-surface-default)
+}
+
+html[data-theme="dark"] .insight-page .insight-station {
+  background: var(--kp-color-surface-default);
+  color: var(--kp-color-action-secondary)
+}
+
+html[data-theme="dark"] .insight-page .insight-station[data-state='current'] {
+  color: var(--kp-color-text-primary);
+  background: var(--kp-color-surface-strong);
+  box-shadow: 0 0 20px var(--kp-color-shadow-ink)
+}
+
+html[data-theme="dark"] .insight-page .insight-scroll-hint {
+  color: color-mix(in srgb, var(--kp-color-text-primary) 90%, transparent);
+  text-shadow: 0 1px 10px color-mix(in srgb, var(--kp-color-shadow-ink) 72%, transparent)
+}
+
+html[data-theme="dark"] .insight-page .insight-scroll-arrow {
+  color: color-mix(in srgb, var(--kp-color-text-primary) 78%, transparent);
+  text-shadow: 0 1px 8px color-mix(in srgb, var(--kp-color-shadow-ink) 76%, transparent)
+}
+
+html[data-theme="dark"] .insight-page button:focus-visible,
+html[data-theme="dark"] .insight-page a:focus-visible,
+html[data-theme="dark"] .insight-page summary:focus-visible,
+html[data-theme="dark"] .insight-page h1:focus-visible,
+html[data-theme="dark"] .insight-page h2:focus-visible {
+  outline: 3px solid var(--kp-color-border-focus)
+}
+
+html[data-theme="dark"] .insight-page .insight-skip {
+  background: var(--kp-color-surface-strong)
+}
+
+html[data-theme="dark"] .insight-page .insight-nav-mark {
+  background: color-mix(in srgb, var(--kp-color-surface-default), var(--kp-color-surface-strong) calc(var(--storm) * 75%))
+}
+
+html[data-theme="dark"] .insight-page .insight-progress [aria-current] .insight-nav-mark {
+  background: var(--kp-color-surface-default);
+  box-shadow: 0 0 10px color-mix(in srgb, var(--kp-color-shadow-ink) 33.3%, transparent)
+}
+
+html[data-theme="dark"] .insight-page .insight-nav-tooltip {
+  border: 1px solid color-mix(in srgb, var(--kp-color-border-subtle) 38%, transparent);
+  background: var(--kp-color-surface-default);
+  color: var(--kp-color-text-primary);
+  box-shadow: 0 5px 20px color-mix(in srgb, var(--kp-color-shadow-ink) 7%, transparent);
+  backdrop-filter: blur(var(--kp-glass-blur));
+  -webkit-backdrop-filter: blur(var(--kp-glass-blur))
+}
+
+@media (max-width: 760px) {
+
+html[data-theme="dark"] .insight-page .insight-panel {
+  background: linear-gradient(132deg, var(--kp-color-surface-default), var(--kp-color-surface-default))
+}
+}
+
+/* components/InteractiveAtmosphere.css */
+
+html[data-theme="dark"] .interactive-atmosphere {
+  background: var(--kp-color-surface-strong)
+}
+
+html[data-theme="dark"] .atmosphere-sky {
+  background: linear-gradient(180deg, var(--kp-color-surface-default) 0%, var(--kp-color-surface-strong) 48%, var(--kp-color-surface-strong) 100%)
+}
+
+html[data-theme="dark"] .atmosphere-sun {
+  background: radial-gradient(circle, var(--kp-color-surface-strong) 0 5%, var(--kp-color-surface-default) 14%, color-mix(in srgb, var(--kp-status-moderate-bg) 16.9%, transparent) 34%, transparent 66%)
+}
+
+html[data-theme="dark"] .atmosphere-land-front {
+  background: linear-gradient(165deg, transparent 25%, var(--kp-color-surface-default) 26% 48%, var(--kp-color-surface-solid) 49%)
+}
+
+html[data-theme="dark"] .interactive-atmosphere[data-mode='compare'] .atmosphere-sky {
+  background: linear-gradient(180deg, var(--kp-color-surface-default), var(--kp-color-surface-strong) 48%, var(--kp-color-surface-strong))
+}
+
+html[data-theme="dark"] .atmosphere-progress {
+  background: linear-gradient(90deg, var(--kp-color-surface-default), var(--kp-color-action-primary), var(--kp-status-moderate-bg));
+  box-shadow: 0 0 16px color-mix(in srgb, var(--kp-color-shadow-ink) 70%, transparent)
+}
+
+html[data-theme="dark"] .atmosphere-aurora-a {
+  background: var(--kp-color-surface-strong)
+}
+
+html[data-theme="dark"] .atmosphere-aurora-b {
+  background: var(--kp-status-strong-bg)
+}
+
+html[data-theme="dark"] .atmosphere-pointer-light {
+  background: radial-gradient(circle, var(--kp-color-surface-default), var(--kp-color-surface-soft) 35%, transparent 68%)
+}
+
+html[data-theme="dark"] .atmosphere-caption {
+  color: color-mix(in srgb, var(--kp-color-text-primary) 48%, transparent)
+}
+
+html[data-theme="dark"] .atmosphere-pulse {
+  border: 1px solid color-mix(in srgb, var(--kp-color-border-subtle) 46%, transparent)
+}
+
+html[data-theme="dark"] .app-background:has(.interactive-atmosphere) :is(
+  .profile-domain-card,
+  .key-insight-card,
+  .summary-card,
+  .environmental-compare-card,
+  .next-step-card
+):hover {
+  box-shadow: 0 20px 45px color-mix(in srgb, var(--kp-color-shadow-ink) 16%, transparent)
+}
+
+/* components/SimulationPage.css */
+
+html[data-theme="dark"] .simulation-page-info > button {
+  color: var(--kp-color-text-secondary);
+  background: var(--kp-color-surface-default)
+}
+
+html[data-theme="dark"] .simulation-page-info > button:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--kp-color-border-focus) 24%, transparent)
+}
+
+html[data-theme="dark"] .simulation-page-info-tooltip {
+  color: var(--kp-color-text-secondary);
+  border: 1px solid color-mix(in srgb, var(--kp-color-border-subtle) 16%, transparent);
+  background: var(--kp-color-surface-strong);
+  box-shadow: 0 10px 26px color-mix(in srgb, var(--kp-color-shadow-ink) 12%, transparent)
+}
+
+html[data-theme="dark"] .simulation-page-info-tooltip strong {
+  color: var(--kp-color-action-secondary)
+}
+
+html[data-theme="dark"] .simulation-page-info-tooltip span {
+  color: var(--kp-color-text-secondary)
+}
+
+html[data-theme="dark"] .simulation-subtitle {
+  color: var(--kp-color-text-secondary)
+}
+
+html[data-theme="dark"] .simulation-planning-note {
+  color: var(--kp-color-text-secondary)
+}
+
+html[data-theme="dark"] .simulation-assumption-banner {
+  background: color-mix(in srgb, var(--kp-status-moderate-bg) 18%, transparent);
+  color: var(--kp-status-moderate-text);
+  border: 1px solid color-mix(in srgb, var(--kp-status-moderate-border) 18%, transparent)
+}
+
+html[data-theme="dark"] .assumption-info-trigger {
+  background: color-mix(in srgb, var(--kp-status-moderate-bg) 12%, transparent);
+  color: var(--kp-status-moderate-text)
+}
+
+html[data-theme="dark"] .assumption-info-tooltip {
+  background: var(--kp-color-surface-default);
+  color: var(--kp-color-text-primary);
+  box-shadow: 0 18px 34px color-mix(in srgb, var(--kp-color-shadow-ink) 20%, transparent)
+}
+
+html[data-theme="dark"] .assumption-info-tooltip strong {
+  color: var(--kp-color-text-disabled)
+}
+
+html[data-theme="dark"] .assumption-info-tooltip p {
+  color: var(--kp-color-text-primary)
+}
+
+html[data-theme="dark"] .simulation-panel {
+  background: var(--kp-color-surface-default);
+  border: 1px solid color-mix(in srgb, var(--kp-color-border-subtle) 78%, transparent);
+  box-shadow: 0 7px 18px color-mix(in srgb, var(--kp-color-shadow-ink) 8%, transparent), inset 0 1px 0 color-mix(in srgb, var(--kp-color-shadow-ink) 35%, transparent)
+}
+
+html[data-theme="dark"] .simulation-builder-panel {
+  background: var(--kp-color-surface-default)
+}
+
+html[data-theme="dark"] .simulation-results-panel {
+  background: var(--kp-color-surface-default)
+}
+
+html[data-theme="dark"] .method-info-trigger {
+  color: var(--kp-color-text-primary)
+}
+
+html[data-theme="dark"] .method-info-trigger:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--kp-color-border-focus) 24%, transparent)
+}
+
+html[data-theme="dark"] .method-info-tooltip {
+  color: var(--kp-color-text-secondary);
+  border: 1px solid color-mix(in srgb, var(--kp-color-border-subtle) 14%, transparent);
+  background: var(--kp-color-surface-strong);
+  box-shadow: 0 10px 28px color-mix(in srgb, var(--kp-color-shadow-ink) 14%, transparent)
+}
+
+html[data-theme="dark"] .field-group > label {
+  color: var(--kp-color-text-primary)
+}
+
+html[data-theme="dark"] .simulation-search-results {
+  background: var(--kp-color-surface-strong);
+  box-shadow: 0 18px 40px color-mix(in srgb, var(--kp-color-shadow-ink) 14%, transparent);
+  border: 1px solid color-mix(in srgb, var(--kp-color-border-subtle) 80%, transparent)
+}
+
+html[data-theme="dark"] .simulation-search-results button {
+  color: var(--kp-color-text-primary)
+}
+
+html[data-theme="dark"] .simulation-search-results button + button {
+  border-top: 1px solid color-mix(in srgb, var(--kp-color-border-subtle) 18%, transparent)
+}
+
+html[data-theme="dark"] .simulation-search-results button:hover,
+html[data-theme="dark"] .simulation-search-results button:focus-visible {
+  background: var(--kp-color-surface-soft)
+}
+
+html[data-theme="dark"] .simulation-search-results small {
+  color: var(--kp-color-text-secondary)
+}
+
+html[data-theme="dark"] .select-shell {
+  background: var(--kp-color-surface-default);
+  border: 1px solid color-mix(in srgb, var(--kp-color-border-subtle) 80%, transparent)
+}
+
+html[data-theme="dark"] .select-shell select {
+  color: var(--kp-color-text-primary)
+}
+
+html[data-theme="dark"] .slider-labels {
+  color: var(--kp-color-text-secondary)
+}
+
+html[data-theme="dark"] .slider-labels label {
+  color: var(--kp-color-text-primary)
+}
+
+html[data-theme="dark"] .slider-meta {
+  color: var(--kp-color-text-primary)
+}
+
+html[data-theme="dark"] .slider-meta strong {
+  color: var(--kp-color-text-primary)
+}
+
+html[data-theme="dark"] .scenario-note {
+  color: var(--kp-color-text-secondary)
+}
+
+html[data-theme="dark"] .method-panel {
+  background: var(--kp-color-surface-default);
+  border: 1px solid color-mix(in srgb, var(--kp-color-border-subtle) 70%, transparent)
+}
+
+html[data-theme="dark"] .method-panel ul {
+  color: var(--kp-color-text-primary)
+}
+
+html[data-theme="dark"] .button-secondary {
+  background: var(--kp-color-surface-default);
+  color: var(--kp-color-text-primary);
+  border: 1px solid color-mix(in srgb, var(--kp-color-border-subtle) 80%, transparent)
+}
+
+html[data-theme="dark"] .button-primary {
+  background: linear-gradient(135deg, var(--kp-color-action-primary), var(--kp-color-action-primary));
+  color: var(--kp-color-text-primary);
+  box-shadow: 0 10px 20px color-mix(in srgb, var(--kp-color-shadow-ink) 25%, transparent)
+}
+
+html[data-theme="dark"] .simulation-update-status.updating {
+  color: var(--kp-color-text-secondary);
+  background: var(--kp-color-surface-default)
+}
+
+html[data-theme="dark"] .simulation-update-status.updated {
+  color: var(--kp-status-strong-text);
+  background: color-mix(in srgb, var(--kp-status-strong-bg) 20%, transparent)
+}
+
+html[data-theme="dark"] .ready-pill {
+  background: color-mix(in srgb, var(--kp-status-strong-bg) 24%, transparent);
+  color: var(--kp-status-strong-text)
+}
+
+html[data-theme="dark"] .outcome-summary-strip {
+  border-block: 1px solid color-mix(in srgb, var(--kp-color-border-subtle) 12%, transparent)
+}
+
+html[data-theme="dark"] .outcome-summary-item {
+  border-right: 1px solid color-mix(in srgb, var(--kp-color-border-subtle) 12%, transparent)
+}
+
+html[data-theme="dark"] .outcome-summary-item span {
+  color: var(--kp-color-text-secondary)
+}
+
+html[data-theme="dark"] .outcome-summary-item small {
+  color: var(--kp-color-text-primary)
+}
+
+html[data-theme="dark"] .outcome-summary-item.improves b,
+html[data-theme="dark"] .outcome-summary-item.improves small {
+  color: var(--kp-status-strong-text)
+}
+
+html[data-theme="dark"] .outcome-summary-item.worsens b,
+html[data-theme="dark"] .outcome-summary-item.worsens small {
+  color: var(--kp-status-concern-text)
+}
+
+html[data-theme="dark"] .outcome-summary-item.neutral b,
+html[data-theme="dark"] .outcome-summary-item.neutral small {
+  color: var(--kp-color-text-secondary)
+}
+
+html[data-theme="dark"] .result-card {
+  background: var(--kp-color-surface-default);
+  border: 1px solid color-mix(in srgb, var(--kp-color-border-subtle) 70%, transparent)
+}
+
+html[data-theme="dark"] .result-card-header {
+  color: var(--kp-color-text-secondary)
+}
+
+html[data-theme="dark"] .result-card-body {
+  color: var(--kp-color-text-primary)
+}
+
+html[data-theme="dark"] .result-arrow {
+  color: var(--kp-color-text-secondary)
+}
+
+html[data-theme="dark"] .result-status.success {
+  background: color-mix(in srgb, var(--kp-status-strong-bg) 18%, transparent);
+  color: var(--kp-status-strong-text)
+}
+
+html[data-theme="dark"] .comparison-panel {
+  background: var(--kp-color-surface-strong);
+  border: 1px solid color-mix(in srgb, var(--kp-color-border-subtle) 12%, transparent);
+  box-shadow: 0 8px 22px color-mix(in srgb, var(--kp-color-shadow-ink) 6%, transparent)
+}
+
+html[data-theme="dark"] .comparison-legend {
+  color: var(--kp-color-text-secondary)
+}
+
+html[data-theme="dark"] .comparison-row:hover,
+html[data-theme="dark"] .comparison-row:focus-visible,
+html[data-theme="dark"] .comparison-row:focus-within {
+  background: var(--kp-color-surface-strong)
+}
+
+html[data-theme="dark"] .comparison-empty {
+  border: 1px dashed color-mix(in srgb, var(--kp-color-border-subtle) 38%, transparent);
+  background: var(--kp-color-surface-default);
+  color: var(--kp-color-text-secondary)
+}
+
+html[data-theme="dark"] .comparison-label {
+  color: var(--kp-color-text-primary)
+}
+
+html[data-theme="dark"] .comparison-rule {
+  color: var(--kp-color-text-secondary)
+}
+
+html[data-theme="dark"] .comparison-value.baseline {
+  color: var(--kp-color-text-secondary)
+}
+
+html[data-theme="dark"] .comparison-value.simulated {
+  color: var(--kp-color-text-secondary)
+}
+
+html[data-theme="dark"] .comparison-delta.improves {
+  color: var(--kp-status-strong-text);
+  background: color-mix(in srgb, var(--kp-status-strong-bg) 20%, transparent)
+}
+
+html[data-theme="dark"] .comparison-delta.worsens {
+  color: var(--kp-status-concern-text);
+  background: color-mix(in srgb, var(--kp-status-concern-bg) 18%, transparent)
+}
+
+html[data-theme="dark"] .comparison-delta.neutral {
+  color: var(--kp-color-text-secondary);
+  background: color-mix(in srgb, var(--kp-color-action-secondary) 18%, transparent)
+}
+
+html[data-theme="dark"] .comparison-track-fill.baseline {
+  background: color-mix(in srgb, var(--kp-color-action-secondary) 18%, transparent)
+}
+
+html[data-theme="dark"] .comparison-track-fill.simulated {
+  background: linear-gradient(90deg, var(--kp-color-surface-default), color-mix(in srgb, var(--kp-color-action-primary) 94%, transparent))
+}
+
+html[data-theme="dark"] .comparison-detail {
+  color: var(--kp-color-text-secondary);
+  border: 1px solid var(--kp-color-border-subtle);
+  background: var(--kp-color-surface-strong);
+  box-shadow: 0 8px 22px color-mix(in srgb, var(--kp-color-shadow-ink) 13%, transparent)
+}
+
+html[data-theme="dark"] .comparison-detail::before {
+  border-bottom: 1px solid var(--kp-color-border-subtle);
+  border-left: 1px solid var(--kp-color-border-subtle);
+  background: var(--kp-color-surface-strong)
+}
+
+html[data-theme="dark"] .comparison-detail dt {
+  color: var(--kp-color-text-secondary)
+}
+
+html[data-theme="dark"] .comparison-detail dd {
+  color: var(--kp-color-accent-glow)
+}
+
+html[data-theme="dark"] .insight-box {
+  background: linear-gradient(135deg, var(--kp-color-surface-solid), var(--kp-color-surface-solid));
+  border: 1px solid color-mix(in srgb, var(--kp-color-border-subtle) 14%, transparent);
+  box-shadow: 0 10px 24px color-mix(in srgb, var(--kp-color-shadow-ink) 16%, transparent)
+}
+
+html[data-theme="dark"] .insight-box-header h3 {
+  color: var(--kp-color-text-primary)
+}
+
+html[data-theme="dark"] .insight-toggle {
+  color: var(--kp-color-text-primary);
+  border: 1px solid color-mix(in srgb, var(--kp-color-border-subtle) 18%, transparent);
+  background: var(--kp-color-surface-soft)
+}
+
+html[data-theme="dark"] .insight-toggle:hover {
+  color: var(--kp-color-text-primary);
+  background: var(--kp-color-surface-soft)
+}
+
+html[data-theme="dark"] .insight-toggle:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--kp-color-border-focus) 24%, transparent)
+}
+
+html[data-theme="dark"] .confidence-pill {
+  background: color-mix(in srgb, var(--kp-status-moderate-bg) 94%, transparent);
+  color: var(--kp-status-moderate-text)
+}
+
+html[data-theme="dark"] .insight-box p {
+  color: var(--kp-color-text-primary)
+}
+
+html[data-theme="dark"] .projected-change {
+  color: var(--kp-color-text-primary)
+}
+
+html[data-theme="dark"] .projected-change strong {
+  color: var(--kp-color-text-primary)
+}
+
+html[data-theme="dark"] .simulation-actions .button-secondary {
+  color: var(--kp-color-action-secondary);
+  border: 1px solid color-mix(in srgb, var(--kp-color-border-subtle) 18%, transparent);
+  background: color-mix(in srgb, var(--kp-color-action-secondary) 10%, transparent);
+  box-shadow: 0 5px 14px color-mix(in srgb, var(--kp-color-shadow-ink) 6%, transparent)
+}
+
+html[data-theme="dark"] .simulation-actions .button-tertiary {
+  color: var(--kp-color-text-secondary);
+  border: 1px solid color-mix(in srgb, var(--kp-color-border-subtle) 14%, transparent);
+  background: var(--kp-color-surface-default);
+  box-shadow: 0 5px 14px color-mix(in srgb, var(--kp-color-shadow-ink) 5%, transparent)
+}
+
+html[data-theme="dark"] .simulation-actions .button-tertiary:hover {
+  border-color: color-mix(in srgb, var(--kp-color-border-subtle) 26%, transparent);
+  background: var(--kp-color-surface-strong)
+}
+
+html[data-theme="dark"] .simulation-actions .button-secondary:hover {
+  border-color: color-mix(in srgb, var(--kp-color-border-subtle) 28%, transparent);
+  background: color-mix(in srgb, var(--kp-color-action-secondary) 16%, transparent)
+}
+
+html[data-theme="dark"] .insight-box {
+  border: 1px solid color-mix(in srgb, var(--kp-color-border-subtle) 12%, transparent);
+  background: var(--kp-color-surface-default)
+}
+
+html[data-theme="dark"] .insight-summary {
+  color: var(--kp-color-text-secondary)
+}
+
+html[data-theme="dark"] .insight-summary:hover {
+  background: color-mix(in srgb, var(--kp-color-action-secondary) 5%, transparent)
+}
+
+html[data-theme="dark"] .insight-summary:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--kp-color-border-focus) 22%, transparent)
+}
+
+html[data-theme="dark"] .insight-summary small {
+  color: var(--kp-status-moderate-text)
+}
+
+html[data-theme="dark"] .insight-box .insight-content > p {
+  color: var(--kp-color-text-primary)
+}
+
+html[data-theme="dark"] .insight-box .projected-change {
+  color: var(--kp-color-text-secondary)
+}
+
+html[data-theme="dark"] .insight-box .projected-change strong {
+  color: var(--kp-color-accent-glow)
+}
+
+/* components/WaterRippleBackground.css */
+
+html[data-theme="dark"] .water-ripple-background {
+  background-color: var(--kp-color-surface-strong)
+}
+
+/* styles/landing.css */
+
+html[data-theme="dark"] .home-page::before {
+  background: var(--kp-color-surface-soft)
+}
+
+html[data-theme="dark"] .home-page::after {
+  background: var(--kp-color-surface-soft)
+}
+
+html[data-theme="dark"] .home-header::before {
+  background: linear-gradient(
+    180deg,
+    var(--kp-color-surface-default) 0%,
+    var(--kp-color-surface-default) 24%,
+    var(--kp-color-surface-soft) 48%,
+    var(--kp-color-surface-soft) 68%,
+    var(--kp-color-surface-soft) 84%,
+    transparent 100%
+  );
+  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--kp-color-shadow-ink) 50%, transparent);
+  backdrop-filter: blur(var(--kp-glass-blur)) saturate(140%);
+  -webkit-backdrop-filter: blur(var(--kp-glass-blur)) saturate(140%)
+}
+
+html[data-theme="dark"] .home-nav {
+  color: var(--kp-color-text-secondary)
+}
+
+html[data-theme="dark"] .home-nav button {
+  text-shadow: 0 1px 12px color-mix(in srgb, var(--kp-color-shadow-ink) 20%, transparent), 0 0 3px color-mix(in srgb, var(--kp-color-shadow-ink) 10%, transparent)
+}
+
+html[data-theme="dark"] .home-brand {
+  text-shadow: 0 1px 12px color-mix(in srgb, var(--kp-color-shadow-ink) 20%, transparent), 0 0 3px color-mix(in srgb, var(--kp-color-shadow-ink) 10%, transparent)
+}
+
+html[data-theme="dark"] .home-nav-cta {
+  border: 1px solid color-mix(in srgb, var(--kp-color-border-subtle) 30%, transparent);
+  background: var(--kp-color-surface-soft)
+}
+
+html[data-theme="dark"] .home-nav-cta:hover {
+  border-color: color-mix(in srgb, var(--kp-color-border-subtle) 48%, transparent);
+  background: var(--kp-color-surface-default)
+}
+
+html[data-theme="dark"] .home-brand:focus-visible,
+html[data-theme="dark"] .home-nav button:focus-visible,
+html[data-theme="dark"] .home-nav-cta:focus-visible,
+html[data-theme="dark"] .home-page .button:focus-visible,
+html[data-theme="dark"] .home-text-link:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--kp-color-border-focus) 28%, transparent)
+}
+
+html[data-theme="dark"] .home-hero::after {
+  background: linear-gradient(
+      90deg,
+      var(--kp-color-surface-strong) 0%,
+      var(--kp-color-surface-strong) 28%,
+      var(--kp-color-surface-default) 48%,
+      var(--kp-color-surface-soft) 68%,
+      transparent 84%
+    ),
+    linear-gradient(180deg, var(--kp-color-surface-soft), var(--kp-color-surface-soft))
+}
+
+html[data-theme="dark"] .home-hero h1,
+html[data-theme="dark"] .landing-subheading,
+html[data-theme="dark"] .landing-copy {
+  text-shadow: 0 1px 14px color-mix(in srgb, var(--kp-color-shadow-ink) 34%, transparent), 0 0 4px color-mix(in srgb, var(--kp-color-shadow-ink) 18%, transparent)
+}
+
+html[data-theme="dark"] .home-theme-strip {
+  border-top: 1px solid color-mix(in srgb, var(--kp-color-border-subtle) 72%, transparent);
+  border-bottom: 1px solid color-mix(in srgb, var(--kp-color-border-subtle) 16%, transparent);
+  background: linear-gradient(
+    90deg,
+    var(--kp-color-surface-strong),
+    var(--kp-color-surface-strong) 50%,
+    var(--kp-color-surface-strong)
+  );
+  box-shadow: 0 10px 34px color-mix(in srgb, var(--kp-color-shadow-ink) 8%, transparent);
+  backdrop-filter: blur(var(--kp-glass-blur)) saturate(130%);
+  -webkit-backdrop-filter: blur(var(--kp-glass-blur)) saturate(130%)
+}
+
+html[data-theme="dark"] .home-theme-strip__list li {
+  color: var(--kp-color-text-secondary)
+}
+
+html[data-theme="dark"] .home-theme-strip__list li::after {
+  box-shadow: 0 0 14px color-mix(in srgb, var(--kp-color-shadow-ink) 42%, transparent)
+}
+
+html[data-theme="dark"] .home-insight {
+  border-top: 1px solid color-mix(in srgb, var(--kp-color-border-subtle) 16%, transparent);
+  background: var(--kp-color-surface-strong);
+  box-shadow: 0 -18px 44px color-mix(in srgb, var(--kp-color-shadow-ink) 8%, transparent)
+}
+
+html[data-theme="dark"] .home-discovery-priorities {
+  border-top: 1px solid color-mix(in srgb, var(--kp-color-border-subtle) 22%, transparent)
+}
+
+html[data-theme="dark"] .home-discovery-priorities button {
+  border-bottom: 1px solid color-mix(in srgb, var(--kp-color-border-subtle) 22%, transparent);
+  color: var(--kp-color-text-secondary)
+}
+
+html[data-theme="dark"] .home-discovery-priorities button:hover,
+html[data-theme="dark"] .home-discovery-priorities button[aria-pressed='true'] {
+  background: linear-gradient(90deg, var(--kp-color-surface-default), var(--kp-color-surface-default));
+  color: var(--kp-color-text-primary)
+}
+
+html[data-theme="dark"] .home-discovery-priorities button:hover > span,
+html[data-theme="dark"] .home-discovery-priorities button[aria-pressed='true'] > span {
+  color: color-mix(in srgb, var(--kp-color-text-primary) 78%, transparent)
+}
+
+html[data-theme="dark"] .home-compare-story {
+  background: linear-gradient(135deg, var(--kp-color-action-primary) 0%, var(--kp-color-surface-default) 54%, var(--kp-color-surface-default) 100%);
+  color: var(--kp-color-text-primary)
+}
+
+html[data-theme="dark"] .home-compare-story::before {
+  background: radial-gradient(circle at 38% 42%, var(--kp-color-surface-default), var(--kp-color-surface-soft) 48%, transparent 72%)
+}
+
+html[data-theme="dark"] .home-compare-story::after {
+  background: radial-gradient(circle at 52% 48%, var(--kp-color-surface-default), color-mix(in srgb, var(--kp-color-action-primary) 13%, transparent) 50%, transparent 73%)
+}
+
+html[data-theme="dark"] .home-compare-copy .home-section-kicker {
+  color: color-mix(in srgb, var(--kp-color-text-primary) 80%, transparent)
+}
+
+html[data-theme="dark"] .home-compare-copy h2 {
+  color: var(--kp-color-text-primary)
+}
+
+html[data-theme="dark"] .home-compare-copy > p:not(.home-section-kicker) {
+  color: color-mix(in srgb, var(--kp-color-text-primary) 86%, transparent)
+}
+
+html[data-theme="dark"] .home-compare-copy button {
+  border-bottom: 1px solid color-mix(in srgb, var(--kp-color-border-subtle) 68%, transparent);
+  color: var(--kp-color-text-primary)
+}
+
+html[data-theme="dark"] .home-compare-copy button:hover,
+html[data-theme="dark"] .home-compare-copy button:focus-visible {
+  border-color: var(--kp-color-border-subtle);
+  color: var(--kp-color-text-primary)
+}
+
+html[data-theme="dark"] .home-compare-lines {
+  border-top: 1px solid color-mix(in srgb, var(--kp-color-border-subtle) 25%, transparent)
+}
+
+html[data-theme="dark"] .home-compare-lines span {
+  color: color-mix(in srgb, var(--kp-color-text-primary) 82%, transparent)
+}
+
+html[data-theme="dark"] .home-compare-lines i {
+  background: linear-gradient(90deg, var(--kp-color-surface-strong), var(--kp-color-surface-soft))
+}
+
+html[data-theme="dark"] .home-indicators {
+  border-top: 1px solid color-mix(in srgb, var(--kp-color-border-subtle) 20%, transparent)
+}
+
+html[data-theme="dark"] .home-indicators > div {
+  border-bottom: 1px solid color-mix(in srgb, var(--kp-color-border-subtle) 20%, transparent)
+}
+
+html[data-theme="dark"] .home-insight-statement {
+  border-left: 3px solid color-mix(in srgb, var(--kp-color-border-subtle) 55%, transparent)
+}
+
+html[data-theme="dark"] .home-about {
+  background: var(--kp-color-surface-strong)
+}
+
+html[data-theme="dark"] .home-evidence-copy > p:last-child {
+  color: var(--kp-color-text-secondary)
+}
+
+html[data-theme="dark"] .home-evidence-principles {
+  border-top: 1px solid color-mix(in srgb, var(--kp-color-border-subtle) 23%, transparent)
+}
+
+html[data-theme="dark"] .home-evidence-principles li::after {
+  background: color-mix(in srgb, var(--kp-color-accent-glow) 18%, transparent)
+}
+
+html[data-theme="dark"] .home-explore {
+  background: var(--kp-color-surface-strong)
+}
+
+html[data-theme="dark"] .home-insight::before {
+  background: radial-gradient(circle at 18% 24%, var(--kp-color-surface-default), transparent 34%),
+    radial-gradient(circle at 84% 54%, color-mix(in srgb, var(--kp-color-accent-glow) 18%, transparent), transparent 36%),
+    linear-gradient(135deg, var(--kp-color-surface-strong) 0%, var(--kp-color-surface-strong) 52%, var(--kp-color-surface-strong) 100%)
+}
+
+html[data-theme="dark"] .home-about::before {
+  background: radial-gradient(circle at 78% 24%, var(--kp-color-surface-default), transparent 34%),
+    radial-gradient(circle at 16% 72%, color-mix(in srgb, var(--kp-color-accent-glow) 18%, transparent), transparent 35%),
+    linear-gradient(145deg, var(--kp-color-surface-strong) 0%, var(--kp-color-surface-strong) 50%, var(--kp-color-surface-strong) 100%)
+}
+
+html[data-theme="dark"] .home-explore::before {
+  background: radial-gradient(circle at 22% 70%, var(--kp-color-surface-default), transparent 35%),
+    radial-gradient(circle at 82% 30%, color-mix(in srgb, var(--kp-color-accent-glow) 18%, transparent), transparent 34%),
+    linear-gradient(135deg, var(--kp-color-surface-strong) 0%, var(--kp-color-surface-strong) 52%, var(--kp-color-surface-strong) 100%)
+}
+
+html[data-theme="dark"] .home-explore-nav {
+  border-bottom: 1px solid color-mix(in srgb, var(--kp-color-border-subtle) 22%, transparent)
+}
+
+html[data-theme="dark"] .home-explore-link {
+  border-top: 1px solid color-mix(in srgb, var(--kp-color-border-subtle) 22%, transparent);
+  color: var(--kp-color-text-primary)
+}
+
+html[data-theme="dark"] .home-explore-number {
+  color: var(--kp-color-action-secondary)
+}
+
+html[data-theme="dark"] .home-explore-arrow {
+  color: var(--kp-color-action-secondary)
+}
+
+html[data-theme="dark"] .home-explore-link:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--kp-color-border-focus) 28%, transparent)
+}
+
+html[data-theme="dark"] .home-explore-row-veil {
+  background: linear-gradient(90deg, var(--kp-color-surface-soft), var(--kp-color-surface-default) 72%, var(--kp-color-surface-default));
+  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--kp-color-shadow-ink) 56%, transparent), inset 0 -1px 0 color-mix(in srgb, var(--kp-color-shadow-ink) 40%, transparent)
+}
+
+@media (max-width: 760px), (hover: none), (pointer: coarse) {
+
+html[data-theme="dark"] .home-explore-row-preview {
+  border: 1px solid color-mix(in srgb, var(--kp-color-border-subtle) 68%, transparent)
+}
+}

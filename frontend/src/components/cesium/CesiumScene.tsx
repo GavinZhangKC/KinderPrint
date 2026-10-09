@@ -26,6 +26,7 @@ import {
   Viewer,
 } from 'cesium'
 import 'cesium/Build/Cesium/Widgets/widgets.css'
+import { useTheme } from '../../theme/ThemeProvider'
 import {
   addMelbourneStreetEnvironment,
   type MelbourneJourneyHighlightController,
@@ -76,6 +77,18 @@ interface CesiumSceneProps {
 // Preserve native resolution up to 2x so common Retina displays stay sharp
 // without allowing very high-DPI screens to create oversized GPU buffers.
 const maximumRenderPixelRatio = 2
+
+function applySceneTheme(viewer: Viewer) {
+  const dark = document.documentElement.dataset.theme === 'dark'
+  const tokens = getComputedStyle(document.documentElement)
+  viewer.scene.backgroundColor = Color.fromCssColorString(
+    dark ? tokens.getPropertyValue('--kp-color-bg-canvas-start').trim() : '#e3edf7',
+  )
+  viewer.scene.globe.baseColor = Color.fromCssColorString(
+    dark ? tokens.getPropertyValue('--kp-color-bg-canvas-end').trim() : '#d7e1ea',
+  )
+  viewer.scene.requestRender()
+}
 
 function updateViewerResolution(viewer: Viewer) {
   const devicePixelRatio = window.devicePixelRatio || 1
@@ -951,6 +964,7 @@ const CesiumScene = forwardRef<CesiumSceneHandle, CesiumSceneProps>(function Ces
   },
   ref,
 ) {
+  const { theme } = useTheme()
   const containerRef = useRef<HTMLDivElement>(null)
   const viewerRef = useRef<Viewer | null>(null)
   const journeyGuideRef = useRef<JourneyGuideController | null>(null)
@@ -1139,8 +1153,7 @@ const CesiumScene = forwardRef<CesiumSceneHandle, CesiumSceneProps>(function Ces
     viewer.scene.postProcessStages.fxaa.enabled = true
     if (viewer.scene.msaaSupported) viewer.scene.msaaSamples = 4
     viewer.scene.highDynamicRange = true
-    viewer.scene.backgroundColor = Color.fromCssColorString('#e3edf7')
-    viewer.scene.globe.baseColor = Color.fromCssColorString('#d7e1ea')
+    applySceneTheme(viewer)
     viewer.scene.globe.showGroundAtmosphere = false
     viewer.scene.globe.depthTestAgainstTerrain = true
     viewer.scene.fog.enabled = true
@@ -1266,6 +1279,11 @@ const CesiumScene = forwardRef<CesiumSceneHandle, CesiumSceneProps>(function Ces
       if (!viewer.isDestroyed()) viewer.destroy()
     }
   }, [])
+
+  useEffect(() => {
+    const viewer = viewerRef.current
+    if (viewer && !viewer.isDestroyed()) applySceneTheme(viewer)
+  }, [theme])
 
   return (
     <div
