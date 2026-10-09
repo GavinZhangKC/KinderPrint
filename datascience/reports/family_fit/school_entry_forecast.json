@@ -1,0 +1,115 @@
+{
+  "question": "Share of children on track in all five AEDC domains at the next census (2027), by community",
+  "unit": "AEDC community (one or more SA2s), Greater Melbourne",
+  "training_transitions": [
+    "2012->2015",
+    "2015->2018",
+    "2018->2021"
+  ],
+  "holdout_transition": "2021->2024",
+  "n_train": 1000,
+  "n_holdout": 342,
+  "selection_rule": "lowest child-weighted MAE on the holdout; a more complex model must beat the simpler by >= 3%",
+  "candidates": {
+    "F0": {
+      "weighted_mae_pp": 7.558,
+      "mae_pp": 8.408,
+      "rmse_pp": 10.738,
+      "bias_pp": 3.25,
+      "within_5pp": 0.3713,
+      "within_10pp": 0.6784,
+      "coverage_80": 0.7281,
+      "coverage_95": 0.8977,
+      "mae_after_common_shift_pp": 6.858,
+      "spearman": 0.5138,
+      "top_quarter_precision": 0.4831,
+      "top_quarter_recall": 0.4943,
+      "model_sd_pp": 7.49
+    },
+    "F1": {
+      "weighted_mae_pp": 7.006,
+      "mae_pp": 7.575,
+      "rmse_pp": 9.64,
+      "bias_pp": 3.294,
+      "within_5pp": 0.4181,
+      "within_10pp": 0.7222,
+      "coverage_80": 0.7281,
+      "coverage_95": 0.9152,
+      "mae_after_common_shift_pp": 6.338,
+      "spearman": 0.5571,
+      "top_quarter_precision": 0.4767,
+      "top_quarter_recall": 0.4713,
+      "model_sd_pp": 6.644
+    },
+    "F2": {
+      "weighted_mae_pp": 6.9,
+      "mae_pp": 7.505,
+      "rmse_pp": 9.555,
+      "bias_pp": 2.984,
+      "within_5pp": 0.4181,
+      "within_10pp": 0.7281,
+      "coverage_80": 0.731,
+      "coverage_95": 0.9181,
+      "mae_after_common_shift_pp": 6.338,
+      "spearman": 0.5571,
+      "top_quarter_precision": 0.4767,
+      "top_quarter_recall": 0.4713,
+      "model_sd_pp": 6.687
+    },
+    "F3": {
+      "weighted_mae_pp": 6.429,
+      "mae_pp": 6.841,
+      "rmse_pp": 8.748,
+      "bias_pp": 3.482,
+      "within_5pp": 0.4591,
+      "within_10pp": 0.7573,
+      "coverage_80": 0.6988,
+      "coverage_95": 0.8889,
+      "mae_after_common_shift_pp": 5.68,
+      "spearman": 0.654,
+      "top_quarter_precision": 0.5698,
+      "top_quarter_recall": 0.5632,
+      "model_sd_pp": 4.987,
+      "alpha": 3000
+    },
+    "F4": {
+      "weighted_mae_pp": 6.879,
+      "mae_pp": 7.211,
+      "rmse_pp": 9.213,
+      "bias_pp": 4.067,
+      "within_5pp": 0.4211,
+      "within_10pp": 0.731,
+      "coverage_80": 0.5789,
+      "coverage_95": 0.7924,
+      "mae_after_common_shift_pp": 6.007,
+      "spearman": 0.606,
+      "top_quarter_precision": 0.5465,
+      "top_quarter_recall": 0.5402,
+      "model_sd_pp": 3.326
+    }
+  },
+  "selected": "F3",
+  "skill_vs_persistence": 0.1494,
+  "melbourne_level_shift_2021_2024_pp": -3.453,
+  "forecast": {
+    "origin": 2024,
+    "year": 2027,
+    "communities": 342,
+    "refit_transitions": [
+      "2012->2015",
+      "2015->2018",
+      "2018->2021",
+      "2021->2024"
+    ],
+    "model_sd_pp": 5.211,
+    "cycle_shock_sd_pp": 1.796,
+    "ridge_alpha": 10000
+  },
+  "holdout_cycle_shock_sd_pp": 0.574,
+  "limitations": [
+    "AEDC is a census every three years; four transitions is a short history.",
+    "Greater Melbourne fell by 3.5 percentage points between 2021 and 2024 (after pandemic-affected cohorts); no model trained on earlier cycles anticipated a shift of that size, so holdout errors carry a common bias.",
+    "IRSD is from 2021 and is used for every origin year.",
+    "Forecasts describe areas, never individual children."
+  ]
+}

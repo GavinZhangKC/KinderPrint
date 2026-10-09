@@ -1,8 +1,8 @@
 sa2_code,sa2_name,kind,facility_id,distance_km
 206011106,Brunswick East,hospital,H0381,3.8
 206011106,Brunswick East,hospital,H0364,4.0
-206011106,Brunswick East,hospital,H0371,4.1
 206011106,Brunswick East,hospital,H0366,4.1
+206011106,Brunswick East,hospital,H0371,4.1
 206011106,Brunswick East,hospital,H0374,4.4
 206011106,Brunswick East,hospital,H0367,4.7
 206011106,Brunswick East,hospital,H0359,7.3
@@ -27,8 +27,8 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 206011107,Brunswick West,urgent_care_clinic,UCC-moonee-ponds-urgent-care-clinic,2.0
 206011107,Brunswick West,urgent_care_clinic,UCC-coburg-medicare-urgent-care-clinic,3.3
 206011107,Brunswick West,urgent_care_clinic,UCC-royal-children-s-hospital-urgent-care-clinic,3.4
-206011107,Brunswick West,urgent_care_clinic,UCC-maribyrnong-medicare-urgent-care-clinic,4.8
 206011107,Brunswick West,urgent_care_clinic,UCC-inner-melbourne-medicare-urgent-care-clinic,4.8
+206011107,Brunswick West,urgent_care_clinic,UCC-maribyrnong-medicare-urgent-care-clinic,4.8
 206011109,Pascoe Vale South,hospital,H0364,5.8
 206011109,Pascoe Vale South,hospital,H0366,6.3
 206011109,Pascoe Vale South,hospital,H0371,6.4
@@ -37,8 +37,8 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 206011109,Pascoe Vale South,hospital,H0363,7.0
 206011109,Pascoe Vale South,hospital,H0374,7.7
 206011109,Pascoe Vale South,hospital,H0367,8.0
-206011109,Pascoe Vale South,hospital,H0373,10.8
 206011109,Pascoe Vale South,hospital,H0359,10.8
+206011109,Pascoe Vale South,hospital,H0373,10.8
 206011109,Pascoe Vale South,urgent_care_clinic,UCC-coburg-medicare-urgent-care-clinic,2.5
 206011109,Pascoe Vale South,urgent_care_clinic,UCC-moonee-ponds-urgent-care-clinic,3.1
 206011109,Pascoe Vale South,urgent_care_clinic,UCC-royal-children-s-hospital-urgent-care-clinic,5.7
@@ -135,8 +135,8 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 206021112,Thornbury,urgent_care_clinic,UCC-royal-children-s-hospital-urgent-care-clinic,6.5
 206021112,Thornbury,urgent_care_clinic,UCC-richmond-urgent-care-clinic,6.8
 206021499,Northcote - East,hospital,H0374,4.6
-206021499,Northcote - East,hospital,H0381,4.7
 206021499,Northcote - East,hospital,H0367,4.7
+206021499,Northcote - East,hospital,H0381,4.7
 206021499,Northcote - East,hospital,H0359,5.1
 206021499,Northcote - East,hospital,H0362,5.2
 206021499,Northcote - East,hospital,H0371,5.2
@@ -147,8 +147,8 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 206021499,Northcote - East,urgent_care_clinic,UCC-inner-melbourne-medicare-urgent-care-clinic,4.5
 206021499,Northcote - East,urgent_care_clinic,UCC-coburg-medicare-urgent-care-clinic,4.9
 206021499,Northcote - East,urgent_care_clinic,UCC-richmond-urgent-care-clinic,5.1
-206021499,Northcote - East,urgent_care_clinic,UCC-royal-children-s-hospital-urgent-care-clinic,5.5
 206021499,Northcote - East,urgent_care_clinic,UCC-heidelberg-medicare-urgent-care-clinic,5.5
+206021499,Northcote - East,urgent_care_clinic,UCC-royal-children-s-hospital-urgent-care-clinic,5.5
 206021500,Northcote - West,hospital,H0381,3.9
 206021500,Northcote - West,hospital,H0374,4.2
 206021500,Northcote - West,hospital,H0371,4.3
@@ -212,9 +212,9 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 206031501,Essendon (West) - Aberfeldie,hospital,H0363,4.8
 206031501,Essendon (West) - Aberfeldie,hospital,H0364,6.7
 206031501,Essendon (West) - Aberfeldie,hospital,H0366,7.3
+206031501,Essendon (West) - Aberfeldie,hospital,H0371,7.4
 206031501,Essendon (West) - Aberfeldie,hospital,H0373,7.4
 206031501,Essendon (West) - Aberfeldie,hospital,H0379,7.4
-206031501,Essendon (West) - Aberfeldie,hospital,H0371,7.4
 206031501,Essendon (West) - Aberfeldie,hospital,H0381,7.9
 206031501,Essendon (West) - Aberfeldie,hospital,H0374,9.1
 206031501,Essendon (West) - Aberfeldie,hospital,H0367,9.4
@@ -374,11 +374,11 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 206041503,Melbourne CBD - East,urgent_care_clinic,UCC-royal-children-s-hospital-urgent-care-clinic,2.7
 206041503,Melbourne CBD - East,urgent_care_clinic,UCC-prahran-medicare-urgent-care-clinic,3.8
 206041503,Melbourne CBD - East,urgent_care_clinic,UCC-moonee-ponds-urgent-care-clinic,6.8
-206041504,Melbourne CBD - North,hospital,H0381,1.2
 206041504,Melbourne CBD - North,hospital,H0371,1.2
-206041504,Melbourne CBD - North,hospital,H0374,1.3
+206041504,Melbourne CBD - North,hospital,H0381,1.2
 206041504,Melbourne CBD - North,hospital,H0366,1.3
 206041504,Melbourne CBD - North,hospital,H0367,1.3
+206041504,Melbourne CBD - North,hospital,H0374,1.3
 206041504,Melbourne CBD - North,hospital,H0364,1.8
 206041504,Melbourne CBD - North,hospital,H0358,4.5
 206041504,Melbourne CBD - North,hospital,H0363,6.8
@@ -468,8 +468,8 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 206041510,West Melbourne - Residential,hospital,H0371,1.3
 206041510,West Melbourne - Residential,hospital,H0364,1.6
 206041510,West Melbourne - Residential,hospital,H0381,1.7
-206041510,West Melbourne - Residential,hospital,H0374,2.3
 206041510,West Melbourne - Residential,hospital,H0367,2.3
+206041510,West Melbourne - Residential,hospital,H0374,2.3
 206041510,West Melbourne - Residential,hospital,H0358,5.0
 206041510,West Melbourne - Residential,hospital,H0363,5.8
 206041510,West Melbourne - Residential,hospital,H0375,7.9
@@ -482,8 +482,8 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 206051128,Albert Park,hospital,H0358,1.8
 206051128,Albert Park,hospital,H0367,4.2
 206051128,Albert Park,hospital,H0374,4.4
-206051128,Albert Park,hospital,H0381,5.1
 206051128,Albert Park,hospital,H0371,5.1
+206051128,Albert Park,hospital,H0381,5.1
 206051128,Albert Park,hospital,H0366,5.2
 206051128,Albert Park,hospital,H0364,5.6
 206051128,Albert Park,hospital,H0375,6.4
@@ -498,9 +498,9 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 206051129,Elwood,hospital,H0367,8.1
 206051129,Elwood,hospital,H0374,8.4
 206051129,Elwood,hospital,H0375,8.4
+206051129,Elwood,hospital,H0344,9.3
 206051129,Elwood,hospital,H0381,9.3
 206051129,Elwood,hospital,H1057,9.3
-206051129,Elwood,hospital,H0344,9.3
 206051129,Elwood,hospital,H0371,9.5
 206051129,Elwood,hospital,H0366,9.6
 206051129,Elwood,hospital,H0364,10.1
@@ -513,15 +513,15 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 206051130,Port Melbourne,hospital,H0358,4.5
 206051130,Port Melbourne,hospital,H0366,4.9
 206051130,Port Melbourne,hospital,H0371,5.0
-206051130,Port Melbourne,hospital,H0367,5.2
 206051130,Port Melbourne,hospital,H0364,5.2
+206051130,Port Melbourne,hospital,H0367,5.2
 206051130,Port Melbourne,hospital,H0374,5.3
 206051130,Port Melbourne,hospital,H0381,5.3
 206051130,Port Melbourne,hospital,H0363,6.5
 206051130,Port Melbourne,hospital,H0373,13.4
 206051130,Port Melbourne,urgent_care_clinic,UCC-prahran-medicare-urgent-care-clinic,4.5
-206051130,Port Melbourne,urgent_care_clinic,UCC-royal-children-s-hospital-urgent-care-clinic,5.3
 206051130,Port Melbourne,urgent_care_clinic,UCC-inner-melbourne-medicare-urgent-care-clinic,5.3
+206051130,Port Melbourne,urgent_care_clinic,UCC-royal-children-s-hospital-urgent-care-clinic,5.3
 206051130,Port Melbourne,urgent_care_clinic,UCC-richmond-urgent-care-clinic,6.1
 206051130,Port Melbourne,urgent_care_clinic,UCC-maribyrnong-medicare-urgent-care-clinic,6.9
 206051134,St Kilda East,hospital,H0358,2.9
@@ -532,8 +532,8 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 206051134,St Kilda East,hospital,H0366,8.7
 206051134,St Kilda East,hospital,H0375,9.0
 206051134,St Kilda East,hospital,H0364,9.2
-206051134,St Kilda East,hospital,H1057,10.3
 206051134,St Kilda East,hospital,H0344,10.3
+206051134,St Kilda East,hospital,H1057,10.3
 206051134,St Kilda East,urgent_care_clinic,UCC-prahran-medicare-urgent-care-clinic,3.0
 206051134,St Kilda East,urgent_care_clinic,UCC-richmond-urgent-care-clinic,5.7
 206051134,St Kilda East,urgent_care_clinic,UCC-carnegie-medicare-urgent-care-clinic,5.9
@@ -542,8 +542,8 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 206051511,Port Melbourne Industrial,hospital,H0375,3.6
 206051511,Port Melbourne Industrial,hospital,H0363,5.2
 206051511,Port Melbourne Industrial,hospital,H0366,5.6
-206051511,Port Melbourne Industrial,hospital,H0371,5.7
 206051511,Port Melbourne Industrial,hospital,H0364,5.7
+206051511,Port Melbourne Industrial,hospital,H0371,5.7
 206051511,Port Melbourne Industrial,hospital,H0381,6.2
 206051511,Port Melbourne Industrial,hospital,H0358,6.3
 206051511,Port Melbourne Industrial,hospital,H0367,6.4
@@ -575,10 +575,10 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 206051513,St Kilda - Central,hospital,H0381,7.4
 206051513,St Kilda - Central,hospital,H0371,7.6
 206051513,St Kilda - Central,hospital,H0366,7.8
-206051513,St Kilda - Central,hospital,H0375,8.3
 206051513,St Kilda - Central,hospital,H0364,8.3
-206051513,St Kilda - Central,hospital,H1057,11.2
+206051513,St Kilda - Central,hospital,H0375,8.3
 206051513,St Kilda - Central,hospital,H0344,11.2
+206051513,St Kilda - Central,hospital,H1057,11.2
 206051513,St Kilda - Central,urgent_care_clinic,UCC-prahran-medicare-urgent-care-clinic,2.1
 206051513,St Kilda - Central,urgent_care_clinic,UCC-richmond-urgent-care-clinic,5.0
 206051513,St Kilda - Central,urgent_care_clinic,UCC-carnegie-medicare-urgent-care-clinic,6.7
@@ -593,7 +593,7 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 206051514,St Kilda - West,hospital,H0375,7.3
 206051514,St Kilda - West,hospital,H0364,7.7
 206051514,St Kilda - West,hospital,H0363,10.9
-206051514,St Kilda - West,hospital,H1057,11.7
+206051514,St Kilda - West,hospital,H0344,11.7
 206051514,St Kilda - West,urgent_care_clinic,UCC-prahran-medicare-urgent-care-clinic,1.8
 206051514,St Kilda - West,urgent_care_clinic,UCC-richmond-urgent-care-clinic,5.0
 206051514,St Kilda - West,urgent_care_clinic,UCC-inner-melbourne-medicare-urgent-care-clinic,6.7
@@ -608,7 +608,7 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 206061135,Armadale,hospital,H0364,9.3
 206061135,Armadale,hospital,H0330,10.0
 206061135,Armadale,hospital,H0375,11.2
-206061135,Armadale,hospital,H1057,11.5
+206061135,Armadale,hospital,H0344,11.5
 206061135,Armadale,urgent_care_clinic,UCC-prahran-medicare-urgent-care-clinic,3.7
 206061135,Armadale,urgent_care_clinic,UCC-carnegie-medicare-urgent-care-clinic,4.5
 206061135,Armadale,urgent_care_clinic,UCC-richmond-urgent-care-clinic,4.8
@@ -690,8 +690,8 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 206071139,Abbotsford,urgent_care_clinic,UCC-prahran-medicare-urgent-care-clinic,4.9
 206071139,Abbotsford,urgent_care_clinic,UCC-coburg-medicare-urgent-care-clinic,7.4
 206071140,Carlton North - Princes Hill,hospital,H0381,1.6
-206071140,Carlton North - Princes Hill,hospital,H0371,1.8
 206071140,Carlton North - Princes Hill,hospital,H0364,1.8
+206071140,Carlton North - Princes Hill,hospital,H0371,1.8
 206071140,Carlton North - Princes Hill,hospital,H0366,1.9
 206071140,Carlton North - Princes Hill,hospital,H0374,2.4
 206071140,Carlton North - Princes Hill,hospital,H0367,2.7
@@ -800,8 +800,8 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 207011146,Ashburton (Vic.),hospital,H0331,9.7
 207011146,Ashburton (Vic.),hospital,H0367,11.1
 207011146,Ashburton (Vic.),hospital,H0374,11.4
-207011146,Ashburton (Vic.),hospital,H1057,11.8
 207011146,Ashburton (Vic.),hospital,H0344,11.8
+207011146,Ashburton (Vic.),hospital,H1057,11.8
 207011146,Ashburton (Vic.),hospital,H0359,12.4
 207011146,Ashburton (Vic.),hospital,H0362,12.4
 207011146,Ashburton (Vic.),urgent_care_clinic,UCC-carnegie-medicare-urgent-care-clinic,2.6
@@ -825,8 +825,8 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 207011147,Balwyn,urgent_care_clinic,UCC-carnegie-medicare-urgent-care-clinic,8.5
 207011147,Balwyn,urgent_care_clinic,UCC-forest-hill-urgent-care-clinic,8.9
 207011148,Balwyn North,hospital,H0330,4.0
-207011148,Balwyn North,hospital,H0362,4.4
 207011148,Balwyn North,hospital,H0359,4.4
+207011148,Balwyn North,hospital,H0362,4.4
 207011148,Balwyn North,hospital,H0367,9.7
 207011148,Balwyn North,hospital,H0374,9.8
 207011148,Balwyn North,hospital,H0381,10.6
@@ -837,8 +837,8 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 207011148,Balwyn North,urgent_care_clinic,UCC-heidelberg-medicare-urgent-care-clinic,4.3
 207011148,Balwyn North,urgent_care_clinic,UCC-richmond-urgent-care-clinic,8.4
 207011148,Balwyn North,urgent_care_clinic,UCC-forest-hill-urgent-care-clinic,9.9
-207011148,Balwyn North,urgent_care_clinic,UCC-mount-waverley-medicare-urgent-care-clinic,10.3
 207011148,Balwyn North,urgent_care_clinic,UCC-inner-melbourne-medicare-urgent-care-clinic,10.3
+207011148,Balwyn North,urgent_care_clinic,UCC-mount-waverley-medicare-urgent-care-clinic,10.3
 207011149,Camberwell,hospital,H0330,4.5
 207011149,Camberwell,hospital,H0358,8.4
 207011149,Camberwell,hospital,H0359,9.0
@@ -873,8 +873,8 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 207011152,Hawthorn East,hospital,H0330,6.4
 207011152,Hawthorn East,hospital,H0367,6.9
 207011152,Hawthorn East,hospital,H0374,7.1
-207011152,Hawthorn East,hospital,H0381,8.3
 207011152,Hawthorn East,hospital,H0359,8.3
+207011152,Hawthorn East,hospital,H0381,8.3
 207011152,Hawthorn East,hospital,H0362,8.4
 207011152,Hawthorn East,hospital,H0371,8.9
 207011152,Hawthorn East,hospital,H0366,9.1
@@ -921,14 +921,14 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 207011519,Hawthorn - North,hospital,H0371,6.8
 207011519,Hawthorn - North,hospital,H0366,7.0
 207011519,Hawthorn - North,hospital,H0359,7.4
-207011519,Hawthorn - North,hospital,H0364,7.5
 207011519,Hawthorn - North,hospital,H0362,7.5
+207011519,Hawthorn - North,hospital,H0364,7.5
 207011519,Hawthorn - North,hospital,H0330,7.8
 207011519,Hawthorn - North,urgent_care_clinic,UCC-richmond-urgent-care-clinic,3.1
 207011519,Hawthorn - North,urgent_care_clinic,UCC-prahran-medicare-urgent-care-clinic,5.2
 207011519,Hawthorn - North,urgent_care_clinic,UCC-inner-melbourne-medicare-urgent-care-clinic,5.8
-207011519,Hawthorn - North,urgent_care_clinic,UCC-royal-children-s-hospital-urgent-care-clinic,7.7
 207011519,Hawthorn - North,urgent_care_clinic,UCC-carnegie-medicare-urgent-care-clinic,7.7
+207011519,Hawthorn - North,urgent_care_clinic,UCC-royal-children-s-hospital-urgent-care-clinic,7.7
 207011520,Hawthorn - South,hospital,H0358,4.7
 207011520,Hawthorn - South,hospital,H0367,5.3
 207011520,Hawthorn - South,hospital,H0374,5.5
@@ -960,8 +960,8 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 207011521,Kew - South,urgent_care_clinic,UCC-prahran-medicare-urgent-care-clinic,6.9
 207011521,Kew - South,urgent_care_clinic,UCC-carnegie-medicare-urgent-care-clinic,8.5
 207011522,Kew - West,hospital,H0359,5.3
-207011522,Kew - West,hospital,H0367,5.3
 207011522,Kew - West,hospital,H0362,5.3
+207011522,Kew - West,hospital,H0367,5.3
 207011522,Kew - West,hospital,H0374,5.3
 207011522,Kew - West,hospital,H0381,6.2
 207011522,Kew - West,hospital,H0371,6.9
@@ -974,11 +974,11 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 207011522,Kew - West,urgent_care_clinic,UCC-inner-melbourne-medicare-urgent-care-clinic,5.9
 207011522,Kew - West,urgent_care_clinic,UCC-prahran-medicare-urgent-care-clinic,7.0
 207011522,Kew - West,urgent_care_clinic,UCC-royal-children-s-hospital-urgent-care-clinic,7.6
-207021156,Bulleen,hospital,H0362,2.5
 207021156,Bulleen,hospital,H0359,2.5
+207021156,Bulleen,hospital,H0362,2.5
 207021156,Bulleen,hospital,H0330,6.0
-207021156,Bulleen,hospital,H0374,10.7
 207021156,Bulleen,hospital,H0367,10.7
+207021156,Bulleen,hospital,H0374,10.7
 207021156,Bulleen,hospital,H0381,11.3
 207021156,Bulleen,hospital,H0371,11.9
 207021156,Bulleen,hospital,H0366,12.1
@@ -1005,11 +1005,11 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 207021157,Doncaster,urgent_care_clinic,UCC-mount-waverley-medicare-urgent-care-clinic,11.0
 207021157,Doncaster,urgent_care_clinic,UCC-richmond-urgent-care-clinic,11.8
 207021159,Templestowe,hospital,H0330,6.8
-207021159,Templestowe,hospital,H0362,7.4
 207021159,Templestowe,hospital,H0359,7.4
+207021159,Templestowe,hospital,H0362,7.4
 207021159,Templestowe,hospital,H0332,11.2
-207021159,Templestowe,hospital,H0374,15.9
 207021159,Templestowe,hospital,H0367,15.9
+207021159,Templestowe,hospital,H0374,15.9
 207021159,Templestowe,hospital,H0368,16.2
 207021159,Templestowe,hospital,H0381,16.6
 207021159,Templestowe,hospital,H0371,17.2
@@ -1017,13 +1017,13 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 207021159,Templestowe,urgent_care_clinic,UCC-eltham-medicare-urgent-care-clinic,5.7
 207021159,Templestowe,urgent_care_clinic,UCC-heidelberg-medicare-urgent-care-clinic,7.0
 207021159,Templestowe,urgent_care_clinic,UCC-forest-hill-urgent-care-clinic,10.5
-207021159,Templestowe,urgent_care_clinic,UCC-mount-waverley-medicare-urgent-care-clinic,14.2
 207021159,Templestowe,urgent_care_clinic,UCC-maroondah-medicare-urgent-care-clinic,14.2
-207021160,Templestowe Lower,hospital,H0362,4.8
+207021159,Templestowe,urgent_care_clinic,UCC-mount-waverley-medicare-urgent-care-clinic,14.2
 207021160,Templestowe Lower,hospital,H0359,4.8
+207021160,Templestowe Lower,hospital,H0362,4.8
 207021160,Templestowe Lower,hospital,H0330,5.5
-207021160,Templestowe Lower,hospital,H0374,13.1
 207021160,Templestowe Lower,hospital,H0367,13.1
+207021160,Templestowe Lower,hospital,H0374,13.1
 207021160,Templestowe Lower,hospital,H0332,13.2
 207021160,Templestowe Lower,hospital,H0381,13.7
 207021160,Templestowe Lower,hospital,H0371,14.4
@@ -1051,8 +1051,8 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 207021424,Doncaster East - North,urgent_care_clinic,UCC-mount-waverley-medicare-urgent-care-clinic,14.0
 207021425,Doncaster East - South,hospital,H0330,4.2
 207021425,Doncaster East - South,hospital,H0332,8.7
-207021425,Doncaster East - South,hospital,H0362,9.4
 207021425,Doncaster East - South,hospital,H0359,9.4
+207021425,Doncaster East - South,hospital,H0362,9.4
 207021425,Doncaster East - South,hospital,H1054,13.6
 207021425,Doncaster East - South,hospital,H0331,15.1
 207021425,Doncaster East - South,hospital,H0367,16.1
@@ -1066,8 +1066,8 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 207021425,Doncaster East - South,urgent_care_clinic,UCC-maroondah-medicare-urgent-care-clinic,11.0
 207031161,Blackburn,hospital,H0330,3.0
 207031161,Blackburn,hospital,H0332,9.0
-207031161,Blackburn,hospital,H0362,10.5
 207031161,Blackburn,hospital,H0359,10.5
+207031161,Blackburn,hospital,H0362,10.5
 207031161,Blackburn,hospital,H1054,10.8
 207031161,Blackburn,hospital,H0331,12.4
 207031161,Blackburn,hospital,H0358,15.4
@@ -1096,8 +1096,8 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 207031162,Blackburn South,urgent_care_clinic,UCC-maroondah-medicare-urgent-care-clinic,10.5
 207031163,Box Hill,hospital,H0330,1.8
 207031163,Box Hill,hospital,H1054,9.4
-207031163,Box Hill,hospital,H0362,9.9
 207031163,Box Hill,hospital,H0359,9.9
+207031163,Box Hill,hospital,H0362,9.9
 207031163,Box Hill,hospital,H0331,11.3
 207031163,Box Hill,hospital,H0332,11.7
 207031163,Box Hill,hospital,H0358,12.7
@@ -1110,8 +1110,8 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 207031163,Box Hill,urgent_care_clinic,UCC-heidelberg-medicare-urgent-care-clinic,9.7
 207031163,Box Hill,urgent_care_clinic,UCC-monash-children-s-urgent-care-clinic,9.9
 207031164,Box Hill North,hospital,H0330,1.2
-207031164,Box Hill North,hospital,H0362,7.6
 207031164,Box Hill North,hospital,H0359,7.6
+207031164,Box Hill North,hospital,H0362,7.6
 207031164,Box Hill North,hospital,H0332,11.5
 207031164,Box Hill North,hospital,H1054,12.2
 207031164,Box Hill North,hospital,H0367,12.9
@@ -1127,8 +1127,8 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 207031165,Burwood (Vic.),hospital,H0330,3.7
 207031165,Burwood (Vic.),hospital,H1054,7.6
 207031165,Burwood (Vic.),hospital,H0331,9.8
-207031165,Burwood (Vic.),hospital,H0362,11.1
 207031165,Burwood (Vic.),hospital,H0359,11.1
+207031165,Burwood (Vic.),hospital,H0362,11.1
 207031165,Burwood (Vic.),hospital,H0358,11.7
 207031165,Burwood (Vic.),hospital,H0367,12.9
 207031165,Burwood (Vic.),hospital,H0374,13.0
@@ -1143,8 +1143,8 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 207031166,Burwood East,hospital,H1054,6.6
 207031166,Burwood East,hospital,H0331,8.3
 207031166,Burwood East,hospital,H0332,10.7
-207031166,Burwood East,hospital,H0362,13.3
 207031166,Burwood East,hospital,H0359,13.3
+207031166,Burwood East,hospital,H0362,13.3
 207031166,Burwood East,hospital,H0358,14.6
 207031166,Burwood East,hospital,H0348,15.0
 207031166,Burwood East,hospital,H0333,15.5
@@ -1155,8 +1155,8 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 207031166,Burwood East,urgent_care_clinic,UCC-carnegie-medicare-urgent-care-clinic,8.5
 207031166,Burwood East,urgent_care_clinic,UCC-maroondah-medicare-urgent-care-clinic,10.5
 207031167,Surrey Hills (East) - Mont Albert,hospital,H0330,1.6
-207031167,Surrey Hills (East) - Mont Albert,hospital,H0362,8.6
 207031167,Surrey Hills (East) - Mont Albert,hospital,H0359,8.6
+207031167,Surrey Hills (East) - Mont Albert,hospital,H0362,8.6
 207031167,Surrey Hills (East) - Mont Albert,hospital,H1054,10.2
 207031167,Surrey Hills (East) - Mont Albert,hospital,H0358,11.2
 207031167,Surrey Hills (East) - Mont Albert,hospital,H0367,11.6
@@ -1176,16 +1176,16 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 208011168,Beaumaris,hospital,H0348,15.8
 208011168,Beaumaris,hospital,H0358,15.9
 208011168,Beaumaris,hospital,H0375,18.4
-208011168,Beaumaris,hospital,H0367,20.0
 208011168,Beaumaris,hospital,H0330,20.0
+208011168,Beaumaris,hospital,H0367,20.0
 208011168,Beaumaris,hospital,H0374,20.3
 208011168,Beaumaris,urgent_care_clinic,UCC-sandringham-medicare-urgent-care-clinic,3.0
 208011168,Beaumaris,urgent_care_clinic,UCC-monash-children-s-urgent-care-clinic,10.3
 208011168,Beaumaris,urgent_care_clinic,UCC-carnegie-medicare-urgent-care-clinic,11.0
 208011168,Beaumaris,urgent_care_clinic,UCC-mount-waverley-medicare-urgent-care-clinic,12.8
 208011168,Beaumaris,urgent_care_clinic,UCC-dandenong-medicare-urgent-care-clinic,14.2
-208011169,Brighton (Vic.),hospital,H1057,6.4
 208011169,Brighton (Vic.),hospital,H0344,6.4
+208011169,Brighton (Vic.),hospital,H1057,6.4
 208011169,Brighton (Vic.),hospital,H0358,6.8
 208011169,Brighton (Vic.),hospital,H0375,10.2
 208011169,Brighton (Vic.),hospital,H0367,10.9
@@ -1209,8 +1209,8 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 208011170,Brighton East,hospital,H0374,12.8
 208011170,Brighton East,hospital,H0381,13.9
 208011170,Brighton East,hospital,H0371,14.1
-208011170,Brighton East,urgent_care_clinic,UCC-sandringham-medicare-urgent-care-clinic,5.0
 208011170,Brighton East,urgent_care_clinic,UCC-carnegie-medicare-urgent-care-clinic,5.0
+208011170,Brighton East,urgent_care_clinic,UCC-sandringham-medicare-urgent-care-clinic,5.0
 208011170,Brighton East,urgent_care_clinic,UCC-prahran-medicare-urgent-care-clinic,8.5
 208011170,Brighton East,urgent_care_clinic,UCC-mount-waverley-medicare-urgent-care-clinic,8.8
 208011170,Brighton East,urgent_care_clinic,UCC-monash-children-s-urgent-care-clinic,9.2
@@ -1244,8 +1244,8 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 208011172,Hampton,urgent_care_clinic,UCC-monash-children-s-urgent-care-clinic,9.7
 208011172,Hampton,urgent_care_clinic,UCC-mount-waverley-medicare-urgent-care-clinic,10.3
 208011172,Hampton,urgent_care_clinic,UCC-prahran-medicare-urgent-care-clinic,10.7
-208011173,Sandringham - Black Rock,hospital,H1057,0.2
 208011173,Sandringham - Black Rock,hospital,H0344,0.2
+208011173,Sandringham - Black Rock,hospital,H1057,0.2
 208011173,Sandringham - Black Rock,hospital,H1054,12.1
 208011173,Sandringham - Black Rock,hospital,H0331,13.1
 208011173,Sandringham - Black Rock,hospital,H0358,13.2
@@ -1293,8 +1293,8 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 208021177,Caulfield - North,hospital,H0367,8.1
 208021177,Caulfield - North,hospital,H0374,8.4
 208021177,Caulfield - North,hospital,H0381,9.5
-208021177,Caulfield - North,hospital,H1057,9.7
 208021177,Caulfield - North,hospital,H0344,9.7
+208021177,Caulfield - North,hospital,H1057,9.7
 208021177,Caulfield - North,hospital,H0371,9.9
 208021177,Caulfield - North,hospital,H0366,10.0
 208021177,Caulfield - North,hospital,H0364,10.6
@@ -1305,14 +1305,14 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 208021177,Caulfield - North,urgent_care_clinic,UCC-mount-waverley-medicare-urgent-care-clinic,8.0
 208021177,Caulfield - North,urgent_care_clinic,UCC-inner-melbourne-medicare-urgent-care-clinic,9.2
 208021178,Caulfield - South,hospital,H0358,6.3
-208021178,Caulfield - South,hospital,H1057,7.8
 208021178,Caulfield - South,hospital,H0344,7.8
+208021178,Caulfield - South,hospital,H1057,7.8
 208021178,Caulfield - South,hospital,H0367,10.1
 208021178,Caulfield - South,hospital,H1054,10.3
 208021178,Caulfield - South,hospital,H0374,10.4
 208021178,Caulfield - South,hospital,H0381,11.5
-208021178,Caulfield - South,hospital,H0371,11.9
 208021178,Caulfield - South,hospital,H0330,11.9
+208021178,Caulfield - South,hospital,H0371,11.9
 208021178,Caulfield - South,hospital,H0366,12.0
 208021178,Caulfield - South,urgent_care_clinic,UCC-carnegie-medicare-urgent-care-clinic,3.0
 208021178,Caulfield - South,urgent_care_clinic,UCC-prahran-medicare-urgent-care-clinic,6.4
@@ -1320,8 +1320,8 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 208021178,Caulfield - South,urgent_care_clinic,UCC-sandringham-medicare-urgent-care-clinic,7.8
 208021178,Caulfield - South,urgent_care_clinic,UCC-richmond-urgent-care-clinic,8.5
 208021179,Elsternwick,hospital,H0358,5.2
-208021179,Elsternwick,hospital,H1057,8.1
 208021179,Elsternwick,hospital,H0344,8.1
+208021179,Elsternwick,hospital,H1057,8.1
 208021179,Elsternwick,hospital,H0367,9.3
 208021179,Elsternwick,hospital,H0374,9.6
 208021179,Elsternwick,hospital,H0375,10.4
@@ -1336,8 +1336,8 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 208021179,Elsternwick,urgent_care_clinic,UCC-mount-waverley-medicare-urgent-care-clinic,9.1
 208021180,Hughesdale,hospital,H1054,5.4
 208021180,Hughesdale,hospital,H0331,7.5
-208021180,Hughesdale,hospital,H1057,8.9
 208021180,Hughesdale,hospital,H0344,8.9
+208021180,Hughesdale,hospital,H1057,8.9
 208021180,Hughesdale,hospital,H0330,10.0
 208021180,Hughesdale,hospital,H0358,10.5
 208021180,Hughesdale,hospital,H0367,13.6
@@ -1370,8 +1370,8 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 208021182,Ormond - Glen Huntly,hospital,H1054,8.9
 208021182,Ormond - Glen Huntly,hospital,H0331,11.0
 208021182,Ormond - Glen Huntly,hospital,H0367,11.3
-208021182,Ormond - Glen Huntly,hospital,H0374,11.6
 208021182,Ormond - Glen Huntly,hospital,H0330,11.6
+208021182,Ormond - Glen Huntly,hospital,H0374,11.6
 208021182,Ormond - Glen Huntly,hospital,H0381,12.7
 208021182,Ormond - Glen Huntly,hospital,H0371,13.1
 208021182,Ormond - Glen Huntly,urgent_care_clinic,UCC-carnegie-medicare-urgent-care-clinic,2.2
@@ -1380,8 +1380,8 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 208021182,Ormond - Glen Huntly,urgent_care_clinic,UCC-prahran-medicare-urgent-care-clinic,7.7
 208021182,Ormond - Glen Huntly,urgent_care_clinic,UCC-monash-children-s-urgent-care-clinic,7.8
 208021426,Bentleigh East - North,hospital,H1054,6.3
-208021426,Bentleigh East - North,hospital,H1057,6.8
 208021426,Bentleigh East - North,hospital,H0344,6.8
+208021426,Bentleigh East - North,hospital,H1057,6.8
 208021426,Bentleigh East - North,hospital,H0331,8.1
 208021426,Bentleigh East - North,hospital,H0358,10.7
 208021426,Bentleigh East - North,hospital,H0330,12.1
@@ -1394,8 +1394,8 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 208021426,Bentleigh East - North,urgent_care_clinic,UCC-mount-waverley-medicare-urgent-care-clinic,5.2
 208021426,Bentleigh East - North,urgent_care_clinic,UCC-sandringham-medicare-urgent-care-clinic,6.7
 208021426,Bentleigh East - North,urgent_care_clinic,UCC-prahran-medicare-urgent-care-clinic,10.8
-208021427,Bentleigh East - South,hospital,H1057,5.4
 208021427,Bentleigh East - South,hospital,H0344,5.4
+208021427,Bentleigh East - South,hospital,H1057,5.4
 208021427,Bentleigh East - South,hospital,H1054,6.8
 208021427,Bentleigh East - South,hospital,H0331,8.2
 208021427,Bentleigh East - South,hospital,H0358,11.8
@@ -1411,8 +1411,8 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 208021427,Bentleigh East - South,urgent_care_clinic,UCC-prahran-medicare-urgent-care-clinic,11.9
 208031183,Aspendale Gardens - Waterways,hospital,H0348,9.7
 208031183,Aspendale Gardens - Waterways,hospital,H0331,10.9
-208031183,Aspendale Gardens - Waterways,hospital,H1057,11.4
 208031183,Aspendale Gardens - Waterways,hospital,H0344,11.4
+208031183,Aspendale Gardens - Waterways,hospital,H1057,11.4
 208031183,Aspendale Gardens - Waterways,hospital,H1054,12.2
 208031183,Aspendale Gardens - Waterways,hospital,H0350,14.4
 208031183,Aspendale Gardens - Waterways,hospital,H0353,19.8
@@ -1427,8 +1427,8 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 208031184,Braeside,hospital,H0331,7.9
 208031184,Braeside,hospital,H0348,8.4
 208031184,Braeside,hospital,H1054,9.1
-208031184,Braeside,hospital,H1057,10.1
 208031184,Braeside,hospital,H0344,10.1
+208031184,Braeside,hospital,H1057,10.1
 208031184,Braeside,hospital,H0350,17.5
 208031184,Braeside,hospital,H0333,19.6
 208031184,Braeside,hospital,H0330,20.0
@@ -1442,8 +1442,8 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 208031185,Carrum - Patterson Lakes,hospital,H0350,9.3
 208031185,Carrum - Patterson Lakes,hospital,H0348,12.0
 208031185,Carrum - Patterson Lakes,hospital,H0331,15.7
-208031185,Carrum - Patterson Lakes,hospital,H1057,16.3
 208031185,Carrum - Patterson Lakes,hospital,H0344,16.3
+208031185,Carrum - Patterson Lakes,hospital,H1057,16.3
 208031185,Carrum - Patterson Lakes,hospital,H1054,17.3
 208031185,Carrum - Patterson Lakes,hospital,H1060,17.5
 208031185,Carrum - Patterson Lakes,hospital,H0353,17.8
@@ -1456,8 +1456,8 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 208031185,Carrum - Patterson Lakes,urgent_care_clinic,UCC-monash-children-s-urgent-care-clinic,16.8
 208031186,Chelsea - Bonbeach,hospital,H0350,10.6
 208031186,Chelsea - Bonbeach,hospital,H0348,12.0
-208031186,Chelsea - Bonbeach,hospital,H1057,14.1
 208031186,Chelsea - Bonbeach,hospital,H0344,14.1
+208031186,Chelsea - Bonbeach,hospital,H1057,14.1
 208031186,Chelsea - Bonbeach,hospital,H0331,14.5
 208031186,Chelsea - Bonbeach,hospital,H1054,15.9
 208031186,Chelsea - Bonbeach,hospital,H0353,19.5
@@ -1472,8 +1472,8 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 208031187,Chelsea Heights,hospital,H0348,10.2
 208031187,Chelsea Heights,hospital,H0350,12.3
 208031187,Chelsea Heights,hospital,H0331,12.7
-208031187,Chelsea Heights,hospital,H1057,13.4
 208031187,Chelsea Heights,hospital,H0344,13.4
+208031187,Chelsea Heights,hospital,H1057,13.4
 208031187,Chelsea Heights,hospital,H1054,14.2
 208031187,Chelsea Heights,hospital,H0353,18.7
 208031187,Chelsea Heights,hospital,H1060,19.3
@@ -1491,16 +1491,16 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 208031188,Highett (East) - Cheltenham ,hospital,H0348,13.7
 208031188,Highett (East) - Cheltenham ,hospital,H0358,14.6
 208031188,Highett (East) - Cheltenham ,hospital,H0330,17.0
-208031188,Highett (East) - Cheltenham ,hospital,H0375,18.5
 208031188,Highett (East) - Cheltenham ,hospital,H0367,18.5
+208031188,Highett (East) - Cheltenham ,hospital,H0375,18.5
 208031188,Highett (East) - Cheltenham ,hospital,H0374,18.8
 208031188,Highett (East) - Cheltenham ,urgent_care_clinic,UCC-sandringham-medicare-urgent-care-clinic,4.0
 208031188,Highett (East) - Cheltenham ,urgent_care_clinic,UCC-monash-children-s-urgent-care-clinic,7.1
 208031188,Highett (East) - Cheltenham ,urgent_care_clinic,UCC-carnegie-medicare-urgent-care-clinic,8.5
 208031188,Highett (East) - Cheltenham ,urgent_care_clinic,UCC-mount-waverley-medicare-urgent-care-clinic,9.7
 208031188,Highett (East) - Cheltenham ,urgent_care_clinic,UCC-dandenong-medicare-urgent-care-clinic,12.8
-208031189,Edithvale - Aspendale,hospital,H1057,10.6
 208031189,Edithvale - Aspendale,hospital,H0344,10.6
+208031189,Edithvale - Aspendale,hospital,H1057,10.6
 208031189,Edithvale - Aspendale,hospital,H0348,11.4
 208031189,Edithvale - Aspendale,hospital,H0331,12.0
 208031189,Edithvale - Aspendale,hospital,H1054,13.1
@@ -1529,8 +1529,8 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 208031190,Mentone,urgent_care_clinic,UCC-carnegie-medicare-urgent-care-clinic,11.1
 208031190,Mentone,urgent_care_clinic,UCC-dandenong-medicare-urgent-care-clinic,12.1
 208031190,Mentone,urgent_care_clinic,UCC-mount-waverley-medicare-urgent-care-clinic,12.2
-208031191,Moorabbin - Heatherton,hospital,H1054,6.3
 208031191,Moorabbin - Heatherton,hospital,H0344,6.3
+208031191,Moorabbin - Heatherton,hospital,H1054,6.3
 208031191,Moorabbin - Heatherton,hospital,H1057,6.3
 208031191,Moorabbin - Heatherton,hospital,H0331,6.7
 208031191,Moorabbin - Heatherton,hospital,H0348,11.6
@@ -1593,8 +1593,8 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 208041195,Malvern East,hospital,H0330,8.4
 208041195,Malvern East,hospital,H0358,8.5
 208041195,Malvern East,hospital,H0331,9.6
-208041195,Malvern East,hospital,H1057,10.2
 208041195,Malvern East,hospital,H0344,10.2
+208041195,Malvern East,hospital,H1057,10.2
 208041195,Malvern East,hospital,H0367,11.2
 208041195,Malvern East,hospital,H0374,11.5
 208041195,Malvern East,hospital,H0381,12.7
@@ -1612,8 +1612,8 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 209011196,Bundoora - East,hospital,H0381,14.6
 209011196,Bundoora - East,hospital,H0374,14.7
 209011196,Bundoora - East,hospital,H0367,14.8
-209011196,Bundoora - East,hospital,H0371,15.0
 209011196,Bundoora - East,hospital,H0364,15.0
+209011196,Bundoora - East,hospital,H0371,15.0
 209011196,Bundoora - East,urgent_care_clinic,UCC-heidelberg-medicare-urgent-care-clinic,6.4
 209011196,Bundoora - East,urgent_care_clinic,UCC-epping-medicare-urgent-care-clinic,6.7
 209011196,Bundoora - East,urgent_care_clinic,UCC-eltham-medicare-urgent-care-clinic,7.4
@@ -1624,18 +1624,18 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 209011197,Greensborough,hospital,H0368,9.5
 209011197,Greensborough,hospital,H0330,12.6
 209011197,Greensborough,hospital,H0374,16.2
-209011197,Greensborough,hospital,H0381,16.3
 209011197,Greensborough,hospital,H0367,16.3
-209011197,Greensborough,hospital,H0379,16.8
+209011197,Greensborough,hospital,H0381,16.3
 209011197,Greensborough,hospital,H0371,16.8
+209011197,Greensborough,hospital,H0379,16.8
 209011197,Greensborough,hospital,H0366,16.9
 209011197,Greensborough,urgent_care_clinic,UCC-eltham-medicare-urgent-care-clinic,4.4
 209011197,Greensborough,urgent_care_clinic,UCC-heidelberg-medicare-urgent-care-clinic,6.9
 209011197,Greensborough,urgent_care_clinic,UCC-epping-medicare-urgent-care-clinic,9.2
 209011197,Greensborough,urgent_care_clinic,UCC-coburg-medicare-urgent-care-clinic,12.8
 209011197,Greensborough,urgent_care_clinic,UCC-richmond-urgent-care-clinic,16.1
-209011198,Heidelberg - Rosanna,hospital,H0362,1.5
 209011198,Heidelberg - Rosanna,hospital,H0359,1.5
+209011198,Heidelberg - Rosanna,hospital,H0362,1.5
 209011198,Heidelberg - Rosanna,hospital,H0330,8.8
 209011198,Heidelberg - Rosanna,hospital,H0374,10.8
 209011198,Heidelberg - Rosanna,hospital,H0367,10.9
@@ -1656,8 +1656,8 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 209011199,Heidelberg West,hospital,H0367,9.6
 209011199,Heidelberg West,hospital,H0371,10.0
 209011199,Heidelberg West,hospital,H0366,10.1
-209011199,Heidelberg West,hospital,H0364,10.2
 209011199,Heidelberg West,hospital,H0330,10.2
+209011199,Heidelberg West,hospital,H0364,10.2
 209011199,Heidelberg West,hospital,H0368,10.3
 209011199,Heidelberg West,urgent_care_clinic,UCC-heidelberg-medicare-urgent-care-clinic,2.2
 209011199,Heidelberg West,urgent_care_clinic,UCC-coburg-medicare-urgent-care-clinic,7.0
@@ -1691,8 +1691,8 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 209011201,Ivanhoe East - Eaglemont,hospital,H0358,11.0
 209011201,Ivanhoe East - Eaglemont,urgent_care_clinic,UCC-heidelberg-medicare-urgent-care-clinic,1.7
 209011201,Ivanhoe East - Eaglemont,urgent_care_clinic,UCC-richmond-urgent-care-clinic,8.0
-209011201,Ivanhoe East - Eaglemont,urgent_care_clinic,UCC-inner-melbourne-medicare-urgent-care-clinic,9.0
 209011201,Ivanhoe East - Eaglemont,urgent_care_clinic,UCC-coburg-medicare-urgent-care-clinic,9.0
+209011201,Ivanhoe East - Eaglemont,urgent_care_clinic,UCC-inner-melbourne-medicare-urgent-care-clinic,9.0
 209011201,Ivanhoe East - Eaglemont,urgent_care_clinic,UCC-royal-children-s-hospital-urgent-care-clinic,10.3
 209011202,Montmorency - Briar Hill,hospital,H0362,6.0
 209011202,Montmorency - Briar Hill,hospital,H0359,6.1
@@ -1724,30 +1724,30 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 209011203,Viewbank - Yallambie,urgent_care_clinic,UCC-coburg-medicare-urgent-care-clinic,10.6
 209011203,Viewbank - Yallambie,urgent_care_clinic,UCC-epping-medicare-urgent-care-clinic,10.9
 209011203,Viewbank - Yallambie,urgent_care_clinic,UCC-richmond-urgent-care-clinic,12.3
-209011204,Watsonia,hospital,H0362,6.2
 209011204,Watsonia,hospital,H0359,6.2
+209011204,Watsonia,hospital,H0362,6.2
 209011204,Watsonia,hospital,H0368,8.3
 209011204,Watsonia,hospital,H0330,12.6
 209011204,Watsonia,hospital,H0374,14.9
 209011204,Watsonia,hospital,H0381,15.0
 209011204,Watsonia,hospital,H0367,15.1
 209011204,Watsonia,hospital,H0379,15.3
-209011204,Watsonia,hospital,H0371,15.5
 209011204,Watsonia,hospital,H0364,15.5
+209011204,Watsonia,hospital,H0371,15.5
 209011204,Watsonia,urgent_care_clinic,UCC-eltham-medicare-urgent-care-clinic,6.0
 209011204,Watsonia,urgent_care_clinic,UCC-heidelberg-medicare-urgent-care-clinic,6.0
 209011204,Watsonia,urgent_care_clinic,UCC-epping-medicare-urgent-care-clinic,8.2
 209011204,Watsonia,urgent_care_clinic,UCC-coburg-medicare-urgent-care-clinic,11.3
 209011204,Watsonia,urgent_care_clinic,UCC-inner-melbourne-medicare-urgent-care-clinic,14.9
-209021205,Kingsbury,hospital,H0362,4.8
 209021205,Kingsbury,hospital,H0359,4.8
+209021205,Kingsbury,hospital,H0362,4.8
 209021205,Kingsbury,hospital,H0368,7.4
 209021205,Kingsbury,hospital,H0381,12.1
 209021205,Kingsbury,hospital,H0374,12.2
 209021205,Kingsbury,hospital,H0367,12.4
-209021205,Kingsbury,hospital,H0379,12.5
-209021205,Kingsbury,hospital,H0371,12.5
 209021205,Kingsbury,hospital,H0364,12.5
+209021205,Kingsbury,hospital,H0371,12.5
+209021205,Kingsbury,hospital,H0379,12.5
 209021205,Kingsbury,hospital,H0366,12.6
 209021205,Kingsbury,urgent_care_clinic,UCC-heidelberg-medicare-urgent-care-clinic,4.8
 209021205,Kingsbury,urgent_care_clinic,UCC-epping-medicare-urgent-care-clinic,7.3
@@ -1759,9 +1759,9 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 209021428,Preston - East,hospital,H0381,7.8
 209021428,Preston - East,hospital,H0374,7.9
 209021428,Preston - East,hospital,H0367,8.1
-209021428,Preston - East,hospital,H0371,8.2
 209021428,Preston - East,hospital,H0364,8.2
 209021428,Preston - East,hospital,H0366,8.2
+209021428,Preston - East,hospital,H0371,8.2
 209021428,Preston - East,hospital,H0368,10.0
 209021428,Preston - East,hospital,H0379,11.2
 209021428,Preston - East,urgent_care_clinic,UCC-coburg-medicare-urgent-care-clinic,4.4
@@ -1771,10 +1771,10 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 209021428,Preston - East,urgent_care_clinic,UCC-richmond-urgent-care-clinic,8.7
 209021429,Preston - West,hospital,H0359,6.5
 209021429,Preston - West,hospital,H0362,6.5
-209021429,Preston - West,hospital,H0381,7.0
 209021429,Preston - West,hospital,H0364,7.0
-209021429,Preston - West,hospital,H0371,7.2
+209021429,Preston - West,hospital,H0381,7.0
 209021429,Preston - West,hospital,H0366,7.2
+209021429,Preston - West,hospital,H0371,7.2
 209021429,Preston - West,hospital,H0374,7.5
 209021429,Preston - West,hospital,H0367,7.8
 209021429,Preston - West,hospital,H0379,9.2
@@ -1790,8 +1790,8 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 209021523,Reservoir - North East,hospital,H0379,9.9
 209021523,Reservoir - North East,hospital,H0381,11.5
 209021523,Reservoir - North East,hospital,H0364,11.6
-209021523,Reservoir - North East,hospital,H0371,11.8
 209021523,Reservoir - North East,hospital,H0366,11.8
+209021523,Reservoir - North East,hospital,H0371,11.8
 209021523,Reservoir - North East,hospital,H0374,11.8
 209021523,Reservoir - North East,hospital,H0367,12.1
 209021523,Reservoir - North East,urgent_care_clinic,UCC-epping-medicare-urgent-care-clinic,5.9
@@ -1805,8 +1805,8 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 209021524,Reservoir - North West,hospital,H0362,8.5
 209021524,Reservoir - North West,hospital,H0364,11.3
 209021524,Reservoir - North West,hospital,H0381,11.4
-209021524,Reservoir - North West,hospital,H0371,11.5
 209021524,Reservoir - North West,hospital,H0366,11.5
+209021524,Reservoir - North West,hospital,H0371,11.5
 209021524,Reservoir - North West,hospital,H0374,12.0
 209021524,Reservoir - North West,hospital,H0367,12.2
 209021524,Reservoir - North West,urgent_care_clinic,UCC-coburg-medicare-urgent-care-clinic,5.4
@@ -1818,10 +1818,10 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 209021525,Reservoir - South East,hospital,H0362,4.9
 209021525,Reservoir - South East,hospital,H0368,8.0
 209021525,Reservoir - South East,hospital,H0381,9.7
-209021525,Reservoir - South East,hospital,H0374,10.0
 209021525,Reservoir - South East,hospital,H0364,10.0
-209021525,Reservoir - South East,hospital,H0371,10.1
+209021525,Reservoir - South East,hospital,H0374,10.0
 209021525,Reservoir - South East,hospital,H0366,10.1
+209021525,Reservoir - South East,hospital,H0371,10.1
 209021525,Reservoir - South East,hospital,H0367,10.2
 209021525,Reservoir - South East,hospital,H0379,10.5
 209021525,Reservoir - South East,urgent_care_clinic,UCC-heidelberg-medicare-urgent-care-clinic,5.1
@@ -1835,13 +1835,13 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 209021526,Reservoir - South West,hospital,H0379,8.0
 209021526,Reservoir - South West,hospital,H0364,9.3
 209021526,Reservoir - South West,hospital,H0381,9.3
-209021526,Reservoir - South West,hospital,H0371,9.5
 209021526,Reservoir - South West,hospital,H0366,9.5
+209021526,Reservoir - South West,hospital,H0371,9.5
 209021526,Reservoir - South West,hospital,H0374,9.9
 209021526,Reservoir - South West,hospital,H0367,10.2
 209021526,Reservoir - South West,urgent_care_clinic,UCC-coburg-medicare-urgent-care-clinic,3.6
-209021526,Reservoir - South West,urgent_care_clinic,UCC-heidelberg-medicare-urgent-care-clinic,7.6
 209021526,Reservoir - South West,urgent_care_clinic,UCC-epping-medicare-urgent-care-clinic,7.6
+209021526,Reservoir - South West,urgent_care_clinic,UCC-heidelberg-medicare-urgent-care-clinic,7.6
 209021526,Reservoir - South West,urgent_care_clinic,UCC-moonee-ponds-urgent-care-clinic,8.5
 209021526,Reservoir - South West,urgent_care_clinic,UCC-royal-children-s-hospital-urgent-care-clinic,9.2
 209031209,Eltham,hospital,H0362,10.0
@@ -1882,8 +1882,8 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 209031212,Panton Hill - St Andrews,hospital,H0341,19.3
 209031212,Panton Hill - St Andrews,hospital,H0368,21.2
 209031212,Panton Hill - St Andrews,hospital,H0332,22.6
-209031212,Panton Hill - St Andrews,hospital,H0362,23.6
 209031212,Panton Hill - St Andrews,hospital,H0359,23.6
+209031212,Panton Hill - St Andrews,hospital,H0362,23.6
 209031212,Panton Hill - St Andrews,hospital,H0330,26.0
 209031212,Panton Hill - St Andrews,hospital,H0380,28.9
 209031212,Panton Hill - St Andrews,hospital,H0379,30.7
@@ -1895,14 +1895,14 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 209031212,Panton Hill - St Andrews,urgent_care_clinic,UCC-heidelberg-medicare-urgent-care-clinic,23.3
 209031212,Panton Hill - St Andrews,urgent_care_clinic,UCC-maroondah-medicare-urgent-care-clinic,26.5
 209031213,Plenty - Yarrambat,hospital,H0368,9.6
-209031213,Plenty - Yarrambat,hospital,H0362,13.0
 209031213,Plenty - Yarrambat,hospital,H0359,13.0
+209031213,Plenty - Yarrambat,hospital,H0362,13.0
 209031213,Plenty - Yarrambat,hospital,H0330,18.1
 209031213,Plenty - Yarrambat,hospital,H0379,18.9
 209031213,Plenty - Yarrambat,hospital,H0380,19.0
 209031213,Plenty - Yarrambat,hospital,H0332,20.8
-209031213,Plenty - Yarrambat,hospital,H0381,21.7
 209031213,Plenty - Yarrambat,hospital,H0374,21.7
+209031213,Plenty - Yarrambat,hospital,H0381,21.7
 209031213,Plenty - Yarrambat,hospital,H0367,21.9
 209031213,Plenty - Yarrambat,urgent_care_clinic,UCC-eltham-medicare-urgent-care-clinic,6.6
 209031213,Plenty - Yarrambat,urgent_care_clinic,UCC-epping-medicare-urgent-care-clinic,9.4
@@ -1912,8 +1912,8 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 209031214,Research - North Warrandyte,hospital,H0332,12.3
 209031214,Research - North Warrandyte,hospital,H0341,13.0
 209031214,Research - North Warrandyte,hospital,H0362,15.5
-209031214,Research - North Warrandyte,hospital,H0359,15.6
 209031214,Research - North Warrandyte,hospital,H0330,15.6
+209031214,Research - North Warrandyte,hospital,H0359,15.6
 209031214,Research - North Warrandyte,hospital,H0368,19.0
 209031214,Research - North Warrandyte,hospital,H0333,23.6
 209031214,Research - North Warrandyte,hospital,H0374,24.8
@@ -1940,14 +1940,14 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 209031215,Wattle Glen - Diamond Creek,urgent_care_clinic,UCC-lilydale-medicare-urgent-care-clinic,18.9
 209031215,Wattle Glen - Diamond Creek,urgent_care_clinic,UCC-coburg-medicare-urgent-care-clinic,20.4
 209041216,Bundoora - North,hospital,H0368,6.1
-209041216,Bundoora - North,hospital,H0362,8.2
 209041216,Bundoora - North,hospital,H0359,8.2
+209041216,Bundoora - North,hospital,H0362,8.2
 209041216,Bundoora - North,hospital,H0379,14.0
 209041216,Bundoora - North,hospital,H0330,15.1
 209041216,Bundoora - North,hospital,H0381,16.0
 209041216,Bundoora - North,hospital,H0374,16.2
-209041216,Bundoora - North,hospital,H0367,16.4
 209041216,Bundoora - North,hospital,H0364,16.4
+209041216,Bundoora - North,hospital,H0367,16.4
 209041216,Bundoora - North,hospital,H0371,16.4
 209041216,Bundoora - North,urgent_care_clinic,UCC-epping-medicare-urgent-care-clinic,5.9
 209041216,Bundoora - North,urgent_care_clinic,UCC-eltham-medicare-urgent-care-clinic,7.5
@@ -1955,15 +1955,15 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 209041216,Bundoora - North,urgent_care_clinic,UCC-coburg-medicare-urgent-care-clinic,11.5
 209041216,Bundoora - North,urgent_care_clinic,UCC-inner-melbourne-medicare-urgent-care-clinic,16.0
 209041217,Bundoora - West,hospital,H0368,5.5
-209041217,Bundoora - West,hospital,H0362,7.1
 209041217,Bundoora - West,hospital,H0359,7.1
+209041217,Bundoora - West,hospital,H0362,7.1
 209041217,Bundoora - West,hospital,H0379,12.3
 209041217,Bundoora - West,hospital,H0381,14.1
 209041217,Bundoora - West,hospital,H0374,14.4
 209041217,Bundoora - West,hospital,H0364,14.5
 209041217,Bundoora - West,hospital,H0371,14.5
-209041217,Bundoora - West,hospital,H0367,14.6
 209041217,Bundoora - West,hospital,H0366,14.6
+209041217,Bundoora - West,hospital,H0367,14.6
 209041217,Bundoora - West,urgent_care_clinic,UCC-epping-medicare-urgent-care-clinic,5.3
 209041217,Bundoora - West,urgent_care_clinic,UCC-heidelberg-medicare-urgent-care-clinic,7.1
 209041217,Bundoora - West,urgent_care_clinic,UCC-eltham-medicare-urgent-care-clinic,9.0
@@ -1985,15 +1985,15 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 209041220,Mill Park - North,urgent_care_clinic,UCC-coburg-medicare-urgent-care-clinic,12.6
 209041220,Mill Park - North,urgent_care_clinic,UCC-craigieburn-urgent-care-clinic,15.8
 209041221,Mill Park - South,hospital,H0368,4.1
-209041221,Mill Park - South,hospital,H0362,9.6
 209041221,Mill Park - South,hospital,H0359,9.6
+209041221,Mill Park - South,hospital,H0362,9.6
 209041221,Mill Park - South,hospital,H0379,12.6
 209041221,Mill Park - South,hospital,H0380,14.6
 209041221,Mill Park - South,hospital,H0381,16.4
 209041221,Mill Park - South,hospital,H0364,16.6
 209041221,Mill Park - South,hospital,H0374,16.7
-209041221,Mill Park - South,hospital,H0371,16.8
 209041221,Mill Park - South,hospital,H0366,16.8
+209041221,Mill Park - South,hospital,H0371,16.8
 209041221,Mill Park - South,urgent_care_clinic,UCC-epping-medicare-urgent-care-clinic,3.8
 209041221,Mill Park - South,urgent_care_clinic,UCC-eltham-medicare-urgent-care-clinic,9.4
 209041221,Mill Park - South,urgent_care_clinic,UCC-heidelberg-medicare-urgent-care-clinic,9.5
@@ -2006,8 +2006,8 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 209041223,Thomastown,hospital,H0380,12.4
 209041223,Thomastown,hospital,H0364,13.4
 209041223,Thomastown,hospital,H0381,13.4
-209041223,Thomastown,hospital,H0371,13.6
 209041223,Thomastown,hospital,H0366,13.6
+209041223,Thomastown,hospital,H0371,13.6
 209041223,Thomastown,hospital,H0374,14.0
 209041223,Thomastown,urgent_care_clinic,UCC-epping-medicare-urgent-care-clinic,3.5
 209041223,Thomastown,urgent_care_clinic,UCC-coburg-medicare-urgent-care-clinic,7.5
@@ -2026,12 +2026,12 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 209041225,Whittlesea,hospital,H0380,21.0
 209041225,Whittlesea,hospital,H0312,25.0
 209041225,Whittlesea,hospital,H0379,28.2
-209041225,Whittlesea,hospital,H0362,30.2
 209041225,Whittlesea,hospital,H0359,30.2
+209041225,Whittlesea,hospital,H0362,30.2
 209041225,Whittlesea,hospital,H0330,36.2
 209041225,Whittlesea,hospital,H0341,36.3
-209041225,Whittlesea,hospital,H0381,37.1
 209041225,Whittlesea,hospital,H0364,37.1
+209041225,Whittlesea,hospital,H0381,37.1
 209041225,Whittlesea,urgent_care_clinic,UCC-epping-medicare-urgent-care-clinic,20.3
 209041225,Whittlesea,urgent_care_clinic,UCC-craigieburn-urgent-care-clinic,21.3
 209041225,Whittlesea,urgent_care_clinic,UCC-eltham-medicare-urgent-care-clinic,24.4
@@ -2042,8 +2042,8 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 209041431,Epping - East,hospital,H0379,12.8
 209041431,Epping - East,hospital,H0362,13.4
 209041431,Epping - East,hospital,H0359,13.5
-209041431,Epping - East,hospital,H0381,19.5
 209041431,Epping - East,hospital,H0364,19.5
+209041431,Epping - East,hospital,H0381,19.5
 209041431,Epping - East,hospital,H0371,19.7
 209041431,Epping - East,hospital,H0366,19.8
 209041431,Epping - East,hospital,H0374,19.9
@@ -2070,8 +2070,8 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 209041433,Epping (Vic.) - West,hospital,H0368,2.4
 209041433,Epping (Vic.) - West,hospital,H0380,9.0
 209041433,Epping (Vic.) - West,hospital,H0379,10.4
-209041433,Epping (Vic.) - West,hospital,H0362,14.5
 209041433,Epping (Vic.) - West,hospital,H0359,14.5
+209041433,Epping (Vic.) - West,hospital,H0362,14.5
 209041433,Epping (Vic.) - West,hospital,H0364,18.9
 209041433,Epping (Vic.) - West,hospital,H0381,19.1
 209041433,Epping (Vic.) - West,hospital,H0366,19.2
@@ -2090,8 +2090,8 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 209041435,South Morang - North,hospital,H0330,21.2
 209041435,South Morang - North,hospital,H0381,22.1
 209041435,South Morang - North,hospital,H0364,22.3
-209041435,South Morang - North,hospital,H0374,22.4
 209041435,South Morang - North,hospital,H0371,22.4
+209041435,South Morang - North,hospital,H0374,22.4
 209041435,South Morang - North,urgent_care_clinic,UCC-epping-medicare-urgent-care-clinic,6.8
 209041435,South Morang - North,urgent_care_clinic,UCC-eltham-medicare-urgent-care-clinic,10.8
 209041435,South Morang - North,urgent_care_clinic,UCC-heidelberg-medicare-urgent-care-clinic,14.6
@@ -2104,8 +2104,8 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 209041436,South Morang - South,hospital,H0379,15.7
 209041436,South Morang - South,hospital,H0330,18.8
 209041436,South Morang - South,hospital,H0381,20.0
-209041436,South Morang - South,hospital,H0374,20.2
 209041436,South Morang - South,hospital,H0364,20.2
+209041436,South Morang - South,hospital,H0374,20.2
 209041436,South Morang - South,hospital,H0371,20.3
 209041436,South Morang - South,urgent_care_clinic,UCC-epping-medicare-urgent-care-clinic,6.0
 209041436,South Morang - South,urgent_care_clinic,UCC-eltham-medicare-urgent-care-clinic,8.9
@@ -2115,8 +2115,8 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 209041437,Wollert,hospital,H0368,7.0
 209041437,Wollert,hospital,H0380,7.9
 209041437,Wollert,hospital,H0379,13.4
-209041437,Wollert,hospital,H0362,18.9
 209041437,Wollert,hospital,H0359,18.9
+209041437,Wollert,hospital,H0362,18.9
 209041437,Wollert,hospital,H0364,23.3
 209041437,Wollert,hospital,H0381,23.5
 209041437,Wollert,hospital,H0366,23.6
@@ -2129,13 +2129,13 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 209041437,Wollert,urgent_care_clinic,UCC-heidelberg-medicare-urgent-care-clinic,19.0
 209041527,Doreen - North,hospital,H0368,12.0
 209041527,Doreen - North,hospital,H0380,18.1
-209041527,Doreen - North,hospital,H0362,19.4
 209041527,Doreen - North,hospital,H0359,19.4
+209041527,Doreen - North,hospital,H0362,19.4
 209041527,Doreen - North,hospital,H0379,21.4
 209041527,Doreen - North,hospital,H0330,25.0
 209041527,Doreen - North,hospital,H0332,26.8
-209041527,Doreen - North,hospital,H0381,27.3
 209041527,Doreen - North,hospital,H0341,27.3
+209041527,Doreen - North,hospital,H0381,27.3
 209041527,Doreen - North,hospital,H0374,27.5
 209041527,Doreen - North,urgent_care_clinic,UCC-epping-medicare-urgent-care-clinic,11.8
 209041527,Doreen - North,urgent_care_clinic,UCC-eltham-medicare-urgent-care-clinic,13.2
@@ -2158,12 +2158,12 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 209041528,Doreen - South,urgent_care_clinic,UCC-craigieburn-urgent-care-clinic,18.8
 209041528,Doreen - South,urgent_care_clinic,UCC-coburg-medicare-urgent-care-clinic,19.9
 209041529,Lalor - East,hospital,H0368,2.0
-209041529,Lalor - East,hospital,H0379,10.2
-209041529,Lalor - East,hospital,H0362,10.2
 209041529,Lalor - East,hospital,H0359,10.2
+209041529,Lalor - East,hospital,H0362,10.2
+209041529,Lalor - East,hospital,H0379,10.2
 209041529,Lalor - East,hospital,H0380,12.4
-209041529,Lalor - East,hospital,H0381,15.6
 209041529,Lalor - East,hospital,H0364,15.6
+209041529,Lalor - East,hospital,H0381,15.6
 209041529,Lalor - East,hospital,H0371,15.8
 209041529,Lalor - East,hospital,H0366,15.9
 209041529,Lalor - East,hospital,H0374,16.1
@@ -2195,8 +2195,8 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 209041531,Mernda - North,hospital,H0330,25.6
 209041531,Mernda - North,hospital,H0381,26.2
 209041531,Mernda - North,hospital,H0364,26.3
-209041531,Mernda - North,hospital,H0371,26.5
 209041531,Mernda - North,hospital,H0366,26.5
+209041531,Mernda - North,hospital,H0371,26.5
 209041531,Mernda - North,urgent_care_clinic,UCC-epping-medicare-urgent-care-clinic,9.8
 209041531,Mernda - North,urgent_care_clinic,UCC-eltham-medicare-urgent-care-clinic,14.6
 209041531,Mernda - North,urgent_care_clinic,UCC-craigieburn-urgent-care-clinic,15.7
@@ -2205,8 +2205,8 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 209041532,Mernda - South,hospital,H0368,7.4
 209041532,Mernda - South,hospital,H0380,13.7
 209041532,Mernda - South,hospital,H0379,16.6
-209041532,Mernda - South,hospital,H0362,16.7
 209041532,Mernda - South,hospital,H0359,16.7
+209041532,Mernda - South,hospital,H0362,16.7
 209041532,Mernda - South,hospital,H0330,23.4
 209041532,Mernda - South,hospital,H0381,23.5
 209041532,Mernda - South,hospital,H0364,23.6
@@ -2421,8 +2421,8 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 210031535,Glenroy - East,hospital,H0371,10.9
 210031535,Glenroy - East,hospital,H0381,11.1
 210031535,Glenroy - East,hospital,H0373,11.5
-210031535,Glenroy - East,hospital,H0380,12.1
 210031535,Glenroy - East,hospital,H0374,12.1
+210031535,Glenroy - East,hospital,H0380,12.1
 210031535,Glenroy - East,urgent_care_clinic,UCC-coburg-medicare-urgent-care-clinic,5.5
 210031535,Glenroy - East,urgent_care_clinic,UCC-moonee-ponds-urgent-care-clinic,6.9
 210031535,Glenroy - East,urgent_care_clinic,UCC-maribyrnong-medicare-urgent-care-clinic,9.5
@@ -2451,8 +2451,8 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 210031537,Oak Park,hospital,H0373,9.8
 210031537,Oak Park,hospital,H0381,10.0
 210031537,Oak Park,hospital,H0374,11.1
-210031537,Oak Park,hospital,H0368,11.4
 210031537,Oak Park,hospital,H0367,11.4
+210031537,Oak Park,hospital,H0368,11.4
 210031537,Oak Park,urgent_care_clinic,UCC-coburg-medicare-urgent-care-clinic,5.3
 210031537,Oak Park,urgent_care_clinic,UCC-moonee-ponds-urgent-care-clinic,5.3
 210031537,Oak Park,urgent_care_clinic,UCC-maribyrnong-medicare-urgent-care-clinic,7.6
@@ -2479,8 +2479,8 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 210041240,Sunbury,hospital,H0269,24.4
 210041240,Sunbury,hospital,H0368,24.4
 210041240,Sunbury,hospital,H0363,29.1
-210041240,Sunbury,hospital,H0364,31.8
 210041240,Sunbury,hospital,H0312,31.8
+210041240,Sunbury,hospital,H0364,31.8
 210041240,Sunbury,hospital,H0366,32.3
 210041240,Sunbury,hospital,H0371,32.4
 210041240,Sunbury,urgent_care_clinic,UCC-sunbury-medicare-urgent-care-clinic,4.1
@@ -2621,8 +2621,8 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 210051248,Melbourne Airport,urgent_care_clinic,UCC-sunshine-medicare-urgent-care-clinic,11.5
 210051248,Melbourne Airport,urgent_care_clinic,UCC-craigieburn-urgent-care-clinic,11.6
 210051248,Melbourne Airport,urgent_care_clinic,UCC-moonee-ponds-urgent-care-clinic,12.4
-210051248,Melbourne Airport,urgent_care_clinic,UCC-sunbury-medicare-urgent-care-clinic,13.1
 210051248,Melbourne Airport,urgent_care_clinic,UCC-maribyrnong-medicare-urgent-care-clinic,13.1
+210051248,Melbourne Airport,urgent_care_clinic,UCC-sunbury-medicare-urgent-care-clinic,13.1
 210051250,Tullamarine,hospital,H0379,3.5
 210051250,Tullamarine,hospital,H0373,8.7
 210051250,Tullamarine,hospital,H0363,10.7
@@ -2656,8 +2656,8 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 210051442,Craigieburn - North,hospital,H0380,4.2
 210051442,Craigieburn - North,hospital,H0368,10.9
 210051442,Craigieburn - North,hospital,H0379,13.3
-210051442,Craigieburn - North,hospital,H0362,22.9
 210051442,Craigieburn - North,hospital,H0359,22.9
+210051442,Craigieburn - North,hospital,H0362,22.9
 210051442,Craigieburn - North,hospital,H0373,24.3
 210051442,Craigieburn - North,hospital,H0364,25.2
 210051442,Craigieburn - North,hospital,H0363,25.5
@@ -2765,8 +2765,8 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 211011251,Bayswater,hospital,H1054,13.3
 211011251,Bayswater,hospital,H0330,13.5
 211011251,Bayswater,hospital,H0348,15.0
-211011251,Bayswater,hospital,H0362,20.7
 211011251,Bayswater,hospital,H0359,20.7
+211011251,Bayswater,hospital,H0362,20.7
 211011251,Bayswater,hospital,H0353,23.2
 211011251,Bayswater,urgent_care_clinic,UCC-maroondah-medicare-urgent-care-clinic,0.6
 211011251,Bayswater,urgent_care_clinic,UCC-forest-hill-urgent-care-clinic,8.5
@@ -2781,8 +2781,8 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 211011254,Knoxfield - Scoresby,hospital,H0330,13.6
 211011254,Knoxfield - Scoresby,hospital,H0341,18.8
 211011254,Knoxfield - Scoresby,hospital,H0353,19.3
-211011254,Knoxfield - Scoresby,hospital,H1057,20.2
 211011254,Knoxfield - Scoresby,hospital,H0344,20.2
+211011254,Knoxfield - Scoresby,hospital,H1057,20.2
 211011254,Knoxfield - Scoresby,urgent_care_clinic,UCC-maroondah-medicare-urgent-care-clinic,6.8
 211011254,Knoxfield - Scoresby,urgent_care_clinic,UCC-forest-hill-urgent-care-clinic,7.7
 211011254,Knoxfield - Scoresby,urgent_care_clinic,UCC-monash-children-s-urgent-care-clinic,9.8
@@ -2792,12 +2792,12 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 211011255,Lysterfield,hospital,H0348,8.6
 211011255,Lysterfield,hospital,H0331,12.0
 211011255,Lysterfield,hospital,H1054,13.7
-211011255,Lysterfield,hospital,H0353,13.9
 211011255,Lysterfield,hospital,H0332,13.9
+211011255,Lysterfield,hospital,H0353,13.9
 211011255,Lysterfield,hospital,H1060,19.0
 211011255,Lysterfield,hospital,H0341,19.7
 211011255,Lysterfield,hospital,H0330,20.0
-211011255,Lysterfield,hospital,H1057,24.6
+211011255,Lysterfield,hospital,H0344,24.6
 211011255,Lysterfield,urgent_care_clinic,UCC-maroondah-medicare-urgent-care-clinic,9.9
 211011255,Lysterfield,urgent_care_clinic,UCC-narre-warren-medicare-urgent-care-clinic,10.6
 211011255,Lysterfield,urgent_care_clinic,UCC-dandenong-medicare-urgent-care-clinic,12.6
@@ -2811,8 +2811,8 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 211011256,Rowville - Central,hospital,H0330,16.0
 211011256,Rowville - Central,hospital,H0353,16.9
 211011256,Rowville - Central,hospital,H0341,20.0
-211011256,Rowville - Central,hospital,H1057,20.7
 211011256,Rowville - Central,hospital,H0344,20.7
+211011256,Rowville - Central,hospital,H1057,20.7
 211011256,Rowville - Central,urgent_care_clinic,UCC-maroondah-medicare-urgent-care-clinic,8.5
 211011256,Rowville - Central,urgent_care_clinic,UCC-forest-hill-urgent-care-clinic,10.1
 211011256,Rowville - Central,urgent_care_clinic,UCC-monash-children-s-urgent-care-clinic,10.7
@@ -2826,8 +2826,8 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 211011257,Rowville - North,hospital,H0330,16.0
 211011257,Rowville - North,hospital,H0353,17.3
 211011257,Rowville - North,hospital,H0341,18.6
-211011257,Rowville - North,hospital,H1057,21.9
 211011257,Rowville - North,hospital,H0344,21.9
+211011257,Rowville - North,hospital,H1057,21.9
 211011257,Rowville - North,urgent_care_clinic,UCC-maroondah-medicare-urgent-care-clinic,7.3
 211011257,Rowville - North,urgent_care_clinic,UCC-forest-hill-urgent-care-clinic,10.1
 211011257,Rowville - North,urgent_care_clinic,UCC-monash-children-s-urgent-care-clinic,11.8
@@ -2841,8 +2841,8 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 211011258,Rowville - South,hospital,H0353,15.0
 211011258,Rowville - South,hospital,H0330,17.6
 211011258,Rowville - South,hospital,H1060,19.4
-211011258,Rowville - South,hospital,H1057,19.9
 211011258,Rowville - South,hospital,H0344,19.9
+211011258,Rowville - South,hospital,H1057,19.9
 211011258,Rowville - South,urgent_care_clinic,UCC-dandenong-medicare-urgent-care-clinic,9.0
 211011258,Rowville - South,urgent_care_clinic,UCC-monash-children-s-urgent-care-clinic,10.6
 211011258,Rowville - South,urgent_care_clinic,UCC-maroondah-medicare-urgent-care-clinic,11.0
@@ -2870,8 +2870,8 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 211011260,Wantirna South,hospital,H0330,11.0
 211011260,Wantirna South,hospital,H0348,11.7
 211011260,Wantirna South,hospital,H0341,17.1
-211011260,Wantirna South,hospital,H0362,19.0
 211011260,Wantirna South,hospital,H0359,19.0
+211011260,Wantirna South,hospital,H0362,19.0
 211011260,Wantirna South,hospital,H0344,20.4
 211011260,Wantirna South,urgent_care_clinic,UCC-forest-hill-urgent-care-clinic,5.1
 211011260,Wantirna South,urgent_care_clinic,UCC-maroondah-medicare-urgent-care-clinic,5.1
@@ -2886,8 +2886,8 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 211011446,Boronia,hospital,H0348,13.9
 211011446,Boronia,hospital,H0330,15.5
 211011446,Boronia,hospital,H0353,21.1
-211011446,Boronia,hospital,H0362,22.9
 211011446,Boronia,hospital,H0359,22.9
+211011446,Boronia,hospital,H0362,22.9
 211011446,Boronia,urgent_care_clinic,UCC-maroondah-medicare-urgent-care-clinic,2.9
 211011446,Boronia,urgent_care_clinic,UCC-forest-hill-urgent-care-clinic,10.2
 211011446,Boronia,urgent_care_clinic,UCC-lilydale-medicare-urgent-care-clinic,13.1
@@ -2917,7 +2917,7 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 211011448,Ferntree Gully (South) - Upper Ferntree Gully,hospital,H0330,16.6
 211011448,Ferntree Gully (South) - Upper Ferntree Gully,hospital,H0353,18.1
 211011448,Ferntree Gully (South) - Upper Ferntree Gully,hospital,H1060,23.2
-211011448,Ferntree Gully (South) - Upper Ferntree Gully,hospital,H1057,24.3
+211011448,Ferntree Gully (South) - Upper Ferntree Gully,hospital,H0344,24.3
 211011448,Ferntree Gully (South) - Upper Ferntree Gully,urgent_care_clinic,UCC-maroondah-medicare-urgent-care-clinic,5.7
 211011448,Ferntree Gully (South) - Upper Ferntree Gully,urgent_care_clinic,UCC-forest-hill-urgent-care-clinic,10.8
 211011448,Ferntree Gully (South) - Upper Ferntree Gully,urgent_care_clinic,UCC-monash-children-s-urgent-care-clinic,14.0
@@ -2941,8 +2941,8 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 211021261,Donvale - Park Orchards,hospital,H0332,4.9
 211021261,Donvale - Park Orchards,hospital,H0330,8.2
 211021261,Donvale - Park Orchards,hospital,H0362,13.1
-211021261,Donvale - Park Orchards,hospital,H0359,13.2
 211021261,Donvale - Park Orchards,hospital,H0341,13.2
+211021261,Donvale - Park Orchards,hospital,H0359,13.2
 211021261,Donvale - Park Orchards,hospital,H1054,15.2
 211021261,Donvale - Park Orchards,hospital,H0333,15.8
 211021261,Donvale - Park Orchards,hospital,H0331,16.3
@@ -3000,8 +3000,8 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 211031265,Croydon Hills - Warranwood,urgent_care_clinic,UCC-heidelberg-medicare-urgent-care-clinic,17.8
 211031266,Ringwood,hospital,H0332,2.4
 211031266,Ringwood,hospital,H0330,9.5
-211031266,Ringwood,hospital,H0341,12.4
 211031266,Ringwood,hospital,H0333,12.4
+211031266,Ringwood,hospital,H0341,12.4
 211031266,Ringwood,hospital,H1054,13.8
 211031266,Ringwood,hospital,H0331,14.4
 211031266,Ringwood,hospital,H0362,15.8
@@ -3020,8 +3020,8 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 211031267,Ringwood East,hospital,H1054,13.9
 211031267,Ringwood East,hospital,H0331,14.2
 211031267,Ringwood East,hospital,H0348,17.5
-211031267,Ringwood East,hospital,H0362,17.9
 211031267,Ringwood East,hospital,H0359,17.9
+211031267,Ringwood East,hospital,H0362,17.9
 211031267,Ringwood East,hospital,H0358,23.5
 211031267,Ringwood East,urgent_care_clinic,UCC-maroondah-medicare-urgent-care-clinic,2.8
 211031267,Ringwood East,urgent_care_clinic,UCC-forest-hill-urgent-care-clinic,7.5
@@ -3033,8 +3033,8 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 211031268,Ringwood North,hospital,H0341,11.6
 211031268,Ringwood North,hospital,H0333,13.8
 211031268,Ringwood North,hospital,H1054,15.2
-211031268,Ringwood North,hospital,H0362,15.4
 211031268,Ringwood North,hospital,H0359,15.4
+211031268,Ringwood North,hospital,H0362,15.4
 211031268,Ringwood North,hospital,H0331,16.0
 211031268,Ringwood North,hospital,H0348,20.2
 211031268,Ringwood North,hospital,H0367,22.2
@@ -3050,8 +3050,8 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 211031450,Croydon - East,hospital,H1054,18.5
 211031450,Croydon - East,hospital,H0331,18.6
 211031450,Croydon - East,hospital,H0348,20.8
-211031450,Croydon - East,hospital,H0362,20.9
 211031450,Croydon - East,hospital,H0359,20.9
+211031450,Croydon - East,hospital,H0362,20.9
 211031450,Croydon - East,hospital,H0358,27.8
 211031450,Croydon - East,urgent_care_clinic,UCC-maroondah-medicare-urgent-care-clinic,5.3
 211031450,Croydon - East,urgent_care_clinic,UCC-lilydale-medicare-urgent-care-clinic,6.9
@@ -3138,8 +3138,8 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 211041272,Vermont,hospital,H1054,9.7
 211041272,Vermont,hospital,H0331,10.5
 211041272,Vermont,hospital,H0333,12.1
-211041272,Vermont,hospital,H0362,15.3
 211041272,Vermont,hospital,H0359,15.3
+211041272,Vermont,hospital,H0362,15.3
 211041272,Vermont,hospital,H0348,15.4
 211041272,Vermont,hospital,H0341,16.2
 211041272,Vermont,hospital,H0358,19.1
@@ -3154,10 +3154,10 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 211041273,Vermont South,hospital,H0331,8.4
 211041273,Vermont South,hospital,H0333,12.1
 211041273,Vermont South,hospital,H0348,13.7
-211041273,Vermont South,hospital,H0362,15.7
 211041273,Vermont South,hospital,H0359,15.7
-211041273,Vermont South,hospital,H0358,18.1
+211041273,Vermont South,hospital,H0362,15.7
 211041273,Vermont South,hospital,H0341,18.1
+211041273,Vermont South,hospital,H0358,18.1
 211041273,Vermont South,urgent_care_clinic,UCC-forest-hill-urgent-care-clinic,1.7
 211041273,Vermont South,urgent_care_clinic,UCC-maroondah-medicare-urgent-care-clinic,7.1
 211041273,Vermont South,urgent_care_clinic,UCC-mount-waverley-medicare-urgent-care-clinic,7.4
@@ -3172,12 +3172,12 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 211051274,Belgrave - Selby,hospital,H1054,18.8
 211051274,Belgrave - Selby,hospital,H0341,20.1
 211051274,Belgrave - Selby,hospital,H0330,24.6
-211051274,Belgrave - Selby,hospital,H1057,29.4
+211051274,Belgrave - Selby,hospital,H0344,29.4
 211051274,Belgrave - Selby,urgent_care_clinic,UCC-narre-warren-medicare-urgent-care-clinic,10.1
 211051274,Belgrave - Selby,urgent_care_clinic,UCC-maroondah-medicare-urgent-care-clinic,13.0
 211051274,Belgrave - Selby,urgent_care_clinic,UCC-dandenong-medicare-urgent-care-clinic,15.9
-211051274,Belgrave - Selby,urgent_care_clinic,UCC-pakenham-medicare-urgent-care-clinic,18.7
 211051274,Belgrave - Selby,urgent_care_clinic,UCC-forest-hill-urgent-care-clinic,18.7
+211051274,Belgrave - Selby,urgent_care_clinic,UCC-pakenham-medicare-urgent-care-clinic,18.7
 211051275,Chirnside Park,hospital,H0341,3.7
 211051275,Chirnside Park,hospital,H0332,9.2
 211051275,Chirnside Park,hospital,H0333,17.7
@@ -3251,11 +3251,11 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 211051280,Montrose,hospital,H0333,10.3
 211051280,Montrose,hospital,H0330,20.3
 211051280,Montrose,hospital,H0331,21.3
-211051280,Montrose,hospital,H1054,21.7
 211051280,Montrose,hospital,H0348,21.7
+211051280,Montrose,hospital,H1054,21.7
 211051280,Montrose,hospital,H0353,26.1
-211051280,Montrose,hospital,H0362,26.2
 211051280,Montrose,hospital,H0359,26.2
+211051280,Montrose,hospital,H0362,26.2
 211051280,Montrose,urgent_care_clinic,UCC-lilydale-medicare-urgent-care-clinic,6.0
 211051280,Montrose,urgent_care_clinic,UCC-maroondah-medicare-urgent-care-clinic,8.1
 211051280,Montrose,urgent_care_clinic,UCC-forest-hill-urgent-care-clinic,16.4
@@ -3265,8 +3265,8 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 211051281,Mooroolbark,hospital,H0332,7.0
 211051281,Mooroolbark,hospital,H0333,13.4
 211051281,Mooroolbark,hospital,H0330,18.6
-211051281,Mooroolbark,hospital,H1054,22.1
 211051281,Mooroolbark,hospital,H0331,22.1
+211051281,Mooroolbark,hospital,H1054,22.1
 211051281,Mooroolbark,hospital,H0362,23.4
 211051281,Mooroolbark,hospital,H0359,23.5
 211051281,Mooroolbark,hospital,H0348,23.9
@@ -3315,7 +3315,7 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 211051284,Upwey - Tecoma,hospital,H1054,16.7
 211051284,Upwey - Tecoma,hospital,H0330,21.0
 211051284,Upwey - Tecoma,hospital,H1060,21.2
-211051284,Upwey - Tecoma,hospital,H1057,28.0
+211051284,Upwey - Tecoma,hospital,H0344,28.0
 211051284,Upwey - Tecoma,urgent_care_clinic,UCC-maroondah-medicare-urgent-care-clinic,8.9
 211051284,Upwey - Tecoma,urgent_care_clinic,UCC-narre-warren-medicare-urgent-care-clinic,13.2
 211051284,Upwey - Tecoma,urgent_care_clinic,UCC-forest-hill-urgent-care-clinic,15.3
@@ -3454,8 +3454,8 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 212021293,Berwick - North,hospital,H1054,22.4
 212021293,Berwick - North,hospital,H0350,23.6
 212021293,Berwick - North,hospital,H0332,26.0
-212021293,Berwick - North,hospital,H1057,30.0
 212021293,Berwick - North,hospital,H0344,30.0
+212021293,Berwick - North,hospital,H1057,30.0
 212021293,Berwick - North,urgent_care_clinic,UCC-narre-warren-medicare-urgent-care-clinic,3.3
 212021293,Berwick - North,urgent_care_clinic,UCC-pakenham-medicare-urgent-care-clinic,12.5
 212021293,Berwick - North,urgent_care_clinic,UCC-dandenong-medicare-urgent-care-clinic,13.6
@@ -3467,15 +3467,15 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 212021295,Doveton,hospital,H0333,12.0
 212021295,Doveton,hospital,H1054,12.3
 212021295,Doveton,hospital,H1060,14.7
-212021295,Doveton,hospital,H1057,19.8
 212021295,Doveton,hospital,H0344,19.8
-212021295,Doveton,hospital,H0350,20.4
+212021295,Doveton,hospital,H1057,19.8
 212021295,Doveton,hospital,H0332,20.4
+212021295,Doveton,hospital,H0350,20.4
 212021295,Doveton,urgent_care_clinic,UCC-dandenong-medicare-urgent-care-clinic,4.5
 212021295,Doveton,urgent_care_clinic,UCC-narre-warren-medicare-urgent-care-clinic,7.3
 212021295,Doveton,urgent_care_clinic,UCC-monash-children-s-urgent-care-clinic,12.9
-212021295,Doveton,urgent_care_clinic,UCC-mount-waverley-medicare-urgent-care-clinic,16.7
 212021295,Doveton,urgent_care_clinic,UCC-maroondah-medicare-urgent-care-clinic,16.7
+212021295,Doveton,urgent_care_clinic,UCC-mount-waverley-medicare-urgent-care-clinic,16.7
 212021297,Hallam,hospital,H0348,5.6
 212021297,Hallam,hospital,H0353,8.0
 212021297,Hallam,hospital,H1060,11.6
@@ -3484,8 +3484,8 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 212021297,Hallam,hospital,H1054,15.5
 212021297,Hallam,hospital,H0350,20.1
 212021297,Hallam,hospital,H0332,22.3
-212021297,Hallam,hospital,H1057,22.6
 212021297,Hallam,hospital,H0344,22.6
+212021297,Hallam,hospital,H1057,22.6
 212021297,Hallam,urgent_care_clinic,UCC-narre-warren-medicare-urgent-care-clinic,4.1
 212021297,Hallam,urgent_care_clinic,UCC-dandenong-medicare-urgent-care-clinic,6.4
 212021297,Hallam,urgent_care_clinic,UCC-monash-children-s-urgent-care-clinic,16.1
@@ -3514,8 +3514,8 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 212021453,Endeavour Hills - North,hospital,H1060,16.6
 212021453,Endeavour Hills - North,hospital,H0332,17.0
 212021453,Endeavour Hills - North,hospital,H0330,20.5
-212021453,Endeavour Hills - North,hospital,H1057,21.3
 212021453,Endeavour Hills - North,hospital,H0344,21.3
+212021453,Endeavour Hills - North,hospital,H1057,21.3
 212021453,Endeavour Hills - North,urgent_care_clinic,UCC-dandenong-medicare-urgent-care-clinic,8.0
 212021453,Endeavour Hills - North,urgent_care_clinic,UCC-narre-warren-medicare-urgent-care-clinic,8.3
 212021453,Endeavour Hills - North,urgent_care_clinic,UCC-monash-children-s-urgent-care-clinic,12.8
@@ -3528,8 +3528,8 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 212021454,Endeavour Hills - South,hospital,H1054,13.4
 212021454,Endeavour Hills - South,hospital,H1060,14.1
 212021454,Endeavour Hills - South,hospital,H0332,19.7
-212021454,Endeavour Hills - South,hospital,H1057,21.6
 212021454,Endeavour Hills - South,hospital,H0344,21.6
+212021454,Endeavour Hills - South,hospital,H1057,21.6
 212021454,Endeavour Hills - South,hospital,H0350,21.9
 212021454,Endeavour Hills - South,urgent_care_clinic,UCC-narre-warren-medicare-urgent-care-clinic,6.1
 212021454,Endeavour Hills - South,urgent_care_clinic,UCC-dandenong-medicare-urgent-care-clinic,6.5
@@ -3544,8 +3544,8 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 212021455,Narre Warren - North East,hospital,H1054,18.4
 212021455,Narre Warren - North East,hospital,H0350,22.5
 212021455,Narre Warren - North East,hospital,H0332,22.9
-212021455,Narre Warren - North East,hospital,H1057,26.2
 212021455,Narre Warren - North East,hospital,H0344,26.2
+212021455,Narre Warren - North East,hospital,H1057,26.2
 212021455,Narre Warren - North East,urgent_care_clinic,UCC-narre-warren-medicare-urgent-care-clinic,1.6
 212021455,Narre Warren - North East,urgent_care_clinic,UCC-dandenong-medicare-urgent-care-clinic,10.1
 212021455,Narre Warren - North East,urgent_care_clinic,UCC-pakenham-medicare-urgent-care-clinic,16.5
@@ -3559,8 +3559,8 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 212021456,Narre Warren - South West,hospital,H1054,19.6
 212021456,Narre Warren - South West,hospital,H0350,20.7
 212021456,Narre Warren - South West,hospital,H0332,25.2
-212021456,Narre Warren - South West,hospital,H1057,26.5
 212021456,Narre Warren - South West,hospital,H0344,26.5
+212021456,Narre Warren - South West,hospital,H1057,26.5
 212021456,Narre Warren - South West,urgent_care_clinic,UCC-narre-warren-medicare-urgent-care-clinic,0.9
 212021456,Narre Warren - South West,urgent_care_clinic,UCC-dandenong-medicare-urgent-care-clinic,10.0
 212021456,Narre Warren - South West,urgent_care_clinic,UCC-pakenham-medicare-urgent-care-clinic,15.9
@@ -3589,8 +3589,8 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 212021554,Berwick - South West,hospital,H0350,20.9
 212021554,Berwick - South West,hospital,H1054,22.5
 212021554,Berwick - South West,hospital,H0332,27.7
-212021554,Berwick - South West,hospital,H1057,29.0
 212021554,Berwick - South West,hospital,H0344,29.0
+212021554,Berwick - South West,hospital,H1057,29.0
 212021554,Berwick - South West,urgent_care_clinic,UCC-narre-warren-medicare-urgent-care-clinic,3.4
 212021554,Berwick - South West,urgent_care_clinic,UCC-dandenong-medicare-urgent-care-clinic,12.5
 212021554,Berwick - South West,urgent_care_clinic,UCC-pakenham-medicare-urgent-care-clinic,13.5
@@ -3618,8 +3618,8 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 212031303,Cranbourne South,hospital,H0333,28.1
 212031303,Cranbourne South,hospital,H0331,28.2
 212031303,Cranbourne South,hospital,H1054,30.5
-212031303,Cranbourne South,hospital,H1057,33.3
 212031303,Cranbourne South,hospital,H0344,33.3
+212031303,Cranbourne South,hospital,H1057,33.3
 212031303,Cranbourne South,hospital,H0332,38.6
 212031303,Cranbourne South,urgent_care_clinic,UCC-narre-warren-medicare-urgent-care-clinic,14.4
 212031303,Cranbourne South,urgent_care_clinic,UCC-somerville-medicare-urgent-care-clinic,14.9
@@ -3633,8 +3633,8 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 212031304,Cranbourne West,hospital,H0331,20.8
 212031304,Cranbourne West,hospital,H1054,23.0
 212031304,Cranbourne West,hospital,H0333,23.2
-212031304,Cranbourne West,hospital,H1057,25.5
 212031304,Cranbourne West,hospital,H0344,25.5
+212031304,Cranbourne West,hospital,H1057,25.5
 212031304,Cranbourne West,hospital,H0332,32.7
 212031304,Cranbourne West,urgent_care_clinic,UCC-narre-warren-medicare-urgent-care-clinic,10.3
 212031304,Cranbourne West,urgent_care_clinic,UCC-dandenong-medicare-urgent-care-clinic,11.1
@@ -3648,8 +3648,8 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 212031306,Lynbrook - Lyndhurst,hospital,H0331,17.0
 212031306,Lynbrook - Lyndhurst,hospital,H0333,18.9
 212031306,Lynbrook - Lyndhurst,hospital,H1054,19.3
-212031306,Lynbrook - Lyndhurst,hospital,H1057,23.4
 212031306,Lynbrook - Lyndhurst,hospital,H0344,23.4
+212031306,Lynbrook - Lyndhurst,hospital,H1057,23.4
 212031306,Lynbrook - Lyndhurst,hospital,H0332,28.3
 212031306,Lynbrook - Lyndhurst,urgent_care_clinic,UCC-narre-warren-medicare-urgent-care-clinic,6.8
 212031306,Lynbrook - Lyndhurst,urgent_care_clinic,UCC-dandenong-medicare-urgent-care-clinic,7.6
@@ -3663,8 +3663,8 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 212031308,Pearcedale - Tooradin,hospital,H0331,34.2
 212031308,Pearcedale - Tooradin,hospital,H0333,34.5
 212031308,Pearcedale - Tooradin,hospital,H1054,36.5
-212031308,Pearcedale - Tooradin,hospital,H1057,38.1
 212031308,Pearcedale - Tooradin,hospital,H0344,38.1
+212031308,Pearcedale - Tooradin,hospital,H1057,38.1
 212031308,Pearcedale - Tooradin,urgent_care_clinic,UCC-somerville-medicare-urgent-care-clinic,13.2
 212031308,Pearcedale - Tooradin,urgent_care_clinic,UCC-frankston-medicare-urgent-care-clinic,18.1
 212031308,Pearcedale - Tooradin,urgent_care_clinic,UCC-narre-warren-medicare-urgent-care-clinic,20.8
@@ -3677,8 +3677,8 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 212031457,Narre Warren South - East,hospital,H0350,19.3
 212031457,Narre Warren South - East,hospital,H0331,19.9
 212031457,Narre Warren South - East,hospital,H1054,22.2
-212031457,Narre Warren South - East,hospital,H1057,28.1
 212031457,Narre Warren South - East,hospital,H0344,28.1
+212031457,Narre Warren South - East,hospital,H1057,28.1
 212031457,Narre Warren South - East,hospital,H0332,28.4
 212031457,Narre Warren South - East,urgent_care_clinic,UCC-narre-warren-medicare-urgent-care-clinic,4.0
 212031457,Narre Warren South - East,urgent_care_clinic,UCC-dandenong-medicare-urgent-care-clinic,11.6
@@ -3692,8 +3692,8 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 212031458,Narre Warren South - West,hospital,H0331,17.7
 212031458,Narre Warren South - West,hospital,H0350,18.4
 212031458,Narre Warren South - West,hospital,H1054,20.0
-212031458,Narre Warren South - West,hospital,H1057,25.8
 212031458,Narre Warren South - West,hospital,H0344,25.8
+212031458,Narre Warren South - West,hospital,H1057,25.8
 212031458,Narre Warren South - West,hospital,H0332,26.9
 212031458,Narre Warren South - West,urgent_care_clinic,UCC-narre-warren-medicare-urgent-care-clinic,3.4
 212031458,Narre Warren South - West,urgent_care_clinic,UCC-dandenong-medicare-urgent-care-clinic,9.3
@@ -3708,8 +3708,8 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 212031555,Clyde North - North,hospital,H0331,24.6
 212031555,Clyde North - North,hospital,H1054,27.0
 212031555,Clyde North - North,hospital,H0332,32.2
-212031555,Clyde North - North,hospital,H1057,32.7
 212031555,Clyde North - North,hospital,H0344,32.7
+212031555,Clyde North - North,hospital,H1057,32.7
 212031555,Clyde North - North,urgent_care_clinic,UCC-narre-warren-medicare-urgent-care-clinic,8.0
 212031555,Clyde North - North,urgent_care_clinic,UCC-pakenham-medicare-urgent-care-clinic,11.1
 212031555,Clyde North - North,urgent_care_clinic,UCC-dandenong-medicare-urgent-care-clinic,16.3
@@ -3722,8 +3722,8 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 212031556,Clyde North - South,hospital,H0333,23.7
 212031556,Clyde North - South,hospital,H0331,27.0
 212031556,Clyde North - South,hospital,H1054,29.3
-212031556,Clyde North - South,hospital,H1057,34.5
 212031556,Clyde North - South,hospital,H0344,34.5
+212031556,Clyde North - South,hospital,H1057,34.5
 212031556,Clyde North - South,hospital,H0332,34.8
 212031556,Clyde North - South,urgent_care_clinic,UCC-narre-warren-medicare-urgent-care-clinic,10.6
 212031556,Clyde North - South,urgent_care_clinic,UCC-pakenham-medicare-urgent-care-clinic,11.1
@@ -3752,8 +3752,8 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 212031558,Cranbourne East - South,hospital,H0333,24.6
 212031558,Cranbourne East - South,hospital,H0331,24.8
 212031558,Cranbourne East - South,hospital,H1054,27.1
-212031558,Cranbourne East - South,hospital,H1057,30.5
 212031558,Cranbourne East - South,hospital,H0344,30.5
+212031558,Cranbourne East - South,hospital,H1057,30.5
 212031558,Cranbourne East - South,hospital,H0332,35.0
 212031558,Cranbourne East - South,urgent_care_clinic,UCC-narre-warren-medicare-urgent-care-clinic,10.9
 212031558,Cranbourne East - South,urgent_care_clinic,UCC-frankston-medicare-urgent-care-clinic,15.2
@@ -3782,8 +3782,8 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 212031560,Cranbourne North - West,hospital,H0331,19.6
 212031560,Cranbourne North - West,hospital,H0333,19.9
 212031560,Cranbourne North - West,hospital,H1054,21.9
-212031560,Cranbourne North - West,hospital,H1057,26.2
 212031560,Cranbourne North - West,hospital,H0344,26.2
+212031560,Cranbourne North - West,hospital,H1057,26.2
 212031560,Cranbourne North - West,hospital,H0332,29.9
 212031560,Cranbourne North - West,urgent_care_clinic,UCC-narre-warren-medicare-urgent-care-clinic,6.6
 212031560,Cranbourne North - West,urgent_care_clinic,UCC-dandenong-medicare-urgent-care-clinic,10.3
@@ -3797,8 +3797,8 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 212031561,Hampton Park - East,hospital,H0333,16.5
 212031561,Hampton Park - East,hospital,H0350,17.5
 212031561,Hampton Park - East,hospital,H1054,18.8
-212031561,Hampton Park - East,hospital,H1057,24.3
 212031561,Hampton Park - East,hospital,H0344,24.3
+212031561,Hampton Park - East,hospital,H1057,24.3
 212031561,Hampton Park - East,hospital,H0332,26.4
 212031561,Hampton Park - East,urgent_care_clinic,UCC-narre-warren-medicare-urgent-care-clinic,4.1
 212031561,Hampton Park - East,urgent_care_clinic,UCC-dandenong-medicare-urgent-care-clinic,7.9
@@ -3812,8 +3812,8 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 212031562,Hampton Park - West,hospital,H0333,15.6
 212031562,Hampton Park - West,hospital,H1054,16.9
 212031562,Hampton Park - West,hospital,H0350,17.4
-212031562,Hampton Park - West,hospital,H1057,22.5
 212031562,Hampton Park - West,hospital,H0344,22.5
+212031562,Hampton Park - West,hospital,H1057,22.5
 212031562,Hampton Park - West,hospital,H0332,25.1
 212031562,Hampton Park - West,urgent_care_clinic,UCC-narre-warren-medicare-urgent-care-clinic,4.9
 212031562,Hampton Park - West,urgent_care_clinic,UCC-dandenong-medicare-urgent-care-clinic,6.0
@@ -3822,8 +3822,8 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 212031562,Hampton Park - West,urgent_care_clinic,UCC-pakenham-medicare-urgent-care-clinic,20.0
 212041309,Clarinda - Oakleigh South,hospital,H1054,4.5
 212041309,Clarinda - Oakleigh South,hospital,H0331,5.4
-212041309,Clarinda - Oakleigh South,hospital,H1057,7.5
 212041309,Clarinda - Oakleigh South,hospital,H0344,7.5
+212041309,Clarinda - Oakleigh South,hospital,H1057,7.5
 212041309,Clarinda - Oakleigh South,hospital,H0348,11.5
 212041309,Clarinda - Oakleigh South,hospital,H0330,13.7
 212041309,Clarinda - Oakleigh South,hospital,H0358,14.2
@@ -3838,8 +3838,8 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 212041310,Clayton South,hospital,H0331,3.5
 212041310,Clayton South,hospital,H1054,3.8
 212041310,Clayton South,hospital,H0348,9.0
-212041310,Clayton South,hospital,H1057,9.5
 212041310,Clayton South,hospital,H0344,9.5
+212041310,Clayton South,hospital,H1057,9.5
 212041310,Clayton South,hospital,H0330,14.5
 212041310,Clayton South,hospital,H0358,16.6
 212041310,Clayton South,hospital,H0333,17.4
@@ -3868,8 +3868,8 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 212041313,Dingley Village,hospital,H0331,5.8
 212041313,Dingley Village,hospital,H1054,6.9
 212041313,Dingley Village,hospital,H0348,7.9
-212041313,Dingley Village,hospital,H1057,9.8
 212041313,Dingley Village,hospital,H0344,9.8
+212041313,Dingley Village,hospital,H1057,9.8
 212041313,Dingley Village,hospital,H0330,17.9
 212041313,Dingley Village,hospital,H0333,18.3
 212041313,Dingley Village,hospital,H0358,19.2
@@ -3890,8 +3890,8 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 212041316,Noble Park North,hospital,H0332,16.9
 212041316,Noble Park North,hospital,H0353,17.4
 212041316,Noble Park North,hospital,H1060,21.0
-212041316,Noble Park North,urgent_care_clinic,UCC-monash-children-s-urgent-care-clinic,6.7
 212041316,Noble Park North,urgent_care_clinic,UCC-dandenong-medicare-urgent-care-clinic,6.7
+212041316,Noble Park North,urgent_care_clinic,UCC-monash-children-s-urgent-care-clinic,6.7
 212041316,Noble Park North,urgent_care_clinic,UCC-mount-waverley-medicare-urgent-care-clinic,10.4
 212041316,Noble Park North,urgent_care_clinic,UCC-forest-hill-urgent-care-clinic,11.4
 212041316,Noble Park North,urgent_care_clinic,UCC-narre-warren-medicare-urgent-care-clinic,13.5
@@ -3913,8 +3913,8 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 212041318,Springvale South,hospital,H0331,5.1
 212041318,Springvale South,hospital,H0348,6.4
 212041318,Springvale South,hospital,H1054,6.7
-212041318,Springvale South,hospital,H1057,11.3
 212041318,Springvale South,hospital,H0344,11.3
+212041318,Springvale South,hospital,H1057,11.3
 212041318,Springvale South,hospital,H0333,16.9
 212041318,Springvale South,hospital,H0330,17.8
 212041318,Springvale South,hospital,H0353,19.4
@@ -3943,8 +3943,8 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 212041460,Noble Park - West,hospital,H0348,4.3
 212041460,Noble Park - West,hospital,H0331,4.9
 212041460,Noble Park - West,hospital,H1054,7.0
-212041460,Noble Park - West,hospital,H1057,13.4
 212041460,Noble Park - West,hospital,H0344,13.4
+212041460,Noble Park - West,hospital,H1057,13.4
 212041460,Noble Park - West,hospital,H0333,14.9
 212041460,Noble Park - West,hospital,H0353,17.6
 212041460,Noble Park - West,hospital,H0330,18.0
@@ -3961,10 +3961,10 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 212041563,Dandenong - North,hospital,H0333,12.8
 212041563,Dandenong - North,hospital,H0353,13.3
 212041563,Dandenong - North,hospital,H1060,16.5
-212041563,Dandenong - North,hospital,H1057,17.6
 212041563,Dandenong - North,hospital,H0344,17.6
-212041563,Dandenong - North,hospital,H0350,20.0
+212041563,Dandenong - North,hospital,H1057,17.6
 212041563,Dandenong - North,hospital,H0332,20.0
+212041563,Dandenong - North,hospital,H0350,20.0
 212041563,Dandenong - North,urgent_care_clinic,UCC-dandenong-medicare-urgent-care-clinic,3.3
 212041563,Dandenong - North,urgent_care_clinic,UCC-narre-warren-medicare-urgent-care-clinic,9.4
 212041563,Dandenong - North,urgent_care_clinic,UCC-monash-children-s-urgent-care-clinic,10.9
@@ -3976,8 +3976,8 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 212041564,Dandenong - South,hospital,H1054,13.9
 212041564,Dandenong - South,hospital,H1060,14.6
 212041564,Dandenong - South,hospital,H0350,15.0
-212041564,Dandenong - South,hospital,H1057,17.5
 212041564,Dandenong - South,hospital,H0344,17.5
+212041564,Dandenong - South,hospital,H1057,17.5
 212041564,Dandenong - South,hospital,H0333,17.6
 212041564,Dandenong - South,hospital,H0330,24.9
 212041564,Dandenong - South,urgent_care_clinic,UCC-dandenong-medicare-urgent-care-clinic,2.0
@@ -4012,15 +4012,15 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 212041566,Keysborough - South,hospital,H0330,23.7
 212041566,Keysborough - South,urgent_care_clinic,UCC-dandenong-medicare-urgent-care-clinic,3.5
 212041566,Keysborough - South,urgent_care_clinic,UCC-monash-children-s-urgent-care-clinic,12.2
-212041566,Keysborough - South,urgent_care_clinic,UCC-narre-warren-medicare-urgent-care-clinic,13.3
 212041566,Keysborough - South,urgent_care_clinic,UCC-frankston-medicare-urgent-care-clinic,13.3
+212041566,Keysborough - South,urgent_care_clinic,UCC-narre-warren-medicare-urgent-care-clinic,13.3
 212041566,Keysborough - South,urgent_care_clinic,UCC-sandringham-medicare-urgent-care-clinic,14.3
 212051319,Ashwood - Chadstone,hospital,H1054,5.5
 212051319,Ashwood - Chadstone,hospital,H0330,6.7
 212051319,Ashwood - Chadstone,hospital,H0331,7.9
 212051319,Ashwood - Chadstone,hospital,H0358,10.9
-212051319,Ashwood - Chadstone,hospital,H1057,12.2
 212051319,Ashwood - Chadstone,hospital,H0344,12.2
+212051319,Ashwood - Chadstone,hospital,H1057,12.2
 212051319,Ashwood - Chadstone,hospital,H0367,13.1
 212051319,Ashwood - Chadstone,hospital,H0374,13.3
 212051319,Ashwood - Chadstone,hospital,H0359,13.4
@@ -4036,13 +4036,13 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 212051321,Glen Waverley - East,hospital,H0332,10.7
 212051321,Glen Waverley - East,hospital,H0348,10.9
 212051321,Glen Waverley - East,hospital,H0333,11.9
-212051321,Glen Waverley - East,hospital,H1057,16.6
 212051321,Glen Waverley - East,hospital,H0344,16.6
-212051321,Glen Waverley - East,hospital,H0362,17.6
+212051321,Glen Waverley - East,hospital,H1057,16.6
 212051321,Glen Waverley - East,hospital,H0359,17.6
+212051321,Glen Waverley - East,hospital,H0362,17.6
 212051321,Glen Waverley - East,urgent_care_clinic,UCC-forest-hill-urgent-care-clinic,4.0
-212051321,Glen Waverley - East,urgent_care_clinic,UCC-mount-waverley-medicare-urgent-care-clinic,6.2
 212051321,Glen Waverley - East,urgent_care_clinic,UCC-monash-children-s-urgent-care-clinic,6.2
+212051321,Glen Waverley - East,urgent_care_clinic,UCC-mount-waverley-medicare-urgent-care-clinic,6.2
 212051321,Glen Waverley - East,urgent_care_clinic,UCC-maroondah-medicare-urgent-care-clinic,8.9
 212051321,Glen Waverley - East,urgent_care_clinic,UCC-carnegie-medicare-urgent-care-clinic,10.7
 212051322,Glen Waverley - West,hospital,H1054,3.7
@@ -4051,8 +4051,8 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 212051322,Glen Waverley - West,hospital,H0348,11.9
 212051322,Glen Waverley - West,hospital,H0332,12.0
 212051322,Glen Waverley - West,hospital,H0333,14.0
-212051322,Glen Waverley - West,hospital,H1057,15.0
 212051322,Glen Waverley - West,hospital,H0344,15.0
+212051322,Glen Waverley - West,hospital,H1057,15.0
 212051322,Glen Waverley - West,hospital,H0358,15.8
 212051322,Glen Waverley - West,hospital,H0362,16.3
 212051322,Glen Waverley - West,urgent_care_clinic,UCC-forest-hill-urgent-care-clinic,3.8
@@ -4065,11 +4065,11 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 212051323,Mount Waverley - North,hospital,H0331,7.3
 212051323,Mount Waverley - North,hospital,H0332,12.7
 212051323,Mount Waverley - North,hospital,H0358,13.3
-212051323,Mount Waverley - North,hospital,H0362,13.7
 212051323,Mount Waverley - North,hospital,H0359,13.7
+212051323,Mount Waverley - North,hospital,H0362,13.7
 212051323,Mount Waverley - North,hospital,H0344,14.5
-212051323,Mount Waverley - North,hospital,H1057,14.5
 212051323,Mount Waverley - North,hospital,H0348,14.5
+212051323,Mount Waverley - North,hospital,H1057,14.5
 212051323,Mount Waverley - North,urgent_care_clinic,UCC-mount-waverley-medicare-urgent-care-clinic,2.5
 212051323,Mount Waverley - North,urgent_care_clinic,UCC-forest-hill-urgent-care-clinic,3.9
 212051323,Mount Waverley - North,urgent_care_clinic,UCC-monash-children-s-urgent-care-clinic,5.8
@@ -4107,8 +4107,8 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 212051325,Mulgrave,urgent_care_clinic,UCC-dandenong-medicare-urgent-care-clinic,10.2
 212051326,Oakleigh - Huntingdale,hospital,H1054,3.2
 212051326,Oakleigh - Huntingdale,hospital,H0331,5.3
-212051326,Oakleigh - Huntingdale,hospital,H1057,9.6
 212051326,Oakleigh - Huntingdale,hospital,H0344,9.6
+212051326,Oakleigh - Huntingdale,hospital,H1057,9.6
 212051326,Oakleigh - Huntingdale,hospital,H0330,10.5
 212051326,Oakleigh - Huntingdale,hospital,H0348,12.6
 212051326,Oakleigh - Huntingdale,hospital,H0358,12.7
@@ -4142,8 +4142,8 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 212051567,Clayton (North) - Notting Hill,hospital,H0344,11.6
 212051567,Clayton (North) - Notting Hill,hospital,H1057,11.6
 212051567,Clayton (North) - Notting Hill,hospital,H0358,15.4
-212051567,Clayton (North) - Notting Hill,hospital,H0333,15.7
 212051567,Clayton (North) - Notting Hill,hospital,H0332,15.7
+212051567,Clayton (North) - Notting Hill,hospital,H0333,15.7
 212051567,Clayton (North) - Notting Hill,hospital,H0367,18.2
 212051567,Clayton (North) - Notting Hill,urgent_care_clinic,UCC-monash-children-s-urgent-care-clinic,1.2
 212051567,Clayton (North) - Notting Hill,urgent_care_clinic,UCC-mount-waverley-medicare-urgent-care-clinic,4.3
@@ -4152,8 +4152,8 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 212051567,Clayton (North) - Notting Hill,urgent_care_clinic,UCC-sandringham-medicare-urgent-care-clinic,11.6
 212051568,Clayton - Central,hospital,H1054,1.8
 212051568,Clayton - Central,hospital,H0331,3.1
-212051568,Clayton - Central,hospital,H1057,10.2
 212051568,Clayton - Central,hospital,H0344,10.2
+212051568,Clayton - Central,hospital,H1057,10.2
 212051568,Clayton - Central,hospital,H0348,10.3
 212051568,Clayton - Central,hospital,H0330,12.1
 212051568,Clayton - Central,hospital,H0358,15.1
@@ -4229,9 +4229,9 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 213011333,Kings Park (Vic.),hospital,H0363,11.9
 213011333,Kings Park (Vic.),hospital,H0379,14.0
 213011333,Kings Park (Vic.),hospital,H0364,17.1
+213011333,Kings Park (Vic.),hospital,H0366,17.6
 213011333,Kings Park (Vic.),hospital,H0369,17.6
 213011333,Kings Park (Vic.),hospital,H0375,17.6
-213011333,Kings Park (Vic.),hospital,H0366,17.6
 213011333,Kings Park (Vic.),hospital,H0371,17.8
 213011333,Kings Park (Vic.),hospital,H0381,18.4
 213011333,Kings Park (Vic.),hospital,H0269,19.5
@@ -4347,8 +4347,8 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 213011340,Taylors Lakes,urgent_care_clinic,UCC-craigieburn-urgent-care-clinic,15.2
 213011569,Deer Park,hospital,H0373,3.7
 213011569,Deer Park,hospital,H0363,10.4
-213011569,Deer Park,hospital,H0379,15.1
 213011569,Deer Park,hospital,H0375,15.1
+213011569,Deer Park,hospital,H0379,15.1
 213011569,Deer Park,hospital,H0369,15.2
 213011569,Deer Park,hospital,H0364,15.9
 213011569,Deer Park,hospital,H0366,16.3
@@ -4412,8 +4412,8 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 213021343,Altona North,hospital,H0366,11.0
 213021343,Altona North,hospital,H0371,11.1
 213021343,Altona North,hospital,H0381,11.7
-213021343,Altona North,hospital,H0374,12.4
 213021343,Altona North,hospital,H0367,12.4
+213021343,Altona North,hospital,H0374,12.4
 213021343,Altona North,hospital,H0358,12.7
 213021343,Altona North,urgent_care_clinic,UCC-sunshine-medicare-urgent-care-clinic,6.1
 213021343,Altona North,urgent_care_clinic,UCC-maribyrnong-medicare-urgent-care-clinic,7.2
@@ -4454,8 +4454,8 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 213021346,Williamstown,hospital,H0363,7.6
 213021346,Williamstown,hospital,H0358,8.4
 213021346,Williamstown,hospital,H0366,9.0
-213021346,Williamstown,hospital,H0371,9.1
 213021346,Williamstown,hospital,H0364,9.1
+213021346,Williamstown,hospital,H0371,9.1
 213021346,Williamstown,hospital,H0381,9.5
 213021346,Williamstown,hospital,H0367,9.6
 213021346,Williamstown,hospital,H0374,9.7
@@ -4497,8 +4497,8 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 213031348,Footscray,urgent_care_clinic,UCC-inner-melbourne-medicare-urgent-care-clinic,6.3
 213031349,Maribyrnong,hospital,H0363,2.0
 213031349,Maribyrnong,hospital,H0364,6.0
-213031349,Maribyrnong,hospital,H0373,6.5
 213031349,Maribyrnong,hospital,H0366,6.5
+213031349,Maribyrnong,hospital,H0373,6.5
 213031349,Maribyrnong,hospital,H0371,6.7
 213031349,Maribyrnong,hospital,H0381,7.3
 213031349,Maribyrnong,hospital,H0374,8.5
@@ -4516,8 +4516,8 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 213031350,Seddon - Kingsville,hospital,H0371,6.1
 213031350,Seddon - Kingsville,hospital,H0375,6.2
 213031350,Seddon - Kingsville,hospital,H0381,6.8
-213031350,Seddon - Kingsville,hospital,H0374,7.7
 213031350,Seddon - Kingsville,hospital,H0367,7.7
+213031350,Seddon - Kingsville,hospital,H0374,7.7
 213031350,Seddon - Kingsville,hospital,H0373,8.3
 213031350,Seddon - Kingsville,hospital,H0358,9.3
 213031350,Seddon - Kingsville,urgent_care_clinic,UCC-maribyrnong-medicare-urgent-care-clinic,2.6
@@ -4695,8 +4695,8 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 213041573,Eynesbury - Exford,hospital,H0371,37.8
 213041573,Eynesbury - Exford,urgent_care_clinic,UCC-melton-medicare-urgent-care-clinic,8.9
 213041573,Eynesbury - Exford,urgent_care_clinic,UCC-werribee-medicare-urgent-care-clinic,19.7
-213041573,Eynesbury - Exford,urgent_care_clinic,UCC-sunshine-medicare-urgent-care-clinic,27.5
 213041573,Eynesbury - Exford,urgent_care_clinic,UCC-sunbury-medicare-urgent-care-clinic,27.5
+213041573,Eynesbury - Exford,urgent_care_clinic,UCC-sunshine-medicare-urgent-care-clinic,27.5
 213041573,Eynesbury - Exford,urgent_care_clinic,UCC-maribyrnong-medicare-urgent-care-clinic,32.0
 213041574,Fraser Rise - Plumpton,hospital,H0269,10.9
 213041574,Fraser Rise - Plumpton,hospital,H0373,14.3
@@ -5006,8 +5006,8 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 213051586,Truganina - North,hospital,H0366,19.4
 213051586,Truganina - North,hospital,H0371,19.6
 213051586,Truganina - North,hospital,H0381,20.2
-213051586,Truganina - North,hospital,H0374,21.1
 213051586,Truganina - North,hospital,H0367,21.1
+213051586,Truganina - North,hospital,H0374,21.1
 213051586,Truganina - North,urgent_care_clinic,UCC-sunshine-medicare-urgent-care-clinic,10.5
 213051586,Truganina - North,urgent_care_clinic,UCC-werribee-medicare-urgent-care-clinic,10.8
 213051586,Truganina - North,urgent_care_clinic,UCC-maribyrnong-medicare-urgent-care-clinic,14.4
@@ -5021,8 +5021,8 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 213051587,Truganina - South East,hospital,H0366,19.6
 213051587,Truganina - South East,hospital,H0371,19.8
 213051587,Truganina - South East,hospital,H0381,20.4
-213051587,Truganina - South East,hospital,H0374,21.1
 213051587,Truganina - South East,hospital,H0358,21.1
+213051587,Truganina - South East,hospital,H0374,21.1
 213051587,Truganina - South East,urgent_care_clinic,UCC-werribee-medicare-urgent-care-clinic,9.0
 213051587,Truganina - South East,urgent_care_clinic,UCC-sunshine-medicare-urgent-care-clinic,11.9
 213051587,Truganina - South East,urgent_care_clinic,UCC-maribyrnong-medicare-urgent-care-clinic,15.2
@@ -5078,8 +5078,8 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 214011370,Carrum Downs,hospital,H1060,14.8
 214011370,Carrum Downs,hospital,H0353,16.0
 214011370,Carrum Downs,hospital,H0331,18.4
-214011370,Carrum Downs,hospital,H1057,20.0
 214011370,Carrum Downs,hospital,H0344,20.0
+214011370,Carrum Downs,hospital,H1057,20.0
 214011370,Carrum Downs,hospital,H1054,20.2
 214011370,Carrum Downs,hospital,H0333,24.8
 214011370,Carrum Downs,hospital,H0330,31.4
@@ -5107,8 +5107,8 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 214011372,Frankston North,hospital,H1060,16.9
 214011372,Frankston North,hospital,H0348,18.3
 214011372,Frankston North,hospital,H0353,19.3
-214011372,Frankston North,hospital,H1057,22.8
 214011372,Frankston North,hospital,H0344,22.8
+214011372,Frankston North,hospital,H1057,22.8
 214011372,Frankston North,hospital,H0331,23.0
 214011372,Frankston North,hospital,H1054,24.7
 214011372,Frankston North,hospital,H0333,29.6
@@ -5122,8 +5122,8 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 214011373,Frankston South,hospital,H1060,20.4
 214011373,Frankston South,hospital,H0348,23.4
 214011373,Frankston South,hospital,H0353,23.6
-214011373,Frankston South,hospital,H1057,26.1
 214011373,Frankston South,hospital,H0344,26.1
+214011373,Frankston South,hospital,H1057,26.1
 214011373,Frankston South,hospital,H0331,27.8
 214011373,Frankston South,hospital,H1054,29.4
 214011373,Frankston South,hospital,H0343,30.1
@@ -5152,8 +5152,8 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 214011375,Seaford (Vic.),hospital,H0348,15.6
 214011375,Seaford (Vic.),hospital,H1060,17.6
 214011375,Seaford (Vic.),hospital,H0353,19.0
-214011375,Seaford (Vic.),hospital,H1057,19.1
 214011375,Seaford (Vic.),hospital,H0344,19.1
+214011375,Seaford (Vic.),hospital,H1057,19.1
 214011375,Seaford (Vic.),hospital,H0331,19.5
 214011375,Seaford (Vic.),hospital,H1054,21.2
 214011375,Seaford (Vic.),hospital,H0333,27.2
@@ -5169,8 +5169,8 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 214011376,Skye - Sandhurst,hospital,H0348,13.8
 214011376,Skye - Sandhurst,hospital,H0331,19.8
 214011376,Skye - Sandhurst,hospital,H1054,21.9
-214011376,Skye - Sandhurst,hospital,H1057,23.1
 214011376,Skye - Sandhurst,hospital,H0344,23.1
+214011376,Skye - Sandhurst,hospital,H1057,23.1
 214011376,Skye - Sandhurst,hospital,H0333,24.1
 214011376,Skye - Sandhurst,hospital,H0332,32.9
 214011376,Skye - Sandhurst,urgent_care_clinic,UCC-frankston-medicare-urgent-care-clinic,8.6
@@ -5198,8 +5198,8 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 214021381,Mount Eliza,hospital,H1060,24.3
 214021381,Mount Eliza,hospital,H0343,26.3
 214021381,Mount Eliza,hospital,H0348,26.4
-214021381,Mount Eliza,hospital,H1057,26.7
 214021381,Mount Eliza,hospital,H0344,26.7
+214021381,Mount Eliza,hospital,H1057,26.7
 214021381,Mount Eliza,hospital,H0353,27.5
 214021381,Mount Eliza,hospital,H0331,30.1
 214021381,Mount Eliza,hospital,H1054,31.5
@@ -5212,8 +5212,8 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 214021382,Mount Martha,hospital,H0350,16.1
 214021382,Mount Martha,hospital,H0343,16.2
 214021382,Mount Martha,hospital,H1060,33.8
-214021382,Mount Martha,hospital,H1057,34.8
 214021382,Mount Martha,hospital,H0344,34.8
+214021382,Mount Martha,hospital,H1057,34.8
 214021382,Mount Martha,hospital,H0348,36.9
 214021382,Mount Martha,hospital,H0353,37.5
 214021382,Mount Martha,urgent_care_clinic,UCC-somerville-medicare-urgent-care-clinic,13.1
@@ -5234,8 +5234,8 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 214021385,Somerville,hospital,H0353,26.0
 214021385,Somerville,hospital,H0343,28.8
 214021385,Somerville,hospital,H0348,28.9
-214021385,Somerville,hospital,H1057,33.1
 214021385,Somerville,hospital,H0344,33.1
+214021385,Somerville,hospital,H1057,33.1
 214021385,Somerville,hospital,H0331,34.0
 214021385,Somerville,hospital,H1054,35.8
 214021385,Somerville,hospital,H0333,39.3
@@ -5247,8 +5247,8 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 214021591,Mornington - East,hospital,H0350,11.0
 214021591,Mornington - East,hospital,H0343,21.0
 214021591,Mornington - East,hospital,H1060,29.1
-214021591,Mornington - East,hospital,H1057,30.7
 214021591,Mornington - East,hospital,H0344,30.7
+214021591,Mornington - East,hospital,H1057,30.7
 214021591,Mornington - East,hospital,H0348,31.8
 214021591,Mornington - East,hospital,H0353,32.6
 214021591,Mornington - East,hospital,H0331,35.2
@@ -5260,8 +5260,8 @@ sa2_code,sa2_name,kind,facility_id,distance_km
 214021591,Mornington - East,urgent_care_clinic,UCC-narre-warren-medicare-urgent-care-clinic,32.2
 214021592,Mornington - West,hospital,H0350,11.0
 214021592,Mornington - West,hospital,H0343,20.7
-214021592,Mornington - West,hospital,H1057,29.2
 214021592,Mornington - West,hospital,H0344,29.2
+214021592,Mornington - West,hospital,H1057,29.2
 214021592,Mornington - West,hospital,H1060,30.0
 214021592,Mornington - West,hospital,H0348,31.5
 214021592,Mornington - West,hospital,H0353,33.2

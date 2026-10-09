@@ -1,6 +1,6 @@
 # Pipeline KPIs (DS-20)
 
-Run: 2026-09-29T154334Z
+Run: 2026-10-09T051316Z
 
 | KPI | Value | Target | Met |
 |---|---|---|---|
@@ -10,6 +10,6 @@ Run: 2026-09-29T154334Z
 | K4 lineage | 1.0 | 1.0 | yes |
 | K5 reproducibility | 1.0 | 1.0 | yes |
 | K6 freshness | 9 | 9 | yes |
-| K7 null resolution | 0.9797 | 0.9 | yes |
+| K7 null resolution | 0.9867 | 0.9 | yes |
 
 Details are in pipeline_kpis.json.

@@ -1,25 +1,25 @@
 {
-  "run_utc": "2026-09-29T151127Z",
+  "run_utc": "2026-10-09T051251Z",
   "mode": "offline",
   "stages": [
     {
       "stage": "1 acquire",
-      "seconds": 0.52,
+      "seconds": 1.01,
       "status": "ok"
     },
     {
       "stage": "2 build",
-      "seconds": 3.23,
+      "seconds": 19.36,
       "status": "ok"
     },
     {
       "stage": "3 gate",
-      "seconds": 2.65,
+      "seconds": 5.21,
       "status": "ok"
     },
     {
       "stage": "4 KPIs",
-      "seconds": 3.84,
+      "seconds": 20.28,
       "status": "ok"
     }
   ],
@@ -31,7 +31,7 @@
     "osm_overpass_food_outlets_2026": "ok",
     "fsanz_afcd_release_3": "ok"
   },
-  "tests": "266 passed, 28 skipped in 2.47s",
+  "tests": "318 passed, 28 skipped in 4.69s",
   "kpis_met": true,
   "outcome": "published"
 }

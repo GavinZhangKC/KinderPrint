@@ -1,5 +1,5 @@
 {
-  "run_utc": "2026-09-29T154334Z",
+  "run_utc": "2026-10-09T051316Z",
   "kpis": [
     {
       "kpi": "K1 validity",
@@ -22,6 +22,8 @@
       "by_table": {
         "seasonal_air_quality_sa2.csv": 1.0,
         "nearby_health_services_sa2.csv": 1.0,
+        "vaccination_places_sa2.csv": 1.0,
+        "council_immunisation_sa2.csv": 1.0,
         "care_compare_sa2.csv": 1.0,
         "food_access_sa2.csv": 1.0,
         "primary_care_cost_sa3.csv (SA3)": 1.0
@@ -43,7 +45,7 @@
       "value": 1.0,
       "target": 1.0,
       "passed": true,
-      "processed_files": 60,
+      "processed_files": 64,
       "problems": []
     },
     {
@@ -60,7 +62,9 @@
         "food_access_sa2.csv": "identical",
         "care_compare_sa2.csv": "identical",
         "urgent_care_clinics_vic.csv": "identical",
-        "access_e2sfca_sa2.csv": "identical"
+        "access_e2sfca_sa2.csv": "identical",
+        "school_entry_forecast_community.csv": "identical",
+        "family_fit_community.csv": "identical"
       }
     },
     {
@@ -69,22 +73,22 @@
       "target": 9,
       "passed": true,
       "age_days": {
-        "afcd_r3_selected_per100g.csv": 0,
-        "aihw_mbs_local_areas_vic_2024_25.csv": 0,
-        "myhospitals_reported_measures.csv": 0,
-        "myhospitals_vic_data_items.csv": 0,
-        "myhospitals_vic_hospitals.csv": 0,
-        "nndss_influenza_vic_monthly.csv": 0,
-        "nndss_salmonella_vic_monthly.csv": 0,
-        "osm_food_outlets_melbourne.csv": 0,
-        "urgent_care_clinics_vic.csv": 0
+        "afcd_r3_selected_per100g.csv": 10,
+        "aihw_mbs_local_areas_vic_2024_25.csv": 10,
+        "myhospitals_reported_measures.csv": 10,
+        "myhospitals_vic_data_items.csv": 10,
+        "myhospitals_vic_hospitals.csv": 10,
+        "nndss_influenza_vic_monthly.csv": 10,
+        "nndss_salmonella_vic_monthly.csv": 10,
+        "osm_food_outlets_melbourne.csv": 10,
+        "urgent_care_clinics_vic.csv": 10
       },
       "stale": [],
       "not_in_manifest": []
     },
     {
       "kpi": "K7 null resolution",
-      "value": 0.9797,
+      "value": 0.9867,
       "target": 0.9,
       "passed": true,
       "by_table": {
@@ -93,7 +97,11 @@
         "care_compare_sa2.csv": 1.0,
         "food_access_sa2.csv": 1.0,
         "seasonal_air_quality_sa2.csv": 1.0,
-        "nearby_health_services_sa2.csv": 1.0
+        "nearby_health_services_sa2.csv": 1.0,
+        "vaccination_places_sa2.csv": 1.0,
+        "council_immunisation_sa2.csv": 1.0,
+        "school_entry_forecast_community.csv": 1.0,
+        "family_fit_community.csv": 0.9884
       },
       "note": "Missing values stay missing (suppressed, not published, or no service in range); none imputed."
     }

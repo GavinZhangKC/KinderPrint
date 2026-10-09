@@ -1,6 +1,7 @@
 name: Data refresh (Iteration 3)
 
-# Live acquisition of the six Iteration-3 sources, QA, rebuild, test gate and KPIs.
+# Live acquisition of the six Iteration-3 sources, QA, rebuild (including the school-entry
+# outlook and Family Fit with their blocking gates), test gate and KPIs.
 # The workflow never pushes: refreshed files, QA reports and change logs are
 # uploaded as an artifact for a person to review and commit on a feature branch.
 
@@ -42,7 +43,9 @@ jobs:
         if: always()
         with:
           name: iteration3-offline-reports
-          path: datascience/reports/iteration3/
+          path: |
+            datascience/reports/iteration3/
+            datascience/reports/family_fit/
 
   live-refresh:
     if: github.event_name != 'pull_request'
@@ -74,6 +77,9 @@ jobs:
             echo
             cat reports/iteration3/pipeline_kpis.md 2>/dev/null || echo "KPIs not produced"
             echo
+            echo "### Family Fit changes since the last published artefact"
+            python -c "import json;c=json.load(open('reports/family_fit/change_log.json'));print(c['summary'])" 2>/dev/null || echo "No change log"
+            echo
             echo '```'
             git status --short -- data reports || true
             echo '```'
@@ -93,3 +99,8 @@ jobs:
             datascience/data/processed/food_access_sa2.csv
             datascience/data/processed/care_compare_sa2.csv
             datascience/data/processed/urgent_care_clinics_vic.csv
+            datascience/data/processed/access_e2sfca_sa2.csv
+            datascience/data/processed/school_entry_forecast_community.csv
+            datascience/data/processed/family_fit_community.csv
+            datascience/outputs/iteration_3/family_fit.json
+            datascience/reports/family_fit/
