@@ -7,6 +7,7 @@ import time
 from typing import Any
 
 from fastapi import FastAPI, Query, Request
+from fastapi import Path as FastAPIPath
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.responses import JSONResponse
@@ -43,6 +44,16 @@ from loaders.community_context import (
 from loaders.early_childhood import load_early_childhood_context
 from loaders.geocoding_quality import load_geocoding_quality
 from loaders.population import load_population_projections
+from loaders.family_fit import (
+    RADII_KM as FAMILY_FIT_RADII,
+    area_detail as family_fit_area_detail,
+    load_family_fit,
+    load_shapes as load_family_fit_shapes,
+    needs_and_rules as family_fit_rules,
+    parse_priorities as parse_family_fit_priorities,
+    places as family_fit_places,
+    search as family_fit_search,
+)
 from loaders.care_context import compare_care, nutrition_report, practitioner_context, seasonal_illness
 from loaders.digital_health import (
     child_health_context,
@@ -1665,6 +1676,89 @@ def locality_suitability(
         limitations=response_limitations,
         notices=[AREA_LEVEL_NOTICE],
     )
+
+
+FAMILY_FIT_NOTICE = {
+    "code": "family_fit_comparative_index",
+    "message": "The match score is a comparative index across Greater Melbourne areas, not a probability or a rating of any home, school or service. It does not confirm childcare vacancies or GP appointments.",
+}
+FAMILY_FIT_SOURCE = ("AEDC 2015 and 2024; Cooling and Greening Melbourne 2018; VPA open space; DTP traffic 2019; "
+                     "PTV stops 2026; NPI 2024-25; Victorian school locations 2025; ACECQA 2026; "
+                     "National Health Services Directory 2025; VIF2023; ABS ASGS Edition 3")
+FAMILY_FIT_AREA_PATTERN = r"^\d{9}(_\d{9})*$"
+
+
+@app.get("/api/family-fit/setup")
+def family_fit_setup() -> dict[str, Any]:
+    """Needs, scoring rules and the list of areas a family can search near."""
+    rules, limitations = family_fit_rules()
+    if rules is None:
+        return envelope("unavailable", {"needs": [], "places": []}, limitations=limitations)
+    places, _ = family_fit_places()
+    return envelope("available", {**rules, "places": places}, metadata={"source": FAMILY_FIT_SOURCE},
+                    notices=[FAMILY_FIT_NOTICE, AREA_LEVEL_NOTICE])
+
+
+@app.get("/api/family-fit/search")
+def family_fit_search_endpoint(
+    anchor: str = Query(..., max_length=80, pattern=FAMILY_FIT_AREA_PATTERN),
+    radius_km: int = Query(15),
+    priorities: str = Query("", max_length=400),
+    limit: int = Query(10, ge=1, le=30),
+) -> dict[str, Any]:
+    """Rank Greater Melbourne areas for a family's priorities near one area."""
+    source, limitations = load_family_fit()
+    if source is None:
+        return envelope("unavailable", {"results": []}, limitations=limitations)
+    if radius_km not in FAMILY_FIT_RADII:
+        return JSONResponse(status_code=422, content=envelope("unavailable", None, limitations=[limitation(
+            "invalid_radius", f"radius_km must be one of {list(FAMILY_FIT_RADII)}.", "radius_km")]))
+    try:
+        chosen = parse_family_fit_priorities(priorities, {n["id"] for n in source["needs"]})
+    except ValueError:
+        return JSONResponse(status_code=422, content=envelope("unavailable", None, limitations=[limitation(
+            "invalid_priorities", "Priorities must be need:prefer or need:essential, each need once.", "priorities")]))
+    data, limitations = family_fit_search(anchor, radius_km, chosen, limit)
+    if data is None:
+        return envelope("unavailable", {"results": []}, limitations=limitations)
+    if data.get("error") == "unknown_anchor":
+        return JSONResponse(status_code=404, content=envelope("unavailable", None, limitations=[limitation(
+            "unknown_area", "No reporting area has that id.", "anchor")]))
+    status = "available" if data["results"] else "missing"
+    if chosen and data["counts"]["data_unavailable"]:
+        limitations = limitations + [limitation(
+            "family_fit_data_unavailable",
+            f"{data['counts']['data_unavailable']} area(s) within the distance lack data for a chosen priority and are left out.",
+            "results")]
+    return envelope(status, data, metadata={
+        "source": FAMILY_FIT_SOURCE, "model_version": source["metadata"]["model_version"],
+        "built_utc": source["metadata"]["built_utc"],
+        "geographic_unit": "AEDC reporting area; straight-line distance between area reference points",
+        "interpretation": "Comparative index. Essential means at or above the Greater Melbourne median for that priority.",
+    }, limitations=limitations, notices=[FAMILY_FIT_NOTICE, AREA_LEVEL_NOTICE])
+
+
+@app.get("/api/family-fit/areas/{area_id}")
+def family_fit_area(area_id: str = FastAPIPath(..., max_length=80, pattern=FAMILY_FIT_AREA_PATTERN)) -> dict[str, Any]:
+    """Every priority and measure for one area, with what each does not confirm."""
+    data, limitations = family_fit_area_detail(area_id)
+    if data is None:
+        return envelope("unavailable", None, limitations=limitations)
+    if data.get("error") == "unknown_area":
+        return JSONResponse(status_code=404, content=envelope("unavailable", None, limitations=[limitation(
+            "unknown_area", "No reporting area has that id.", "area_id")]))
+    return envelope("available", data, metadata={"source": FAMILY_FIT_SOURCE},
+                    notices=[FAMILY_FIT_NOTICE, AREA_LEVEL_NOTICE])
+
+
+@app.get("/api/family-fit/shapes")
+def family_fit_shapes() -> dict[str, Any]:
+    """Simplified area outlines for the overview map."""
+    data, limitations = load_family_fit_shapes()
+    if data is None:
+        return envelope("unavailable", {"areas": {}}, limitations=limitations)
+    return envelope("available", {"areas": data}, metadata={
+        "source": "ABS ASGS Edition 3 SA2 boundaries dissolved to AEDC reporting areas; simplified for display"})
 
 
 handler = Mangum(app, lifespan="off")

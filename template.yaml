@@ -101,6 +101,8 @@ Resources:
           KINDERPRINT_NEARBY_SERVICES_DATA_PATH: /var/task/data/nearby_health_services_sa2.csv
           KINDERPRINT_VACCINATION_PLACES_DATA_PATH: /var/task/data/vaccination_places_sa2.csv
           KINDERPRINT_COUNCIL_IMMUNISATION_DATA_PATH: /var/task/data/council_immunisation_sa2.csv
+          KINDERPRINT_FAMILY_FIT_DATA_PATH: /var/task/data/family_fit.json
+          KINDERPRINT_FAMILY_FIT_SHAPES_DATA_PATH: /var/task/data/family_fit_shapes.json
           KINDERPRINT_HOSPITAL_CAPABILITY_DATA_PATH: /var/task/data/hospital_capability_vic.csv
           KINDERPRINT_CARE_COMPARE_DATA_PATH: /var/task/data/care_compare_sa2.csv
           KINDERPRINT_URGENT_CARE_CLINICS_DATA_PATH: /var/task/data/urgent_care_clinics_vic.csv

@@ -8,6 +8,7 @@ TASK_PACKAGE_DIR="$TASK_SCRIPT_DIR/lambda_package"
 TASK_DATA_DIR="$TASK_REPOSITORY_DIR/datascience/outputs/iteration_1"
 TASK_ITERATION_2_DATA_DIR="$TASK_REPOSITORY_DIR/datascience/outputs/iteration_2"
 TASK_PROCESSED_DATA_DIR="$TASK_REPOSITORY_DIR/datascience/data/processed"
+TASK_ITERATION_3_DATA_DIR="$TASK_REPOSITORY_DIR/datascience/outputs/iteration_3"
 
 rm -rf "$TASK_PACKAGE_DIR"
 mkdir -p "$TASK_PACKAGE_DIR/core" "$TASK_PACKAGE_DIR/data" "$TASK_PACKAGE_DIR/loaders"
@@ -52,6 +53,8 @@ cp "$TASK_PROCESSED_DATA_DIR/food_access_sa2.csv" "$TASK_PACKAGE_DIR/data/"
 cp "$TASK_PROCESSED_DATA_DIR/child_nutrient_foods.csv" "$TASK_PACKAGE_DIR/data/"
 cp "$TASK_PROCESSED_DATA_DIR/../../config/child_nutrient_targets.csv" "$TASK_PACKAGE_DIR/data/"
 cp "$TASK_PROCESSED_DATA_DIR/practitioner_context_sa2.csv" "$TASK_PACKAGE_DIR/data/"
+cp "$TASK_ITERATION_3_DATA_DIR/family_fit.json" "$TASK_PACKAGE_DIR/data/"
+cp "$TASK_ITERATION_3_DATA_DIR/family_fit_shapes.json" "$TASK_PACKAGE_DIR/data/"
 
 python3 -m pip install \
     --disable-pip-version-check \
