@@ -1,4 +1,7 @@
-from loaders.care_context import _read
+import pytest
+
+from core.data_loader import CARE_CONTEXT_ENV
+from loaders.care_context import _integer, _read
 
 
 def _write(path, text):
@@ -147,3 +150,68 @@ def test_practitioner_context_rejects_numeric_band(client, monkeypatch, tmp_path
 
 def test_practitioner_context_unavailable_without_configuration(client):
     assert client.get("/api/digital-health/practitioner-context?sa2_code=206011106").json()["status"] == "unavailable"
+
+
+@pytest.mark.parametrize("month", ["0", "13", "-1", "1.5", "inf", "-inf", "NaN", "", "nonsense"])
+def test_seasonal_illness_rejects_invalid_month_without_crashing(client, monkeypatch, tmp_path, month):
+    monkeypatch.setenv(CARE_CONTEXT_ENV["seasonal_illness"], _write(tmp_path / "s.csv",
+        "disease,disease_label,age_band,month,average_notifications,share_of_year_pct,reference_years\n"
+        f"influenza,Influenza,0-14 years,{month},100,10,2024\n"))
+    response = client.get("/api/digital-health/seasonal-illness")
+    assert response.status_code == 200
+    body = response.json()
+    assert set(body) == {"status", "data", "metadata", "limitations", "notices"}
+    assert body["status"] == "unavailable"
+    assert body["limitations"][0]["code"] == "seasonal_illness_invalid"
+    assert body["data"] == {"diseases": []}
+
+
+@pytest.mark.parametrize("value", ["-1", "2.5", "inf", "NaN", "", None])
+def test_context_integer_validation_rejects_invalid_counts(value):
+    with pytest.raises(ValueError):
+        _integer(value)
+
+
+@pytest.mark.parametrize("value, expected", [("0", 0), ("1.0", 1), ("12", 12)])
+def test_context_integer_validation_preserves_valid_integers(value, expected):
+    assert _integer(value) == expected
+
+
+@pytest.mark.parametrize("value, minimum, maximum", [("2", 0, 1), ("0", 1, None), ("13", 1, 12)])
+def test_context_integer_validation_enforces_field_bounds(value, minimum, maximum):
+    with pytest.raises(ValueError):
+        _integer(value, minimum, maximum)
+
+
+def test_data_readiness_and_status_include_all_new_context_resources(client):
+    identifiers = {"seasonal_air", "nearby_services", "vaccination_places", "council_immunisation", *CARE_CONTEXT_ENV}
+    checks = {row["id"]: row for row in client.get("/api/health/data").json()["data"]["checks"]}
+    products = {row["id"]: row for row in client.get("/api/datasets/status").json()["data"]["datasets"]}
+    assert identifiers <= checks.keys() and identifiers <= products.keys()
+    assert all(checks[key]["readiness"] == "not_configured" for key in identifiers)
+    assert all(products[key]["configured"] is False for key in identifiers)
+    assert all("path" not in row for row in products.values())
+
+
+def test_data_readiness_checks_loaded_and_invalid_context_resources(client, monkeypatch, tmp_path):
+    _configure(monkeypatch, tmp_path)
+    monkeypatch.setenv(CARE_CONTEXT_ENV["seasonal_illness"], _write(tmp_path / "invalid.csv", "bad_header\n"))
+    body = client.get("/api/health/data").json()
+    checks = {row["id"]: row for row in body["data"]["checks"]}
+    assert checks["hospital_capability"]["readiness"] == "ready"
+    assert checks["hospital_capability"]["record_count"] == 2
+    assert checks["seasonal_illness"]["readiness"] == "invalid"
+    assert checks["seasonal_illness"]["limitation_codes"] == ["seasonal_illness_invalid"]
+    products = {row["id"]: row for row in client.get("/api/datasets/status").json()["data"]["datasets"]}
+    assert products["hospital_capability"]["configured"] is True
+    assert products["hospital_capability"]["configuration_variable"] == CARE_CONTEXT_ENV["hospital_capability"]
+
+
+def test_care_context_static_csv_is_reused(client, monkeypatch, tmp_path):
+    _configure(monkeypatch, tmp_path)
+    client.get("/api/digital-health/compare-care?sa2_code=206011106")
+    first = _read.cache_info()
+    client.get("/api/digital-health/compare-care?sa2_code=206011107")
+    second = _read.cache_info()
+    assert second.misses == first.misses == 4
+    assert second.hits == first.hits + 4

@@ -7,6 +7,7 @@ from typing import Any
 from geography import load_boundary_features
 from loaders.air_quality import load_station_year_observations
 from loaders.community_context import load_community_context
+from loaders.care_context import SPECS as CARE_CONTEXT_SPECS, load as load_care_context
 from loaders.digital_health import (
     load_abs_child_health,
     load_bushfire_context,
@@ -17,6 +18,10 @@ from loaders.digital_health import (
     load_transport_context,
     load_vcams_area_context,
     load_vcams_lga_context,
+    load_seasonal_air,
+    load_nearby_services,
+    load_vaccination_places,
+    load_council_immunisation,
 )
 from loaders.early_childhood import load_early_childhood_context
 from loaders.geocoding_quality import load_geocoding_quality
@@ -74,7 +79,7 @@ def runtime_data_readiness() -> list[dict[str, Any]]:
     comparisons, _, comparison_limitations = load_comparison_data()
     suitability, _, suitability_limitations = load_suitability_rankings()
 
-    return [
+    checks = [
         _check("aedc_locality_profiles", locality_value, locality_limitations,
                len(profiles) if profiles is not None else None),
         _check("vif_child_population_projections", projections, projection_limitations,
@@ -131,3 +136,15 @@ def runtime_data_readiness() -> list[dict[str, Any]]:
         _check("locality_suitability", suitability, suitability_limitations,
                len(suitability) if suitability is not None else None),
     ]
+    for identifier, loader in (
+        ("seasonal_air", load_seasonal_air),
+        ("nearby_services", load_nearby_services),
+        ("vaccination_places", load_vaccination_places),
+        ("council_immunisation", load_council_immunisation),
+    ):
+        rows, limitations = loader()
+        checks.append(_check(identifier, rows, limitations, len(rows) if rows is not None else None))
+    for resource in CARE_CONTEXT_SPECS:
+        rows, limitations = load_care_context(resource)
+        checks.append(_check(resource, rows, limitations, len(rows) if rows is not None else None))
+    return checks

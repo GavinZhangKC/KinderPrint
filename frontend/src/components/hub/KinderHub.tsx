@@ -149,8 +149,8 @@ function useEndpoint<T>(load: (signal: AbortSignal) => Promise<{ data: T }>, key
   return state
 }
 
-function useStored<T>(key: string, fallback: T): [T, (value: T | ((current: T) => T)) => void] {
-  const [value, setValue] = useState<T>(() => readStored(key, fallback))
+function useStored<T>(key: string, fallback: T, validate?: (value: unknown) => value is T): [T, (value: T | ((current: T) => T)) => void] {
+  const [value, setValue] = useState<T>(() => readStored(key, fallback, validate))
   useEffect(() => writeStored(key, value), [key, value])
   return [value, setValue]
 }
@@ -313,8 +313,10 @@ function MonthPicker({ value, onChange }: { value: string; onChange: (value: str
 }
 
 export default function KinderHub({ locality, data, onSelectLocality, onOpenPlan, onOpenMap }: KinderHubProps) {
-  const [audience, setAudience] = useStored<Audience>(AUDIENCE_KEY, 'parent')
-  const [storedPage, setPage] = useStored<Page>(PAGE_KEY, 'home')
+  const [audience, setAudience] = useStored<Audience>(AUDIENCE_KEY, 'parent',
+    (value): value is Audience => value === 'parent' || value === 'practitioner')
+  const [storedPage, setPage] = useStored<Page>(PAGE_KEY, 'home',
+    (value): value is Page => typeof value === 'string' && ['home', 'day', 'health', 'vaccines', 'food', 'seasons', 'care'].includes(value))
   const [navExpanded, setNavExpanded] = useState(false)
   const [birthMonth, setBirthMonth] = useStored(BIRTH_KEY, '')
   const [age, setAge] = useState(() => { try { return window.localStorage.getItem(AGE_KEY) ?? '5–9 years' } catch { return '5–9 years' } })
@@ -454,7 +456,16 @@ interface PageContext {
 function FoodPage({ parent, nutrition, age, locality }: PageContext) {
   const band = SERVE_BAND[age] ?? '4–8 years'
   const today = new Date().toISOString().slice(0, 10)
-  const [serves, setServes] = useState<Record<string, number>>(() => { const stored = readStored<{ date: string; counts: Record<string, number> }>(SERVE_KEY, { date: today, counts: {} }); return stored.date === today ? stored.counts : {} })
+  const [serves, setServes] = useState<Record<string, number>>(() => {
+    const stored = readStored<{ date: string; counts: Record<string, number> }>(SERVE_KEY, { date: today, counts: {} },
+      (value): value is { date: string; counts: Record<string, number> } => {
+        if (!value || typeof value !== 'object' || Array.isArray(value)) return false
+        const row = value as Record<string, unknown>
+        return typeof row.date === 'string' && !!row.counts && typeof row.counts === 'object' && !Array.isArray(row.counts)
+          && Object.values(row.counts).every(count => typeof count === 'number' && Number.isFinite(count) && count >= 0)
+      })
+    return stored.date === today ? stored.counts : {}
+  })
   useEffect(() => writeStored(SERVE_KEY, { date: today, counts: serves }), [serves, today])
   const guide = DAILY_SERVES[band]
   const reached = guide.filter(row => (serves[row.group] ?? 0) >= row.serves).length

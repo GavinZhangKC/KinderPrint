@@ -59,7 +59,30 @@ function checks(s: DayInput, band: Band): Check[] {
   ]
 }
 
-function readStore(): Partial<Record<Band, DayInput>> { try { return JSON.parse(window.localStorage.getItem(STORE_KEY) ?? '{}') } catch { return {} } }
+function isDayInput(value: unknown, band: Band): value is DayInput {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return false
+  const row = value as Record<string, unknown>
+  const bounds = { bed: 24, wake: 24, active: band === '0' ? 300 : 150, screens: 360, veg: 8, water: 10 }
+  return typeof row.sweet === 'boolean' && Object.entries(bounds).every(([key, maximum]) => {
+    const number = row[key]
+    return typeof number === 'number' && Number.isFinite(number) && number >= 0 && number <= maximum
+  })
+}
+
+function readStore(): Partial<Record<Band, DayInput>> {
+  try {
+    const value: unknown = JSON.parse(window.localStorage.getItem(STORE_KEY) ?? '{}')
+    if (!value || typeof value !== 'object' || Array.isArray(value)) return {}
+    const saved = value as Record<string, unknown>
+    const valid: Partial<Record<Band, DayInput>> = {}
+    for (const band of ['0', '1', '2'] as const) {
+      if (isDayInput(saved[band], band)) valid[band] = saved[band]
+    }
+    return valid
+  } catch {
+    return {}
+  }
+}
 
 function Stepper({ label, value, onChange, step, max }: { label: string; value: number; onChange: (value: number) => void; step: number; max: number }) {
   return <div className="hd-field hd-inline"><span>{label}</span><span className="hd-step">

@@ -136,10 +136,18 @@ export function emailToSelf(subject: string, body: string): void {
   window.location.href = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body.slice(0, 1800))}`
 }
 
-export function readStored<T>(key: string, fallback: T): T {
+export function readStored<T>(key: string, fallback: T, validate?: (value: unknown) => value is T): T {
   try {
     const raw = window.localStorage.getItem(key)
-    return raw === null ? fallback : JSON.parse(raw) as T
+    if (raw === null) return fallback
+    const value: unknown = JSON.parse(raw)
+    if (validate) return validate(value) ? value : fallback
+    if (value === null || typeof value !== typeof fallback) return fallback
+    if (Array.isArray(fallback)) {
+      return Array.isArray(value) ? value as T : fallback
+    }
+    if (Array.isArray(value)) return fallback
+    return value as T
   } catch {
     return fallback
   }
