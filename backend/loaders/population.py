@@ -3,13 +3,13 @@
 from __future__ import annotations
 
 import csv
-from functools import lru_cache
 import math
 from pathlib import Path
 from typing import Any
 
 from core.data_loader import VIF_PROJECTION_DATA_PATH_ENV, vif_projection_data_path
 from core.responses import limitation
+from core.sources import dataset_cache, read_csv_rows, source_exists
 
 REQUIRED_FIELDS = {
     "sa2_code_2021", "sa2_name_2021", "projection_year", "sex",
@@ -25,39 +25,38 @@ NUMERIC_FIELDS = {
 }
 
 
-@lru_cache(maxsize=1)
+@dataset_cache(maxsize=1)
 def _load_population_projections(path: Path) -> tuple[tuple[dict[str, Any], ...] | None, tuple[dict[str, Any], ...]]:
     """Read and validate the static projection file once per warm process."""
-    if not path.is_file():
+    if not source_exists(path, VIF_PROJECTION_DATA_PATH_ENV):
         return None, (limitation("population_projection_dataset_unavailable",
             "The configured VIF projection dataset could not be found.", "population_projections"),)
     try:
-        with path.open(encoding="utf-8-sig", newline="") as source:
-            reader = csv.DictReader(source)
-            if not reader.fieldnames or not REQUIRED_FIELDS.issubset(reader.fieldnames):
+        reader = read_csv_rows(path, VIF_PROJECTION_DATA_PATH_ENV)
+        if not reader.fieldnames or not REQUIRED_FIELDS.issubset(reader.fieldnames):
+            raise ValueError
+        rows = []
+        keys: set[tuple[str, int, str]] = set()
+        for raw in reader:
+            year = int(raw["projection_year"])
+            values = {field: float(raw[field]) for field in NUMERIC_FIELDS}
+            if (not raw["sa2_code_2021"].isdigit() or len(raw["sa2_code_2021"]) != 9
+                    or not raw["sa2_name_2021"].strip() or not raw["sex"].strip()
+                    or raw["value_status"] != "PROJECTED"
+                    or any(not math.isfinite(value) or value < 0 for value in values.values())):
                 raise ValueError
-            rows = []
-            keys: set[tuple[str, int, str]] = set()
-            for raw in reader:
-                year = int(raw["projection_year"])
-                values = {field: float(raw[field]) for field in NUMERIC_FIELDS}
-                if (not raw["sa2_code_2021"].isdigit() or len(raw["sa2_code_2021"]) != 9
-                        or not raw["sa2_name_2021"].strip() or not raw["sex"].strip()
-                        or raw["value_status"] != "PROJECTED"
-                        or any(not math.isfinite(value) or value < 0 for value in values.values())):
-                    raise ValueError
-                key = (raw["sa2_code_2021"], year, raw["sex"])
-                if key in keys:
-                    raise ValueError
-                keys.add(key)
-                rows.append({
-                    "sa2_code": raw["sa2_code_2021"],
-                    "sa2_name": raw["sa2_name_2021"],
-                    "projection_year": year,
-                    "sex": raw["sex"],
-                    **values,
-                    "status": "projected",
-                })
+            key = (raw["sa2_code_2021"], year, raw["sex"])
+            if key in keys:
+                raise ValueError
+            keys.add(key)
+            rows.append({
+                "sa2_code": raw["sa2_code_2021"],
+                "sa2_name": raw["sa2_name_2021"],
+                "projection_year": year,
+                "sex": raw["sex"],
+                **values,
+                "status": "projected",
+            })
     except (OSError, UnicodeError, csv.Error, TypeError, ValueError):
         return None, (limitation("population_projection_dataset_invalid",
             "The configured VIF projection dataset failed schema or value validation.",

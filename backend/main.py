@@ -12,10 +12,12 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.responses import JSONResponse
 from mangum import Mangum
+from starlette.concurrency import run_in_threadpool
 
 from core.data_loader import boundary_data_path
 from core.data_readiness import runtime_data_readiness
 from core.dataset_status import dataset_statuses
+from core.sources import POSTGRES, data_backend, refresh_caches_if_changed
 from core.responses import (
     AREA_LEVEL_NOTICE, ASSOCIATION_NOTICE, COMPARABLE_NOTICE, COMPARISON_AREA_NOTICE,
     HUMAN_DECISION_NOTICE, INDUSTRIAL_EMISSIONS_CONTEXT_NOTICE,
@@ -114,6 +116,14 @@ async def log_request(request: Request, call_next: Any) -> Any:
     logger.info("request_complete method=%s path=%s status=%s duration_ms=%s",
                 request.method, request.url.path, response.status_code, duration_ms)
     return response
+
+
+@app.middleware("http")
+async def refresh_dataset_caches(request: Request, call_next: Any) -> Any:
+    """In postgres mode, drop cached datasets once a newer database load is published."""
+    if data_backend() == POSTGRES:
+        await run_in_threadpool(refresh_caches_if_changed)
+    return await call_next(request)
 
 
 @app.exception_handler(RequestValidationError)

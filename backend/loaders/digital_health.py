@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import csv
-from functools import lru_cache
 import math
 from pathlib import Path
 from typing import Any
@@ -37,6 +36,7 @@ from core.data_loader import (
     vcams_lga_data_path,
 )
 from core.responses import limitation
+from core.sources import dataset_cache, read_csv_rows, source_exists
 
 
 AREA_FIELDS = {
@@ -322,25 +322,24 @@ ROW_PARSERS = {
 }
 
 
-@lru_cache(maxsize=16)
-def _read(path: Path, resource: str) -> tuple[dict[str, Any], ...]:
+@dataset_cache(maxsize=16)
+def _read(path: Path, resource: str, env: str) -> tuple[dict[str, Any], ...]:
     """Read, validate and parse a static digital-health dataset once per process."""
-    with path.open(encoding="utf-8-sig", newline="") as source:
-        reader = csv.DictReader(source)
-        required = REQUIRED_FIELDS[resource]
-        if not reader.fieldnames or not required.issubset(reader.fieldnames):
+    reader = read_csv_rows(path, env)
+    required = REQUIRED_FIELDS[resource]
+    if not reader.fieldnames or not required.issubset(reader.fieldnames):
+        raise ValueError
+    parser = ROW_PARSERS[resource]
+    rows = []
+    keys: set[tuple[Any, ...]] = set()
+    for raw in reader:
+        row = parser(raw)
+        key = tuple(row[field] for field in UNIQUE_FIELDS[resource])
+        if key in keys:
             raise ValueError
-        parser = ROW_PARSERS[resource]
-        rows = []
-        keys: set[tuple[Any, ...]] = set()
-        for raw in reader:
-            row = parser(raw)
-            key = tuple(row[field] for field in UNIQUE_FIELDS[resource])
-            if key in keys:
-                raise ValueError
-            keys.add(key)
-            rows.append(row)
-        return tuple(rows)
+        keys.add(key)
+        rows.append(row)
+    return tuple(rows)
 
 
 def _source(
@@ -352,12 +351,12 @@ def _source(
         return None, [limitation(
             f"{resource}_not_configured", f"Set {env} to the validated CSV.", resource,
         )]
-    if not path.is_file():
+    if not source_exists(path, env):
         return None, [limitation(
             f"{resource}_unavailable", "The configured dataset could not be found.", resource,
         )]
     try:
-        return _read(path, resource), []
+        return _read(path, resource, env), []
     except (OSError, UnicodeError, csv.Error, KeyError, TypeError, ValueError):
         return None, [limitation(
             f"{resource}_invalid",

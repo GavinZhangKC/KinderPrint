@@ -71,7 +71,8 @@ The backend listens on all network interfaces. It is available locally at
 
 ```text
 backend/
-├── core/          # Configuration, response envelopes and readiness checks
+├── core/          # Configuration, response envelopes, readiness checks, file/database dispatch
+├── db/            # PostgreSQL storage: dataset registry, schema, connection, repository
 ├── loaders/       # Validated readers for approved runtime datasets
 ├── tests/         # Backend and deployment tests
 ├── main.py        # FastAPI routes and Lambda entry point
@@ -103,6 +104,23 @@ only as an aggregate quality report; the service never returns address rows.
 
 `GET /api/health` confirms that the FastAPI application is running.
 
+### Data storage: files or PostgreSQL
+
+The API reads datasets from files by default (`KINDERPRINT_DATA_BACKEND=files`),
+which is what local development and the tests use. Production can read the same
+datasets from PostgreSQL instead (`KINDERPRINT_DATA_BACKEND=postgres`). Responses
+are identical in both modes.
+
+```bash
+# Check the files that would be loaded, without a database
+python3 datascience/scripts/load_to_db.py --dry-run
+```
+
+To roll back, set `KINDERPRINT_DATA_BACKEND=files` (or deploy with
+`DataBackend=files`); the data files are still packaged. See
+[`docs/DATABASE.md`](docs/DATABASE.md) for the tables, security and tests, and
+[`docs/AWS_VKINDER.md`](docs/AWS_VKINDER.md) for the Vkinder AWS database stack.
+
 ### Backend tests
 
 ```bash
@@ -125,6 +143,11 @@ suitability datasets, then deploy the prepared package with AWS SAM:
 ./backend/prepare_lambda_package.sh
 sam deploy --template-file template.yaml --guided
 ```
+
+Deploys default to files mode and create no database. To run Vkinder with its
+own private PostgreSQL database, alerts and the daily credit guard, use
+`infra/vkinder_aws.sh deploy <alert email>` (see
+[`docs/AWS_VKINDER.md`](docs/AWS_VKINDER.md)).
 
 The preparation script already assembles the deployable package with Linux x86_64
 native wheels. Do not run a local `sam build` over that package, because it can

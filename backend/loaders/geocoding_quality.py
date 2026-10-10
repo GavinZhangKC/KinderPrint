@@ -4,12 +4,12 @@ from __future__ import annotations
 
 import csv
 from collections import Counter
-from functools import lru_cache
 from pathlib import Path
 from typing import Any
 
 from core.data_loader import ACECQA_GEOCODING_DATA_PATH_ENV, acecqa_geocoding_data_path
 from core.responses import limitation
+from core.sources import dataset_cache, read_csv_rows, source_exists
 
 REQUIRED_FIELDS = {
     "service_approval_number", "match_status", "assigned_sa2",
@@ -18,38 +18,37 @@ REQUIRED_FIELDS = {
 MATCH_STATUSES = {"EXACT", "HIGH_CONFIDENCE", "REVIEW", "UNMATCHED"}
 
 
-@lru_cache(maxsize=1)
+@dataset_cache(maxsize=1)
 def _load_geocoding_quality(path: Path) -> tuple[dict[str, Any] | None, tuple[dict[str, Any], ...]]:
     """Read and validate the static geocoding QA source once per warm process."""
-    if not path.is_file():
+    if not source_exists(path, ACECQA_GEOCODING_DATA_PATH_ENV):
         return None, (limitation("geocoding_dataset_unavailable",
             "The configured ACECQA/G-NAF dataset could not be found.", "geocoding_quality"),)
     try:
-        with path.open(encoding="utf-8-sig", newline="") as source:
-            reader = csv.DictReader(source)
-            if not reader.fieldnames or not REQUIRED_FIELDS.issubset(reader.fieldnames):
+        reader = read_csv_rows(path, ACECQA_GEOCODING_DATA_PATH_ENV)
+        if not reader.fieldnames or not REQUIRED_FIELDS.issubset(reader.fieldnames):
+            raise ValueError
+        counts: Counter[str] = Counter()
+        service_ids: set[str] = set()
+        for row in reader:
+            status = row["match_status"]
+            included_value = row["included_in_spatial_analysis"].casefold()
+            if (status not in MATCH_STATUSES or included_value not in {"true", "false"}
+                    or not row["service_approval_number"].strip()
+                    or row["service_approval_number"] in service_ids):
                 raise ValueError
-            counts: Counter[str] = Counter()
-            service_ids: set[str] = set()
-            for row in reader:
-                status = row["match_status"]
-                included_value = row["included_in_spatial_analysis"].casefold()
-                if (status not in MATCH_STATUSES or included_value not in {"true", "false"}
-                        or not row["service_approval_number"].strip()
-                        or row["service_approval_number"] in service_ids):
-                    raise ValueError
-                service_ids.add(row["service_approval_number"])
-                included = included_value == "true"
-                if included and (status not in {"EXACT", "HIGH_CONFIDENCE"}
-                                 or not row["assigned_sa2"].strip()
-                                 or not row["assigned_kinderprint_locality"].strip()):
-                    raise ValueError
-                counts[status] += 1
-                counts["included" if included else "excluded"] += 1
-                if row["assigned_sa2"].strip():
-                    counts["sa2_assigned"] += 1
-                if row["assigned_kinderprint_locality"].strip():
-                    counts["locality_assigned"] += 1
+            service_ids.add(row["service_approval_number"])
+            included = included_value == "true"
+            if included and (status not in {"EXACT", "HIGH_CONFIDENCE"}
+                             or not row["assigned_sa2"].strip()
+                             or not row["assigned_kinderprint_locality"].strip()):
+                raise ValueError
+            counts[status] += 1
+            counts["included" if included else "excluded"] += 1
+            if row["assigned_sa2"].strip():
+                counts["sa2_assigned"] += 1
+            if row["assigned_kinderprint_locality"].strip():
+                counts["locality_assigned"] += 1
     except (OSError, UnicodeError, csv.Error, TypeError, ValueError):
         return None, (limitation("geocoding_dataset_invalid",
             "The configured ACECQA/G-NAF dataset failed schema or quality-boundary validation.",

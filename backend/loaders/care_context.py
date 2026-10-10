@@ -7,13 +7,13 @@ builders. Nothing here scores, ranks or recommends a service.
 from __future__ import annotations
 
 import csv
-from functools import lru_cache
 import math
 from pathlib import Path
 from typing import Any
 
 from core.data_loader import CARE_CONTEXT_ENV, care_context_path
 from core.responses import limitation
+from core.sources import dataset_cache, read_csv_rows, source_exists
 
 HOSPITAL_NUMBERS = (
     "latitude", "longitude", "ed_on_time_resuscitation_pct", "ed_on_time_emergency_pct",
@@ -121,29 +121,28 @@ def _integer(value: str, minimum: int = 0, maximum: int | None = None) -> int:
     return int(number)
 
 
-@lru_cache(maxsize=16)
+@dataset_cache(maxsize=16)
 def _read(path: Path, resource: str) -> tuple[dict[str, Any], ...]:
     spec = SPECS[resource]
-    with path.open(encoding="utf-8-sig", newline="") as source:
-        reader = csv.DictReader(source)
-        if not reader.fieldnames or not spec["required"].issubset(reader.fieldnames):
+    reader = read_csv_rows(path, CARE_CONTEXT_ENV[resource])
+    if not reader.fieldnames or not spec["required"].issubset(reader.fieldnames):
+        raise ValueError
+    rows, keys = [], set()
+    for raw in reader:
+        row: dict[str, Any] = {field: raw[field] for field in spec["required"]}
+        for field in spec.get("numbers", ()):
+            row[field] = _number(raw[field])
+        for field in spec.get("integers", ()):
+            minimum, maximum = spec.get("integer_bounds", {}).get(field, (0, None))
+            row[field] = _integer(raw[field], minimum, maximum)
+        for field in spec.get("booleans", ()):
+            row[field] = _boolean(raw[field])
+        key = tuple(row[field] for field in spec["key"])
+        if key in keys:
             raise ValueError
-        rows, keys = [], set()
-        for raw in reader:
-            row: dict[str, Any] = {field: raw[field] for field in spec["required"]}
-            for field in spec.get("numbers", ()):
-                row[field] = _number(raw[field])
-            for field in spec.get("integers", ()):
-                minimum, maximum = spec.get("integer_bounds", {}).get(field, (0, None))
-                row[field] = _integer(raw[field], minimum, maximum)
-            for field in spec.get("booleans", ()):
-                row[field] = _boolean(raw[field])
-            key = tuple(row[field] for field in spec["key"])
-            if key in keys:
-                raise ValueError
-            keys.add(key)
-            rows.append(row)
-        return tuple(rows)
+        keys.add(key)
+        rows.append(row)
+    return tuple(rows)
 
 
 def load(resource: str) -> tuple[tuple[dict[str, Any], ...] | None, list[dict[str, Any]]]:
@@ -151,7 +150,7 @@ def load(resource: str) -> tuple[tuple[dict[str, Any], ...] | None, list[dict[st
     env = CARE_CONTEXT_ENV[resource]
     if path is None:
         return None, [limitation(f"{resource}_not_configured", f"Set {env} to the validated CSV.", resource)]
-    if not path.is_file():
+    if not source_exists(path, env):
         return None, [limitation(f"{resource}_unavailable", "The configured dataset could not be found.", resource)]
     try:
         return _read(path, resource), []

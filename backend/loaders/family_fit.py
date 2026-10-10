@@ -13,7 +13,6 @@ from __future__ import annotations
 import hashlib
 import math
 import random
-from functools import lru_cache
 from typing import Any
 
 import os
@@ -21,6 +20,7 @@ from pathlib import Path
 
 from core.data_loader import load_json_source
 from core.responses import limitation
+from core.sources import dataset_cache
 
 FAMILY_FIT_DATA_PATH_ENV = "KINDERPRINT_FAMILY_FIT_DATA_PATH"
 FAMILY_FIT_SHAPES_DATA_PATH_ENV = "KINDERPRINT_FAMILY_FIT_SHAPES_DATA_PATH"
@@ -90,7 +90,7 @@ def validate(source: dict[str, Any]) -> list[dict[str, Any]]:
     return []
 
 
-@lru_cache(maxsize=4)
+@dataset_cache(maxsize=4)
 def _load(path_text: str | None, mtime: float | None):
     path = Path(path_text) if path_text else None
     source, limits = load_json_source(path, FAMILY_FIT_DATA_PATH_ENV, "family_fit")

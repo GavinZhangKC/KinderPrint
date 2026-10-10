@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 from copy import deepcopy
-from functools import lru_cache
 import json
 import math
 from pathlib import Path
@@ -11,6 +10,7 @@ from typing import Any
 
 from core.data_loader import BOUNDARY_DATA_PATH_ENV, boundary_data_path
 from core.responses import limitation
+from core.sources import dataset_cache, read_json, source_exists
 
 DEFAULT_BOUNDARY_VERSION = "Not supplied"
 
@@ -67,17 +67,17 @@ class BoundaryDatasetError(Exception):
         self.affected_fields = affected_fields
 
 
-@lru_cache(maxsize=1)
+@dataset_cache(maxsize=1)
 def _load_validated_boundary_features(path: Path) -> tuple[dict[str, Any], ...]:
     """Read, parse and validate one static boundary file per warm process."""
-    if not path.is_file():
+    if not source_exists(path, BOUNDARY_DATA_PATH_ENV):
         raise BoundaryDatasetError(
             "boundary_dataset_unavailable",
             "The configured boundary dataset could not be found.",
             "geometry",
         )
     try:
-        source = json.loads(path.read_text(encoding="utf-8"))
+        source = read_json(path, BOUNDARY_DATA_PATH_ENV)
     except (OSError, json.JSONDecodeError):
         raise BoundaryDatasetError(
             "boundary_dataset_unreadable",

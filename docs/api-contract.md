@@ -62,6 +62,19 @@ Service responses use a consistent top-level envelope:
 - `limitations` records missing data, incompatible geography or reference years, unsupported results, unavailable inputs, and other data-quality constraints.
 - `notices` contains explanatory and safety framing. Wording is TBC unless explicitly approved below.
 
+### Storage modes
+
+The contract does not depend on where datasets are stored. The backend reads
+them from files (`KINDERPRINT_DATA_BACKEND=files`, the default) or from
+PostgreSQL (`KINDERPRINT_DATA_BACKEND=postgres`), and every endpoint returns the
+same envelope, data, limitations and notices in both modes; automated tests
+compare the two byte for byte. In postgres mode a dataset that has not been
+loaded, or a database that cannot be reached, is reported with the same
+`*_unavailable` (or `*_invalid`) limitation codes as a missing or unreadable
+file, and `GET /api/datasets/status` reports `configured: false` for it. No
+endpoint exposes database names, hosts or credentials. See
+[`DATABASE.md`](DATABASE.md).
+
 ### Shared structures
 
 ```json

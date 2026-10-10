@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import csv
-from functools import lru_cache
 import math
 from pathlib import Path
 from typing import Any
@@ -15,6 +14,7 @@ from core.data_loader import (
     community_identity_data_path,
 )
 from core.responses import limitation
+from core.sources import dataset_cache, read_csv_rows, source_exists
 
 TRAFFIC_FIELDS = (
     "declared_road_km",
@@ -118,50 +118,49 @@ INDUSTRIAL_EVIDENCE = {
 }
 
 
-@lru_cache(maxsize=1)
+@dataset_cache(maxsize=1)
 def _load_community_identities(
     identity_path: Path,
 ) -> tuple[dict[str, dict[str, Any]] | None, tuple[dict[str, Any], ...]]:
     """Load reporting-locality identities independently of context metrics."""
-    if not identity_path.is_file():
+    if not source_exists(identity_path, COMMUNITY_IDENTITY_DATA_PATH_ENV):
         return None, (limitation(
             "community_identity_dataset_unavailable",
             "The configured reporting-locality identity dataset could not be found.",
             "community_identity",
         ),)
     try:
-        with identity_path.open(encoding="utf-8-sig", newline="") as source:
-            identity_reader = csv.DictReader(source)
-            if (not identity_reader.fieldnames
-                    or not IDENTITY_FIELDS.issubset(identity_reader.fieldnames)):
+        identity_reader = read_csv_rows(identity_path, COMMUNITY_IDENTITY_DATA_PATH_ENV)
+        if (not identity_reader.fieldnames
+                or not IDENTITY_FIELDS.issubset(identity_reader.fieldnames)):
+            raise ValueError
+        identities: dict[str, dict[str, Any]] = {}
+        neighbourhood_ids: set[str] = set()
+        for row in identity_reader:
+            community_id = row["community_id"].strip()
+            neighbourhood_id = row["neighbourhood_id"].strip()
+            name = row["community_name"].strip()
+            component_sa2_count = int(row["n_component_sa2"])
+            is_merged_text = row["is_merged"].strip().lower()
+            if is_merged_text not in {"true", "false"}:
                 raise ValueError
-            identities: dict[str, dict[str, Any]] = {}
-            neighbourhood_ids: set[str] = set()
-            for row in identity_reader:
-                community_id = row["community_id"].strip()
-                neighbourhood_id = row["neighbourhood_id"].strip()
-                name = row["community_name"].strip()
-                component_sa2_count = int(row["n_component_sa2"])
-                is_merged_text = row["is_merged"].strip().lower()
-                if is_merged_text not in {"true", "false"}:
-                    raise ValueError
-                is_merged = is_merged_text == "true"
-                if (not community_id or not neighbourhood_id or not name
-                        or component_sa2_count < 1
-                        or is_merged != (component_sa2_count > 1)
-                        or community_id in identities
-                        or neighbourhood_id in neighbourhood_ids):
-                    raise ValueError
-                identities[community_id] = {
-                    "neighbourhood": {
-                        "id": neighbourhood_id,
-                        "name": name,
-                        "geographic_unit": "VKinder reporting locality",
-                    },
-                    "component_sa2_count": component_sa2_count,
-                    "is_merged": is_merged,
-                }
-                neighbourhood_ids.add(neighbourhood_id)
+            is_merged = is_merged_text == "true"
+            if (not community_id or not neighbourhood_id or not name
+                    or component_sa2_count < 1
+                    or is_merged != (component_sa2_count > 1)
+                    or community_id in identities
+                    or neighbourhood_id in neighbourhood_ids):
+                raise ValueError
+            identities[community_id] = {
+                "neighbourhood": {
+                    "id": neighbourhood_id,
+                    "name": name,
+                    "geographic_unit": "VKinder reporting locality",
+                },
+                "component_sa2_count": component_sa2_count,
+                "is_merged": is_merged,
+            }
+            neighbourhood_ids.add(neighbourhood_id)
     except (OSError, UnicodeError, csv.Error, TypeError, ValueError):
         return None, (limitation(
             "community_identity_dataset_invalid",
@@ -190,13 +189,13 @@ def load_community_identities(
     }, []
 
 
-@lru_cache(maxsize=1)
+@dataset_cache(maxsize=1)
 def _load_community_context(
     context_path: Path,
     identity_path: Path,
 ) -> tuple[dict[str, dict[str, Any]] | None, tuple[dict[str, Any], ...]]:
     """Load, validate and index static DS context without deriving new values."""
-    if not context_path.is_file():
+    if not source_exists(context_path, COMMUNITY_CONTEXT_DATA_PATH_ENV):
         return None, (limitation(
             "community_context_dataset_unavailable",
             "The configured community context dataset could not be found.",
@@ -206,52 +205,51 @@ def _load_community_context(
     if identities is None:
         return None, identity_limitations
     try:
-        with context_path.open(encoding="utf-8-sig", newline="") as source:
-            context_reader = csv.DictReader(source)
-            if not context_reader.fieldnames or not CONTEXT_FIELDS.issubset(context_reader.fieldnames):
+        context_reader = read_csv_rows(context_path, COMMUNITY_CONTEXT_DATA_PATH_ENV)
+        if not context_reader.fieldnames or not CONTEXT_FIELDS.issubset(context_reader.fieldnames):
+            raise ValueError
+        index: dict[str, dict[str, Any]] = {}
+        seen_communities: set[str] = set()
+        for row in context_reader:
+            community_id = row["community_id"].strip()
+            if (community_id not in identities or community_id in seen_communities
+                    or row["context_quality_flag"] != "CONTEXT_ONLY"):
                 raise ValueError
-            index: dict[str, dict[str, Any]] = {}
-            seen_communities: set[str] = set()
-            for row in context_reader:
-                community_id = row["community_id"].strip()
-                if (community_id not in identities or community_id in seen_communities
-                        or row["context_quality_flag"] != "CONTEXT_ONLY"):
-                    raise ValueError
-                traffic_values = {
-                    field: float(row[field]) if row[field].strip() else None
-                    for field in TRAFFIC_FIELDS
-                }
-                if any(value is None for value in traffic_values.values()) and not all(
-                        value is None for value in traffic_values.values()):
-                    raise ValueError
-                counts = {field: int(row[field]) for field in INDUSTRIAL_COUNT_FIELDS}
-                distances = {
-                    field: float(row[field]) if row[field].strip() else None
-                    for field in INDUSTRIAL_DISTANCE_FIELDS
-                }
-                numeric_values = [
-                    value for value in (*traffic_values.values(), *counts.values(), *distances.values())
-                    if value is not None
-                ]
-                if (any(not math.isfinite(value) or value < 0 for value in numeric_values)
-                        or counts["npi_respiratory_reporting_facilities"] > counts["npi_facilities"]
-                        or any(traffic_values[field] is not None
-                               and traffic_values[field] > 100
-                               for field in ("high_traffic_road_share_pct",
-                                             "actual_observation_road_share_pct"))):
-                    raise ValueError
-                identity = identities[community_id]
-                neighbourhood = identity["neighbourhood"]
-                index[neighbourhood["id"]] = {
-                    "neighbourhood": neighbourhood,
-                    "component_sa2_count": identity["component_sa2_count"],
-                    "is_merged": identity["is_merged"],
-                    "traffic": traffic_values,
-                    "industrial_emissions": {**counts, **distances},
-                }
-                seen_communities.add(community_id)
-            if seen_communities != set(identities):
+            traffic_values = {
+                field: float(row[field]) if row[field].strip() else None
+                for field in TRAFFIC_FIELDS
+            }
+            if any(value is None for value in traffic_values.values()) and not all(
+                    value is None for value in traffic_values.values()):
                 raise ValueError
+            counts = {field: int(row[field]) for field in INDUSTRIAL_COUNT_FIELDS}
+            distances = {
+                field: float(row[field]) if row[field].strip() else None
+                for field in INDUSTRIAL_DISTANCE_FIELDS
+            }
+            numeric_values = [
+                value for value in (*traffic_values.values(), *counts.values(), *distances.values())
+                if value is not None
+            ]
+            if (any(not math.isfinite(value) or value < 0 for value in numeric_values)
+                    or counts["npi_respiratory_reporting_facilities"] > counts["npi_facilities"]
+                    or any(traffic_values[field] is not None
+                           and traffic_values[field] > 100
+                           for field in ("high_traffic_road_share_pct",
+                                         "actual_observation_road_share_pct"))):
+                raise ValueError
+            identity = identities[community_id]
+            neighbourhood = identity["neighbourhood"]
+            index[neighbourhood["id"]] = {
+                "neighbourhood": neighbourhood,
+                "component_sa2_count": identity["component_sa2_count"],
+                "is_merged": identity["is_merged"],
+                "traffic": traffic_values,
+                "industrial_emissions": {**counts, **distances},
+            }
+            seen_communities.add(community_id)
+        if seen_communities != set(identities):
+            raise ValueError
     except (OSError, UnicodeError, csv.Error, TypeError, ValueError):
         return None, (limitation(
             "community_context_dataset_invalid",

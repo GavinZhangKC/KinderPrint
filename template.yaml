@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: "2010-09-09"
 Transform: AWS::Serverless-2016-10-31
-Description: KinderPrint FastAPI backend
+Description: Vkinder FastAPI backend, with an optional private PostgreSQL database
 
 Parameters:
   VercelOrigin:
@@ -35,6 +35,61 @@ Parameters:
     Type: String
     Default: http://localhost:5173
     Description: Exact HTTP origin of the local Vite development server
+  DataBackend:
+    Type: String
+    Default: files
+    AllowedValues:
+      - files
+      - postgres
+    Description: Where the API reads datasets from. Set back to files to roll back from PostgreSQL.
+  DbSecretArn:
+    Type: String
+    Default: ""
+    Description: >-
+      ARN of the Secrets Manager secret holding the PostgreSQL credentials
+      (host, port, username, password, dbname). Leave empty in files mode.
+  SubnetIds:
+    Type: CommaDelimitedList
+    Default: ""
+    Description: Private subnets that can reach the database. Leave empty to run outside a VPC.
+  SecurityGroupIds:
+    Type: CommaDelimitedList
+    Default: ""
+    Description: Security groups for the function when it runs in a VPC.
+  CreateDatabase:
+    Type: String
+    Default: "false"
+    AllowedValues: ["true", "false"]
+    Description: >-
+      true creates the Vkinder database stack in this account: a private
+      PostgreSQL instance (db.t4g.micro, 20 GB), its own network, an admin-only
+      loader function and the credit guard. It costs money; leave false unless
+      the account owner has agreed.
+  AlertEmail:
+    Type: String
+    Default: ""
+    Description: Email address for budget and credit-guard alerts (confirm the subscription email AWS sends).
+  MonthlyBudgetUsd:
+    Type: Number
+    Default: 30
+    Description: Monthly cost budget for alerts (before credits are applied).
+  StopCreditsUsd:
+    Type: Number
+    Default: 10
+    Description: The credit guard stops the database and functions when remaining credits fall below this.
+  StopDays:
+    Type: Number
+    Default: 3
+    Description: The credit guard also stops everything this many days before the credits expire.
+
+Conditions:
+  HasDbSecret: !Not [!Equals [!Ref DbSecretArn, ""]]
+  HasSubnets: !Not [!Equals [!Join ["", !Ref SubnetIds], ""]]
+  HasSecurityGroups: !Not [!Equals [!Join ["", !Ref SecurityGroupIds], ""]]
+  HasVpcConfig: !And [!Condition HasSubnets, !Condition HasSecurityGroups]
+  CreateDb: !Equals [!Ref CreateDatabase, "true"]
+  HasAlertEmail: !Not [!Equals [!Ref AlertEmail, ""]]
+  CreateDbWithAlerts: !And [!Condition CreateDb, !Condition HasAlertEmail]
 
 Globals:
   Function:
@@ -43,6 +98,51 @@ Globals:
       - x86_64
     MemorySize: 1024
     Timeout: 30
+    Tags:
+      Project: Vkinder
+    Environment:
+      Variables:
+        # Dataset files bundled with the package. The API serves them in files
+        # mode; the Vkinder loader copies them into PostgreSQL.
+        KINDERPRINT_PROFILE_DATA_PATH: /var/task/data/profiles.json
+        KINDERPRINT_BOUNDARY_DATA_PATH: /var/task/data/boundaries.geojson
+        KINDERPRINT_PRIORITY_DATA_PATH: /var/task/data/priorities.json
+        KINDERPRINT_EXPLANATION_DATA_PATH: /var/task/data/explanations.json
+        KINDERPRINT_COMPARISON_DATA_PATH: /var/task/data/comparisons.json
+        KINDERPRINT_OUTCOME_COMPARISON_DATA_PATH: /var/task/data/outcome_comparisons.json
+        KINDERPRINT_ENVIRONMENTAL_DIFFERENCE_DATA_PATH: /var/task/data/environmental_differences.json
+        KINDERPRINT_SUITABILITY_DATA_PATH: /var/task/data/suitability.json
+        KINDERPRINT_VIF_PROJECTION_DATA_PATH: /var/task/data/vif_child_population_projections_sa2.csv
+        KINDERPRINT_EPA_STATION_YEAR_DATA_PATH: /var/task/data/epa_air_quality_station_year.csv
+        KINDERPRINT_ACECQA_GEOCODING_DATA_PATH: /var/task/data/acecqa_gnaf_geocoding.csv
+        KINDERPRINT_ACECQA_CONTEXT_DATA_PATH: /var/task/data/acecqa_gnaf_context_community.csv
+        KINDERPRINT_COMMUNITY_CONTEXT_DATA_PATH: /var/task/data/community_context.csv
+        KINDERPRINT_COMMUNITY_IDENTITY_DATA_PATH: /var/task/data/communities.csv
+        KINDERPRINT_VCAMS_AREA_DATA_PATH: /var/task/data/vcams_child_health_area.csv
+        KINDERPRINT_VCAMS_LGA_DATA_PATH: /var/task/data/vcams_child_health_lga.csv
+        KINDERPRINT_HEALTH_FACILITY_DATA_PATH: /var/task/data/healthdirect_facilities.csv
+        KINDERPRINT_ABS_CHILD_HEALTH_DATA_PATH: /var/task/data/abs_child_health_sa2.csv
+        KINDERPRINT_PHIDU_CHILD_HEALTH_DATA_PATH: /var/task/data/phidu_child_health_pha.csv
+        KINDERPRINT_PHIDU_PHA_SA2_BRIDGE_DATA_PATH: /var/task/data/phidu_pha_sa2_bridge.csv
+        KINDERPRINT_DEPARTMENT_AREA_BRIDGE_DATA_PATH: /var/task/data/sa2_department_area_bridge.csv
+        KINDERPRINT_BUSHFIRE_CONTEXT_DATA_PATH: /var/task/data/bushfire_context_sa2.csv
+        KINDERPRINT_TRANSPORT_CONTEXT_DATA_PATH: /var/task/data/transport_context_sa2.csv
+        KINDERPRINT_SEASONAL_AIR_DATA_PATH: /var/task/data/seasonal_air_quality_sa2.csv
+        KINDERPRINT_NEARBY_SERVICES_DATA_PATH: /var/task/data/nearby_health_services_sa2.csv
+        KINDERPRINT_VACCINATION_PLACES_DATA_PATH: /var/task/data/vaccination_places_sa2.csv
+        KINDERPRINT_COUNCIL_IMMUNISATION_DATA_PATH: /var/task/data/council_immunisation_sa2.csv
+        KINDERPRINT_FAMILY_FIT_DATA_PATH: /var/task/data/family_fit.json
+        KINDERPRINT_FAMILY_FIT_SHAPES_DATA_PATH: /var/task/data/family_fit_shapes.json
+        KINDERPRINT_HOSPITAL_CAPABILITY_DATA_PATH: /var/task/data/hospital_capability_vic.csv
+        KINDERPRINT_CARE_COMPARE_DATA_PATH: /var/task/data/care_compare_sa2.csv
+        KINDERPRINT_URGENT_CARE_CLINICS_DATA_PATH: /var/task/data/urgent_care_clinics_vic.csv
+        KINDERPRINT_PRIMARY_CARE_COST_DATA_PATH: /var/task/data/primary_care_cost_sa3.csv
+        KINDERPRINT_SEASONAL_ILLNESS_DATA_PATH: /var/task/data/seasonal_illness_vic.csv
+        KINDERPRINT_FOOD_OUTLETS_DATA_PATH: /var/task/data/food_outlets_sa2.csv
+        KINDERPRINT_FOOD_ACCESS_DATA_PATH: /var/task/data/food_access_sa2.csv
+        KINDERPRINT_CHILD_NUTRIENT_FOODS_DATA_PATH: /var/task/data/child_nutrient_foods.csv
+        KINDERPRINT_CHILD_NUTRIENT_TARGETS_DATA_PATH: /var/task/data/child_nutrient_targets.csv
+        KINDERPRINT_PRACTITIONER_CONTEXT_DATA_PATH: /var/task/data/practitioner_context_sa2.csv
 
 Resources:
   KinderPrintHttpApi:
@@ -71,48 +171,41 @@ Resources:
     Properties:
       CodeUri: backend/lambda_package/
       Handler: main.handler
-      Description: KinderPrint API
+      Description: Vkinder API
+      Policies:
+        - !If
+          - HasDbSecret
+          - Version: "2012-10-17"
+            Statement:
+              - Sid: ReadDatabaseSecret
+                Effect: Allow
+                Action: secretsmanager:GetSecretValue
+                Resource: !Ref DbSecretArn
+          - !Ref AWS::NoValue
+      VpcConfig: !If
+        - CreateDb
+        - SubnetIds: [!Ref VkinderPrivateSubnetA, !Ref VkinderPrivateSubnetB]
+          SecurityGroupIds: [!Ref VkinderFunctionSecurityGroup]
+        - !If
+          - HasVpcConfig
+          - SubnetIds: !Ref SubnetIds
+            SecurityGroupIds: !Ref SecurityGroupIds
+          - !Ref AWS::NoValue
       Environment:
         Variables:
-          KINDERPRINT_PROFILE_DATA_PATH: /var/task/data/profiles.json
-          KINDERPRINT_BOUNDARY_DATA_PATH: /var/task/data/boundaries.geojson
-          KINDERPRINT_PRIORITY_DATA_PATH: /var/task/data/priorities.json
-          KINDERPRINT_EXPLANATION_DATA_PATH: /var/task/data/explanations.json
-          KINDERPRINT_COMPARISON_DATA_PATH: /var/task/data/comparisons.json
-          KINDERPRINT_OUTCOME_COMPARISON_DATA_PATH: /var/task/data/outcome_comparisons.json
-          KINDERPRINT_ENVIRONMENTAL_DIFFERENCE_DATA_PATH: /var/task/data/environmental_differences.json
-          KINDERPRINT_SUITABILITY_DATA_PATH: /var/task/data/suitability.json
-          KINDERPRINT_VIF_PROJECTION_DATA_PATH: /var/task/data/vif_child_population_projections_sa2.csv
-          KINDERPRINT_EPA_STATION_YEAR_DATA_PATH: /var/task/data/epa_air_quality_station_year.csv
-          KINDERPRINT_ACECQA_GEOCODING_DATA_PATH: /var/task/data/acecqa_gnaf_geocoding.csv
-          KINDERPRINT_ACECQA_CONTEXT_DATA_PATH: /var/task/data/acecqa_gnaf_context_community.csv
-          KINDERPRINT_COMMUNITY_CONTEXT_DATA_PATH: /var/task/data/community_context.csv
-          KINDERPRINT_COMMUNITY_IDENTITY_DATA_PATH: /var/task/data/communities.csv
-          KINDERPRINT_VCAMS_AREA_DATA_PATH: /var/task/data/vcams_child_health_area.csv
-          KINDERPRINT_VCAMS_LGA_DATA_PATH: /var/task/data/vcams_child_health_lga.csv
-          KINDERPRINT_HEALTH_FACILITY_DATA_PATH: /var/task/data/healthdirect_facilities.csv
-          KINDERPRINT_ABS_CHILD_HEALTH_DATA_PATH: /var/task/data/abs_child_health_sa2.csv
-          KINDERPRINT_PHIDU_CHILD_HEALTH_DATA_PATH: /var/task/data/phidu_child_health_pha.csv
-          KINDERPRINT_PHIDU_PHA_SA2_BRIDGE_DATA_PATH: /var/task/data/phidu_pha_sa2_bridge.csv
-          KINDERPRINT_DEPARTMENT_AREA_BRIDGE_DATA_PATH: /var/task/data/sa2_department_area_bridge.csv
-          KINDERPRINT_BUSHFIRE_CONTEXT_DATA_PATH: /var/task/data/bushfire_context_sa2.csv
-          KINDERPRINT_TRANSPORT_CONTEXT_DATA_PATH: /var/task/data/transport_context_sa2.csv
-          KINDERPRINT_SEASONAL_AIR_DATA_PATH: /var/task/data/seasonal_air_quality_sa2.csv
-          KINDERPRINT_NEARBY_SERVICES_DATA_PATH: /var/task/data/nearby_health_services_sa2.csv
-          KINDERPRINT_VACCINATION_PLACES_DATA_PATH: /var/task/data/vaccination_places_sa2.csv
-          KINDERPRINT_COUNCIL_IMMUNISATION_DATA_PATH: /var/task/data/council_immunisation_sa2.csv
-          KINDERPRINT_FAMILY_FIT_DATA_PATH: /var/task/data/family_fit.json
-          KINDERPRINT_FAMILY_FIT_SHAPES_DATA_PATH: /var/task/data/family_fit_shapes.json
-          KINDERPRINT_HOSPITAL_CAPABILITY_DATA_PATH: /var/task/data/hospital_capability_vic.csv
-          KINDERPRINT_CARE_COMPARE_DATA_PATH: /var/task/data/care_compare_sa2.csv
-          KINDERPRINT_URGENT_CARE_CLINICS_DATA_PATH: /var/task/data/urgent_care_clinics_vic.csv
-          KINDERPRINT_PRIMARY_CARE_COST_DATA_PATH: /var/task/data/primary_care_cost_sa3.csv
-          KINDERPRINT_SEASONAL_ILLNESS_DATA_PATH: /var/task/data/seasonal_illness_vic.csv
-          KINDERPRINT_FOOD_OUTLETS_DATA_PATH: /var/task/data/food_outlets_sa2.csv
-          KINDERPRINT_FOOD_ACCESS_DATA_PATH: /var/task/data/food_access_sa2.csv
-          KINDERPRINT_CHILD_NUTRIENT_FOODS_DATA_PATH: /var/task/data/child_nutrient_foods.csv
-          KINDERPRINT_CHILD_NUTRIENT_TARGETS_DATA_PATH: /var/task/data/child_nutrient_targets.csv
-          KINDERPRINT_PRACTITIONER_CONTEXT_DATA_PATH: /var/task/data/practitioner_context_sa2.csv
+          KINDERPRINT_DATA_BACKEND: !Ref DataBackend
+          KINDERPRINT_DB_SECRET_ARN: !Ref DbSecretArn
+          # Vkinder database: credentials are resolved from Secrets Manager at
+          # deploy time, so the function needs no NAT gateway or VPC endpoint.
+          KINDERPRINT_DB_HOST: !If [CreateDb, !GetAtt VkinderDatabase.Endpoint.Address, !Ref AWS::NoValue]
+          KINDERPRINT_DB_PORT: !If [CreateDb, !GetAtt VkinderDatabase.Endpoint.Port, !Ref AWS::NoValue]
+          KINDERPRINT_DB_NAME: !If [CreateDb, vkinder, !Ref AWS::NoValue]
+          KINDERPRINT_DB_SCHEMA: !If [CreateDb, vkinder, !Ref AWS::NoValue]
+          KINDERPRINT_DB_USER: !If [CreateDb, vkinder_api, !Ref AWS::NoValue]
+          KINDERPRINT_DB_PASSWORD: !If
+            - CreateDb
+            - !Sub "{{resolve:secretsmanager:${VkinderApiDbSecret}:SecretString:password}}"
+            - !Ref AWS::NoValue
       Events:
         ApiProxy:
           Type: HttpApi
@@ -127,7 +220,292 @@ Resources:
             Path: /
             Method: ANY
 
+  # ------------------------------------------------------------------ Vkinder database stack
+  # Created only when CreateDatabase=true. Private network with no internet
+  # gateway or NAT: nothing outside the VPC can reach the database, and there
+  # is no hourly network charge. See docs/AWS_VKINDER.md for costs.
+
+  VkinderVpc:
+    Type: AWS::EC2::VPC
+    Condition: CreateDb
+    Properties:
+      CidrBlock: 10.42.0.0/16
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      Tags:
+        - { Key: Name, Value: vkinder-vpc }
+        - { Key: Project, Value: Vkinder }
+
+  VkinderPrivateSubnetA:
+    Type: AWS::EC2::Subnet
+    Condition: CreateDb
+    Properties:
+      VpcId: !Ref VkinderVpc
+      CidrBlock: 10.42.1.0/24
+      AvailabilityZone: !Select [0, !GetAZs ""]
+      Tags:
+        - { Key: Name, Value: vkinder-private-a }
+        - { Key: Project, Value: Vkinder }
+
+  VkinderPrivateSubnetB:
+    Type: AWS::EC2::Subnet
+    Condition: CreateDb
+    Properties:
+      VpcId: !Ref VkinderVpc
+      CidrBlock: 10.42.2.0/24
+      AvailabilityZone: !Select [1, !GetAZs ""]
+      Tags:
+        - { Key: Name, Value: vkinder-private-b }
+        - { Key: Project, Value: Vkinder }
+
+  VkinderFunctionSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Condition: CreateDb
+    Properties:
+      GroupDescription: Vkinder API and loader functions
+      VpcId: !Ref VkinderVpc
+      SecurityGroupEgress:
+        - IpProtocol: tcp
+          FromPort: 5432
+          ToPort: 5432
+          CidrIp: 10.42.0.0/16
+          Description: PostgreSQL inside the Vkinder network only
+      Tags:
+        - { Key: Project, Value: Vkinder }
+
+  VkinderDatabaseSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Condition: CreateDb
+    Properties:
+      GroupDescription: Vkinder database, reachable only from the Vkinder functions
+      VpcId: !Ref VkinderVpc
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 5432
+          ToPort: 5432
+          SourceSecurityGroupId: !Ref VkinderFunctionSecurityGroup
+          Description: PostgreSQL from the Vkinder functions
+      SecurityGroupEgress:
+        - IpProtocol: "-1"
+          CidrIp: 127.0.0.1/32
+          Description: No outbound traffic
+      Tags:
+        - { Key: Project, Value: Vkinder }
+
+  VkinderDbSubnetGroup:
+    Type: AWS::RDS::DBSubnetGroup
+    Condition: CreateDb
+    Properties:
+      DBSubnetGroupDescription: Vkinder private subnets
+      SubnetIds: [!Ref VkinderPrivateSubnetA, !Ref VkinderPrivateSubnetB]
+      Tags:
+        - { Key: Project, Value: Vkinder }
+
+  # Generated passwords. Never typed, printed or committed.
+  VkinderAdminDbSecret:
+    Type: AWS::SecretsManager::Secret
+    Condition: CreateDb
+    Properties:
+      Name: vkinder/db/admin
+      Description: Vkinder database owner (used only by the loader function)
+      GenerateSecretString:
+        SecretStringTemplate: '{"username": "vkinder_admin"}'
+        GenerateStringKey: password
+        PasswordLength: 32
+        ExcludeCharacters: "\"'@/\\ `"
+      Tags:
+        - { Key: Project, Value: Vkinder }
+
+  VkinderApiDbSecret:
+    Type: AWS::SecretsManager::Secret
+    Condition: CreateDb
+    Properties:
+      Name: vkinder/db/api
+      Description: Vkinder read-only API login
+      GenerateSecretString:
+        SecretStringTemplate: '{"username": "vkinder_api"}'
+        GenerateStringKey: password
+        PasswordLength: 32
+        ExcludeCharacters: "\"'@/\\ `"
+      Tags:
+        - { Key: Project, Value: Vkinder }
+
+  VkinderDbParameters:
+    Type: AWS::RDS::DBParameterGroup
+    Condition: CreateDb
+    Properties:
+      Family: postgres17
+      Description: Vkinder PostgreSQL settings
+      Parameters:
+        rds.force_ssl: "1"
+      Tags:
+        - { Key: Project, Value: Vkinder }
+
+  VkinderDatabase:
+    Type: AWS::RDS::DBInstance
+    Condition: CreateDb
+    DeletionPolicy: Snapshot
+    UpdateReplacePolicy: Snapshot
+    Properties:
+      DBInstanceIdentifier: vkinder-db
+      DBName: vkinder
+      Engine: postgres
+      EngineVersion: "17.11"
+      DBInstanceClass: db.t4g.micro
+      AllocatedStorage: "20"
+      MaxAllocatedStorage: 20
+      StorageType: gp3
+      StorageEncrypted: true
+      MultiAZ: false
+      PubliclyAccessible: false
+      DBSubnetGroupName: !Ref VkinderDbSubnetGroup
+      VPCSecurityGroups: [!Ref VkinderDatabaseSecurityGroup]
+      DBParameterGroupName: !Ref VkinderDbParameters
+      MasterUsername: vkinder_admin
+      MasterUserPassword: !Sub "{{resolve:secretsmanager:${VkinderAdminDbSecret}:SecretString:password}}"
+      BackupRetentionPeriod: 1
+      AutoMinorVersionUpgrade: true
+      EnablePerformanceInsights: false
+      MonitoringInterval: 0
+      CopyTagsToSnapshot: true
+      Tags:
+        - { Key: Project, Value: Vkinder }
+
+  VkinderLoaderFunction:
+    Type: AWS::Serverless::Function
+    Condition: CreateDb
+    Properties:
+      FunctionName: vkinder-loader
+      CodeUri: backend/lambda_package/
+      Handler: loader_handler.handler
+      Description: Vkinder admin-only dataset loader (invoke manually)
+      MemorySize: 2048
+      Timeout: 900
+      # SAM adds AWSLambdaVPCAccessExecutionRole because of VpcConfig.
+      VpcConfig:
+        SubnetIds: [!Ref VkinderPrivateSubnetA, !Ref VkinderPrivateSubnetB]
+        SecurityGroupIds: [!Ref VkinderFunctionSecurityGroup]
+      Environment:
+        Variables:
+          KINDERPRINT_DB_HOST: !GetAtt VkinderDatabase.Endpoint.Address
+          KINDERPRINT_DB_PORT: !GetAtt VkinderDatabase.Endpoint.Port
+          KINDERPRINT_DB_NAME: vkinder
+          KINDERPRINT_DB_SCHEMA: vkinder
+          KINDERPRINT_DB_USER: vkinder_admin
+          KINDERPRINT_DB_PASSWORD: !Sub "{{resolve:secretsmanager:${VkinderAdminDbSecret}:SecretString:password}}"
+          KINDERPRINT_DB_READER_ROLE: vkinder_api
+          KINDERPRINT_DB_READER_PASSWORD: !Sub "{{resolve:secretsmanager:${VkinderApiDbSecret}:SecretString:password}}"
+
+  # ------------------------------------------------------------------ cost controls
+
+  VkinderAlertTopic:
+    Type: AWS::SNS::Topic
+    Condition: CreateDb
+    Properties:
+      TopicName: vkinder-alerts
+      Tags:
+        - { Key: Project, Value: Vkinder }
+
+  VkinderAlertSubscription:
+    Type: AWS::SNS::Subscription
+    Condition: CreateDbWithAlerts
+    Properties:
+      TopicArn: !Ref VkinderAlertTopic
+      Protocol: email
+      Endpoint: !Ref AlertEmail
+
+  VkinderCreditGuardFunction:
+    Type: AWS::Serverless::Function
+    Condition: CreateDb
+    Properties:
+      FunctionName: vkinder-credit-guard
+      CodeUri: infra/credit_guard/
+      Handler: app.handler
+      Description: Stops Vkinder's paid resources before the AWS credits run out
+      MemorySize: 128
+      Timeout: 60
+      Environment:
+        Variables:
+          DB_INSTANCE_ID: vkinder-db
+          # Bundled Free Tier API model, in case the runtime's boto3 predates it.
+          AWS_DATA_PATH: /var/task/models
+          FUNCTION_NAMES: !Sub "${KinderPrintApiFunction},vkinder-loader"
+          ALERT_TOPIC_ARN: !Ref VkinderAlertTopic
+          STOP_CREDITS_USD: !Ref StopCreditsUsd
+          STOP_DAYS: !Ref StopDays
+          WARN_CREDITS_USD: "30"
+          WARN_DAYS: "14"
+      Policies:
+        - Version: "2012-10-17"
+          Statement:
+            - Sid: ReadCredits
+              Effect: Allow
+              Action: freetier:GetAccountPlanState
+              Resource: "*"
+            - Sid: StopDatabase
+              Effect: Allow
+              Action:
+                - rds:DescribeDBInstances
+                - rds:StopDBInstance
+              Resource: !Sub "arn:${AWS::Partition}:rds:${AWS::Region}:${AWS::AccountId}:db:vkinder-db"
+            - Sid: DisableFunctions
+              Effect: Allow
+              Action: lambda:PutFunctionConcurrency
+              Resource:
+                - !GetAtt KinderPrintApiFunction.Arn
+                - !Sub "arn:${AWS::Partition}:lambda:${AWS::Region}:${AWS::AccountId}:function:vkinder-loader"
+            - Sid: Alert
+              Effect: Allow
+              Action: sns:Publish
+              Resource: !Ref VkinderAlertTopic
+      Events:
+        Daily:
+          Type: ScheduleV2
+          Properties:
+            ScheduleExpression: cron(0 21 * * ? *)
+            Description: Daily credit check (07:00 or 08:00 Melbourne time)
+
+  VkinderMonthlyBudget:
+    Type: AWS::Budgets::Budget
+    Condition: CreateDbWithAlerts
+    Properties:
+      Budget:
+        BudgetName: vkinder-monthly
+        BudgetType: COST
+        TimeUnit: MONTHLY
+        BudgetLimit:
+          Amount: !Ref MonthlyBudgetUsd
+          Unit: USD
+        CostTypes:
+          IncludeCredit: false
+          IncludeRefund: false
+      NotificationsWithSubscribers:
+        - Notification:
+            NotificationType: ACTUAL
+            ComparisonOperator: GREATER_THAN
+            Threshold: 80
+            ThresholdType: PERCENTAGE
+          Subscribers:
+            - SubscriptionType: EMAIL
+              Address: !Ref AlertEmail
+        - Notification:
+            NotificationType: FORECASTED
+            ComparisonOperator: GREATER_THAN
+            Threshold: 100
+            ThresholdType: PERCENTAGE
+          Subscribers:
+            - SubscriptionType: EMAIL
+              Address: !Ref AlertEmail
+
 Outputs:
   ApiUrl:
     Description: Base URL for VITE_API_BASE_URL
     Value: !Sub "https://${KinderPrintHttpApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}"
+  DatabaseEndpoint:
+    Condition: CreateDb
+    Description: Private address of the Vkinder database (reachable only inside its network)
+    Value: !GetAtt VkinderDatabase.Endpoint.Address
+  LoaderFunction:
+    Condition: CreateDb
+    Description: Invoke to load or refresh the datasets in the database
+    Value: !Ref VkinderLoaderFunction
