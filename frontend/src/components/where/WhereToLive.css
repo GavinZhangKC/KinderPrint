@@ -256,3 +256,27 @@
 :root[data-theme='dark'] .where-page .wl-place-list { background: #12223B; border-color: rgba(175, 192, 217, .28); }
 .wl-view-switch { display: inline-flex; min-width: 420px; margin-bottom: 18px; }
 .wl-help .wl-link { display: inline-block; min-height: 24px; line-height: 24px; }
+
+/* ------------------------------------------------------------------ Child Health template
+   Where to live inside the shared hub frame (WhereToLivePage): hero, Parent / Practitioner switch,
+   hub theme colours. The hub tokens (--kt-*) drive the page tokens (--wl-*), light and dark. */
+.kp-hub .where-page.wl-hub {
+  --wl-bg: transparent; --wl-surface: var(--kt-surface); --wl-soft: var(--kt-glass-soft);
+  --wl-line: var(--kt-line); --wl-line-strong: var(--kt-field-line);
+  --wl-ink: var(--kt-ink); --wl-ink2: var(--kt-ink2);
+  --wl-brand: var(--kt-accent, var(--kt-primary)); --wl-brand-fill: var(--kt-primary); --wl-brand-fill-hover: var(--kt-primary-hover);
+  --wl-brand-ink: var(--kt-on-primary); --wl-brand-tint: var(--kt-icon-bg);
+  --wl-warn: var(--kt-warn-ink); --wl-warn-bg: var(--kt-warn-bg);
+  --wl-map-top: var(--kt-primary); --wl-map-match: color-mix(in srgb, var(--kt-primary) 45%, var(--kt-surface));
+  --wl-pin: var(--kt-primary); --wl-pin-ink: var(--kt-on-primary);
+  --wl-shadow: var(--kt-shadow); --wl-shadow-strong: var(--kt-shadow);
+  font-family: 'Manrope', 'Segoe UI', sans-serif; color: var(--kt-ink); background: none;
+}
+.wl-page-shell .kh-top { margin-bottom: 14px; }
+.kp-hub .kh-nav.wl-hub-label { margin: 0; padding: 10px 18px; gap: 8px; background: var(--kt-primary); color: var(--kt-on-primary); font-weight: 700; border-color: transparent; backdrop-filter: none; }
+.wl-hub-label svg { stroke: currentColor; }
+.kp-hub .wl-hub .wl-main { width: auto; max-width: none; margin: 0; padding: 0 0 80px; }
+.kp-hub .wl-hub .kt-hero h1, .kp-hub .wl-hub .kt-hero p { color: #fff; }
+.kp-hub .wl-hub .wl-hub-bar { justify-content: space-between; margin-bottom: 28px; }
+.kp-hub .wl-hub .wl-hub-bar p { margin: 0; flex: 1 1 360px; color: var(--kt-ink2); font-size: 16px; line-height: 1.5; }
+.kp-hub .wl-hub .wl-seg button[aria-checked=true] { background: var(--kt-primary); color: var(--kt-on-primary); }

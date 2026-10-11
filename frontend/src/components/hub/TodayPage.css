@@ -299,3 +299,64 @@ html[data-theme='dark'][data-kt-theme] .health-page-shell>.nav-shell .nav-links 
 @media (max-width:640px){
   :root[data-theme='dark'] .kt-hero::after,:root[data-theme='dark'] .kt-prac .kt-hero::after{background:linear-gradient(0deg,rgba(9,21,37,.94) 0%,rgba(9,21,37,.6) 50%,rgba(9,21,37,.1) 100%)}
 }
+
+/* Dark mode, one palette per audience so the two views never look alike.
+   Parent, "evening garden": warm forest-black surfaces, sage text accents, moss buttons.
+   Practitioner, "clinical night": deep slate-teal surfaces, cyan text accents, teal buttons.
+   White on each primary is at least 4.9:1; accents on surfaces are at least 7:1. */
+:root[data-theme='dark'] .kp-hub.kt-theme-parent{
+  --kt-ink:#F1F5EA; --kt-ink2:#C3CFB6; --kt-accent:#B9D98C; --kt-primary:#4C7A3A; --kt-primary-hover:#426D32; --kt-focus:#B9D98C;
+  --kt-line:rgba(195,215,170,.2); --kt-line-soft:rgba(195,215,170,.12); --kt-card-line:rgba(195,215,170,.18); --kt-field-line:rgba(195,215,170,.3);
+  --kt-cream:#1A271E; --kt-surface:#152019; --kt-glass:rgba(21,32,25,.78); --kt-glass-soft:rgba(21,32,25,.55);
+  --kt-icon-bg:rgba(185,217,140,.14); --kt-tint:linear-gradient(135deg,#1C2B1F 0%,#252A18 100%);
+  --kt-pill-bg:rgba(185,217,140,.16); --kt-pill-ink:#CDE7A8; --kt-ok-bg:#1E3A24; --kt-ok-ink:#A9E2A0; --kt-neutral-bg:#1E2A1F;
+  --kt-geo-sa2:#2B4A2F; --kt-map-fill:#17221A;
+  --kt-overlay:linear-gradient(90deg,rgba(12,22,14,.9) 0%,rgba(12,22,14,.74) 34%,rgba(12,22,14,.3) 56%,rgba(12,22,14,0) 72%);
+  --kt-shadow:0 8px 24px -12px rgba(0,0,0,.6);
+  background:linear-gradient(180deg,#0F1812 0%,#121C14 50%,#17190F 100%);
+}
+:root[data-theme='dark'] .kp-hub.kt-theme-prac{
+  --kt-ink:#EAF6F8; --kt-ink2:#A9C5CC; --kt-accent:#5FD4DF; --kt-primary:#137C8B; --kt-primary-hover:#0F6C79; --kt-focus:#5FD4DF;
+  --kt-line:rgba(150,205,215,.2); --kt-line-soft:rgba(150,205,215,.12); --kt-card-line:rgba(150,205,215,.18); --kt-field-line:rgba(150,205,215,.3);
+  --kt-cream:#122833; --kt-surface:#0F2129; --kt-glass:rgba(15,33,41,.78); --kt-glass-soft:rgba(15,33,41,.55);
+  --kt-icon-bg:rgba(95,212,223,.14); --kt-tint:linear-gradient(160deg,#10272F 0%,#0E2229 100%);
+  --kt-pill-bg:rgba(95,212,223,.16); --kt-pill-ink:#8EE3EA; --kt-ok-bg:#163A33; --kt-ok-ink:#8FE0BF; --kt-neutral-bg:#13272F;
+  --kt-geo-sa2:#1D4A55; --kt-map-fill:#10232B;
+  --kt-overlay:linear-gradient(90deg,rgba(6,20,27,.92) 0%,rgba(6,20,27,.78) 36%,rgba(6,20,27,.32) 60%,rgba(6,20,27,0) 78%);
+  --kt-shadow:0 8px 24px -12px rgba(0,0,0,.6);
+  background:linear-gradient(180deg,#0A161C 0%,#0C1B22 100%);
+}
+html[data-theme='dark'][data-kt-theme=parent] .health-page-shell{background:#0F1812}
+html[data-theme='dark'][data-kt-theme=prac] .health-page-shell{background:#0A161C}
+html[data-theme='dark'][data-kt-theme=parent] .health-page-shell>.nav-shell{background:rgba(21,32,25,.9);border-color:rgba(195,215,170,.16)}
+html[data-theme='dark'][data-kt-theme=prac] .health-page-shell>.nav-shell{background:rgba(15,33,41,.9);border-color:rgba(150,205,215,.16)}
+html[data-theme='dark'][data-kt-theme=parent] .health-page-shell>.nav-shell .brand-button{color:#B9D98C}
+html[data-theme='dark'][data-kt-theme=prac] .health-page-shell>.nav-shell .brand-button{color:#5FD4DF}
+html[data-theme='dark'][data-kt-theme=parent] .kp-hub .kh-seg button[aria-pressed=true],html[data-theme='dark'][data-kt-theme=parent] .kp-hub .kh-nav button[aria-current=page]{background:var(--kt-primary);color:#fff}
+html[data-theme='dark'][data-kt-theme=prac] .kp-hub .kh-seg button[aria-pressed=true],html[data-theme='dark'][data-kt-theme=prac] .kp-hub .kh-nav button[aria-current=page]{background:var(--kt-primary);color:#fff}
+:root[data-theme='dark'] .kt-track .band{background:var(--kt-geo-sa2)}
+html[data-theme='dark'][data-kt-theme] .health-page-shell>.nav-shell .nav-links .active::after{background:var(--kt-nav-mark,#A9B6FF)}
+html[data-theme='dark'][data-kt-theme=parent]{--kt-nav-mark:#B9D98C}
+html[data-theme='dark'][data-kt-theme=prac]{--kt-nav-mark:#5FD4DF}
+
+
+/* Practitioner banner: the original photo runs under the whole banner; a translucent shade on the
+   left keeps the words readable while the photo still shows through, as on the parent banner. */
+.kt-prac .kt-hero{min-height:340px}
+.kt-prac .kt-hero-img{left:0;right:0;width:100%;object-position:62% 38%}
+.kp-hub.kt-theme-prac{--kt-overlay:linear-gradient(90deg,rgba(10,36,54,.86) 0%,rgba(10,36,54,.74) 34%,rgba(10,36,54,.3) 58%,rgba(10,36,54,0) 76%)}
+:root[data-theme='dark'] .kp-hub.kt-theme-prac{--kt-overlay:linear-gradient(90deg,rgba(6,20,27,.88) 0%,rgba(6,20,27,.74) 36%,rgba(6,20,27,.3) 60%,rgba(6,20,27,0) 78%)}
+
+/* One page width for Child Health and Where to live. */
+html .health-page-shell{--health-content-width:min(1440px,calc(100vw - 64px))}
+
+/* "Child Health › area": back to the map with this area's profile open. */
+.kh-crumbs{display:flex;align-items:center;gap:8px;margin:0 0 12px;font-size:15px;color:var(--kt-ink2,#4C5D7E)}
+.kh-crumbs a{color:var(--kt-accent,#2C5EAF);font-weight:700;text-decoration:underline;text-underline-offset:3px}
+.kh-crumbs [aria-current]{color:var(--kt-ink,#1F3358);font-weight:600}
+
+/* The area chip is a link to the map. */
+.kh-picker-link{display:inline-flex;align-items:center;gap:8px;text-decoration:none;color:inherit}
+.kh-picker-link .kh-picker-label{font-weight:800}
+:root[data-theme='dark'] .kt-theme-parent .kh-picker-change,:root[data-theme='dark'] .kt-theme-prac .kh-picker-change,
+:root[data-theme='dark'] .kt-theme-parent .kh-picker-ways a,:root[data-theme='dark'] .kt-theme-prac .kh-picker-ways a{color:var(--kt-accent)}

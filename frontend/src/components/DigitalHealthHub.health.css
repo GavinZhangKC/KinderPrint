@@ -955,3 +955,33 @@ html:has(.health-page-shell) body::-webkit-scrollbar{
 :root[data-theme='dark'] .dh-area-card .kh-picker-trigger { border-color: rgba(175, 192, 217, .28); background: #182B48; color: #F3F7FF; }
 :root[data-theme='dark'] .dh-area-card .kh-picker-panel { background: transparent; border: 0; padding-left: 0; padding-right: 0; }
 :root[data-theme='dark'] .dh-area-card .kh-picker-panel { box-shadow: none; }
+
+/* Shortcut back to the family's last area, under the chooser. */
+.dh-area-recent { align-self: flex-start; min-height: 44px; padding: 0 18px; border: 1px solid #D9E1F0; border-radius: 12px; background: #F3F6FC; color: #1F3358; font: inherit; font-size: 16px; cursor: pointer; }
+.dh-area-recent b { color: #2C5EAF; }
+.dh-area-recent:hover { background: #E8EEF9; }
+.dh-area-recent:focus-visible { outline: 3px solid rgba(109, 120, 232, .6); outline-offset: 2px; }
+:root[data-theme='dark'] .dh-area-recent { border-color: rgba(175, 192, 217, .28); background: #182B48; color: #F3F7FF; }
+:root[data-theme='dark'] .dh-area-recent b { color: #A9B6FF; }
+:root[data-theme='dark'] .dh-area-recent:hover { background: #20365A; }
+
+/* Map comparison page: selected audience and the main action need 4.5:1 white text. */
+.locality-comparison-shell .dh-audience-toggle button[aria-selected=true],
+.locality-comparison-shell .dh-primary-action { background: #4F5BD5; }
+
+/* Each compared area: its detailed data and its Child Health board. */
+.dh-compare-area-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+.dh-compare-area-actions button { min-height: 40px; padding: 0 14px; border: 1px solid #C9D6EC; border-radius: 10px; background: #F5F8FE; color: #1D3F7A; font: inherit; font-size: 14px; font-weight: 700; cursor: pointer; }
+.dh-compare-area-actions button.is-primary { border-color: #2C5EAF; background: #2C5EAF; color: #fff; }
+.dh-compare-area-actions button:hover { border-color: #2C5EAF; }
+.dh-compare-area-actions button.is-primary:hover { background: #244F96; }
+.dh-compare-area-actions button:focus-visible { outline: 3px solid rgba(109, 120, 232, .6); outline-offset: 2px; }
+:root[data-theme='dark'] .dh-compare-area-actions button { border-color: #2E4570; background: #16264A; color: #E6EDFA; }
+:root[data-theme='dark'] .dh-compare-area-actions button.is-primary { border-color: #4E5FD6; background: #4E5FD6; color: #fff; }
+.dh-area-card > p.dh-area-or-label { margin: 2px 0 -6px; font-size: 15px; }
+.dh-area-recent { min-height: 48px; border-color: #2C5EAF; background: #2C5EAF; color: #fff; font-weight: 700; }
+.dh-area-recent b { color: #fff; }
+.dh-area-recent:hover { background: #244F96; }
+:root[data-theme='dark'] .dh-area-recent { border-color: #4E5FD6; background: #4E5FD6; color: #fff; }
+:root[data-theme='dark'] .dh-area-recent b { color: #fff; }
+:root[data-theme='dark'] .dh-area-recent:hover { background: #4252C4; }

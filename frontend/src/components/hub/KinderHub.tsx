@@ -20,6 +20,7 @@ import {
   type NutritionContext,
   type PopulationProjection,
   type PreventionContext,
+  recordDataIssue,
 } from '../../services/api'
 import { readStored, writeStored } from '../health/healthPlanning'
 import './KinderHub.css'
@@ -130,11 +131,18 @@ export function LocalityPicker({ locality, onSelect, autoOpen = false }: { local
   }, [open])
   const choose = (item: NeighbourhoodSearchResult) => { onSelect(item); setQuery(''); setResults([]); setOpen(false) }
   const mapHref = locality ? `/map?area=${encodeURIComponent(locality.id)}&name=${encodeURIComponent(locality.name)}` : '/map'
+  // With an area chosen, the pin and "Change" go back to the map, where the area's profile opens.
+  if (locality) return <div className="kh-picker">
+    <a className="kh-chip kh-picker-trigger kh-picker-link" href={mapHref} aria-label={`${locality.name}. Change area on the map`}>
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="10" r="3" /><path d="M12 21s-7-6.5-7-11a7 7 0 0 1 14 0c0 4.5-7 11-7 11z" /></svg>
+      <span className="kh-picker-label">{locality.name}</span>
+      <span className="kh-picker-change">Change</span>
+    </a>
+  </div>
   return <div className={`kh-picker${open ? ' is-open' : ''}`} ref={rootRef}>
     <button type="button" className="kh-chip kh-picker-trigger" aria-haspopup="dialog" aria-expanded={open} onClick={() => setOpen(value => !value)}>
       <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="10" r="3" /><path d="M12 21s-7-6.5-7-11a7 7 0 0 1 14 0c0 4.5-7 11-7 11z" /></svg>
-      <span className="kh-picker-label">{locality ? <><span className="kh-sr">Area: </span>{locality.name}</> : 'Choose an area'}</span>
-      <span className="kh-picker-change">{locality ? 'Change' : ''}</span>
+      <span className="kh-picker-label">Choose an area</span>
       <i aria-hidden="true" className={open ? 'is-open' : undefined} />
     </button>
     {open && <div className="kh-picker-panel" role="dialog" aria-label="Choose an area">
@@ -158,7 +166,7 @@ export function LocalityPicker({ locality, onSelect, autoOpen = false }: { local
       </li>)}</ul>}
       <div className="kh-picker-ways">
         <a href={mapHref}>Choose on the map</a>
-        <a href={locality ? `/where-to-live?anchor=${encodeURIComponent(locality.id)}` : '/where-to-live'}>Compare areas to live in</a>
+        <a href="/where-to-live">Compare areas to live in</a>
       </div>
     </div>}
   </div>
@@ -344,8 +352,15 @@ export default function KinderHub({ locality, data, onSelectLocality, onOpenPlan
     return () => { delete root.dataset.ktTheme }
   }, [themed, parent])
 
+  // Load problems never appear on this page; they go to the admin Data status page (/data-status).
+  const issueKey = [...new Set([...pageErrors, ...mappingLimitations])].join('|')
+  useEffect(() => {
+    if (issueKey) issueKey.split('|').forEach(message => recordDataIssue(`Child Health · ${page} · ${locality.name} (${locality.id})`, null, message))
+  }, [issueKey, page, locality.id, locality.name])
+
   return <div className={`kp-hub ${parent ? 'is-parent' : 'is-practitioner'}${themeClass}`} data-page={page}>
     <div className="kh-shell">
+      <nav className="kh-crumbs" aria-label="Breadcrumb"><a href={`/map?area=${encodeURIComponent(locality.id)}&name=${encodeURIComponent(locality.name)}`}>Child Health</a><span aria-hidden="true">›</span><span aria-current="page">{locality.name}</span></nav>
       <header className="kh-top">
         <nav className={`kh-nav${navExpanded ? ' is-expanded' : ''}`} aria-label="Dashboard sections" onMouseEnter={() => setNavExpanded(true)} onMouseLeave={() => setNavExpanded(false)} onFocus={() => setNavExpanded(true)} onBlur={event => { if (!event.currentTarget.contains(event.relatedTarget as Node)) setNavExpanded(false) }}>{orderedNav.map(item => <button key={item.id} type="button" aria-current={page === item.id ? 'page' : undefined} onClick={event => { go(item.id); setNavExpanded(false); event.currentTarget.blur() }}>
           <svg viewBox="0 0 24 24" aria-hidden="true">{item.icon}</svg>{item.label}
@@ -366,7 +381,6 @@ export default function KinderHub({ locality, data, onSelectLocality, onOpenPlan
         </div>
       </section>}
 
-      {[...new Set([...pageErrors, ...mappingLimitations])].map(message => <p key={message} className="kh-error" role="alert">{message}</p>)}
       <main className="kh-main" key={`${page}-${audience}-${locality.id}`}>
         {page === 'home' && (parent
           ? <TodayParent locality={locality} age={age} controls={<><LocalityPicker locality={locality} onSelect={onSelectLocality} /><AgePicker value={age} onChange={setAge} /></>} onCheckDay={() => go('day')} onGo={go} onPrepareVisit={() => onOpenPlan('brain', age)} onOpenMap={onOpenMap} />

@@ -640,44 +640,55 @@ export interface SuitableLocalitiesResponse {
 }
 
 
-const API_BASE =
+export const API_BASE =
   import.meta.env.VITE_API_BASE_URL ?? ''
+
+/* Failed requests are never shown on the site's pages. They are retried once quietly and noted in
+   the browser console for the team. (A data status page for admins is a possible later addition.) */
+export function recordDataIssue(path: string, status: number | null, message: string) {
+  console.warn('[Vkinder data]', status ?? 'network', path, message)
+}
+
+const isAbort = (error: unknown) => error instanceof DOMException && error.name === 'AbortError'
+
+/** GET with one quiet retry for network errors and 5xx (for example a cold start), logging failures. */
+async function fetchWithRetry(path: string, signal?: AbortSignal): Promise<Response> {
+  for (let attempt = 0; ; attempt += 1) {
+    try {
+      const response = await fetch(`${API_BASE}${path}`, { method: 'GET', signal, headers: { Accept: 'application/json' } })
+      if (response.status >= 500 && attempt === 0) continue
+      if (!response.ok && !(response.status >= 400 && response.status < 500)) recordDataIssue(path, response.status, response.statusText || 'Server error')
+      return response
+    } catch (error) {
+      if (isAbort(error)) throw error
+      if (attempt === 0) continue
+      recordDataIssue(path, null, error instanceof Error ? error.message : 'Network error')
+      throw error
+    }
+  }
+}
 
 async function request<T>(
   path: string,
   signal?: AbortSignal,
 ): Promise<ApiEnvelope<T>> {
-  const response = await fetch(
-    `${API_BASE}${path}`,
-    {
-      method: 'GET',
-      signal,
-
-      headers: {
-        Accept: 'application/json',
-      },
-    },
-  )
-
+  const response = await fetchWithRetry(path, signal)
   if (!response.ok) {
-    throw new Error(
-      `Request failed with status ${response.status}`,
-    )
+    if (response.status < 500) recordDataIssue(path, response.status, response.statusText || 'Request failed')
+    throw new Error(`Request failed with status ${response.status}`)
   }
-
-  return response.json() as Promise<
-    ApiEnvelope<T>
-  >
+  return response.json() as Promise<ApiEnvelope<T>>
 }
 
 /** Like request(), but a 4xx that carries an envelope (e.g. an unknown area) is returned, not thrown,
  *  so the page can show the server's plain-language reason. */
 async function requestEnvelope<T>(path: string, signal?: AbortSignal): Promise<ApiEnvelope<T>> {
-  const response = await fetch(`${API_BASE}${path}`, { method: 'GET', signal, headers: { Accept: 'application/json' } })
+  const response = await fetchWithRetry(path, signal)
   if (response.ok) return response.json() as Promise<ApiEnvelope<T>>
   if (response.status >= 400 && response.status < 500) {
     const body = await response.json().catch(() => null) as ApiEnvelope<T> | null
     if (body && typeof body === 'object' && 'status' in body && Array.isArray(body.limitations)) return body
+    recordDataIssue(path, response.status, response.statusText || 'Request failed')
   }
   throw new Error(`Request failed with status ${response.status}`)
 }
