@@ -1,0 +1,84 @@
+/* Your area in 2031. Desktop layout; colours are tokens on .where-page with a dark set. */
+.where-page {
+  --fu-c0: #EEF1F7; --fu-c1: #D2DDF2; --fu-c2: #A9C0EA; --fu-c3: #6E92D4; --fu-c4: #2C5EAF;
+  --fu-down: #E8D9BE; --fu-nodata: #F6F7FA;
+  --fu-line: #FFFFFF; --fu-sel: #1F3358; --fu-s1: #2C5EAF; --fu-s2: #B5620C; --fu-s3: #5B6B86;
+}
+:root[data-theme='dark'] .where-page {
+  --fu-c0: #1B2B46; --fu-c1: #263D66; --fu-c2: #35548F; --fu-c3: #5C7BD6; --fu-c4: #A9B6FF;
+  --fu-down: #5A4A30; --fu-nodata: #111C30;
+  --fu-line: #0E1A2E; --fu-sel: #FFFFFF; --fu-s1: #A9B6FF; --fu-s2: #F2B66B; --fu-s3: #B8C7DE;
+}
+.fu-main { padding-bottom: 64px; }
+.fu-view { display: inline-flex; margin-bottom: 18px; min-width: 360px; }
+.fu-controls { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 16px 32px; margin-bottom: 20px; padding: 18px 22px; border: 1px solid var(--wl-line); border-radius: 14px; background: var(--wl-surface); }
+.fu-area { flex: 0 1 380px; display: flex; flex-direction: column; gap: 8px; }
+.fu-area > label, .fu-label { font-size: 15px; font-weight: 700; }
+.fu-years { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.fu-years .wl-seg { min-width: 340px; }
+.fu-layout { display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(360px, 1fr); gap: 20px; align-items: start; margin-bottom: 20px; }
+.fu-card { padding: 22px 24px; border: 1px solid var(--wl-line); border-radius: 14px; background: var(--wl-surface); min-width: 0; }
+.fu-card + .fu-card { margin-top: 0; }
+.fu-side { display: flex; flex-direction: column; gap: 16px; position: sticky; top: 104px; }
+.fu-h { margin: 0; font-size: 22px !important; line-height: 1.3; font-weight: 700; text-wrap: balance; }
+.fu-sub { margin: 6px 0 0; font-size: 15px; color: var(--wl-ink2); }
+.fu-lead { margin: 10px 0 0; font-size: 17px; line-height: 1.5; }
+.fu-chip { display: inline-flex; margin-left: 10px; padding: 2px 10px; border-radius: 999px; background: var(--wl-soft); font-size: 14px; font-weight: 800; vertical-align: middle; }
+.fu-chip.is-up { background: var(--wl-brand-tint); color: var(--wl-brand); }
+.fu-chip.is-down { background: var(--wl-warn-bg); color: var(--wl-warn); }
+.fu-map-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 12px; }
+.fu-map-head h2 { margin: 0; font-size: 20px; font-weight: 700; }
+.fu-measure { min-width: 300px; }
+.fu-map svg { display: block; width: 100%; height: auto; max-height: 640px; }
+.fu-loading { display: grid; place-items: center; min-height: 420px; color: var(--wl-ink2); }
+.fu-area-shape { fill: var(--fu-nodata); stroke: var(--fu-line); stroke-width: 0.8; cursor: pointer; transition: fill .4s ease; }
+.fu-area-shape:hover { stroke: var(--fu-sel); stroke-width: 1.6; }
+.fu-area-shape.g0, .fu-legend i.g0 { fill: var(--fu-down); background: var(--fu-down); }
+.fu-area-shape.g1, .fu-legend i.g1, .fu-area-shape.c0, .fu-legend i.c0 { fill: var(--fu-c0); background: var(--fu-c0); }
+.fu-area-shape.c1, .fu-legend i.c1 { fill: var(--fu-c1); background: var(--fu-c1); }
+.fu-area-shape.g2, .fu-legend i.g2, .fu-area-shape.c2, .fu-legend i.c2 { fill: var(--fu-c2); background: var(--fu-c2); }
+.fu-area-shape.g3, .fu-legend i.g3, .fu-area-shape.c3, .fu-legend i.c3 { fill: var(--fu-c3); background: var(--fu-c3); }
+.fu-area-shape.g4, .fu-legend i.g4, .fu-area-shape.c4, .fu-legend i.c4 { fill: var(--fu-c4); background: var(--fu-c4); }
+.fu-sel-outline { fill: none; stroke: var(--fu-sel); stroke-width: 3; pointer-events: none; }
+.fu-legend { display: flex; flex-wrap: wrap; gap: 8px 18px; margin: 12px 0 0; padding: 0; list-style: none; font-size: 14px; color: var(--wl-ink2); }
+.fu-legend li { display: inline-flex; align-items: center; gap: 6px; }
+.fu-legend i { width: 18px; height: 12px; border-radius: 3px; border: 1px solid var(--wl-line); background: var(--fu-nodata); }
+.fu-table th small { display: block; font-size: 13px; font-weight: 500; color: var(--wl-ink2); }
+.fu-table td, .fu-table th { font-variant-numeric: tabular-nums; }
+.fu-card > .wl-btn { margin-top: 14px; }
+.fu-trend { display: block; width: 100%; height: auto; margin-top: 14px; }
+.fu-grid { stroke: var(--wl-line); stroke-width: 1; }
+.fu-axis { font-size: 12px; fill: var(--wl-ink2); }
+.fu-axis.is-on { font-weight: 800; fill: var(--wl-ink); }
+.fu-now { stroke: var(--wl-ink2); stroke-width: 1; stroke-dasharray: 3 3; }
+.fu-trend polyline { fill: none; stroke-width: 2.5; }
+.fu-series { font-size: 13px; font-weight: 700; }
+.fu-s1 polyline { stroke: var(--fu-s1); } .fu-s1 circle { fill: var(--fu-s1); } .fu-s1 text { fill: var(--fu-s1); }
+.fu-s2 polyline { stroke: var(--fu-s2); } .fu-s2 circle { fill: var(--fu-s2); } .fu-s2 text { fill: var(--fu-s2); }
+.fu-s3 polyline { stroke: var(--fu-s3); stroke-dasharray: 6 4; } .fu-s3 circle { fill: var(--fu-s3); } .fu-s3 text { fill: var(--fu-s3); }
+.fu-how summary { cursor: pointer; list-style: none; display: flex; align-items: center; min-height: 44px; }
+.fu-how summary::-webkit-details-marker { display: none; }
+.fu-how summary::after { content: '+'; margin-left: auto; font-size: 22px; color: var(--wl-brand); }
+.fu-how[open] summary::after { content: '−'; }
+.fu-how ul { margin: 8px 0 0; padding-left: 20px; display: flex; flex-direction: column; gap: 6px; font-size: 15px; line-height: 1.6; }
+.fu-main > .fu-card { margin-bottom: 20px; }
+
+/* Inside Child Health: take the hub's colours (light and dark follow the hub theme). */
+.fu-hub {
+  --wl-surface: var(--kt-surface); --wl-soft: var(--kt-glass-soft); --wl-line: var(--kt-line); --wl-line-strong: var(--kt-field-line);
+  --wl-ink: var(--kt-ink); --wl-ink2: var(--kt-ink2); --wl-brand: var(--kt-accent, var(--kt-primary)); --wl-brand-fill: var(--kt-primary);
+  --wl-brand-fill-hover: var(--kt-primary-hover); --wl-brand-ink: var(--kt-on-primary); --wl-brand-tint: var(--kt-icon-bg);
+  --wl-warn: var(--kt-warn-ink); --wl-warn-bg: var(--kt-warn-bg); --wl-shadow: transparent;
+  --fu-c0: var(--kt-glass-soft); --fu-c1: color-mix(in srgb, var(--kt-primary) 18%, var(--kt-surface));
+  --fu-c2: color-mix(in srgb, var(--kt-primary) 38%, var(--kt-surface)); --fu-c3: color-mix(in srgb, var(--kt-primary) 65%, var(--kt-surface));
+  --fu-c4: var(--kt-primary); --fu-down: var(--kt-warn-bg); --fu-nodata: var(--kt-surface);
+  --fu-line: var(--kt-surface); --fu-sel: var(--kt-ink); --fu-s1: var(--kt-primary); --fu-s2: var(--kt-warn-ink); --fu-s3: var(--kt-ink2);
+  font-family: 'Manrope', 'Segoe UI', sans-serif; color: var(--kt-ink);
+}
+.fu-hub .fu-scope { margin-top: 24px; display: flex; flex-direction: column; gap: 20px; }
+.fu-hub .fu-controls, .fu-hub .fu-layout { margin-bottom: 0; }
+.fu-hub .fu-controls { align-items: center; justify-content: space-between; }
+.fu-hub .fu-controls .fu-sub { margin: 0; flex: 1 1 320px; }
+.fu-hub .wl-seg button[aria-checked=true] { background: var(--kt-primary); color: var(--kt-on-primary); }
+.fu-hub .fu-side { top: 16px; }
+.fu-hub h2, .fu-hub h3 { color: var(--kt-ink); }

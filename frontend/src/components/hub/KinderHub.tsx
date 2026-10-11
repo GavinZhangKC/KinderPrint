@@ -6,13 +6,12 @@
  * values, denominators, confidence intervals and a geography badge on every figure.
  * Every value comes from a validated KinderPrint endpoint; nothing is invented client-side.
  */
-import { useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from 'react'
+import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 
 import {
   api,
   type ChildHealthContext,
-  type DepartmentAreaIndicator,
   type EarlyChildhoodServices,
   type HealthFacility,
   type ImmunisationContext,
@@ -22,17 +21,7 @@ import {
   type PopulationProjection,
   type PreventionContext,
 } from '../../services/api'
-import {
-  DAILY_SERVES,
-  OFFICIAL,
-  buildCalendar,
-  downloadFile,
-  emailToSelf,
-  nextOccurrence,
-  readStored,
-  writeStored,
-  type CalendarEvent,
-} from '../health/healthPlanning'
+import { readStored, writeStored } from '../health/healthPlanning'
 import './KinderHub.css'
 import HealthyDay from './HealthyDay'
 import { TodayParent, TodayPractitioner } from './TodayPage'
@@ -40,11 +29,13 @@ import HealthTopics from './HealthTopics'
 import VaccinesTool from './VaccinesTool'
 import SeasonsTool from './SeasonsTool'
 import CareNearby from './CareNearby'
+import PlayToday from './PlayToday'
+import LookingAhead from './LookingAhead'
 
 /* ------------------------------------------------------------------ types */
 
 export type Audience = 'parent' | 'practitioner'
-type Page = 'home' | 'day' | 'health' | 'vaccines' | 'food' | 'seasons' | 'care'
+type Page = 'home' | 'day' | 'health' | 'vaccines' | 'food' | 'seasons' | 'care' | 'future'
 export type BodyId = 'brain' | 'lungs' | 'metabolic' | 'immune' | 'perinatal'
 
 export interface HubData {
@@ -73,68 +64,22 @@ const AUDIENCE_KEY = 'kinderprint-audience'
 const AGE_KEY = 'kinderprint-child-age'
 const PAGE_KEY = 'kinderprint-hub-page'
 const BIRTH_KEY = 'kinderprint-child-birth-month'
-const SERVE_KEY = 'kinderprint-serves'
-
 const AGES = ['0–4 years', '5–9 years', '10–14 years']
-const SERVE_BAND: Record<string, string> = { '0–4 years': '2–3 years', '5–9 years': '4–8 years', '10–14 years': '9–11 years' }
-const MONTH_LETTERS = ['J', 'F', 'M', 'A', 'M', 'J', 'J', 'A', 'S', 'O', 'N', 'D']
-const MONTH_NAMES = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
 
 const NAV: Array<{ id: Page; label: string; icon: ReactNode }> = [
   { id: 'home', label: 'Overview', icon: <path d="M3 11l9-7 9 7v9H5z" /> },
   { id: 'day', label: 'Healthy day check', icon: <><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 2" /></> },
   { id: 'health', label: 'Health', icon: <path d="M12 21s-7-4.5-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 11c0 5.5-7 10-7 10z" /> },
   { id: 'vaccines', label: 'Vaccines', icon: <path d="M18 2l4 4M17 7l-9 9-3 1 1-3 9-9M3 21l3-3" /> },
-  { id: 'food', label: 'Food & play', icon: <path d="M12 7c-3-2-8-1-8 5s4 9 6 9c1 0 1.5-.5 2-.5s1 .5 2 .5c2 0 6-3 6-9s-5-7-8-5zM12 7c0-2 1-4 3-4" /> },
+  { id: 'food', label: 'Play today', icon: <><circle cx="12" cy="12" r="4" /><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" /></> },
   { id: 'seasons', label: 'Seasons', icon: <><circle cx="12" cy="12" r="4" /><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2" /></> },
   { id: 'care', label: 'Care nearby', icon: <><circle cx="12" cy="10" r="3" /><path d="M12 21s-7-6.5-7-11a7 7 0 0 1 14 0c0 4.5-7 11-7 11z" /></> },
+  { id: 'future', label: 'In 2031', icon: <><path d="M3 20h18" /><path d="M6 16l4-5 3 3 5-7" /><path d="M15 7h3v3" /></> },
 ]
 
-
-
-interface Season { id: string; title: string; months: number[]; why: string; actions: string[]; link: string; linkLabel: string }
-const SEASONS: Season[] = [
-  { id: 'heat', title: 'Extreme heat', months: [11, 0, 1, 2], why: 'Hot days are harder on young children, especially where shade is limited.', actions: ['Play outside before 11 am or after 4 pm', 'Offer water often and dress children in light clothing', 'Never leave a child in a parked car'], link: OFFICIAL.heat, linkLabel: 'Heat-health warnings' },
-  { id: 'uv', title: 'Sun and UV', months: [8, 9, 10, 11, 0, 1, 2, 3], why: 'UV is high enough to damage skin from spring to autumn.', actions: ['Hat, sunscreen, covering clothing, shade and sunglasses', 'Check the daily sun protection times', 'Choose shaded play spaces'], link: OFFICIAL.sunSmart, linkLabel: 'SunSmart' },
-  { id: 'asthma', title: 'Thunderstorm asthma', months: [9, 10, 11], why: 'Storms on high grass-pollen days can trigger sudden, severe asthma.', actions: ['Review the asthma action plan before October', 'Keep the reliever puffer and spacer handy', 'Check the forecast daily and stay inside during storms on high-risk days'], link: OFFICIAL.asthmaForecast, linkLabel: 'Thunderstorm asthma forecast' },
-  { id: 'smoke', title: 'Bushfire smoke', months: [11, 0, 1, 2], why: 'Smoke from regional fires can reach Melbourne suburbs.', actions: ['Check air quality on smoky days', 'Keep children indoors with windows closed when air is poor', 'Keep asthma medicines up to date'], link: OFFICIAL.airWatch, linkLabel: 'EPA AirWatch' },
-  { id: 'water', title: 'Water safety', months: [10, 11, 0, 1, 2], why: 'Summer brings more time at pools and beaches.', actions: ['Always watch young children in and near water', 'Check pool gates close by themselves', 'Enrol in swimming and water-safety lessons'], link: OFFICIAL.waterSafety, linkLabel: 'Royal Life Saving' },
-  { id: 'flu', title: 'Flu and RSV', months: [5, 6, 7, 8], why: 'Winter brings the biggest rise in children’s coughs, colds and flu.', actions: ['Flu vaccine in April or May', 'Ask about free infant RSV protection for babies', 'Keep sick children home and wash hands'], link: OFFICIAL.rsv, linkLabel: 'RSV immunisation' },
-]
-
-const VCAMS_PLAIN: Record<string, string> = {
-  minimum_recommended_vegetables: 'eat enough vegetables',
-  minimum_recommended_fruit: 'eat enough fruit',
-  recommended_daily_physical_activity: 'are active for 60 minutes a day',
-  electronic_media_over_two_hours: 'spend more than 2 hours on screens',
-  household_food_insecurity: 'live in a household that ran short of food',
-  tobacco_smoke_exposure_at_home: 'are exposed to tobacco smoke at home',
-}
-const VCAMS_LABEL: Record<string, string> = {
-  minimum_recommended_vegetables: 'Eat enough vegetables',
-  minimum_recommended_fruit: 'Eat enough fruit',
-  recommended_daily_physical_activity: 'Active 60 minutes a day',
-  electronic_media_over_two_hours: 'More than 2 hours screen time',
-  household_food_insecurity: 'Household food insecurity',
-  tobacco_smoke_exposure_at_home: 'Tobacco smoke at home',
-}
-
-const VCAMS_STANDARD_DIRECTION: Partial<Record<string, 'higher' | 'lower'>> = {
-  minimum_recommended_vegetables: 'higher',
-  minimum_recommended_fruit: 'higher',
-  recommended_daily_physical_activity: 'higher',
-  electronic_media_over_two_hours: 'lower',
-  household_food_insecurity: 'lower',
-  tobacco_smoke_exposure_at_home: 'lower',
-}
 
 /* ------------------------------------------------------------------ helpers */
 
-const pct = (value: number | null | undefined, digits = 1) => value === null || value === undefined ? '—' : `${value.toFixed(digits)}%`
-const inHundred = (value: number | null | undefined) => value === null || value === undefined ? '—' : `${Math.round(value)} in 100`
-const count = (value: number | null | undefined) => value === null || value === undefined ? '—' : Math.round(value).toLocaleString('en-AU')
-const slug = (value: string) => value.replace(/\W+/g, '-').replace(/^-|-$/g, '').toLowerCase()
-const mapsLink = (facility: HealthFacility) => `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${facility.name} ${facility.address}`)}`
 
 function useEndpoint<T>(load: (signal: AbortSignal) => Promise<{ data: T }>, key: string): Loaded<T> {
   const [state, setState] = useState<Loaded<T>>({ data: null, loading: true, error: null })
@@ -158,33 +103,6 @@ function useStored<T>(key: string, fallback: T, validate?: (value: unknown) => v
 }
 
 /* ------------------------------------------------------------------ shared UI */
-
-function Geo({ children }: { children: ReactNode }) {
-  return <span className="kh-tag kh-geo">{children}</span>
-}
-
-function Card({ title, sub, aside, children, className = '' }: { title: ReactNode; sub?: ReactNode; aside?: ReactNode; children: ReactNode; className?: string }) {
-  return <section className={`kh-card ${className}`}>
-    <header className="kh-card-h"><div><h2>{title}</h2>{sub && <p>{sub}</p>}</div>{aside}</header>
-    {children}
-  </section>
-}
-
-
-function RangeMarker({ item }: { item: DepartmentAreaIndicator }) {
-  if (item.area.percent === null) return null
-  const value = Math.max(0, Math.min(100, item.area.percent))
-  const direction = VCAMS_STANDARD_DIRECTION[item.indicator_id]
-  const rawStandard = item.department_areas?.median
-  const standard = rawStandard === undefined ? null : Math.max(0, Math.min(100, rawStandard))
-  const hasStandard = Boolean(direction && standard !== null)
-  const meetsStandard = !hasStandard || (direction === 'higher' ? value >= standard! : value <= standard!)
-  const description = hasStandard ? `${value.toFixed(1)}% in this region · standard ${standard!.toFixed(1)}% · ${meetsStandard ? 'meets standard' : 'does not meet standard'}` : `${value.toFixed(1)}% in this region`
-  return <span className={`kh-range ${meetsStandard ? 'is-met' : 'is-below'}${hasStandard ? ' has-standard' : ''}`} role="img" aria-label={description} title={description}>
-    <i><b style={{ width: `${value}%` }} /></i>
-    {hasStandard && <em style={{ left: `${standard}%` }} />}
-  </span>
-}
 
 /** Area chooser: shows the chosen area, opens a search, and offers the map as another way to choose. */
 export function LocalityPicker({ locality, onSelect, autoOpen = false }: { locality: NeighbourhoodSearchResult | null; onSelect: (value: NeighbourhoodSearchResult) => void; autoOpen?: boolean }) {
@@ -358,7 +276,7 @@ export default function KinderHub({ locality, data, onSelectLocality, onOpenPlan
   const [audience, setAudience] = useStored<Audience>(AUDIENCE_KEY, 'parent',
     (value): value is Audience => value === 'parent' || value === 'practitioner')
   const [storedPage, setPage] = useStored<Page>(PAGE_KEY, 'home',
-    (value): value is Page => typeof value === 'string' && ['home', 'day', 'health', 'vaccines', 'food', 'seasons', 'care'].includes(value))
+    (value): value is Page => typeof value === 'string' && ['home', 'day', 'health', 'vaccines', 'food', 'seasons', 'care', 'future'].includes(value))
   const [navExpanded, setNavExpanded] = useState(false)
   const [birthMonth, setBirthMonth] = useStored(BIRTH_KEY, '')
   const [age, setAge] = useState(() => { try { return window.localStorage.getItem(AGE_KEY) ?? '5–9 years' } catch { return '5–9 years' } })
@@ -375,7 +293,6 @@ export default function KinderHub({ locality, data, onSelectLocality, onOpenPlan
   // The Healthy day check is a parent tool; practitioners land on the overview instead.
   const page: Page = storedPage === 'day' && !parent ? 'home' : storedPage
   const go = (next: Page) => { setPage(next); window.scrollTo({ top: 0, behavior: 'smooth' }) }
-  const context: PageContext = { locality, data, figures, immunisation, nutrition, prevention, childcare, parent, age, body, setBody, go, onOpenPlan }
 
   const hour = new Date().getHours()
   const greeting = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening'
@@ -384,17 +301,19 @@ export default function KinderHub({ locality, data, onSelectLocality, onOpenPlan
     day: ['Healthy day check', 'Describe a typical weekday. See how it compares with the guidelines and the two changes that would help most.'],
     health: ['Your child’s health, area by area', 'Pick a part of the body to see what local numbers mean and what you can do.'],
     vaccines: ['Vaccines', 'Your child’s free vaccines, what’s next, and how protected your area is.'],
-    food: ['Food and play', 'Track today’s serves and see how kids in your region eat and play.'],
+    food: ['Where to play today', 'The best time to play outside, places nearby and active minutes.'],
     seasons: ['Stay a season ahead', 'What’s coming, why it matters here, and what to do.'],
     care: ['Care nearby', `Health and childcare services listed in ${locality.name}.`],
+    future: ['Growing up here in 2031', 'How many children will live here and whether services keep up.'],
   } : {
     home: [`${locality.name} · child health brief`, 'Population evidence for planning and service conversations. Every value shows its geography and year.'],
     day: ['Healthy day check', 'Parent planning tool.'],
     health: ['Child health conditions', 'Exact SA2 observations and separately labelled PHA context. No PHA value is assigned to an SA2.'],
     vaccines: ['Immunisation coverage', 'Australian Immunisation Register coverage via PHIDU, with a pooled Victorian reference.'],
-    food: ['Nutrition and activity', 'VCAMS Department-area estimates compared across 17 areas, plus PHA weight estimates.'],
+    food: ['Active play access', 'Play spaces, activity and screen habits, and heat and shade.'],
     seasons: ['Seasonal prevention', 'Seasonal risks explained with SA2 place context. 2018 environment measures describe the area, not exposure.'],
     care: ['Care access', 'Directory presence inside the SA2. Not capacity, fees, bulk billing or waiting time.'],
+    future: ['Future demand', 'Projected children and service pressure, 2021 to 2036.'],
   }
   const pageErrors = [
     ...(page === 'home' ? [data.errors.profile, data.errors.projections, data.errors.facilities, data.errors.childHealth] : []),
@@ -415,7 +334,7 @@ export default function KinderHub({ locality, data, onSelectLocality, onOpenPlan
   const visibleNav = NAV.filter(item => parent || item.id !== 'day')
   const orderedNav = [...visibleNav.filter(item => item.id === page), ...visibleNav.filter(item => item.id !== page)]
   const today = page === 'home'
-  const themed = today || page === 'day' || page === 'health' || page === 'vaccines' || page === 'seasons' || page === 'care'
+  const themed = today || page === 'day' || page === 'health' || page === 'vaccines' || page === 'seasons' || page === 'care' || page === 'food' || page === 'future'
   const themeClass = themed ? (parent ? ' kt-theme-parent' : ' kt-theme-prac') : ''
   // Let the site header and page background around the hub take the same audience theme.
   useEffect(() => {
@@ -459,8 +378,11 @@ export default function KinderHub({ locality, data, onSelectLocality, onOpenPlan
         {page === 'vaccines' && <VaccinesTool parent={parent} locality={locality} birthMonth={birthMonth} immunisation={immunisation.data} phaName={figures.phaName}
           controls={parent ? <><LocalityPicker locality={locality} onSelect={onSelectLocality} /><MonthPicker value={birthMonth} onChange={setBirthMonth} /></> : <LocalityPicker locality={locality} onSelect={onSelectLocality} />}
           onOpenMap={onOpenMap} onOpenCare={() => go('care')} />}
-        {page === 'food' && <FoodPage {...context} />}
+        {page === 'food' && <PlayToday parent={parent} locality={locality} age={age} nutrition={nutrition.data} env={figures.env}
+          controls={parent ? <><LocalityPicker locality={locality} onSelect={onSelectLocality} /><AgePicker value={age} onChange={setAge} /></> : <LocalityPicker locality={locality} onSelect={onSelectLocality} />} />}
         {page === 'seasons' && <SeasonsTool parent={parent} locality={locality} env={figures.env} asthma={figures.sa2('asthma')?.percent ?? null} prevention={prevention.data}
+          controls={<LocalityPicker locality={locality} onSelect={onSelectLocality} />} />}
+        {page === 'future' && <LookingAhead parent={parent} locality={locality} onSelectLocality={onSelectLocality}
           controls={<LocalityPicker locality={locality} onSelect={onSelectLocality} />} />}
         {page === 'care' && <CareNearby parent={parent} locality={locality} childcare={childcare.data} prevention={prevention.data}
           controls={<LocalityPicker locality={locality} onSelect={onSelectLocality} />} onOpenMap={onOpenMap} />}
@@ -470,21 +392,6 @@ export default function KinderHub({ locality, data, onSelectLocality, onOpenPlan
   </div>
 }
 
-interface PageContext {
-  locality: NeighbourhoodSearchResult
-  data: HubData
-  figures: ReturnType<typeof useHubFigures>
-  immunisation: Loaded<ImmunisationContext>
-  nutrition: Loaded<NutritionContext>
-  prevention: Loaded<PreventionContext>
-  childcare: Loaded<EarlyChildhoodServices | null>
-  parent: boolean
-  age: string
-  body: BodyId
-  setBody: (value: BodyId) => void
-  go: (page: Page) => void
-  onOpenPlan: (body: BodyId, age: string) => void
-}
 
 /* ------------------------------------------------------------------ home */
 
@@ -496,48 +403,3 @@ interface PageContext {
 
 
 /* ------------------------------------------------------------------ food */
-
-function FoodPage({ parent, nutrition, age, locality }: PageContext) {
-  const band = SERVE_BAND[age] ?? '4–8 years'
-  const today = new Date().toISOString().slice(0, 10)
-  const [serves, setServes] = useState<Record<string, number>>(() => {
-    const stored = readStored<{ date: string; counts: Record<string, number> }>(SERVE_KEY, { date: today, counts: {} },
-      (value): value is { date: string; counts: Record<string, number> } => {
-        if (!value || typeof value !== 'object' || Array.isArray(value)) return false
-        const row = value as Record<string, unknown>
-        return typeof row.date === 'string' && !!row.counts && typeof row.counts === 'object' && !Array.isArray(row.counts)
-          && Object.values(row.counts).every(count => typeof count === 'number' && Number.isFinite(count) && count >= 0)
-      })
-    return stored.date === today ? stored.counts : {}
-  })
-  useEffect(() => writeStored(SERVE_KEY, { date: today, counts: serves }), [serves, today])
-  const guide = DAILY_SERVES[band]
-  const reached = guide.filter(row => (serves[row.group] ?? 0) >= row.serves).length
-  const area = nutrition.data?.locality?.department_area
-  const habits = nutrition.data?.vcams ?? []
-  const summary = [`Food plan · ${band}`, ...guide.map(row => `${row.group}: ${serves[row.group] ?? 0} of ${row.serves} serves`)].join('\n')
-  return <div className="kh-split">
-    {parent && <Card title="Today’s serves" sub={`Australian Dietary Guidelines · ages ${band}`} aside={<span className={reached >= 4 ? 'kh-tag good' : 'kh-tag'}>{reached} of {guide.length} groups</span>}>
-      {guide.map(row => { const current = Math.min(serves[row.group] ?? 0, row.serves); const steps = Math.round(row.serves * 2); const progress = row.serves > 0 ? (current / row.serves) * 100 : 0; return <div key={row.group} className="kh-serve">
-        <span><b>{row.group}</b><small>1 serve = {row.example}</small></span>
-        <label className="kh-serve-slider" style={{ '--serve-progress': `${progress}%` } as CSSProperties}><span className="kh-sr">{row.group} serves</span><input type="range" min="0" max={row.serves} step="0.5" value={current} onChange={event => setServes(value => ({ ...value, [row.group]: Number(event.target.value) }))} /><span className="kh-serve-ticks" aria-hidden="true">{Array.from({ length: steps + 1 }, (_, index) => <i key={index} className={index % 2 === 0 ? 'major' : undefined} />)}</span></label>
-        <em>{current} / {row.serves}</em>
-      </div> })}
-      <div className="kh-row"><button type="button" className="kh-btn" onClick={() => setServes({})}>Reset today</button><button type="button" className="kh-btn" onClick={() => emailToSelf(`Food plan · ${locality.name}`, summary)}>Email to myself</button></div>
-      <a className="kh-link" href={OFFICIAL.serves} target="_blank" rel="noreferrer">Eat for Health ↗</a>
-    </Card>}
-    <Card title={parent ? `Kids in the ${area ?? ''} region` : `Healthy habits · ${area ?? 'Department area'}`} sub={parent ? 'The mark shows the standard. Green meets it; orange-red does not.' : 'VCAMS survey · mark shows the standard; colour indicates whether it is met'} aside={<Geo>Dept area</Geo>}>
-      {nutrition.loading ? <p className="kh-empty">Loading survey context.</p> : <div className="kh-habits">{habits.map(item => <div key={item.indicator_id}>
-        <span className="kh-habit-label">{parent ? <><b>{inHundred(item.area.percent)}</b> children {VCAMS_PLAIN[item.indicator_id] ?? item.indicator_label}</> : <b>{VCAMS_LABEL[item.indicator_id] ?? item.indicator_label}</b>}
-          <small>{item.age_group} · {item.reference_year}{item.area.quality_flag !== 'available' ? ` · ${item.area.quality_flag.replace(/_/g, ' ')} (RSE ${item.area.rse_percent?.toFixed(0)}%)` : ''}</small></span>
-        {!parent && <strong>{pct(item.area.percent)}</strong>}
-        <RangeMarker item={item} />
-      </div>)}</div>}
-    </Card>
-    {!parent && <Card title="Healthy weight" sub={`${nutrition.data?.locality?.pha_name ?? 'Containing PHA'} · modelled estimates`} aside={<Geo>PHA</Geo>}>
-      <div className="kh-kpis two">{(nutrition.data?.weight ?? []).map(item => <article key={item.indicator_id} className="kh-kpi"><span>{item.indicator_id === 'child_obese' ? 'Obesity' : 'Overweight, excluding obesity'}</span><strong>{pct(item.pha.percent)}</strong><small>95% CI {item.pha.lower_95_ci?.toFixed(1)}–{item.pha.upper_95_ci?.toFixed(1)} · Vic {pct(item.victoria?.percent)} · {item.reference_period}</small></article>)}</div>
-    </Card>}
-  </div>
-}
-
-/* ------------------------------------------------------------------ seasons */

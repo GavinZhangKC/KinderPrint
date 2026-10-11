@@ -1,0 +1,108 @@
+/* Plan a change. Reuses the Where to live tokens (--wl-*), so light and dark come from WhereToLive.css.
+   Type scale: page title 34, card heading 22-24, sub-heading 18, body 16-17, supporting 14-15, metadata 13. */
+.plan-page { overflow: visible; overflow-x: clip; }
+.pl-main { padding-bottom: 64px; }
+.pl-audience { min-width: 260px; }
+.pl-layout { display: grid; grid-template-columns: 360px minmax(0, 1fr); gap: 24px; align-items: start; }
+.pl-builder { position: sticky; top: 104px; }
+.pl-builder h2 { font-size: 22px; font-weight: 700; }
+.pl-results { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+
+.pl-card { padding: 22px 24px; border: 1px solid var(--wl-line); border-radius: 14px; background: var(--wl-surface); min-width: 0; }
+.pl-card h2 { font-size: 22px; line-height: 1.3; font-weight: 700; text-wrap: balance; }
+.pl-card h2:focus { outline: none; }
+.pl-card h2:focus-visible { outline: 3px solid var(--wl-brand); outline-offset: 4px; }
+.pl-h3 { font-size: 18px !important; }
+.pl-h4 { margin: 0 0 6px; font-size: 15px; font-weight: 700; }
+.pl-eyebrow { margin: 0 0 6px; font-size: 13px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: var(--wl-brand); }
+.pl-big { color: var(--wl-brand); white-space: nowrap; }
+.pl-sub, .pl-lead { margin: 10px 0 0; font-size: 16px; line-height: 1.55; color: var(--wl-ink2); max-width: 70ch; }
+.pl-lead { font-size: 17px; color: var(--wl-ink); }
+.pl-muted { color: var(--wl-ink2); }
+.pl-warn { background: var(--wl-warn-bg) !important; color: var(--wl-ink); border-left: 4px solid var(--wl-warn); }
+.pl-empty p { margin: 8px 0 0; font-size: 16px; line-height: 1.55; color: var(--wl-ink2); max-width: 62ch; }
+.pl-none p { margin: 8px 0 0; font-size: 16px; line-height: 1.55; }
+
+/* Plan chooser */
+.pl-choices { display: flex; flex-direction: column; gap: 12px; }
+.pl-presets, .pl-custom { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 6px; }
+.pl-presets label { display: flex; align-items: center; gap: 10px; min-height: 44px; padding: 8px 12px; border: 1px solid var(--wl-line); border-radius: 10px; cursor: pointer; font-size: 15px; line-height: 1.35; }
+.pl-presets label:hover { background: var(--wl-soft); }
+.pl-presets label.is-on { border-color: var(--wl-brand); background: var(--wl-brand-tint); font-weight: 700; }
+.pl-presets input, .pl-check input { width: 18px; height: 18px; accent-color: var(--wl-brand); flex: none; }
+.pl-custom li { padding: 10px 12px; border: 1px solid var(--wl-line); border-radius: 10px; }
+.pl-custom li.is-on { background: var(--wl-soft); border-color: var(--wl-line-strong); }
+.pl-check { display: flex; align-items: center; gap: 10px; min-height: 32px; font-size: 15px; font-weight: 600; cursor: pointer; }
+.pl-check input:disabled + span { color: var(--wl-ink2); }
+.pl-stepper { display: inline-flex; align-items: center; gap: 4px; margin-top: 8px; padding: 3px; border: 1px solid var(--wl-line); border-radius: 10px; background: var(--wl-surface); }
+.pl-stepper button { width: 40px; height: 40px; border: 0; border-radius: 8px; background: transparent; color: var(--wl-brand); font: inherit; font-size: 20px; font-weight: 700; cursor: pointer; }
+.pl-stepper button:hover:not(:disabled) { background: var(--wl-brand-tint); }
+.pl-stepper button:disabled { color: var(--wl-line-strong); cursor: not-allowed; }
+.pl-stepper output { min-width: 112px; text-align: center; font-size: 15px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.pl-run { display: flex; flex-direction: column; gap: 6px; }
+
+/* 2027 outlook range */
+.pl-range { position: relative; height: 34px; margin: 18px 8px 4px; }
+.pl-range::before { content: ''; position: absolute; left: 0; right: 0; top: 10px; height: 8px; border-radius: 999px; background: var(--wl-soft); box-shadow: inset 0 0 0 1px var(--wl-line); }
+.pl-range-band { position: absolute; top: 10px; height: 8px; border-radius: 999px; background: var(--wl-map-match); }
+.pl-range-dot { position: absolute; top: 6px; width: 16px; height: 16px; margin-left: -8px; border-radius: 50%; background: var(--wl-brand-fill); box-shadow: 0 0 0 3px var(--wl-surface); }
+.pl-range-now { position: absolute; top: 4px; width: 3px; height: 20px; margin-left: -1.5px; border-radius: 2px; background: var(--wl-ink); }
+.pl-range-tick { position: absolute; top: 22px; transform: translateX(-50%); font-size: 13px; color: var(--wl-ink2); }
+
+/* Tables */
+.pl-table { width: 100%; margin-top: 14px; border-collapse: collapse; font-size: 15px; font-variant-numeric: tabular-nums; }
+.pl-table th, .pl-table td { padding: 10px 8px; border-top: 1px solid var(--wl-line); text-align: left; vertical-align: top; }
+.pl-table thead th { border-top: 0; font-size: 13px; font-weight: 700; color: var(--wl-ink2); }
+.pl-table tbody th { font-weight: 700; }
+.pl-more { margin-top: 10px; font-size: 15px; min-height: 44px; }
+
+/* Difference chart */
+.pl-chart { display: flex; flex-direction: column; gap: 10px; margin-top: 18px; }
+.pl-diff { display: grid; grid-template-columns: minmax(0, 220px) minmax(0, 1fr) 56px; align-items: center; gap: 14px; }
+.pl-diff-label { font-size: 15px; font-weight: 600; }
+.pl-diff-track { position: relative; height: 28px; border-radius: 8px; background: var(--wl-soft); }
+.pl-diff-zero { position: absolute; left: 50%; top: 2px; bottom: 2px; width: 2px; margin-left: -1px; background: var(--wl-ink2); }
+.pl-diff-band { position: absolute; top: 10px; height: 8px; border-radius: 999px; background: var(--wl-line-strong); }
+.pl-diff-band.is-higher { background: var(--wl-good-bg); box-shadow: inset 0 0 0 1px var(--wl-good); }
+.pl-diff-band.is-lower { background: var(--wl-warn-bg); box-shadow: inset 0 0 0 1px var(--wl-warn); }
+.pl-diff-dot { position: absolute; top: 7px; width: 14px; height: 14px; margin-left: -7px; border-radius: 50%; background: var(--wl-ink2); box-shadow: 0 0 0 2px var(--wl-surface); }
+.pl-diff-dot.is-higher { background: var(--wl-good); }
+.pl-diff-dot.is-lower { background: var(--wl-warn); }
+.pl-diff-value { font-size: 16px; font-weight: 800; text-align: right; font-variant-numeric: tabular-nums; }
+.pl-axis { display: grid; grid-template-columns: minmax(0, 220px) minmax(0, 1fr) 56px; gap: 14px; font-size: 13px; color: var(--wl-ink2); }
+.pl-axis-scale { display: flex; justify-content: space-between; }
+.pl-compact { font-size: 14px; }
+
+/* Compared areas, actions, method */
+.pl-areas { margin-top: 18px; border-top: 1px solid var(--wl-line); padding-top: 12px; }
+.pl-areas summary, .pl-how summary { cursor: pointer; min-height: 44px; display: flex; align-items: center; font-size: 16px; font-weight: 700; color: var(--wl-brand); }
+.pl-how summary { list-style: none; color: var(--wl-ink); }
+.pl-how summary::-webkit-details-marker { display: none; }
+.pl-how summary::after { content: '+'; margin-left: auto; font-size: 22px; color: var(--wl-brand); }
+.pl-how[open] summary::after { content: '−'; }
+.pl-two { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 10px; }
+.pl-list { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 2px; font-size: 15px; line-height: 1.5; }
+.pl-list a { color: var(--wl-brand); text-underline-offset: 3px; display: inline-block; min-height: 28px; padding: 2px 0; }
+.pl-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+.pl-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.pl-how-body { font-size: 15px; line-height: 1.6; color: var(--wl-ink); }
+.pl-how-body ul { margin: 8px 0 0; padding-left: 20px; display: flex; flex-direction: column; gap: 6px; }
+.pl-how-body p { margin: 8px 0 0; max-width: 75ch; }
+.pl-foot { margin: 28px 0 0; text-align: center; font-size: 14px; color: var(--wl-ink2); }
+
+@media (max-width: 1040px) {
+  .pl-layout { grid-template-columns: minmax(0, 1fr); }
+  .pl-builder { position: static; }
+}
+@media (max-width: 640px) {
+  .pl-card { padding: 18px 16px; }
+  .pl-audience { min-width: 0; width: 100%; }
+  .pl-diff, .pl-axis { grid-template-columns: minmax(0, 1fr) 48px; }
+  .pl-diff-label { grid-column: 1 / -1; }
+  .pl-axis > span:first-child { display: none; }
+  .pl-two { grid-template-columns: 1fr; }
+  .pl-table { font-size: 14px; }
+  .pl-table th, .pl-table td { padding: 8px 4px; }
+}
+/* Where to live collapses its filter panel on small screens; the plan builder always stays open. */
+.pl-builder .wl-filter-body:not(.is-open) { display: flex; }

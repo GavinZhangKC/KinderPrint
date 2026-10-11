@@ -70,6 +70,9 @@ CARE_CONTEXT_PRODUCTS = (
     ("food_access", "SA2 label point to outlet", "Distance-based outlet counts, not individual food access."),
     ("child_nutrient_foods", "not geographic", "Published composition per 100 g, not a personalised diet plan."),
     ("child_nutrient_targets", "not geographic", "Age-group nutrient guidance, not individual medical advice."),
+    ("play_spaces", "SA2 label point to place", "Listed play places from Vicmap; not shade, fencing, toilets or condition."),
+    ("play_access", "SA2 label point to place", "Distance-based counts of play places, not walking routes."),
+    ("future_demand", "SA2", "VIF2023 projections with today's services held fixed; not a forecast of new services."),
     ("practitioner_context", "AEDC reporting area and SA2", "Area-level investigation context; not a diagnosis or prediction for a child."),
 )
 

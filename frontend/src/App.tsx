@@ -12,7 +12,7 @@ import NeighbourhoodMap from './components/NeighbourhoodMap'
 import PreferencePanel from './components/PreferencePanel'
 import SimulationPage from './components/SimulationPage'
 import WaterRippleBackground from './components/WaterRippleBackground'
-import WhereToLive from './components/where/WhereToLive'
+import WhereToLivePage from './components/where/WhereToLivePage'
 
 import { useNeighbourhoodSearch } from './hooks/useNeighbourhoodSearch'
 
@@ -167,7 +167,7 @@ export default function App() {
   }
 
   if (appPage === 'where') {
-    return <WhereToLive
+    return <WhereToLivePage
       onHome={backToLanding}
       onInsight={openInsightPage}
       onMap={openMapPage}

@@ -275,7 +275,7 @@ html[data-kt-theme] .health-page-shell>.nav-shell :focus-visible{outline:3px sol
   color:var(--kt-ink);
 }
 :root[data-theme='dark'] .kp-hub.kt-theme-parent,:root[data-theme='dark'] .kp-hub.kt-theme-prac{
-  --kt-accent:#A9B6FF; --kt-primary:#5466DB; --kt-primary-hover:#6375E8; --kt-focus:#A9B6FF; --kt-icon-bg:rgba(113,131,243,.18);
+  --kt-accent:#A9B6FF; --kt-primary:#5466DB; --kt-primary-hover:#4657CF; --kt-focus:#A9B6FF; --kt-icon-bg:rgba(113,131,243,.18);
   --kt-tint:linear-gradient(135deg,#16244A 0%,#132441 100%);
   --kt-overlay:linear-gradient(90deg,rgba(9,21,37,.92) 0%,rgba(9,21,37,.78) 34%,rgba(9,21,37,.35) 56%,rgba(9,21,37,0) 72%);
   --kt-pill-bg:rgba(113,131,243,.2); --kt-pill-ink:#A9B6FF;

@@ -240,7 +240,7 @@
 :root[data-theme='dark'] .where-page {
   --wl-surface: #12223B; --wl-soft: #182B48; --wl-line: rgba(175, 192, 217, .2); --wl-line-strong: rgba(154, 169, 255, .45);
   --wl-ink: #F3F7FF; --wl-ink2: #B8C7DE;
-  --wl-brand: #A9B6FF; --wl-brand-fill: #4E5FD6; --wl-brand-fill-hover: #5D6EE6; --wl-brand-ink: #FFFFFF; --wl-brand-tint: rgba(113, 131, 243, .2);
+  --wl-brand: #A9B6FF; --wl-brand-fill: #4E5FD6; --wl-brand-fill-hover: #4252C4; --wl-brand-ink: #FFFFFF; --wl-brand-tint: rgba(113, 131, 243, .2);
   --wl-prefer-bg: rgba(113, 131, 243, .32);
   --wl-good: #8FE0BF; --wl-good-bg: #173D35; --wl-warn: #FFE08A; --wl-warn-bg: #4B3D1B;
   --wl-shadow: rgba(4, 6, 17, .35); --wl-shadow-strong: rgba(4, 6, 17, .55);
@@ -254,3 +254,5 @@
 :root[data-theme='dark'] .where-page .wl-dialog::backdrop { background: rgba(4, 6, 17, .6); }
 :root[data-theme='dark'] .where-page > .nav-shell { background: rgba(14, 27, 48, .85); }
 :root[data-theme='dark'] .where-page .wl-place-list { background: #12223B; border-color: rgba(175, 192, 217, .28); }
+.wl-view-switch { display: inline-flex; min-width: 420px; margin-bottom: 18px; }
+.wl-help .wl-link { display: inline-block; min-height: 24px; line-height: 24px; }

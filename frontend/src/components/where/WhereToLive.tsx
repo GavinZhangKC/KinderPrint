@@ -48,6 +48,8 @@ interface Props {
   onMap: () => void
   onSimulation: () => void
   onHealth: () => void
+  /** Switch between finding areas and "What if this area changed?". */
+  viewSwitch?: ReactNode
 }
 
 export default function WhereToLive(props: Props) {
@@ -173,6 +175,7 @@ export default function WhereToLive(props: Props) {
   return <div className="app-background where-page">
     {header}
     <main className="wl-main" id="main">
+      {props.viewSwitch}
       <section className="wl-intro" aria-labelledby="wl-title">
         <div>
           <h1 id="wl-title">Find an area that fits your family</h1>

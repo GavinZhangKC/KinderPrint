@@ -194,3 +194,12 @@ Rolling-origin design: train on 2012→15, 15→18 and 18→21; hold out 21→24
   2024.
 * The published 2027 intervals add a cycle-shock variance of 1.80 pp, estimated
   from all four transitions.
+
+### Plan a change: P0 → P2 (Simulation page)
+
+| Step | Change | Trigger or result |
+|---|---|---|
+| P0 | Least squares of AEDC on five place features, fitted in the browser | Tree-cover slope 3.48 pp/SD fell to 1.20 once IRSD was added (65.5% was disadvantage); it extrapolated beyond observed areas |
+| P1 | Two independent nearest-neighbour groups (like the plan, like now), similar to this area on IRSD, children and all other features | Coverage only 1% when matching on five dimensions; balanced in about 25% of results |
+| P2 v1 | 1:1 matched pairs on IRSD and children only | Coverage 71.1%, balance 90.5%; placebo "clear" rate 25.7%, above the 20% expected |
+| **P2** | **Interval widened ×1.158, calibrated on shuffled data** | **Placebo 19.7%; real 24.4%. Clearest for tree cover (+10 points: 32.8%)** |

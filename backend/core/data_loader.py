@@ -222,6 +222,9 @@ CARE_CONTEXT_ENV = {
     "child_nutrient_foods": "KINDERPRINT_CHILD_NUTRIENT_FOODS_DATA_PATH",
     "child_nutrient_targets": "KINDERPRINT_CHILD_NUTRIENT_TARGETS_DATA_PATH",
     "practitioner_context": "KINDERPRINT_PRACTITIONER_CONTEXT_DATA_PATH",
+    "play_spaces": "KINDERPRINT_PLAY_SPACES_DATA_PATH",
+    "play_access": "KINDERPRINT_PLAY_ACCESS_DATA_PATH",
+    "future_demand": "KINDERPRINT_FUTURE_DEMAND_DATA_PATH",
 }
 
 

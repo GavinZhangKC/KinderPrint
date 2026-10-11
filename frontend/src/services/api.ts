@@ -776,6 +776,77 @@ export interface FamilyFitAreaDetail {
   outlook_2027: FamilyFitOutlook | null
 }
 
+// ------------------------------------------------------------------ Your area in 2031
+export interface FutureYear {
+  sa2_code: string; sa2_name: string; projection_year: number
+  children_0_4: number | null; children_5_9: number | null; children_10_14: number | null; children_0_14: number | null
+  population_all_ages: number | null
+  ecec_places_per_100_0_4: number | null; gp_practices_per_10000: number | null
+  primary_campuses: number | null; primary_campuses_per_1000_5_9: number | null
+  children_0_4_change_from_2026_pct: number | null; ecec_places_to_keep_2026_access: number | null
+  ecec_access_percentile: number | null
+}
+export type FutureOverviewRow = Pick<FutureYear, 'sa2_code' | 'sa2_name' | 'projection_year' | 'children_0_4' | 'children_0_14'
+  | 'children_0_4_change_from_2026_pct' | 'ecec_places_per_100_0_4' | 'ecec_places_to_keep_2026_access'>
+
+// ------------------------------------------------------------------ Play today
+export type PlayKind = 'Playground' | 'Swimming pool' | 'Picnic area' | 'Day visitor area'
+export interface PlaySpace {
+  sa2_code: string; kind: PlayKind; rank: number; feature_id: string; name: string | null; park: string | null
+  latitude: number; longitude: number; distance_km: number; direction: string
+}
+export interface PlayAccess { sa2_code: string; kind: PlayKind; within_1km: number; within_2km: number; nearest_km: number | null }
+export interface PlaySpaces {
+  sa2_code: string
+  origin: { latitude: number; longitude: number } | null
+  places: PlaySpace[] | null
+  access: PlayAccess[] | null
+}
+
+// ------------------------------------------------------------------ Plan a change
+export type PlanLeverId = 'tree_cover' | 'urban_heat' | 'open_space' | 'road_traffic'
+export type PlanOutcomeId = 'all_five' | 'physical'
+export interface PlanLever { id: PlanLeverId; label: string; unit: string; better: 'higher' | 'lower'; melbourne_range: [number, number] }
+export interface PlanPreset { id: string; label: string; plan: Partial<Record<PlanLeverId, number>> }
+export interface PlanSetup {
+  levers: PlanLever[]
+  presets: PlanPreset[]
+  outcomes: Record<PlanOutcomeId, string>
+  max_levers: number
+  caveat: string
+  sources: Record<string, string>
+  model: string
+  built_utc: string
+}
+export interface PlanAreaDetail {
+  id: string
+  name: string
+  sa4: string
+  place_features: Record<PlanLeverId, { value: number; melbourne_percentile: number } | null>
+  outcomes_2024: Record<PlanOutcomeId, number | null>
+  outlook_2027: { all_five_pct: number; lower_80: number; upper_80: number } | null
+  children_assessed_2024: number | null
+}
+export interface PlanOutcomeResult {
+  like_plan_pct: number
+  like_now_pct: number
+  difference_pp: number
+  interval_80_pp: [number, number]
+  direction: 'higher' | 'lower' | 'unclear'
+}
+export interface PlanResult {
+  area: { id: string; name: string }
+  plan: Partial<Record<PlanLeverId, number>>
+  status: 'ok' | 'too_few_similar' | 'beyond_observed' | 'no_data'
+  targets?: Partial<Record<PlanLeverId, number>>
+  like_plan?: Array<{ id: string; name: string }>
+  like_now?: Array<{ id: string; name: string }>
+  outcomes?: Record<PlanOutcomeId, PlanOutcomeResult>
+  balance_smd?: Record<string, number>
+  balanced?: boolean
+  levers?: PlanLeverId[]
+}
+
 export const api = {
 
 
@@ -904,6 +975,17 @@ export const api = {
       `/api/digital-health/seasonal-air?sa2_code=${encodeURIComponent(sa2Code)}`, signal,
     ),
 
+  getFutureArea: (sa2Code: string, signal?: AbortSignal) =>
+    requestEnvelope<{ sa2_code: string; sa2_name?: string; years: FutureYear[] }>(`/api/future/area?sa2_code=${encodeURIComponent(sa2Code)}`, signal),
+  getFutureOverview: (signal?: AbortSignal) => request<{ rows: FutureOverviewRow[] }>('/api/future/overview', signal),
+  getPlaySpaces: (sa2Code: string, signal?: AbortSignal) =>
+    request<PlaySpaces>(`/api/digital-health/play-spaces?sa2_code=${encodeURIComponent(sa2Code)}`, signal),
+  getPlanSetup: (signal?: AbortSignal) => request<PlanSetup>('/api/plan-change/setup', signal),
+  getPlanArea: (id: string, signal?: AbortSignal) =>
+    requestEnvelope<PlanAreaDetail>(`/api/plan-change/areas/${encodeURIComponent(id)}`, signal),
+  evaluatePlan: (area: string, plan: Partial<Record<PlanLeverId, number>>, signal?: AbortSignal) =>
+    requestEnvelope<PlanResult | null>(`/api/plan-change/evaluate?area=${encodeURIComponent(area)}${Object.entries(plan)
+      .map(([lever, value]) => `&${lever}=${encodeURIComponent(String(value))}`).join('')}`, signal),
   getFamilyFitSetup: (signal?: AbortSignal) => request<FamilyFitSetup>('/api/family-fit/setup', signal),
   getFamilyFitShapes: (signal?: AbortSignal) =>
     request<{ areas: Record<string, Array<Array<[number, number]>>> }>('/api/family-fit/shapes', signal),

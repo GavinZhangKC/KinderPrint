@@ -133,6 +133,10 @@ Globals:
         KINDERPRINT_COUNCIL_IMMUNISATION_DATA_PATH: /var/task/data/council_immunisation_sa2.csv
         KINDERPRINT_FAMILY_FIT_DATA_PATH: /var/task/data/family_fit.json
         KINDERPRINT_FAMILY_FIT_SHAPES_DATA_PATH: /var/task/data/family_fit_shapes.json
+        KINDERPRINT_PLAN_CHANGE_DATA_PATH: /var/task/data/plan_change.json
+        KINDERPRINT_PLAY_SPACES_DATA_PATH: /var/task/data/play_spaces_sa2.csv
+        KINDERPRINT_PLAY_ACCESS_DATA_PATH: /var/task/data/play_access_sa2.csv
+        KINDERPRINT_FUTURE_DEMAND_DATA_PATH: /var/task/data/future_demand_sa2.csv
         KINDERPRINT_HOSPITAL_CAPABILITY_DATA_PATH: /var/task/data/hospital_capability_vic.csv
         KINDERPRINT_CARE_COMPARE_DATA_PATH: /var/task/data/care_compare_sa2.csv
         KINDERPRINT_URGENT_CARE_CLINICS_DATA_PATH: /var/task/data/urgent_care_clinics_vic.csv

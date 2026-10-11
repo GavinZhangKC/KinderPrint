@@ -46,6 +46,14 @@ from loaders.community_context import (
 from loaders.early_childhood import load_early_childhood_context
 from loaders.geocoding_quality import load_geocoding_quality
 from loaders.population import load_population_projections
+from loaders.plan_change import (
+    LEVER_IDS as PLAN_LEVERS,
+    area_detail as plan_area_detail,
+    evaluate as plan_evaluate,
+    load_plan_change,
+    resolve_area as plan_resolve_area,
+    setup as plan_setup,
+)
 from loaders.family_fit import (
     RADII_KM as FAMILY_FIT_RADII,
     area_detail as family_fit_area_detail,
@@ -56,7 +64,9 @@ from loaders.family_fit import (
     places as family_fit_places,
     search as family_fit_search,
 )
-from loaders.care_context import compare_care, nutrition_report, practitioner_context, seasonal_illness
+from loaders.care_context import (
+    compare_care, future_area, future_overview, nutrition_report, play_spaces, practitioner_context, seasonal_illness,
+)
 from loaders.digital_health import (
     child_health_context,
     immunisation_context,
@@ -469,6 +479,52 @@ def digital_health_seasonal_illness() -> dict[str, Any]:
         "geographic_unit": "Victoria",
         "interpretation": "Average of past seasons (2016-2019, 2022-2024); notifications reflect testing as well "
                           "as illness. Not a forecast and not a local figure.",
+    }, limitations=limitations)
+
+
+FUTURE_METADATA = {
+    "projection_source": "Victoria in Future 2023 (Victorian Government), SA2 projections by age",
+    "services": "ACECQA approved places 2026; National Health Services Directory 2025; school locations 2025",
+    "method": "Childcare and GP access re-run with each year's projected population (E2SFCA, 5 km) while today's "
+              "services are held fixed. Places to keep 2026 access is a rough guide that ignores neighbouring areas.",
+    "interpretation": "Official projections, not certainties. Shows pressure if nothing new opens.",
+}
+
+
+@app.get("/api/future/area")
+def future_area_endpoint(sa2_code: str = Query(..., min_length=9, max_length=9, pattern=r"^\d{9}$")) -> dict[str, Any]:
+    """Projected children and pressure on childcare, GPs and primary schools for one SA2, 2021-2036."""
+    rows, limitations = future_area(sa2_code)
+    if rows is None:
+        return envelope("unavailable", {"sa2_code": sa2_code, "years": []}, limitations=limitations)
+    if not rows:
+        return envelope("unavailable", {"sa2_code": sa2_code, "years": []}, limitations=[limitation(
+            "unknown_area", "We could not find that area. Choose another one from the list.", "sa2_code")])
+    return envelope("available", {"sa2_code": sa2_code, "sa2_name": rows[0]["sa2_name"], "years": rows},
+                    metadata=FUTURE_METADATA, limitations=limitations, notices=[AREA_LEVEL_NOTICE])
+
+
+@app.get("/api/future/overview")
+def future_overview_endpoint() -> dict[str, Any]:
+    """Every Greater Melbourne SA2 by projection year, for the map."""
+    rows, limitations = future_overview()
+    if rows is None:
+        return envelope("unavailable", {"rows": []}, limitations=limitations)
+    return envelope("available", {"rows": rows}, metadata=FUTURE_METADATA, limitations=limitations)
+
+
+@app.get("/api/digital-health/play-spaces")
+def digital_health_play_spaces(
+    sa2_code: str = Query(..., min_length=9, max_length=9, pattern=r"^\d{9}$"),
+) -> dict[str, Any]:
+    """Playgrounds, swimming pools and picnic areas near the SA2, from Vicmap Features of Interest."""
+    data, limitations = play_spaces(sa2_code)
+    if data is None:
+        return envelope("unavailable", {"sa2_code": sa2_code, "places": None, "access": None}, limitations=limitations)
+    return envelope("available", data, metadata={
+        "source": "Vicmap Features of Interest, Victorian Government (CC BY 4.0), downloaded 13 September 2026",
+        "geographic_unit": "straight-line distance from the SA2 label point",
+        "interpretation": "Listed places only. Vicmap does not record shade, fencing, toilets or condition.",
     }, limitations=limitations)
 
 
@@ -1789,6 +1845,84 @@ def family_fit_shapes() -> dict[str, Any]:
         return envelope("unavailable", {"areas": {}}, limitations=limitations)
     return envelope("available", {"areas": data}, metadata={
         "source": "ABS ASGS Edition 3 SA2 boundaries dissolved to AEDC reporting areas; simplified for display"})
+
+
+PLAN_NOTICE = {
+    "code": "plan_change_association",
+    "message": "Areas that already look like the plan are compared with similar areas that look like this one now. "
+               "This is an association across areas, not the effect of making the change, and never about a child.",
+}
+PLAN_SOURCE = ("AEDC 2024 (small-number adjusted); Cooling and Greening Melbourne 2018; VPA open space 2018; "
+               "DTP declared-road traffic 2019; ABS SEIFA 2021 IRSD; Vkinder 2027 school-entry outlook (F3)")
+PLAN_AREA_PATTERN = r"^\d{9}(_\d{9})*$"
+PLAN_MESSAGES = {
+    "too_few_similar": "Not enough Melbourne areas are similar to this one in both groups to compare fairly.",
+    "beyond_observed": "No Melbourne area already has this level, so there is nothing real to compare with.",
+    "no_data": "This area is missing a measure the plan needs.",
+}
+
+
+def _plan_loaded():
+    loaded, limitations = load_plan_change()
+    if loaded is None:
+        return None, envelope("unavailable", None, limitations=limitations)
+    return loaded, None
+
+
+@app.get("/api/plan-change/setup")
+def plan_change_setup() -> dict[str, Any]:
+    """Place features a plan can change, ready-made plans and the method caveat."""
+    loaded, failure = _plan_loaded()
+    if failure:
+        return failure
+    return envelope("available", plan_setup(loaded), metadata={"source": PLAN_SOURCE}, notices=[PLAN_NOTICE, AREA_LEVEL_NOTICE])
+
+
+@app.get("/api/plan-change/areas/{area_id}")
+def plan_change_area(area_id: str = FastAPIPath(..., max_length=80, pattern=PLAN_AREA_PATTERN)) -> dict[str, Any]:
+    """An area's place features, 2024 results and 2027 outlook."""
+    loaded, failure = _plan_loaded()
+    if failure:
+        return failure
+    resolved = plan_resolve_area(loaded, area_id)
+    if resolved is None:
+        return envelope("unavailable", None, limitations=[limitation(
+            "unknown_area", "We could not find that area. Choose another one from the list.", "area_id")])
+    return envelope("available", plan_area_detail(loaded, resolved), metadata={"source": PLAN_SOURCE},
+                    notices=[PLAN_NOTICE, AREA_LEVEL_NOTICE])
+
+
+@app.get("/api/plan-change/evaluate")
+def plan_change_evaluate(
+    area: str = Query(..., max_length=80, pattern=PLAN_AREA_PATTERN),
+    tree_cover: float | None = Query(None, gt=0, le=40),
+    urban_heat: float | None = Query(None, ge=-5, lt=0),
+    open_space: float | None = Query(None, gt=0, le=30),
+    road_traffic: float | None = Query(None, ge=-90, lt=0),
+) -> dict[str, Any]:
+    """Compare areas that already look like the plan with similar areas that look like this one now."""
+    loaded, failure = _plan_loaded()
+    if failure:
+        return failure
+    resolved = plan_resolve_area(loaded, area)
+    if resolved is None:
+        return envelope("unavailable", None, limitations=[limitation(
+            "unknown_area", "We could not find that area. Choose another one from the list.", "area")])
+    values = {"tree_cover": tree_cover, "urban_heat": urban_heat, "open_space": open_space, "road_traffic": road_traffic}
+    plan = {lever: float(value) for lever, value in values.items() if value is not None and lever in PLAN_LEVERS}
+    if not plan or len(plan) > 2:
+        return envelope("unavailable", None, limitations=[limitation(
+            "invalid_plan", "Choose one or two changes to plan.", "plan")])
+    data = plan_evaluate(loaded, resolved, plan)
+    status = data.get("status")
+    if status == "invalid_plan":
+        return envelope("unavailable", None, limitations=[limitation("invalid_plan", "Choose one or two changes to plan.", "plan")])
+    limitations = [] if status == "ok" else [limitation(f"plan_{status}", PLAN_MESSAGES.get(status, "No comparison is available."), "plan")]
+    if status == "ok" and not data.get("balanced"):
+        limitations.append(limitation("plan_groups_differ",
+            "The two groups differ somewhat in disadvantage or size, so treat this comparison with extra caution.", "plan"))
+    return envelope("available" if status == "ok" else "no_match", data, metadata={"source": PLAN_SOURCE},
+                    limitations=limitations, notices=[PLAN_NOTICE, AREA_LEVEL_NOTICE])
 
 
 handler = Mangum(app, lifespan="off")

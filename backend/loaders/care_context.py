@@ -26,6 +26,8 @@ COST_NUMBERS = (
     "benefits_paid", "patient_contribution_per_service", "benefit_share_of_fees_pct",
 )
 
+FUTURE_NUMBERS = ("children_0_4", "children_5_9", "children_10_14", "children_0_14", "population_all_ages", "ecec_places_per_100_0_4", "gp_practices_per_10000", "primary_campuses", "primary_campuses_per_1000_5_9", "children_0_4_change_from_2026_pct", "ecec_places_to_keep_2026_access", "ecec_access_percentile")
+
 SPECS: dict[str, dict[str, Any]] = {
     "hospital_capability": {
         "required": {"hospital_code", "hospital_name", "private", "specialised_units", "has_paediatric_service",
@@ -83,6 +85,23 @@ SPECS: dict[str, dict[str, Any]] = {
         "numbers": ("n_children", "observed_pct", "expected_pct", "expected_range_lo_pct", "expected_range_hi_pct",
                     "band_stability", "gp_access_5km", "gp_access_percentile", "gp_nearest_km",
                     "ecec_access_5km", "ecec_access_percentile", "ecec_nearest_km"),
+    },
+    "play_spaces": {
+        "required": {"sa2_code", "kind", "rank", "feature_id", "name", "park", "latitude", "longitude",
+                     "distance_km", "direction"},
+        "key": ("sa2_code", "kind", "rank"), "numbers": ("latitude", "longitude", "distance_km"),
+        "integers": ("rank",), "integer_bounds": {"rank": (1, None)},
+    },
+    "play_access": {
+        "required": {"sa2_code", "kind", "origin_latitude", "origin_longitude", "within_1km", "within_2km",
+                     "nearest_km"},
+        "key": ("sa2_code", "kind"), "numbers": ("origin_latitude", "origin_longitude", "nearest_km"),
+        "integers": ("within_1km", "within_2km"),
+    },
+    "future_demand": {
+        "required": {"sa2_code", "sa2_name", "projection_year", *FUTURE_NUMBERS},
+        "key": ("sa2_code", "projection_year"), "numbers": FUTURE_NUMBERS, "integers": ("projection_year",),
+        "integer_bounds": {"projection_year": (2021, 2036)},
     },
     "child_nutrient_targets": {
         "required": {"nutrient_id", "nutrient", "unit", "basis", "age_1_3", "age_4_8", "age_9_13_boys",
@@ -263,6 +282,51 @@ def nutrition_report(sa2_code: str) -> tuple[dict[str, Any] | None, list[dict[st
             (dict(row) for row in outlets if row["sa2_code"] == sa2_code), key=lambda r: r["distance_km"]),
         "access": None if access is None else [dict(row) for row in access if row["sa2_code"] == sa2_code],
     }, limitations
+
+
+PLAY_KINDS = ("Playground", "Swimming pool", "Picnic area", "Day visitor area")
+
+
+def play_spaces(sa2_code: str) -> tuple[dict[str, Any] | None, list[dict[str, Any]]]:
+    """Listed play places near an SA2 (Vicmap Features of Interest) and counts by distance."""
+    spaces, a = load("play_spaces")
+    access, b = load("play_access")
+    limitations = [*a, *b]
+    if spaces is None and access is None:
+        return None, limitations
+    order = {kind: index for index, kind in enumerate(PLAY_KINDS)}
+    rows = [] if access is None else [row for row in access if row["sa2_code"] == sa2_code]
+    origin = {"latitude": rows[0]["origin_latitude"], "longitude": rows[0]["origin_longitude"]} if rows else None
+    return {
+        "sa2_code": sa2_code,
+        "origin": origin,
+        "places": None if spaces is None else sorted(
+            (dict(row) for row in spaces if row["sa2_code"] == sa2_code),
+            key=lambda r: (order.get(r["kind"], 99), r["rank"])),
+        "access": None if access is None else sorted(
+            ({k: v for k, v in row.items() if not k.startswith("origin_")} for row in rows),
+            key=lambda r: order.get(r["kind"], 99)),
+    }, limitations
+
+
+FUTURE_OVERVIEW = ("sa2_code", "sa2_name", "projection_year", "children_0_4", "children_0_14",
+                   "children_0_4_change_from_2026_pct", "ecec_places_per_100_0_4", "ecec_places_to_keep_2026_access")
+
+
+def future_area(sa2_code: str) -> tuple[list[dict[str, Any]] | None, list[dict[str, Any]]]:
+    """Projected children and service pressure for one SA2, 2021-2036 (VIF2023; services held fixed)."""
+    rows, limitations = load("future_demand")
+    if rows is None:
+        return None, limitations
+    return sorted((dict(r) for r in rows if r["sa2_code"] == sa2_code), key=lambda r: r["projection_year"]), limitations
+
+
+def future_overview() -> tuple[list[dict[str, Any]] | None, list[dict[str, Any]]]:
+    """A compact row per SA2 and year, for the Greater Melbourne map."""
+    rows, limitations = load("future_demand")
+    if rows is None:
+        return None, limitations
+    return [{k: r[k] for k in FUTURE_OVERVIEW} for r in rows], limitations
 
 
 PRIORITY_BANDS = {"Higher", "Moderate", "Lower"}

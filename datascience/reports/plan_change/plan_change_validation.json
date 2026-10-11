@@ -1,0 +1,154 @@
+{
+  "built_utc": "2026-10-11T06:11:44+00:00",
+  "model": "P2 matched-pair analogues",
+  "p0_audit": {
+    "model": "P0: ordinary least squares of AEDC all-five on four place features (previous Simulation page)",
+    "tree_cover_slope_pp_per_sd_without_irsd": 3.48,
+    "tree_cover_slope_pp_per_sd_with_irsd": 1.2,
+    "share_of_tree_slope_explained_by_irsd": 0.655,
+    "areas": 330,
+    "finding": "Most of the straight-line tree-cover slope reflects disadvantage, which P0 did not account for."
+  },
+  "presets": {
+    "trees_5": {
+      "statuses": {
+        "ok": 286,
+        "too_few_similar": 42,
+        "no_data": 16,
+        "beyond_observed": 2
+      },
+      "coverage": 0.827,
+      "balanced_share": 0.916,
+      "clear_share": 0.283
+    },
+    "trees_10": {
+      "statuses": {
+        "ok": 271,
+        "too_few_similar": 53,
+        "no_data": 16,
+        "beyond_observed": 6
+      },
+      "coverage": 0.783,
+      "balanced_share": 0.908,
+      "clear_share": 0.328
+    },
+    "cooler_1": {
+      "statuses": {
+        "ok": 259,
+        "too_few_similar": 70,
+        "no_data": 16,
+        "beyond_observed": 1
+      },
+      "coverage": 0.749,
+      "balanced_share": 0.915,
+      "clear_share": 0.185
+    },
+    "cooler_2": {
+      "statuses": {
+        "ok": 284,
+        "too_few_similar": 44,
+        "no_data": 16,
+        "beyond_observed": 2
+      },
+      "coverage": 0.821,
+      "balanced_share": 0.944,
+      "clear_share": 0.218
+    },
+    "open_3": {
+      "statuses": {
+        "ok": 242,
+        "too_few_similar": 88,
+        "no_data": 16
+      },
+      "coverage": 0.699,
+      "balanced_share": 0.884,
+      "clear_share": 0.256
+    },
+    "traffic_50": {
+      "statuses": {
+        "ok": 285,
+        "no_data": 4,
+        "too_few_similar": 57
+      },
+      "coverage": 0.824,
+      "balanced_share": 0.867,
+      "clear_share": 0.186
+    },
+    "greener_cooler": {
+      "statuses": {
+        "ok": 96,
+        "too_few_similar": 232,
+        "no_data": 16,
+        "beyond_observed": 2
+      },
+      "coverage": 0.277,
+      "balanced_share": 0.896,
+      "clear_share": 0.26
+    }
+  },
+  "overall": {
+    "results": 1723,
+    "searches": 2422,
+    "coverage": 0.711,
+    "balanced_share": 0.905,
+    "clear_share": 0.244
+  },
+  "placebo": {
+    "results": 1672,
+    "clear_share_uncalibrated": 0.257,
+    "inflate": 1.158,
+    "clear_share_calibrated": 0.197,
+    "note": "Place features shuffled across areas, so any link with AEDC is broken. Intervals are widened until at most 20% of shuffled results look clear, the rate an 80% interval should give by chance."
+  },
+  "sensitivity": {
+    "band_7": {
+      "shared_results": 1449,
+      "same_direction": 0.762,
+      "clear_results_not_reversed": 0.997
+    },
+    "band_13": {
+      "shared_results": 1683,
+      "same_direction": 0.759,
+      "clear_results_not_reversed": 0.998
+    },
+    "k_8": {
+      "shared_results": 1723,
+      "same_direction": 0.868,
+      "clear_results_not_reversed": 1.0
+    },
+    "k_16": {
+      "shared_results": 1723,
+      "same_direction": 0.919,
+      "clear_results_not_reversed": 1.0
+    },
+    "pair_caliper_7": {
+      "shared_results": 1556,
+      "same_direction": 0.828,
+      "clear_results_not_reversed": 1.0
+    },
+    "pair_caliper_13": {
+      "shared_results": 1723,
+      "same_direction": 0.847,
+      "clear_results_not_reversed": 1.0
+    }
+  },
+  "gates": {
+    "coverage": {
+      "value": 0.711,
+      "threshold": 0.6,
+      "pass": true
+    },
+    "balance": {
+      "value": 0.905,
+      "threshold": 0.8,
+      "pass": true
+    },
+    "reproducible": {
+      "pass": true
+    },
+    "reference_searches": {
+      "value": 21,
+      "pass": true
+    }
+  }
+}

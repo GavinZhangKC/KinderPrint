@@ -59,6 +59,10 @@ cp "$TASK_PROCESSED_DATA_DIR/../../config/child_nutrient_targets.csv" "$TASK_PAC
 cp "$TASK_PROCESSED_DATA_DIR/practitioner_context_sa2.csv" "$TASK_PACKAGE_DIR/data/"
 cp "$TASK_ITERATION_3_DATA_DIR/family_fit.json" "$TASK_PACKAGE_DIR/data/"
 cp "$TASK_ITERATION_3_DATA_DIR/family_fit_shapes.json" "$TASK_PACKAGE_DIR/data/"
+cp "$TASK_ITERATION_3_DATA_DIR/plan_change.json" "$TASK_PACKAGE_DIR/data/"
+cp "$TASK_PROCESSED_DATA_DIR/play_spaces_sa2.csv" "$TASK_PACKAGE_DIR/data/"
+cp "$TASK_PROCESSED_DATA_DIR/play_access_sa2.csv" "$TASK_PACKAGE_DIR/data/"
+cp "$TASK_PROCESSED_DATA_DIR/future_demand_sa2.csv" "$TASK_PACKAGE_DIR/data/"
 
 python3 -m pip install \
     --disable-pip-version-check \
