@@ -38,6 +38,8 @@ import HealthyDay from './HealthyDay'
 import { TodayParent, TodayPractitioner } from './TodayPage'
 import HealthTopics from './HealthTopics'
 import VaccinesTool from './VaccinesTool'
+import SeasonsTool from './SeasonsTool'
+import CareNearby from './CareNearby'
 
 /* ------------------------------------------------------------------ types */
 
@@ -413,7 +415,7 @@ export default function KinderHub({ locality, data, onSelectLocality, onOpenPlan
   const visibleNav = NAV.filter(item => parent || item.id !== 'day')
   const orderedNav = [...visibleNav.filter(item => item.id === page), ...visibleNav.filter(item => item.id !== page)]
   const today = page === 'home'
-  const themed = today || page === 'day' || page === 'health' || page === 'vaccines'
+  const themed = today || page === 'day' || page === 'health' || page === 'vaccines' || page === 'seasons' || page === 'care'
   const themeClass = themed ? (parent ? ' kt-theme-parent' : ' kt-theme-prac') : ''
   // Let the site header and page background around the hub take the same audience theme.
   useEffect(() => {
@@ -458,8 +460,10 @@ export default function KinderHub({ locality, data, onSelectLocality, onOpenPlan
           controls={parent ? <><LocalityPicker locality={locality} onSelect={onSelectLocality} /><MonthPicker value={birthMonth} onChange={setBirthMonth} /></> : <LocalityPicker locality={locality} onSelect={onSelectLocality} />}
           onOpenMap={onOpenMap} onOpenCare={() => go('care')} />}
         {page === 'food' && <FoodPage {...context} />}
-        {page === 'seasons' && <SeasonsPage {...context} />}
-        {page === 'care' && <CarePage {...context} />}
+        {page === 'seasons' && <SeasonsTool parent={parent} locality={locality} env={figures.env} asthma={figures.sa2('asthma')?.percent ?? null} prevention={prevention.data}
+          controls={<LocalityPicker locality={locality} onSelect={onSelectLocality} />} />}
+        {page === 'care' && <CareNearby parent={parent} locality={locality} childcare={childcare.data} prevention={prevention.data}
+          controls={<LocalityPicker locality={locality} onSelect={onSelectLocality} />} onOpenMap={onOpenMap} />}
       </main>
       <footer className="kh-foot">Area-level evidence. Vkinder does not diagnose a child or give medical advice. In an emergency call 000.</footer>
     </div>
@@ -537,73 +541,3 @@ function FoodPage({ parent, nutrition, age, locality }: PageContext) {
 }
 
 /* ------------------------------------------------------------------ seasons */
-
-function SeasonsPage({ parent, figures, prevention, locality }: PageContext) {
-  const month = new Date().getMonth()
-  const [selected, setSelected] = useState(() => (SEASONS.find(item => item.months.includes(month)) ?? SEASONS[0]).id)
-  const season = SEASONS.find(item => item.id === selected) ?? SEASONS[0]
-  const asthma = figures.sa2('asthma')
-  const evidence: Record<string, Array<[string, string]>> = {
-    heat: [['Urban heat effect', figures.env.heat === null ? '—' : `+${figures.env.heat.toFixed(1)}°C`], ['Tree and plant cover', pct(figures.env.vegetation)]],
-    uv: [['Tree and plant cover (shade)', pct(figures.env.vegetation)], ['Public open space', pct(figures.env.openSpace)]],
-    asthma: [['Children with asthma', pct(asthma?.percent, 2)]],
-    smoke: [['Bushfire-prone land', pct(prevention.data?.bushfire?.bushfire_prone_pct)]],
-    water: [['Public open space', pct(figures.env.openSpace)]],
-    flu: [['Children with asthma', pct(asthma?.percent, 2)]],
-  }
-  const events: CalendarEvent[] = SEASONS.map(item => { const start = nextOccurrence(item.months[0], 1); start.setDate(start.getDate() - 14); return { id: `season-${item.id}-${start.getFullYear()}`, title: `Prepare: ${item.title}`, date: start, description: `${item.actions.join('. ')}. ${item.link}` } })
-  return <div className="kh-stack">
-    <Card title={parent ? 'Your year at a glance' : 'Prevention calendar'} sub="Select a season. The outlined column is this month." aside={<button type="button" className="kh-btn primary" onClick={() => downloadFile(`kinderprint-seasons-${slug(locality.name)}.ics`, buildCalendar(events), 'text/calendar')}>Add season reminders</button>}>
-      <div className="kh-scroll"><div className="kh-cal">
-        <span />{MONTH_LETTERS.map((letter, index) => <span key={index} className={index === month ? 'kh-cal-h now' : 'kh-cal-h'}>{letter}</span>)}
-        {SEASONS.map(item => <div key={item.id} className="kh-cal-row">
-          <button type="button" aria-pressed={item.id === selected} onClick={() => setSelected(item.id)}>{item.title}</button>
-          {MONTH_LETTERS.map((_, index) => <i key={index} className={[item.months.includes(index) ? 'on' : '', index === month ? 'now' : ''].join(' ').trim() || undefined} title={`${item.title} · ${MONTH_NAMES[index]}`} />)}
-        </div>)}
-      </div></div>
-      <div className="kh-season">
-        <h3>{season.title} · {MONTH_NAMES[season.months[0]]} – {MONTH_NAMES[season.months[season.months.length - 1]]}</h3>
-        <p>{season.why}</p>
-        <div className="kh-evidence">{evidence[season.id].map(([label, value]) => <span key={label}>{label} in {locality.name}: <b>{value}</b></span>)}</div>
-        <ul>{season.actions.map(action => <li key={action}>{action}</li>)}</ul>
-        <a className="kh-link" href={season.link} target="_blank" rel="noreferrer">{season.linkLabel} ↗</a>
-      </div>
-    </Card>
-    <div className="kh-split">
-      <Card title="Check today" sub="Official live services for the Central forecast district.">
-        <div className="kh-live">{[['Heat-health warning', OFFICIAL.heat], ['Thunderstorm asthma forecast', OFFICIAL.asthmaForecast], ['Air quality', OFFICIAL.airWatch], ['UV and sun protection times', OFFICIAL.sunSmart]].map(([label, href]) => <a key={label} href={href} target="_blank" rel="noreferrer"><b>{label}</b><span>Open ↗</span></a>)}</div>
-      </Card>
-      <Card title={parent ? 'About where you live' : 'Place context'} sub={parent ? 'Local features that change how each season feels.' : '2018 environment measures and 2019 traffic describe the SA2, not a home.'} aside={<Geo>SA2</Geo>}>
-        <ul className="kh-notes">
-          <li><b>Shade and heat</b><span>{pct(figures.env.vegetation)} tree and plant cover; urban heat effect {figures.env.heat === null ? '—' : `+${figures.env.heat.toFixed(1)}°C`}.</span></li>
-          <li><b>Parks</b><span>{pct(figures.env.openSpace)} of the area is public open space.</span></li>
-          <li><b>Roads</b><span>{prevention.data?.transport?.traffic_intensity_percentile != null ? `Busier than ${Math.round(prevention.data.transport.traffic_intensity_percentile)}% of ${prevention.data.transport.sa2_compared} Melbourne areas.` : '—'}</span></li>
-          <li><b>Bushfire</b><span>{pct(prevention.data?.bushfire?.bushfire_prone_pct)} of the area is designated bushfire-prone.</span></li>
-        </ul>
-      </Card>
-    </div>
-  </div>
-}
-
-/* ------------------------------------------------------------------ care */
-
-function CarePage({ parent, data, childcare, prevention, locality }: PageContext) {
-  const label = (facility: HealthFacility) => facility.service_type.includes('Maternal') ? 'Maternal and child health' : facility.category === 'pharmacy' ? 'Pharmacy' : facility.category === 'hospital' ? 'Hospital' : 'General practice'
-  const icon = (facility: HealthFacility) => facility.service_type.includes('Maternal') ? <><circle cx="12" cy="8" r="3" /><path d="M6 20c0-4 3-6 6-6s6 2 6 6" /></> : facility.category === 'pharmacy' ? <><rect x="5" y="4" width="14" height="16" rx="3" /><path d="M12 9v6M9 12h6" /></> : <path d="M12 5v14M5 12h14" />
-  return <div className="kh-split wide-left">
-    <Card title={`${data.facilities.length} listed services`} sub={parent ? 'Call ahead to check fees, bulk billing and appointments.' : 'Healthdirect facilities extract, 7 March 2025. Presence is not capacity.'} aside={<Geo>SA2</Geo>}>
-      {data.loading ? <p className="kh-empty">Loading services.</p> : data.facilities.length === 0 ? <p className="kh-empty">No service is listed inside {locality.name}. Services in nearby suburbs may still be close.</p> : <ul className="kh-services">{data.facilities.map(facility => <li key={facility.facility_id}>
-        <span className="kh-svc-ic"><svg viewBox="0 0 24 24" aria-hidden="true">{icon(facility)}</svg></span>
-        <span><b>{facility.name}</b><small>{label(facility)} · {facility.address.replace(/ Australia$/, '')}</small></span>
-        <a className="kh-btn small" href={mapsLink(facility)} target="_blank" rel="noreferrer">Directions</a>
-      </li>)}</ul>}
-    </Card>
-    <Card title="Childcare and getting there" sub="ACECQA National Registers matched to G-NAF 2026" aside={<Geo>SA2</Geo>}>
-      <div className="kh-kpis one">
-        <article className="kh-kpi"><span>Childcare services</span><strong>{count(childcare.data?.active_education_care_services)}</strong><small>{count(childcare.data?.long_day_care_services)} long day care · {count(childcare.data?.services_with_current_rating)} with a current quality rating</small></article>
-        <article className="kh-kpi"><span>Approved places</span><strong>{count(childcare.data?.total_approved_places)}</strong><small>Approved places are not current vacancies</small></article>
-        <article className="kh-kpi"><span>Public transport stops</span><strong>{count(prevention.data?.transport?.public_transport_stop_count)}</strong><small>Inside the SA2 · DTP 2026</small></article>
-      </div>
-    </Card>
-  </div>
-}

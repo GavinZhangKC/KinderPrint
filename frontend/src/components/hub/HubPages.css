@@ -1,0 +1,116 @@
+/* Food and play, Seasons and Care nearby: same tokens and pieces as Vaccines (TodayPage.css, VaccinesTool.css). */
+.hp .vx-rows li.hp-serve,.hp .vx-rows li.hp-habit,.hp .vx-rows li.hp-food{display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px;padding:12px 8px}
+.hp-serve .vx-txt{flex:1 1 260px}
+.hp-serve .hp-bar{flex:1 1 140px;margin:0}
+.hp-habit .vx-txt{flex:1 1 300px}
+.hp-habit>.hp-bar{flex:1 1 160px;margin:0}
+.hp-food .vx-txt{flex:1 1 200px}
+.hp-bar{position:relative;display:block;height:9px;border-radius:999px;background:var(--kt-glass);box-shadow:inset 0 0 0 1px var(--kt-line)}
+.hp-bar>span{display:block;height:100%;border-radius:999px;background:var(--kt-primary)}
+.hp-bar>i{position:absolute;top:-4px;width:2px;height:17px;background:var(--kt-ink)}
+
+.hp-step{flex:none;display:inline-flex;align-items:center;border:1px solid var(--kt-line);border-radius:12px;background:var(--kt-surface)}
+.hp-step button{width:44px;height:44px;border:0;border-radius:12px;background:none;color:var(--kt-primary);font-size:22px;font-weight:700;line-height:1;cursor:pointer;transition:background-color .15s ease}
+.hp-step button:hover:not(:disabled){background:var(--kt-icon-bg)}
+.hp-step button:disabled{color:var(--kt-line);cursor:default}
+.hp-step b{min-width:72px;text-align:center;font-size:var(--fs-body);font-variant-numeric:tabular-nums}
+.hp-step b.is-done{color:var(--kt-primary)}
+
+.hp-play{padding:16px 18px;border-radius:14px;background:var(--kt-surface);border:1px solid var(--kt-line-soft)}
+.hp-play b{display:block;font-size:var(--fs-h3)}
+.hp-play p{margin:4px 0 6px;font-size:var(--fs-body)}
+
+.hp-nutrient{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:24px;padding:18px 20px;border-radius:14px;background:var(--kt-surface);border:1px solid var(--kt-line-soft)}
+.hp-nutrient p{font-size:var(--fs-body)}
+.hp .vx-eyebrow{margin:0}
+
+.hp-say{font-size:var(--fs-body);line-height:1.55}
+.hp-months{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:6px;align-items:end;height:150px;padding:8px 0 0}
+.hp-months>div{display:flex;flex-direction:column;align-items:center;gap:6px;height:100%}
+.hp-months span{flex:1;display:flex;align-items:flex-end;width:100%;max-width:44px;border-radius:8px;background:var(--kt-glass-soft)}
+.hp-months i{display:block;width:100%;border-radius:8px;background:var(--kt-line)}
+.hp-months .is-high i{background:var(--kt-primary)}
+.hp-months b{font-size:var(--fs-label);font-weight:700;color:var(--kt-ink2)}
+.hp-months .is-now b{color:var(--kt-ink);text-decoration:underline;text-underline-offset:4px;text-decoration-thickness:2px}
+
+.hp-cal-wrap{overflow-x:auto;max-width:100%}
+.hp-cal{width:100%;min-width:560px;border-collapse:separate;border-spacing:3px}
+.hp-cal thead th{font-size:var(--fs-label);font-weight:700;color:var(--kt-ink2);text-align:center}
+.hp-cal thead th.is-now{color:var(--kt-ink);text-decoration:underline;text-underline-offset:4px;text-decoration-thickness:2px}
+.hp-cal tbody th{width:32%;text-align:left}
+.hp-cal tbody th button{display:flex;justify-content:space-between;align-items:center;width:100%;min-height:44px;padding:0 10px;border:0;border-radius:10px;background:transparent;color:var(--kt-ink);font-size:var(--fs-body2);font-weight:700;text-align:left;cursor:pointer;transition:background-color .15s ease}
+.hp-cal tbody th button:hover{background:var(--kt-icon-bg)}
+.hp-cal tbody th button span{color:var(--kt-ink2);font-size:20px}
+.hp-cal td{height:30px;border-radius:6px;background:var(--kt-glass-soft)}
+.hp-cal td.on{background:var(--kt-primary)}
+.hp-cal td.is-now{box-shadow:inset 0 0 0 2px var(--kt-ink)}
+
+.hp-table thead th{padding:8px 0;font-size:var(--fs-label);font-weight:700;color:var(--kt-ink2);text-align:right}
+.hp-table thead th:first-child{text-align:left}
+.hp-table td{font-size:var(--fs-body);font-variant-numeric:tabular-nums}
+.hp-table td.is-warn{color:var(--kt-warn-ink)}
+.hp-table tr.is-now th,.hp-table tr.is-now td{background:var(--kt-icon-bg)}
+.hp-notes td span{display:block;font-size:var(--fs-meta);font-weight:500;color:var(--kt-ink2)}
+.hp-click tbody tr{cursor:pointer}
+.hp-click tbody tr:hover th,.hp-click tbody tr:hover td{background:var(--kt-icon-bg)}
+
+.hp-links{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:0;padding:0;list-style:none}
+.hp-links a{display:flex;flex-direction:column;justify-content:center;min-height:72px;padding:12px 16px;border:1px solid var(--kt-line);border-radius:14px;background:var(--kt-surface);color:var(--kt-ink);text-decoration:none;transition:background-color .15s ease}
+.hp-links a:hover{background:var(--kt-icon-bg)}
+.hp-links b{font-size:var(--fs-body)}
+.hp-links small{font-size:var(--fs-meta);color:var(--kt-ink2)}
+
+.hp-triage .vx-eyebrow{margin-bottom:12px}
+.hp-triage-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border-top:2px solid var(--kt-line)}
+.hp-triage-grid>div{display:flex;flex-direction:column;align-items:flex-start;gap:4px;padding:16px 20px 4px}
+.hp-triage-grid>div:first-child{padding-left:0}
+.hp-triage-grid>div+div{border-left:1px solid var(--kt-line)}
+.hp-triage-grid b{font-size:var(--fs-label);font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:var(--kt-ink2)}
+.hp-triage-grid p{font-size:var(--fs-body2);color:var(--kt-ink2)}
+.hp-call{padding:0;border:0;background:none;color:var(--kt-ink);font-size:var(--fs-h3);font-weight:800;line-height:1.3;text-align:left;text-decoration:none;cursor:pointer}
+a.hp-call,button.hp-call{text-decoration:underline;text-underline-offset:4px;text-decoration-thickness:1px}
+.hp-triage-grid .is-urgent b,.hp-triage-grid .is-urgent .hp-call{color:#A1261F}
+.hp-link{padding:0;border:0;background:none;color:var(--kt-accent);font-size:var(--fs-body2);font-weight:700;text-align:left;text-decoration:underline;text-underline-offset:3px;cursor:pointer}
+.hp-table .hp-link{color:var(--kt-ink);font-size:var(--fs-body2);text-decoration:none}
+
+.hp-facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px}
+.hp-facts>div{display:flex;flex-direction:column;padding:16px 18px;border:1px solid var(--kt-line-soft);border-radius:14px;background:var(--kt-surface)}
+.hp-facts strong{font-size:var(--fs-data);font-weight:800;line-height:1.15;font-variant-numeric:tabular-nums}
+.hp-facts span{font-size:var(--fs-body);font-weight:700}
+.hp-facts small{font-size:var(--fs-meta);color:var(--kt-ink2)}
+.hp-money{flex:none;display:flex;flex-direction:column;align-items:flex-end}
+.hp-money strong{font-size:var(--fs-h2);font-weight:800;font-variant-numeric:tabular-nums}
+.hp-money small{font-size:var(--fs-meta);color:var(--kt-ink2)}
+.vx-num.hp-k-general_practice{background:#355C38}
+.vx-num.hp-k-pharmacy{background:#8A5300}
+.vx-num.hp-k-maternal_child_health{background:#2E6E8E}
+
+@media (max-width:960px){.hp-triage-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.hp-triage-grid>div:nth-child(3){padding-left:0;border-left:0}.hp-triage-grid>div:nth-child(n+3){border-top:1px solid var(--kt-line)}}
+@media (max-width:760px){.hp-nutrient{grid-template-columns:minmax(0,1fr)}.hp-links{grid-template-columns:minmax(0,1fr)}.hp-months{gap:3px}}
+@media (max-width:560px){.hp-triage-grid{grid-template-columns:minmax(0,1fr)}.hp-triage-grid>div{padding-left:0;border-left:0!important}.hp-triage-grid>div+div{border-top:1px solid var(--kt-line)}}
+@media print{.hp-step button{display:none}}
+.hp .vx-txt>b{display:block;font-size:var(--fs-body);line-height:1.35}
+.hp .vx-txt>small{display:block;font-size:var(--fs-meta);color:var(--kt-ink2)}
+.hp .hp-step button{font-size:24px;color:var(--kt-primary)}
+.hp .hp-step button:disabled{color:var(--kt-line)}
+.hp .vx-cov .vx-txt{flex:0 0 250px}
+@media (max-width:640px){.hp .vx-cov .vx-txt{flex:1 1 100%}}
+.hp-cal{table-layout:fixed}
+.hp-cal thead th:first-child,.hp-cal tbody th{width:30%}
+.hp .vx-tabpanel{min-width:0}
+.hp-cal{min-width:0}
+@media (max-width:640px){.hp-cal{border-spacing:2px}.hp-cal tbody th{width:36%}.hp-cal thead th:first-child{width:36%}.hp-cal tbody th button{padding:0 4px;font-size:var(--fs-label)}.hp-cal tbody th button span{display:none}.hp-cal td{height:28px;border-radius:4px}}
+.hp-nutrient .vx-big{margin:2px 0 6px;font-size:var(--fs-data);font-weight:800;line-height:1.15}
+.hp .vx-tabpanel>.kh-btn,.hp .vx-near .kh-btn{align-self:flex-start}
+.hp-months em{font-style:normal;font-size:var(--fs-label);font-weight:800;color:var(--kt-ink);min-height:1.2em}
+.hp-multiples{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:16px 32px}
+.hp-mult-head{display:flex;flex-wrap:wrap;justify-content:space-between;gap:4px 12px}
+.hp-mult-head b{font-size:var(--fs-body)}
+.hp-mult-head span{font-size:var(--fs-body2);color:var(--kt-ink2)}
+.hp .vx-more[open] .hp-cal-wrap{margin-top:8px}
+
+/* Dark theme: urgent text and number badges keep their meaning with enough contrast. */
+:root[data-theme='dark'] .hp-triage-grid .is-urgent b,:root[data-theme='dark'] .hp-triage-grid .is-urgent .hp-call{color:#FFB8AB}
+:root[data-theme='dark'] .vx-num.hp-k-general_practice{background:#4E7A52}
+:root[data-theme='dark'] .vx-num.hp-k-pharmacy{background:#9A6410}
+:root[data-theme='dark'] .vx-num.hp-k-maternal_child_health{background:#3A7FA2}

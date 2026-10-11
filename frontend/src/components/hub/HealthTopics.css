@@ -23,7 +23,7 @@
 .ht-facets{display:flex;flex-wrap:wrap;gap:4px;margin-top:12px;padding:3px;border:1px solid var(--kt-line);border-radius:14px;background:var(--kt-glass-soft)}
 .ht-facets button{flex:1 1 auto;min-height:40px;padding:0 14px;border:0;border-radius:11px;background:transparent;color:var(--kt-ink2);font:inherit;font-size:var(--fs-control);font-weight:700;cursor:pointer;transition:background-color .18s ease,color .18s ease}
 .ht-facets button:hover{background:var(--kt-icon-bg);color:var(--kt-ink)}
-.ht-facets button[aria-selected=true]{background:var(--kt-primary);color:var(--kt-on-primary)}
+.ht-facets button[aria-selected=true],.ht-facets button[aria-pressed=true]{background:var(--kt-primary);color:var(--kt-on-primary)}
 
 .ht-figures .kt-sub{margin-bottom:8px}
 .ht-fig{padding:16px 0;border-top:1px solid var(--kt-line-soft)}
