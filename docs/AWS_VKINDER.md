@@ -17,7 +17,7 @@ Without it, a deploy behaves exactly as before.
 | API function (existing) | Runs inside the private network and reads as `vkinder_api`, a read-only login. |
 | `vkinder-loader` function | Admin-only. Copies the packaged datasets into the database in one transaction. It has no public trigger. |
 | `vkinder-credit-guard` function, run daily | Checks the remaining credits and stops spending (see below). |
-| `vkinder-alerts` email topic and the `vkinder-monthly` budget | Cost and credit emails. |
+| `vkinder-alerts` email topic and the `vkinder-monthly-cost` budget (alerts sent through the topic) | Cost and credit emails. |
 
 Credentials reach the functions at deploy time through CloudFormation dynamic
 references. This means the functions need no NAT gateway (about $33/month) and

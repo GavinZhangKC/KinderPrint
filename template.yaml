@@ -469,12 +469,34 @@ Resources:
             ScheduleExpression: cron(0 21 * * ? *)
             Description: Daily credit check (07:00 or 08:00 Melbourne time)
 
+  # Budget alerts go to the vkinder-alerts topic, so changing the alert email
+  # only replaces the email subscription and never the budget itself.
+  VkinderAlertTopicPolicy:
+    Type: AWS::SNS::TopicPolicy
+    Condition: CreateDbWithAlerts
+    Properties:
+      Topics:
+        - !Ref VkinderAlertTopic
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Sid: AllowBudgetAlerts
+            Effect: Allow
+            Principal:
+              Service: budgets.amazonaws.com
+            Action: SNS:Publish
+            Resource: !Ref VkinderAlertTopic
+            Condition:
+              StringEquals:
+                aws:SourceAccount: !Ref AWS::AccountId
+
   VkinderMonthlyBudget:
     Type: AWS::Budgets::Budget
     Condition: CreateDbWithAlerts
+    DependsOn: VkinderAlertTopicPolicy
     Properties:
       Budget:
-        BudgetName: vkinder-monthly
+        BudgetName: vkinder-monthly-cost
         BudgetType: COST
         TimeUnit: MONTHLY
         BudgetLimit:
@@ -490,16 +512,16 @@ Resources:
             Threshold: 80
             ThresholdType: PERCENTAGE
           Subscribers:
-            - SubscriptionType: EMAIL
-              Address: !Ref AlertEmail
+            - SubscriptionType: SNS
+              Address: !Ref VkinderAlertTopic
         - Notification:
             NotificationType: FORECASTED
             ComparisonOperator: GREATER_THAN
             Threshold: 100
             ThresholdType: PERCENTAGE
           Subscribers:
-            - SubscriptionType: EMAIL
-              Address: !Ref AlertEmail
+            - SubscriptionType: SNS
+              Address: !Ref VkinderAlertTopic
 
 Outputs:
   ApiUrl:
