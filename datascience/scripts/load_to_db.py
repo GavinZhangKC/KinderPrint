@@ -308,9 +308,13 @@ def ensure_reader_login(conn: Any, role: str, password: str) -> None:
     """
     role_q = quote_identifier(role)
     exists = conn.run("SELECT 1 FROM pg_roles WHERE rolname = :role", role=role)
-    verb = "ALTER ROLE" if exists else "CREATE ROLE"
-    conn.run(f"{verb} {role_q} WITH LOGIN NOSUPERUSER NOCREATEDB NOCREATEROLE "
-             f"PASSWORD {sql_literal(password)}")
+    if exists:
+        # Only a superuser may name SUPERUSER in ALTER ROLE, and the RDS admin
+        # is not one, so a rerun only renews the login and password.
+        conn.run(f"ALTER ROLE {role_q} WITH LOGIN PASSWORD {sql_literal(password)}")
+    else:
+        conn.run(f"CREATE ROLE {role_q} WITH LOGIN NOSUPERUSER NOCREATEDB NOCREATEROLE "
+                 f"PASSWORD {sql_literal(password)}")
 
 
 def grant_reader(conn: Any, schema_q: str, role: str) -> None:
