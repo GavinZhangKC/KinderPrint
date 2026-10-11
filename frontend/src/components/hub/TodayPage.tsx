@@ -264,6 +264,10 @@ const FOCUS: Record<Season, { months: string; title: string; questions: string[]
 const pct = (value: number | null | undefined, digits = 1) => value === null || value === undefined ? '—' : `${value.toFixed(digits)}%`
 const num = (value: number | null | undefined) => value === null || value === undefined ? '—' : Math.round(value).toLocaleString('en-AU')
 const ordinal = (n: number) => { const r = Math.round(n); const s = r % 100 >= 11 && r % 100 <= 13 ? 'th' : ['th', 'st', 'nd', 'rd', 'th', 'th', 'th', 'th', 'th', 'th'][r % 10]; return `${r}${s}` }
+/* One labelled 0–60% scale for every area, so cards compare and nothing is clipped: the highest
+   observed share in Greater Melbourne is 50.8% and the highest expected upper limit 49.8%. */
+const DEV_AXIS_MAX = 60
+const DEV_AXIS_TICKS = [0, 20, 40, 60]
 const scale = (value: number, min: number, max: number) => `${Math.max(0, Math.min(100, (value - min) / (max - min) * 100))}%`
 
 type ContextTab = 'access' | 'air' | 'focus' | 'areas'
@@ -289,6 +293,8 @@ export function TodayPractitioner({ locality, controls, immunisation, asthma, as
   const dev = context.data?.development ?? null
   const access = context.data?.access ?? null
   const twoYear = immunisation?.indicators.find(item => item.indicator_id === 'immunised_age_2')
+  // Axis from 80% (or lower, in tens, when a value is below 80%) to 100%, so no value is cut off.
+  const immLow = Math.min(80, Math.floor(Math.min(twoYear?.pha.percent ?? 80, twoYear?.victoria?.percent ?? 80) / 10) * 10)
   const oneYear = immunisation?.indicators.find(item => item.indicator_id === 'immunised_age_1')
   const fiveYear = immunisation?.indicators.find(item => item.indicator_id === 'immunised_age_5')
   const phaName = immunisation?.locality?.pha_name ?? null
@@ -304,7 +310,7 @@ export function TodayPractitioner({ locality, controls, immunisation, asthma, as
   const devStatus = dev?.observed_vulnerable_pct == null || lo == null || hi == null ? null : dev.observed_vulnerable_pct > hi ? 'higher' : dev.observed_vulnerable_pct < lo ? 'lower' : 'within'
   const findings: ReactNode[] = []
   if (devStatus) findings.push(<>Developmental vulnerability at school entry is <b>{devStatus === 'within' ? 'within the expected range' : `${devStatus} than expected`}</b> for an area like {locality.name}.</>)
-  if (twoYear?.pha.percent != null && twoYear.victoria?.percent != null) findings.push(<>Immunisation at 24 months is <b>{twoYear.pha.percent >= twoYear.victoria.percent ? 'above' : 'below'} the Victorian rate</b>{twoYear.pha.percent < 95 ? ' but below the 95% national target' : ' and meets the 95% national target'}.</>)
+  if (twoYear?.pha.percent != null && twoYear.victoria?.percent != null) findings.push(<>Immunisation at 24 months is <b>{twoYear.pha.percent >= twoYear.victoria.percent ? 'above' : 'below'} the Victorian rate</b>{twoYear.pha.percent < 95 ? (twoYear.pha.percent >= twoYear.victoria.percent ? ' but below the 95% national target' : ' and below the 95% national target') : ' and meets the 95% national target'}.</>)
   if (access?.general_practice.percentile != null && access.early_childhood_education_and_care.percentile != null) {
     const both = access.general_practice.percentile >= 50 && access.early_childhood_education_and_care.percentile >= 50
     findings.push(<>Access to GPs and childcare places is <b>{both ? 'better than in most Victorian areas' : 'below the Victorian middle on at least one measure'}</b>.</>)
@@ -341,7 +347,8 @@ export function TodayPractitioner({ locality, controls, immunisation, asthma, as
           {context.loading ? <p className="kt-empty">Loading…</p> : dev?.observed_vulnerable_pct == null ? <p className="kt-empty">Not available for this locality. Nothing has been estimated in its place.</p> : <>
             <div className="kt-value-row"><strong>{pct(dev.observed_vulnerable_pct)}</strong>{devStatus && devStatus !== 'within' && <span className="kt-badge"><Icon d={devStatus === 'higher' ? 'M12 19V5M6 11l6-6 6 6' : 'M12 5v14M6 13l6 6 6-6'} />{devStatus === 'higher' ? 'Higher' : 'Lower'} than expected</span>}</div>
             {lo != null && hi != null && dev.expected_vulnerable_pct != null && <div className="kt-range" role="img" aria-label={`Observed ${pct(dev.observed_vulnerable_pct)}. Expected ${pct(dev.expected_vulnerable_pct)}, likely range ${pct(lo)} to ${pct(hi)}.`}>
-              <div className="kt-track"><i className="band" style={{ left: scale(lo, 0, 30), width: `calc(${scale(hi, 0, 30)} - ${scale(lo, 0, 30)})` }} /><i className="exp" style={{ left: scale(dev.expected_vulnerable_pct, 0, 30) }} /><i className="obs" style={{ left: scale(dev.observed_vulnerable_pct, 0, 30) }} /></div>
+              <div className="kt-track"><i className="band" style={{ left: scale(lo, 0, DEV_AXIS_MAX), width: `calc(${scale(hi, 0, DEV_AXIS_MAX)} - ${scale(lo, 0, DEV_AXIS_MAX)})` }} /><i className="exp" style={{ left: scale(dev.expected_vulnerable_pct, 0, DEV_AXIS_MAX) }} /><i className={`obs${dev.observed_vulnerable_pct > DEV_AXIS_MAX ? ' is-over' : ''}`} style={{ left: scale(dev.observed_vulnerable_pct, 0, DEV_AXIS_MAX) }} /></div>
+              <div className="kt-axis" aria-hidden="true">{DEV_AXIS_TICKS.map(t => <span key={t} style={{ left: scale(t, 0, DEV_AXIS_MAX) }}>{t}%</span>)}</div>
               <span>Expected {pct(dev.expected_vulnerable_pct)} (likely range {pct(lo)}–{pct(hi)}), based on the area’s characteristics.</span>
             </div>}
             <p className="kt-limit">A teacher-completed snapshot of children starting school, not an assessment of any individual child.</p>
@@ -353,7 +360,8 @@ export function TodayPractitioner({ locality, controls, immunisation, asthma, as
           {twoYear?.pha.percent == null ? <p className="kt-empty">Not available for this locality.</p> : <>
             <div className="kt-value-row"><strong>{pct(twoYear.pha.percent)}</strong></div>
             <div className="kt-range" role="img" aria-label={`${pct(twoYear.pha.percent)} locally, compared with Victoria ${pct(twoYear.victoria?.percent)} and the 95 percent national target.`}>
-              <div className="kt-track"><i className="fill" style={{ width: scale(twoYear.pha.percent, 80, 98) }} />{twoYear.victoria?.percent != null && <i className="ref" style={{ left: scale(twoYear.victoria.percent, 80, 98) }} />}<i className="target" style={{ left: scale(95, 80, 98) }} /></div>
+              <div className="kt-track"><i className="fill" style={{ width: scale(twoYear.pha.percent, immLow, 100) }} />{twoYear.victoria?.percent != null && <i className="ref" style={{ left: scale(twoYear.victoria.percent, immLow, 100) }} />}<i className="target" style={{ left: scale(95, immLow, 100) }} /></div>
+              <div className="kt-axis" aria-hidden="true"><span style={{ left: '0%' }}>{immLow}%</span><span style={{ left: scale(95, immLow, 100) }}>95% target</span><span style={{ left: '100%' }}>100%</span></div>
               <span>Victoria {pct(twoYear.victoria?.percent)}. National target 95%. Higher is better. {num(twoYear.pha.numerator)} of {num(twoYear.pha.denominator)} children.{oneYear?.pha.percent != null && fiveYear?.pha.percent != null ? ` At 12 months: ${pct(oneYear.pha.percent)}; at 5 years: ${pct(fiveYear.pha.percent)}.` : ''}</span>
             </div>
             <p className="kt-limit">Late recording on the register can understate coverage.</p>

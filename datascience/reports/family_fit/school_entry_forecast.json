@@ -90,6 +90,193 @@
   },
   "selected": "F3",
   "skill_vs_persistence": 0.1494,
+  "labels": {
+    "holdout_role": "validation: 2021->2024 was used to choose among the candidates, so the candidate metrics above are not an untouched test; see chronological_evaluation",
+    "candidate_intervals": "SD from in-sample training residuals plus a cycle-shock term; coverage_80 and coverage_95 are observed on the validation transition",
+    "mae_after_common_shift_pp": "diagnostic only: assumes the 2021->2024 Melbourne-wide shift was known in advance; not operational performance",
+    "forecast_interval": "nominal 80% range (coverage not yet demonstrated)",
+    "outlook_status": "exploratory"
+  },
+  "chronological_evaluation": {
+    "design": "Candidate and ridge alpha chosen on transitions ending on or before the test origin; chosen candidate refitted on all earlier transitions and scored once on the test transition. Interval SD from out-of-time residuals available at the test origin only (net of binomial noise), plus binomial variance for the observed test cohort. No cycle-shock term is added.",
+    "selection_set": {
+      "train_transitions": [
+        "2012->2015",
+        "2015->2018"
+      ],
+      "validation_transition": "2018->2021",
+      "n_train": 663,
+      "n_validate": 337,
+      "past_only_residuals": [
+        "2015->2018"
+      ],
+      "rule": "lowest child-weighted MAE on the validation transition; a more complex candidate must beat the simpler by >= 3%"
+    },
+    "validation": {
+      "F0": {
+        "weighted_mae_pp": 6.725,
+        "rmse_pp": 9.753,
+        "bias_pp": 0.522,
+        "spearman": 0.5358,
+        "coverage_80": 0.7923,
+        "mean_width_80_pp": 23.003,
+        "coverage_95": 0.9288,
+        "mean_width_95_pp": 35.18,
+        "past_only_model_sd_pp": 7.761
+      },
+      "F1": {
+        "weighted_mae_pp": 6.222,
+        "rmse_pp": 8.865,
+        "bias_pp": 0.49,
+        "spearman": 0.5428,
+        "coverage_80": 0.7923,
+        "mean_width_80_pp": 21.035,
+        "coverage_95": 0.9228,
+        "mean_width_95_pp": 32.17,
+        "past_only_model_sd_pp": 6.836
+      },
+      "F2": {
+        "weighted_mae_pp": 6.232,
+        "rmse_pp": 8.892,
+        "bias_pp": 0.846,
+        "spearman": 0.5428,
+        "coverage_80": 0.7893,
+        "mean_width_80_pp": 21.081,
+        "coverage_95": 0.9258,
+        "mean_width_95_pp": 32.241,
+        "past_only_model_sd_pp": 6.862
+      },
+      "F3": {
+        "weighted_mae_pp": 5.272,
+        "rmse_pp": 7.54,
+        "bias_pp": 0.954,
+        "spearman": 0.6478,
+        "coverage_80": 0.7923,
+        "mean_width_80_pp": 17.478,
+        "coverage_95": 0.9288,
+        "mean_width_95_pp": 26.73,
+        "past_only_model_sd_pp": 5.091,
+        "alpha": 10000
+      },
+      "F4": {
+        "weighted_mae_pp": 5.46,
+        "rmse_pp": 7.854,
+        "bias_pp": 1.023,
+        "spearman": 0.6292,
+        "coverage_80": 0.8131,
+        "mean_width_80_pp": 19.09,
+        "coverage_95": 0.9407,
+        "mean_width_95_pp": 29.196,
+        "past_only_model_sd_pp": 5.911
+      }
+    },
+    "selected_by_validation": "F3",
+    "test_set": {
+      "train_transitions": [
+        "2012->2015",
+        "2015->2018",
+        "2018->2021"
+      ],
+      "test_transition": "2021->2024",
+      "n_train": 1000,
+      "n_test": 342,
+      "test_transitions": 1,
+      "past_only_residuals": [
+        "2015->2018",
+        "2018->2021"
+      ],
+      "strength": "weak: one test transition (342 areas sharing one common cycle shift); area errors are not independent, so coverage and skill have wide uncertainty"
+    },
+    "test_all_candidates": {
+      "F0": {
+        "weighted_mae_pp": 7.558,
+        "rmse_pp": 10.738,
+        "bias_pp": 3.25,
+        "spearman": 0.5138,
+        "coverage_80": 0.731,
+        "mean_width_80_pp": 23.087,
+        "coverage_95": 0.9006,
+        "mean_width_95_pp": 35.309,
+        "past_only_model_sd_pp": 7.588
+      },
+      "F1": {
+        "weighted_mae_pp": 7.006,
+        "rmse_pp": 9.64,
+        "bias_pp": 3.294,
+        "spearman": 0.5571,
+        "coverage_80": 0.7281,
+        "mean_width_80_pp": 21.299,
+        "coverage_95": 0.9152,
+        "mean_width_95_pp": 32.574,
+        "past_only_model_sd_pp": 6.716
+      },
+      "F2": {
+        "weighted_mae_pp": 6.9,
+        "rmse_pp": 9.555,
+        "bias_pp": 2.984,
+        "spearman": 0.5571,
+        "coverage_80": 0.7339,
+        "mean_width_80_pp": 21.372,
+        "coverage_95": 0.9181,
+        "mean_width_95_pp": 32.686,
+        "past_only_model_sd_pp": 6.747
+      },
+      "F3": {
+        "weighted_mae_pp": 6.429,
+        "rmse_pp": 8.748,
+        "bias_pp": 3.482,
+        "spearman": 0.654,
+        "coverage_80": 0.6988,
+        "mean_width_80_pp": 17.947,
+        "coverage_95": 0.8889,
+        "mean_width_95_pp": 27.448,
+        "past_only_model_sd_pp": 5.016,
+        "alpha": 3000
+      },
+      "F4": {
+        "weighted_mae_pp": 6.879,
+        "rmse_pp": 9.213,
+        "bias_pp": 4.067,
+        "spearman": 0.606,
+        "coverage_80": 0.7135,
+        "mean_width_80_pp": 19.134,
+        "coverage_95": 0.8713,
+        "mean_width_95_pp": 29.263,
+        "past_only_model_sd_pp": 5.645
+      }
+    },
+    "test_all_candidates_note": "reported for reference only; the test result is the selected candidate",
+    "selected_test": {
+      "weighted_mae_pp": 6.429,
+      "rmse_pp": 8.748,
+      "bias_pp": 3.482,
+      "spearman": 0.654,
+      "coverage_80": 0.6988,
+      "mean_width_80_pp": 17.947,
+      "coverage_95": 0.8889,
+      "mean_width_95_pp": 27.448,
+      "past_only_model_sd_pp": 5.016,
+      "alpha": 3000
+    },
+    "persistence_test": {
+      "weighted_mae_pp": 7.558,
+      "rmse_pp": 10.738,
+      "bias_pp": 3.25,
+      "spearman": 0.5138,
+      "coverage_80": 0.731,
+      "mean_width_80_pp": 23.087,
+      "coverage_95": 0.9006,
+      "mean_width_95_pp": 35.309,
+      "past_only_model_sd_pp": 7.588
+    },
+    "skill_vs_persistence_test": 0.1494,
+    "nominal_coverage": {
+      "coverage_80": 0.8,
+      "coverage_95": 0.95
+    },
+    "information_note": "IRSD 2021 is used as a feature for every origin, including 2012, 2015 and 2018, so earlier transitions use information not available at their origin.",
+    "interpretation": "Selected F3 using 2018->2021 only. On the untouched 2021->2024 transition (342 areas) its child-weighted MAE is 6.43 pp against 7.56 pp for persistence (better, skill +14.9%), Spearman 0.65 vs 0.51, bias +3.48 pp (positive means forecasts were too high on average). With past-only residuals the nominal 80% and 95% intervals covered 69.9% and 88.9% of areas (below nominal). This is one test transition; it cannot show that coverage or skill will hold in 2027, so the 2027 outlook is exploratory and its interval is nominal."
+  },
   "melbourne_level_shift_2021_2024_pp": -3.453,
   "forecast": {
     "origin": 2024,
@@ -103,13 +290,18 @@
     ],
     "model_sd_pp": 5.211,
     "cycle_shock_sd_pp": 1.796,
-    "ridge_alpha": 10000
+    "ridge_alpha": 10000,
+    "interval": "lower_80_pct to upper_80_pct",
+    "interval_label": "nominal 80% range (coverage not yet demonstrated)",
+    "interval_note": "cycle-shock SD estimated after 2024 was seen; 2027 coverage is unvalidated"
   },
   "holdout_cycle_shock_sd_pp": 0.574,
   "limitations": [
     "AEDC is a census every three years; four transitions is a short history.",
     "Greater Melbourne fell by 3.5 percentage points between 2021 and 2024 (after pandemic-affected cohorts); no model trained on earlier cycles anticipated a shift of that size, so holdout errors carry a common bias.",
-    "IRSD is from 2021 and is used for every origin year.",
+    "IRSD is from 2021 and is used for every origin year, so the 2012, 2015 and 2018 transitions use information that was not available at their origin.",
+    "The candidate table uses 2021->2024 both to choose the model and to score it; the untouched-test result is chronological_evaluation, which has a single test transition.",
+    "The 2027 interval is a nominal 80% range (coverage not yet demonstrated).",
     "Forecasts describe areas, never individual children."
   ]
 }

@@ -26,6 +26,7 @@ FAMILY_FIT_DATA_PATH_ENV = "KINDERPRINT_FAMILY_FIT_DATA_PATH"
 FAMILY_FIT_SHAPES_DATA_PATH_ENV = "KINDERPRINT_FAMILY_FIT_SHAPES_DATA_PATH"
 LEVELS = {"prefer", "essential"}
 DRAWS = 200
+SCORE_DECIMALS = 4  # mirrors the data-science engine's published precision
 RADII_KM = (5, 10, 15, 25)
 AEDC_PREFIX = "aedc_"
 CHANGE_FLAGS = {"up", "down", "no_clear_change", "not_available"}
@@ -206,18 +207,21 @@ def search(anchor_id: str, radius_km: float, priorities: dict[str, str], limit: 
     ranked = sorted(eligible, key=lambda i: (-fit[i], areas[i]["id"]))
     top = ranked[:max(limit, 10)]
 
-    # Confidence: redraw the small-numbers-adjusted AEDC shares and count top-10 places.
+    # Confidence: redraw the small-numbers-adjusted AEDC shares and rerun the whole search on each
+    # draw: distance, data availability, every Essential threshold and the ranking. Areas can enter
+    # or leave the shortlist in a draw, so the share is the chance of being in the top 10 under the
+    # search the user actually ran. Each area's measures are drawn independently (stated limitation).
     used = sorted({m["id"] for n in priorities for m in need_index[n]["measures"]} & {
         m for a in areas[:1] for m in a["adjustment"]})
-    stability = {}
+    stability, entrants, draws_with_fewer = {}, 0, 0
     if used and ranked:
         seed = int(hashlib.sha256(f"{anchor_id}|{radius_km}|{sorted(priorities.items())}|{meta.get('built_utc')}".encode())
                    .hexdigest()[:12], 16)
         rng = random.Random(seed)
         direction = {m["id"]: m["direction"] for n in needs for m in n["measures"]}
         base_pct = {m: [a["percentiles"][m] for a in areas] for m in direction}
-        hits = {i: 0 for i in eligible}
-        eligible_set = set(eligible)
+        within = [i for i in range(len(areas)) if dist[i] <= radius_km]
+        hits = {i: 0 for i in within}
         for _ in range(DRAWS):
             pct = dict(base_pct)
             for m in used:
@@ -226,13 +230,18 @@ def search(anchor_id: str, radius_km: float, priorities: dict[str, str], limit: 
             nv = {}
             for n in priorities:
                 ms = [m["id"] for m in need_index[n]["measures"]]
-                nv[n] = [None if any(pct[m][i] is None for m in ms) else sum(pct[m][i] for m in ms) / len(ms)
+                nv[n] = [None if any(pct[m][i] is None for m in ms) else round(sum(pct[m][i] for m in ms) / len(ms), SCORE_DECIMALS)
                          for i in range(len(areas))]
             sim = match_scores(nv, priorities, weights)
-            order = sorted((i for i in eligible_set if sim[i] is not None), key=lambda i: (-sim[i], areas[i]["id"]))
+            passing = [i for i in within if sim[i] is not None and
+                       all(nv[n][i] >= essential for n, level in priorities.items() if level == "essential")]
+            order = sorted(passing, key=lambda i: (-sim[i], areas[i]["id"]))
+            draws_with_fewer += len(order) < 10
             for i in order[:10]:
                 hits[i] += 1
-        stability = {i: hits[i] / DRAWS for i in eligible}
+        stability = {i: hits[i] / DRAWS for i in within}
+        base_top = set(ranked[:10])
+        entrants = sum(1 for i, h in hits.items() if h and i not in base_top)
 
     def result(rank: int, i: int) -> dict:
         a = areas[i]
@@ -286,7 +295,12 @@ def search(anchor_id: str, radius_km: float, priorities: dict[str, str], limit: 
         "more_available": max(len(ranked) - limit, 0),
         "map": [{"id": areas[i]["id"], "status": ("top" if i in top[:10] else status[i])} for i in range(len(areas))],
         "suggestions": suggestions,
-        "confidence": {"draws": DRAWS if used else 0, "measures_varied": used},
+        "confidence": {"draws": DRAWS if used else 0, "measures_varied": used,
+                       "method": "full search rerun per draw (distance, Essential thresholds, ranking)",
+                       "areas_entering_top10_in_some_draws": entrants,
+                       "draws_with_fewer_than_10_matches": draws_with_fewer,
+                       "monte_carlo_se_max": round(0.5 / DRAWS ** 0.5, 3) if used else None,
+                       "assumption": "each area's school-entry measures are drawn independently"},
     }, []
 
 

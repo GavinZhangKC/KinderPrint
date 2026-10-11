@@ -122,16 +122,19 @@ def build() -> tuple[pd.DataFrame, dict]:
 
 
 def main(argv: list[str] | None = None) -> int:
-    argparse.ArgumentParser(description=__doc__.split("\n")[0]).parse_args(argv)
+    parser = argparse.ArgumentParser(description=__doc__.split("\n")[0])
+    parser.add_argument("--output", type=Path, default=OUTPUT, help="CSV path (default: the processed file)")
+    args = parser.parse_args(argv)
     table, report = build()
     print(json.dumps(report, indent=2))
     if not report["gate_2026_matches_published_access"]["pass"]:
         print("Gate failed: the 2026 re-run does not match the published access table.", file=sys.stderr)
         return 1
-    table.to_csv(OUTPUT, index=False)
-    REPORT.parent.mkdir(parents=True, exist_ok=True)
-    REPORT.write_text(json.dumps(report, indent=2) + "\n")
-    print(f"Wrote {len(table)} rows to {OUTPUT.relative_to(ROOT)}")
+    table.to_csv(args.output, index=False)
+    if args.output == OUTPUT:  # a rebuild check writes elsewhere and leaves the report alone
+        REPORT.parent.mkdir(parents=True, exist_ok=True)
+        REPORT.write_text(json.dumps(report, indent=2) + "\n")
+    print(f"Wrote {len(table)} rows to {args.output}")
     return 0
 
 

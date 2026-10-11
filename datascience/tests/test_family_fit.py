@@ -168,6 +168,59 @@ def test_forecast_never_trains_on_the_holdout():
     assert max(m.TRAIN_ORIGINS) + 3 <= m.HOLDOUT_ORIGIN
 
 
+def test_chronological_selection_never_reads_the_test_transition():
+    import model_school_entry_forecast as m
+    assert max(m.CHRONO_TRAIN) < m.CHRONO_VALIDATE < m.CHRONO_TEST
+    panel = m.year_panel(m.load())
+    with pytest.raises(ValueError):
+        m.select_by_validation(panel)  # a panel that still holds the test target year is refused
+    past = panel[panel.year <= m.CHRONO_TEST].copy()
+    first = m.select_by_validation(past)
+    # Scrambling every year after the test origin cannot change the choice, because it is never passed in.
+    scrambled = panel.copy()
+    late = scrambled.year > m.CHRONO_TEST
+    scrambled.loc[late, ["raw", "shrunk", "n_children"]] = [0.0, 0.0, 1.0]
+    second = m.select_by_validation(scrambled[scrambled.year <= m.CHRONO_TEST].copy())
+    assert first == second
+    r = json.loads(FORECAST_REPORT.read_text())["chronological_evaluation"]
+    assert r["selected_by_validation"] == first["selected"]
+    assert r["selection_set"]["validation_transition"] == f"{m.CHRONO_VALIDATE}->{m.CHRONO_VALIDATE + 3}"
+    assert r["test_set"]["test_transition"] == f"{m.CHRONO_TEST}->{m.CHRONO_TEST + 3}"
+    assert r["test_set"]["test_transition"] not in r["selection_set"]["train_transitions"]
+    assert all(int(t.split("->")[1]) <= m.CHRONO_TEST for t in r["test_set"]["past_only_residuals"])
+
+
+def test_chronological_evaluation_reports_coverage_for_80_and_95():
+    r = json.loads(FORECAST_REPORT.read_text())["chronological_evaluation"]
+    for key in ["selection_set", "test_set", "selected_by_validation", "interpretation",
+                "selected_test", "persistence_test", "test_all_candidates", "validation"]:
+        assert key in r
+    assert r["test_set"]["test_transitions"] == 1 and r["test_set"]["n_test"] > 0
+    assert r["nominal_coverage"] == {"coverage_80": 0.80, "coverage_95": 0.95}
+    assert set(r["test_all_candidates"]) == {"F0", "F1", "F2", "F3", "F4"}
+    assert r["selected_test"] == r["test_all_candidates"][r["selected_by_validation"]]
+    assert r["persistence_test"] == r["test_all_candidates"]["F0"]
+    for m in list(r["test_all_candidates"].values()) + list(r["validation"].values()):
+        for k in ["weighted_mae_pp", "bias_pp", "spearman", "coverage_80", "coverage_95",
+                  "mean_width_80_pp", "mean_width_95_pp", "past_only_model_sd_pp"]:
+            assert k in m
+        assert 0 <= m["coverage_80"] <= m["coverage_95"] <= 1
+        assert 0 < m["mean_width_80_pp"] < m["mean_width_95_pp"]
+
+
+def test_forecast_interval_is_labelled_nominal():
+    import model_school_entry_forecast as m
+    label = "nominal 80% range (coverage not yet demonstrated)"
+    assert m.INTERVAL_LABEL == label
+    r = json.loads(FORECAST_REPORT.read_text())
+    assert r["forecast"]["interval_label"] == label
+    assert r["labels"]["forecast_interval"] == label
+    assert "not operational performance" in r["labels"]["mae_after_common_shift_pp"]
+    assert "validation" in r["labels"]["holdout_role"]
+    f = pd.read_csv(ROOT / "data" / "processed" / "school_entry_forecast_community.csv")
+    assert (f.interval_label == label).all()
+
+
 def test_forecast_file_is_complete():
     f = pd.read_csv(ROOT / "data" / "processed" / "school_entry_forecast_community.csv")
     assert f.community_id.is_unique and len(f) >= 330
@@ -194,3 +247,18 @@ def test_change_log_reports_moved_scores():
     log = b.change_log(old, new, {"input_sha256": {"a.csv": "2"}})
     assert log["changed_inputs"] == ["a.csv"] and log["added"] == ["2"]
     assert log["need_score_movement"]["gp_access"]["areas_moved_over_10_points"] == 1
+
+
+def test_shortlist_stability_reruns_the_full_search():
+    """Stability must come from rerunning the whole search (thresholds included) on every draw."""
+    import json
+    from pathlib import Path
+    report = json.loads((Path(__file__).resolve().parents[1] / "reports" / "family_fit" /
+                         "family_fit_validation.json").read_text())
+    scenarios = report["reference_scenarios"]
+    for sc in scenarios:
+        st = sc["stability"]
+        assert st["method"] == "full search rerun per draw"
+        assert all(0 <= v <= 1 for v in st["top10_share_in_top10"].values())
+        assert "assumption" in st
+    assert any(sc["stability"]["areas_entering_top10_in_some_draws"] >= 1 for sc in scenarios)

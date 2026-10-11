@@ -49,8 +49,30 @@ proposed and rejected, because they move the product away from that niche.
   credited (16 of 20), and small-area error is 15–22% lower.
 * F3 ridge was selected: 14.9% better than persistence, Spearman 0.65. Holdout
   80% coverage is 0.70 because of the 2024 Melbourne-wide fall. The published
-  intervals include a cycle-shock term for this.
+  intervals include a cycle-shock term for this; their coverage is not yet
+  demonstrated (see below).
 * School-entry needs correlate with IRSD (0.74 for early development). This is
   disclosed in the model card and on the page ("area-level, never about a
   child"), not hidden.
 * Rent is out of scope.
+
+## Validation design and limits (added 2026-10-12, after review)
+
+* The 2021→24 holdout chose among F0–F4 and was also reported as the final
+  score, so it is a validation set. A nested chronological evaluation now
+  separates the two: select on 18→21 (trained on 12→15 and 15→18, alpha tuned
+  inside training), then score the chosen model once on 21→24. The selection
+  code refuses data after 2021 (tested).
+* Validation still chose F3, so the published model and 2027 forecast are
+  unchanged. Untouched test: weighted MAE 6.43 pp vs 7.56 pp for persistence,
+  Spearman 0.65 vs 0.51, bias +3.48 pp.
+* With past-only out-of-time residuals, observed coverage is 69.9% for nominal
+  80% and 88.9% for nominal 95%. The common-shift adjusted error is not an
+  operational performance claim.
+* The 2027 interval adds a cycle-shock term estimated after 2024 was seen; it
+  is labelled "nominal 80% range (coverage not yet demonstrated)".
+* IRSD 2021 is reused for every origin, so earlier transitions use information
+  not available at the time.
+* One test transition of 342 correlated areas is a weak test. The outlook is
+  exploratory: better ranking than persistence on one cycle, with level and
+  intervals not shown to be calibrated.

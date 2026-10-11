@@ -4,9 +4,9 @@
 |---|---|
 | Version | V2-M2, 30 September 2026 (supersedes V1 of 30 August 2026; see MODEL_EVOLUTION_LOG.md) |
 | Code | `scripts/model_expected_vulnerability.py`, `scripts/build_practitioner_context.py` |
-| Outputs | `data/processed/expected_vulnerability_community.csv`, `data/processed/practitioner_context_sa2.csv`, `reports/iteration3/model_expected_vulnerability.json`, `reports/iteration3/figures/v2_*.png` |
+| Outputs | `data/processed/expected_vulnerability_community.csv`, `data/processed/practitioner_context_sa2.csv`, `reports/iteration3/model_expected_vulnerability.json`, `reports/iteration3/model_expected_vulnerability_contributions.csv`, `reports/iteration3/figures/v2_*.png` |
 | Served by | `GET /api/digital-health/practitioner-context?sa2_code=` (Practitioner view → Brief) |
-| Tests | `tests/test_models_iteration3.py` (15), `backend/tests/test_care_context.py` (4 new) |
+| Tests | `tests/test_models_iteration3.py` (15), `tests/test_priority_v2_explanations.py` (9), `backend/tests/test_care_context.py` (4 new) |
 
 ## Intended use
 
@@ -92,11 +92,50 @@ spatial scores are not flattered by neighbouring areas.
 | | |
 |---|---|
 | Bands | Higher 42 · Moderate 56 · Lower 244 |
-| Stability | 38 of 42 Higher communities are flagged in ≥ 70% of 200 bootstrap refits (median 96%) |
+| Stability (SA4 block bootstrap, published as `band_stability`) | 35 of 42 Higher communities are Higher in ≥ 70% of 200 replicates (median 95%). Median 5th-95th percentile width of the out-of-fold expectation: 3.26 pp (90th percentile 6.22, max 13.65) |
+| Stability (IID refit, secondary) | 38 of 42 Higher communities in ≥ 70% of 200 refits (median 96%). Labelled "IID refit stability (does not reproduce the spatial holdout)" |
 | Disadvantage guard | \|Spearman(z, −IRSD)\| = 0.013 (limit 0.20): the shortlist is not a map of disadvantage |
 | Agreement with V1 | Spearman of z-scores 0.94. 18 of V1's 20 Higher communities stay Higher, and 23 V1-Moderate communities move up. V2 publishes more Higher areas because V1 divided by the in-sample residual SD, which double-counted sampling error. |
 | Spatial structure | Moran's I (k = 6) falls from 0.40 on the outcome to 0.09 on the residual (p = 0.002). Some regional clustering remains (see limitations). |
-| Main drivers of the expectation (mean absolute effect) | Adults without qualifications 1.85 pp · median age 1.73 · IRSD 1.29 · unemployment 0.88 · household size 0.70 · crowding 0.69 |
+| Main drivers of the expectation (mean absolute effect, from held-out fold models) | Adults without qualifications 1.88 pp · median age 1.82 · IRSD 1.25 · unemployment 1.03 · household size 0.72 · crowding 0.71 |
+
+## Explanation fidelity
+
+The drivers shown beside a band must explain the expectation that is shown.
+
+* **Before (to 1 October 2026).** Expectations were out-of-fold, but driver
+  contributions were taken from the ridge model refitted to all 342
+  communities. They explained a different number. Against the published
+  expected values: mean absolute gap 0.43 pp, max 3.22 pp, 32 communities over
+  1 pp (unrounded: 0.4305, 3.2132 and 33).
+* **After.** Each community's contributions come from the held-out fold model
+  that produced its expectation. The reference value is that fold model's
+  prediction at the child-weighted mean of its training communities, so
+  reference + sum of contributions = expected value. Reconciliation over 342
+  communities: max gap 7.1e-15 pp, mean 1.2e-15 pp, 0 above the 0.01 pp
+  tolerance. The script stops if any community exceeds the tolerance.
+* **Where to check.** `explanation_reconciliation` in the JSON report, and the
+  per-community reference value, held-out SA4 and contributions in
+  `reports/iteration3/model_expected_vulnerability_contributions.csv`.
+* **Effect.** Bands, expected values and ranges are unchanged. Driver text
+  changed for 341 of 342 communities (mostly small changes in the stated pp).
+
+## Band stability
+
+* **Published (`band_stability`): SA4 block bootstrap.** Each of 200
+  replicates draws the 9 SA4s with replacement as whole blocks. For every
+  original SA4 the ridge model is refitted on the drawn blocks other than that
+  SA4, with α re-tuned by inner SA4-grouped CV, and that SA4's communities are
+  predicted out of fold. τ², z-scores and bands are recomputed per replicate.
+  This repeats the spatial holdout that produces the published expectations.
+* **Secondary: IID refit stability (does not reproduce the spatial holdout).**
+  The earlier check: communities resampled independently, model refitted with
+  fixed α, every community predicted by a refit that usually saw it. Kept in
+  the community CSV (`higher_band_iid_refit_share`) and the report for
+  comparison only.
+* **Results.** Spatial: 35 of 42 Higher stable in ≥ 70% of replicates (median
+  share 95%). IID: 38 of 42 (median 96%). The spatial measure is slightly less
+  stable, as expected with only 9 blocks. Both meet the 75% test.
 
 ## Fairness and bias checks
 
@@ -168,6 +207,7 @@ access. The card shows access alongside so this can be checked locally.
   cohorts of 50-200 children. Two large communities of about 310 and 550
   children are also Higher.
 * `v2_importance.png`: Horizontal bars of the mean absolute effect of each
-  feature on the expectation. Adults without qualifications (1.85 pp), median
-  age (1.73) and area disadvantage (1.29) matter most; one-parent families and
-  spread of disadvantage matter least.
+  feature on the expectation, taken from each community's held-out fold model.
+  Adults without qualifications (1.88 pp), median age (1.82) and area
+  disadvantage (1.25) matter most; one-parent families and spread of
+  disadvantage matter least.

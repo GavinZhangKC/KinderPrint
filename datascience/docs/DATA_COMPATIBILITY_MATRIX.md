@@ -8,6 +8,8 @@ is resolved.
 **BLOCKED** here, the code does not perform it, regardless of how convenient it
 would be.
 
+> Reconciled 12 October 2026 with the source register and the verification evidence in Part C.
+
 ---
 
 ## Part A — Per-dataset compatibility attributes
@@ -15,16 +17,16 @@ would be.
 | Attribute | ASGS Ed 3 | AEDC SA2 | SEIFA 2021 | Census 2021 GCP | SILO max_temp | DEA Land Cover v2 |
 |---|---|---|---|---|---|---|
 | Native geography | SA2 polygon | SA2 | SA2 (from SA1) | SA2 (from SA1/MB) | 0.05° grid | 30 m raster |
-| ASGS edition | Ed 3 (2021) | Ed 3 (2021) ? | Ed 3 (2021) | Ed 3 (2021) | n/a | n/a |
+| ASGS edition | Ed 3 (2021) | Ed 3 (2021), verified (Part C, Q4) | Ed 3 (2021) | Ed 3 (2021) | n/a | n/a |
 | Reference year | 2021 | 2024 (cycle 6) | 2021 | 2021 | window TBD | annual to 2025 |
 | Release year | 2021 | 2025 | 2023 | 2022 | rolling | 2026 |
 | Temporal type | snapshot | 3-yearly cycle | 5-yearly | 5-yearly | daily | annual |
 | Unit of measure | n/a | % of children | index score | counts | °C / days | class code |
-| Denominator published | n/a | **?** | n/a | yes | n/a | pixel count |
-| Missing encoding | n/a | ? | ? | ? | `_FillValue` | 255 |
-| Suppression | n/a | small child counts, rule **?** | low-pop SA1 excluded | random perturbation | none | none |
+| Denominator published | n/a | yes (children assessed, Q1) | n/a | yes | n/a | pixel count |
+| Missing encoding | n/a | `#` and `*` (Q3) | ? | ? | `_FillValue` | 255 |
+| Suppression | n/a | `#` = 3 or fewer children; `*` = fewer than 15 valid scores, fewer than 2 teachers or under 80% coverage | low-pop SA1 excluded | random perturbation | none | none |
 | Effective resolution | SA2 | SA2 | SA2 | SA2 | **~5 km — coarser than urban SA2** | 30 m — finer than SA2 |
-| Licence | CC-BY-4.0 | AEDC Data Guidelines **?** | CC-BY-4.0 | CC-BY-4.0 | CC-BY-4.0 | CC-BY-4.0 |
+| Licence | CC-BY-4.0 | AEDC Data Guidelines (see LICENCE_COMPLIANCE.md) | CC-BY-4.0 | CC-BY-4.0 | CC-BY-4.0 | CC-BY-4.0 |
 
 ---
 
@@ -35,7 +37,7 @@ transformation and a recorded caveat) · **BLOCKED** (do not join).
 
 | From | To | Join key | Rating | Condition / reason |
 |---|---|---|---|---|
-| AEDC 2024 | ASGS Ed 3 SA2 | SA2 code | **CONDITIONAL** | Confirm AEDC's SA2 codes are Ed 3 (2021), not Ed 2 (2016). Measure unmatched codes on both sides; a non-zero unmatched count is a finding, not a rounding error. |
+| AEDC 2024 | ASGS Ed 3 SA2 | SA2 code | **OK (verified)** | Edition 3 confirmed by content and a code-match test: 0 of 2,454 AEDC codes unmatched (Q4; `reports/DS03_aedc_profile.md`). Merged AEDC areas are handled through the community bridge. |
 | SEIFA 2021 | ASGS Ed 3 SA2 | SA2 code | **OK** | Both Ed 3, same reference year. |
 | Census 2021 | ASGS Ed 3 SA2 | SA2 code | **OK** | Both Ed 3, same reference year. |
 | AEDC 2024 | SEIFA 2021 | SA2 code | **CONDITIONAL** | 3-year offset. Acceptable for *relative* socioeconomic position, which is stable in most SA2s. NOT acceptable without a flag in high-growth SA2s — compute 2016→2021 population change and flag the top decile of growth. |
@@ -56,7 +58,7 @@ transformation and a recorded caveat) · **BLOCKED** (do not join).
 | Q2 | Is a child assigned to SA2 of **residence** or **school**? | Every environmental join's interpretation | Confirmed as residence-based; recorded in the integrated source register | **RESOLVED — RESIDENCE** |
 | Q3 | What is AEDC's exact suppression threshold and how is it encoded? | Missing-data handling, coverage stats | File footers inspected; `#` and `*` semantics recorded in `reports/DS03_aedc_profile.md` | **RESOLVED** |
 | Q4 | Which ASGS edition do the AEDC SA2 codes use? | The primary join | Content and code-match test confirm Edition 3 (2021) | **RESOLVED — ED. 3** |
-| Q5 | What do the AEDC Data Guidelines permit for public re-display? | Whether KinderPrint can show AEDC at all | AEDC Data Guidelines document | OPEN |
+| Q5 | What do the AEDC Data Guidelines permit for public re-display? | Whether KinderPrint can show AEDC at all | AEDC Data Guidelines document; obligations listed in `docs/LICENCE_COMPLIANCE.md` (attribution, suppression respected, no attempt to identify small groups) | **RESOLVED — area-level display with attribution** |
 | Q6 | Heat threshold: fixed (e.g. ≥35 °C) or relative (TX90p percentile)? | Heat indicator definition | Literature + `docs/methodology/heat_indicator.md` decision record | OPEN |
 | Q7 | Which DEA classes count as "vegetated", and Level 3 or Level 4? | Vegetation indicator definition | DEA product documentation | OPEN |
 

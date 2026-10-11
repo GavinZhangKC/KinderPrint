@@ -1,0 +1,32 @@
+{
+  "purpose": "Fault injection on the real repository: builders run, a bad served artefact is written, then a KPI target is missed.",
+  "exit_code": 2,
+  "outcome": "stopped: a KPI target was missed; previous version kept",
+  "stages": [
+    {
+      "stage": "1 acquire",
+      "seconds": 1.27,
+      "status": "ok"
+    },
+    {
+      "stage": "2 build",
+      "seconds": 27.76,
+      "status": "ok"
+    },
+    {
+      "stage": "3 gate",
+      "seconds": 11.36,
+      "status": "ok"
+    },
+    {
+      "stage": "4 KPIs",
+      "seconds": 0.0,
+      "status": "failed",
+      "error": "KpiMissed: a KPI target was missed"
+    }
+  ],
+  "files_checked": 25,
+  "files_identical_after_run": 25,
+  "all_identical": true,
+  "run_utc": "2026-10-11T165815Z"
+}

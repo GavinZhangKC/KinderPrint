@@ -227,11 +227,19 @@ def s0_vs_s2(table: pd.DataFrame) -> dict:
 
 
 def stability(table: pd.DataFrame, scenario: dict, draws: int = 300, seed: int = 20261009) -> dict:
+    """Chance each shortlisted area stays in the top 10 when the search is rerun on redrawn data.
+
+    Each draw replaces the small-numbers-adjusted AEDC shares with a draw from their posterior and
+    reruns the whole search policy (distance, Essential thresholds, ranking), so areas can enter or
+    leave the shortlist. Measures are drawn independently for each area (a stated assumption: the
+    AEDC measures of one area are correlated in reality, which this does not model).
+    """
     rng = np.random.default_rng(seed)
     base = rank(table, need_scores(table[list(MEASURE_DIRECTION)]), scenario)
     used = {m for need in scenario["priorities"] for m, _ in next(n for n in NEEDS if n.id == need).measures} & set(AEDC_MEASURES)
-    eligible = set(base.id)
-    hits = pd.Series(0, index=list(eligible), dtype=float)
+    top = list(base.head(TOP_N).id)
+    hits: dict[str, int] = {}
+    fewer = 0
     if used:
         for _ in range(draws):
             sim = table.copy()
@@ -239,14 +247,20 @@ def stability(table: pd.DataFrame, scenario: dict, draws: int = 300, seed: int =
                 key = m.replace("_pct", "")
                 ok = sim[f"{key}_alpha"].notna()
                 sim.loc[ok, m] = 100 * rng.beta(sim.loc[ok, f"{key}_alpha"], sim.loc[ok, f"{key}_beta"])
-            r = rank(sim, need_scores(sim[list(MEASURE_DIRECTION)]), scenario)
-            r = r[r.id.isin(eligible)].head(TOP_N)
-            hits[r.id] += 1
-        share = hits / draws
+            r = rank(sim, need_scores(sim[list(MEASURE_DIRECTION)]), scenario).head(TOP_N)
+            fewer += len(r) < TOP_N
+            for i in r.id:
+                hits[i] = hits.get(i, 0) + 1
+        share = {i: hits.get(i, 0) / draws for i in top}
     else:
-        share = pd.Series(1.0, index=base.id.head(TOP_N))
-    top = base.head(TOP_N).id
-    return {"eligible": len(eligible), "top10_share_in_top10": {i: round(float(share.get(i, 0)), 3) for i in top}}
+        share = {i: 1.0 for i in top}
+    entrants = sorted(i for i in hits if i not in set(top))
+    return {"eligible": int(len(base)), "method": "full search rerun per draw",
+            "top10_share_in_top10": {i: round(float(share[i]), 3) for i in top},
+            "areas_entering_top10_in_some_draws": len(entrants),
+            "draws_with_fewer_than_10_matches": int(fewer), "draws": draws if used else 0,
+            "monte_carlo_se_max": round(0.5 / draws ** 0.5, 3) if used else None,
+            "assumption": "each area's school-entry measures are drawn independently"}
 
 
 def sensitivity(table: pd.DataFrame, scores: pd.DataFrame) -> dict:

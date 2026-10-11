@@ -1,5 +1,5 @@
 {
-  "built_utc": "2026-10-09T051301Z",
+  "built_utc": "2026-10-11T165832Z",
   "model_version": "S2.1",
   "input_sha256": {
     "communities.csv": "3e0018ad7a2dc35860b2f01ba6d4374c18d5964f8f519d1b0b08a034a04068c6",
@@ -11,7 +11,7 @@
     "school_child_population_suitability.csv": "8200db63271b55ca87f3643db80f7293114489c8bd9a6ac3a7d5327e7b7b4507",
     "acecqa_suitability.csv": "b71903ce3f68834da4dc85f94448381609d4cc4889315a70bc9a1f148d708f21",
     "access_e2sfca_sa2.csv": "724fa32aedeac96f63a750a11615f1968c49588c6714bd92f7689d43c135f5f8",
-    "school_entry_forecast_community.csv": "1468b0d73d25946f76f3d6d38ede60f3c1f1ae17b6e73b52234d3d98c3d37963"
+    "school_entry_forecast_community.csv": "22fd06354a81ea6141871571aa9e439ce86ac09e6eef49ab66565f6a026cd082"
   },
   "gates": [
     {
@@ -275,6 +275,7 @@
       ],
       "stability": {
         "eligible": 59,
+        "method": "full search rerun per draw",
         "top10_share_in_top10": {
           "209011197": 1.0,
           "206041125": 1.0,
@@ -286,7 +287,12 @@
           "207021425": 0.723,
           "206061515": 0.48,
           "207011155": 0.697
-        }
+        },
+        "areas_entering_top10_in_some_draws": 9,
+        "draws_with_fewer_than_10_matches": 0,
+        "draws": 300,
+        "monte_carlo_se_max": 0.029,
+        "assumption": "each area's school-entry measures are drawn independently"
       }
     },
     {
@@ -353,18 +359,24 @@
       ],
       "stability": {
         "eligible": 28,
+        "method": "full search rerun per draw",
         "top10_share_in_top10": {
-          "206041125": 0.997,
-          "206011497": 0.937,
-          "206071140": 0.9,
-          "206071143": 0.91,
-          "206051128": 0.82,
-          "206071139": 0.75,
-          "206031116": 0.807,
-          "206071517": 0.84,
-          "206031502": 0.6,
-          "206021500": 0.497
-        }
+          "206041125": 0.993,
+          "206011497": 0.973,
+          "206071140": 0.907,
+          "206071143": 0.87,
+          "206051128": 0.827,
+          "206071139": 0.733,
+          "206031116": 0.78,
+          "206071517": 0.827,
+          "206031502": 0.59,
+          "206021500": 0.467
+        },
+        "areas_entering_top10_in_some_draws": 18,
+        "draws_with_fewer_than_10_matches": 0,
+        "draws": 300,
+        "monte_carlo_se_max": 0.029,
+        "assumption": "each area's school-entry measures are drawn independently"
       }
     },
     {
@@ -431,18 +443,24 @@
       ],
       "stability": {
         "eligible": 62,
+        "method": "full search rerun per draw",
         "top10_share_in_top10": {
-          "214021381": 0.997,
-          "211011255": 0.833,
-          "214011373": 0.8,
-          "208011172": 0.893,
-          "207031166": 0.857,
-          "211051284": 0.67,
+          "214021381": 0.993,
+          "211011255": 0.83,
+          "214011373": 0.793,
+          "208011172": 0.883,
+          "207031166": 0.853,
+          "211051284": 0.663,
           "211041273": 0.65,
           "207011146": 0.51,
-          "208031189": 0.503,
+          "208031189": 0.5,
           "208011168": 0.5
-        }
+        },
+        "areas_entering_top10_in_some_draws": 33,
+        "draws_with_fewer_than_10_matches": 0,
+        "draws": 300,
+        "monte_carlo_se_max": 0.029,
+        "assumption": "each area's school-entry measures are drawn independently"
       }
     }
   ]

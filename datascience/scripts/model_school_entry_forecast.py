@@ -23,9 +23,16 @@ Design decisions (stated before results were examined)
    F4 boosting        gradient boosting on the same relative formulation (monotone in the level)
 3. Selection rule. Lowest child-weighted MAE on the 2024 holdout. A more complex model is
    chosen only if it beats the simpler one by at least 3%; otherwise the simpler is kept.
+   Because 2021->2024 is used for this choice, it is a validation set, not an untouched test.
 4. Intervals. Predictive variance = model variance (from training residuals, net of binomial
-   noise) + binomial variance for the expected cohort. 80% and 95% coverage is reported on the
-   holdout, so the intervals are tested, not assumed.
+   noise) + binomial variance for the expected cohort. The 2027 interval also adds a cycle-shock
+   term estimated after 2024 was seen, so its coverage is nominal and not yet demonstrated.
+6. Chronological evaluation (added after review). The candidate and the ridge alpha are chosen
+   with transitions before 2021 only (train 2012->2015 and 2015->2018, validate on 2018->2021;
+   alpha by grouped CV inside training). The chosen candidate is refitted on the three earlier
+   transitions and scored once on 2021->2024. Interval SDs come only from out-of-time residuals
+   available at the 2021 origin (2015->2018 predicted from 2012->2015; 2018->2021 predicted from
+   2012->2015 and 2015->2018).
 5. Ranking metrics are reported too, because the app compares areas by percentile:
    Spearman correlation and precision/recall for "top quarter of areas" in 2024.
 
@@ -64,6 +71,12 @@ HOLDOUT_ORIGIN = 2021
 FORECAST_ORIGIN, FORECAST_YEAR = 2024, 2027
 FEATURES = ["rel_shrunk", "rel_shrunk_prev", "rel_sa4", "sa4_change", "log_n", "irsd"]
 COMPLEXITY_MARGIN = 0.03
+CANDIDATES = ["F0", "F1", "F2", "F3", "F4"]
+# Chronological evaluation: every choice uses transitions that end on or before the test origin.
+CHRONO_TRAIN = [2012, 2015]
+CHRONO_VALIDATE = 2018
+CHRONO_TEST = 2021
+INTERVAL_LABEL = "nominal 80% range (coverage not yet demonstrated)"
 SOURCE_ID = "aedc_sa2_2009_2024;seifa_2021_sa2"
 
 
@@ -176,6 +189,128 @@ def cycle_shock_sd(panel: pd.DataFrame, origins: list[int]) -> float:
     return float(np.sqrt(np.mean(changes ** 2))) if len(changes) else 0.0
 
 
+def select(maes: dict) -> str:
+    """Walk from the simplest candidate; replace only if at least COMPLEXITY_MARGIN better."""
+    chosen = CANDIDATES[0]
+    for name in CANDIDATES[1:]:
+        if maes[name] <= maes[chosen] * (1 - COMPLEXITY_MARGIN):
+            chosen = name
+    return chosen
+
+
+def out_of_time(panel: pd.DataFrame, name: str, origins: list[int]) -> pd.DataFrame:
+    """Out-of-time residual rows: each transition after the first is predicted by a model trained
+    only on the transitions before it (alpha tuned inside that training set)."""
+    rows = []
+    for i in range(1, len(origins)):
+        tr = _ready(transitions(panel, origins[:i]))
+        te = _ready(transitions(panel, [origins[i]]))
+        pred, _ = fit_predict(name, tr, te)
+        rows.append(te.assign(pred=pred))
+    return pd.concat(rows)
+
+
+def _ready(t: pd.DataFrame) -> pd.DataFrame:
+    return t.dropna(subset=FEATURES + ["raw", "target"])
+
+
+def scored(y, pred, w, n, sd) -> dict:
+    """Accuracy, ranking and nominal-interval checks for one set of predictions."""
+    m = {k: v for k, v in wmetrics(y, pred, w).items() if k in ("weighted_mae_pp", "bias_pp", "rmse_pp")}
+    m["spearman"] = round(float(spearmanr(pred, y).statistic), 4)
+    se = interval(pred, sd, n)
+    for level in (80, 95):
+        z = norm.ppf(0.5 + level / 200)
+        m[f"coverage_{level}"] = round(float(np.mean(np.abs(y - pred) <= z * se)), 4)
+        m[f"mean_width_{level}_pp"] = round(float(np.mean(2 * z * se)), 3)
+    m["past_only_model_sd_pp"] = round(sd, 3)
+    return m
+
+
+def select_by_validation(panel: pd.DataFrame) -> dict:
+    """Choose the candidate using only transitions that end on or before CHRONO_TEST.
+
+    The panel passed in must not contain any year after the test origin; this is enforced so the
+    test transition cannot be read by mistake.
+    """
+    if panel.year.max() > CHRONO_TEST:
+        raise ValueError("selection must not see years after the test origin")
+    train = _ready(transitions(panel, CHRONO_TRAIN))
+    val = _ready(transitions(panel, [CHRONO_VALIDATE]))
+    y, w, n = val.target.to_numpy(), val.target_n.to_numpy(), val.target_n.to_numpy()
+    out = {}
+    for name in CANDIDATES:
+        pred, extra = fit_predict(name, train, val)
+        past = out_of_time(panel, name, CHRONO_TRAIN)  # 2012->2015 trains, 2015->2018 is residual
+        sd = model_sd(past, past.pred.to_numpy())
+        out[name] = scored(y, pred, w, n, sd)
+        if extra and "alpha" in extra:
+            out[name]["alpha"] = extra["alpha"]
+    chosen = select({k: v["weighted_mae_pp"] for k, v in out.items()})
+    return {"validation": out, "selected": chosen, "n_train": int(len(train)), "n_validate": int(len(val))}
+
+
+def chronological_evaluation(panel: pd.DataFrame) -> dict:
+    """Nested, strictly chronological evaluation. The test transition is read once, after selection."""
+    sel = select_by_validation(panel[panel.year <= CHRONO_TEST].copy())
+    chosen = sel["selected"]
+    past_panel = panel[panel.year <= CHRONO_TEST]
+    origins = CHRONO_TRAIN + [CHRONO_VALIDATE]
+    train = _ready(transitions(past_panel, origins))
+    test = _ready(transitions(panel, [CHRONO_TEST]))
+    y, w, n = test.target.to_numpy(), test.target_n.to_numpy(), test.target_n.to_numpy()
+    test_scores = {}
+    for name in CANDIDATES:
+        pred, extra = fit_predict(name, train, test)
+        past = out_of_time(past_panel, name, origins)
+        sd = model_sd(past, past.pred.to_numpy())
+        test_scores[name] = scored(y, pred, w, n, sd)
+        if extra and "alpha" in extra:
+            test_scores[name]["alpha"] = extra["alpha"]
+    s, p = test_scores[chosen], test_scores["F0"]
+    skill = 1 - s["weighted_mae_pp"] / p["weighted_mae_pp"]
+    fmt = lambda t: f"{t}->{t + 3}"  # noqa: E731
+    beats = s["weighted_mae_pp"] < p["weighted_mae_pp"]
+    interp = (
+        f"Selected {chosen} using 2018->2021 only. On the untouched 2021->2024 transition ({len(test)} areas) "
+        f"its child-weighted MAE is {s['weighted_mae_pp']:.2f} pp against {p['weighted_mae_pp']:.2f} pp for persistence "
+        f"({'better' if beats else 'not better'}, skill {skill:+.1%}), Spearman {s['spearman']:.2f} vs {p['spearman']:.2f}, "
+        f"bias {s['bias_pp']:+.2f} pp (positive means forecasts were too high on average). With past-only residuals "
+        f"the nominal 80% and 95% intervals covered {s['coverage_80']:.1%} and {s['coverage_95']:.1%} of areas"
+        f"{' (below nominal)' if s['coverage_80'] < 0.8 or s['coverage_95'] < 0.95 else ''}. "
+        "This is one test transition; it cannot show that "
+        "coverage or skill will hold in 2027, so the 2027 outlook is exploratory and its interval is nominal."
+    )
+    return {
+        "design": "Candidate and ridge alpha chosen on transitions ending on or before the test origin; "
+                  "chosen candidate refitted on all earlier transitions and scored once on the test transition. "
+                  "Interval SD from out-of-time residuals available at the test origin only (net of binomial noise), "
+                  "plus binomial variance for the observed test cohort. No cycle-shock term is added.",
+        "selection_set": {"train_transitions": [fmt(o) for o in CHRONO_TRAIN],
+                          "validation_transition": fmt(CHRONO_VALIDATE),
+                          "n_train": sel["n_train"], "n_validate": sel["n_validate"],
+                          "past_only_residuals": [fmt(o) for o in CHRONO_TRAIN[1:]],
+                          "rule": "lowest child-weighted MAE on the validation transition; a more complex "
+                                  "candidate must beat the simpler by >= 3%"},
+        "validation": sel["validation"],
+        "selected_by_validation": chosen,
+        "test_set": {"train_transitions": [fmt(o) for o in origins], "test_transition": fmt(CHRONO_TEST),
+                     "n_train": int(len(train)), "n_test": int(len(test)), "test_transitions": 1,
+                     "past_only_residuals": [fmt(o) for o in origins[1:]],
+                     "strength": f"weak: one test transition ({len(test)} areas sharing one common cycle shift); "
+                                 "area errors are not independent, so coverage and skill have wide uncertainty"},
+        "test_all_candidates": test_scores,
+        "test_all_candidates_note": "reported for reference only; the test result is the selected candidate",
+        "selected_test": s,
+        "persistence_test": p,
+        "skill_vs_persistence_test": round(float(skill), 4),
+        "nominal_coverage": {"coverage_80": 0.80, "coverage_95": 0.95},
+        "information_note": "IRSD 2021 is used as a feature for every origin, including 2012, 2015 and 2018, "
+                            "so earlier transitions use information not available at their origin.",
+        "interpretation": interp,
+    }
+
+
 def interval(pred, sd_model, n, sd_shock=0.0):
     p = np.clip(pred, 1, 99)
     sd = np.sqrt(sd_model ** 2 + sd_shock ** 2 + p * (100 - p) / n)
@@ -212,11 +347,7 @@ def run() -> tuple[pd.DataFrame, dict]:
             m["alpha"] = alpha
         results[name], preds[name] = m, pred
     # selection: walk from simplest; replace only if >= 3% better
-    order = ["F0", "F1", "F2", "F3", "F4"]
-    chosen = order[0]
-    for name in order[1:]:
-        if results[name]["weighted_mae_pp"] <= results[chosen]["weighted_mae_pp"] * (1 - COMPLEXITY_MARGIN):
-            chosen = name
+    chosen = select({k: v["weighted_mae_pp"] for k, v in results.items()})
     # bias-corrected variant reported for transparency (not used for selection)
     skill = 1 - results[chosen]["weighted_mae_pp"] / results["F0"]["weighted_mae_pp"]
 
@@ -240,9 +371,11 @@ def run() -> tuple[pd.DataFrame, dict]:
         "lower_80_pct": np.clip(fpred - norm.ppf(0.9) * se, 0, 100).round(2),
         "upper_80_pct": np.clip(fpred + norm.ppf(0.9) * se, 0, 100).round(2),
         "model": chosen,
+        "interval_label": INTERVAL_LABEL,
         "source_id": SOURCE_ID,
     }).sort_values("community_id")
     level_shift = float(panel[panel.year == 2024].melb_change.iloc[0])
+    chrono = chronological_evaluation(panel)
     report = {
         "question": "Share of children on track in all five AEDC domains at the next census (2027), by community",
         "unit": "AEDC community (one or more SA2s), Greater Melbourne",
@@ -253,16 +386,33 @@ def run() -> tuple[pd.DataFrame, dict]:
         "candidates": results,
         "selected": chosen,
         "skill_vs_persistence": round(float(skill), 4),
+        "labels": {
+            "holdout_role": "validation: 2021->2024 was used to choose among the candidates, so the "
+                            "candidate metrics above are not an untouched test; see chronological_evaluation",
+            "candidate_intervals": "SD from in-sample training residuals plus a cycle-shock term; "
+                                   "coverage_80 and coverage_95 are observed on the validation transition",
+            "mae_after_common_shift_pp": "diagnostic only: assumes the 2021->2024 Melbourne-wide shift was known "
+                                         "in advance; not operational performance",
+            "forecast_interval": INTERVAL_LABEL,
+            "outlook_status": "exploratory",
+        },
+        "chronological_evaluation": chrono,
         "melbourne_level_shift_2021_2024_pp": round(level_shift, 3),
         "forecast": {"origin": FORECAST_ORIGIN, "year": FORECAST_YEAR, "communities": int(len(out)),
                      "refit_transitions": [f"{o}->{o + 3}" for o in TRAIN_ORIGINS + [HOLDOUT_ORIGIN]],
-                     "model_sd_pp": round(sd, 3), "cycle_shock_sd_pp": round(full_shock, 3), "ridge_alpha": final_alpha},
+                     "model_sd_pp": round(sd, 3), "cycle_shock_sd_pp": round(full_shock, 3), "ridge_alpha": final_alpha,
+                     "interval": "lower_80_pct to upper_80_pct", "interval_label": INTERVAL_LABEL,
+                     "interval_note": "cycle-shock SD estimated after 2024 was seen; 2027 coverage is unvalidated"},
         "holdout_cycle_shock_sd_pp": round(shock, 3),
         "limitations": [
             "AEDC is a census every three years; four transitions is a short history.",
             f"Greater Melbourne {'fell' if level_shift < 0 else 'rose'} by {abs(level_shift):.1f} percentage points between 2021 and 2024 "
             "(after pandemic-affected cohorts); no model trained on earlier cycles anticipated a shift of that size, so holdout errors carry a common bias.",
-            "IRSD is from 2021 and is used for every origin year.",
+            "IRSD is from 2021 and is used for every origin year, so the 2012, 2015 and 2018 transitions use "
+            "information that was not available at their origin.",
+            "The candidate table uses 2021->2024 both to choose the model and to score it; the untouched-test "
+            "result is chronological_evaluation, which has a single test transition.",
+            f"The 2027 interval is a {INTERVAL_LABEL}.",
             "Forecasts describe areas, never individual children.",
         ],
     }
@@ -281,6 +431,8 @@ def main(argv=None) -> int:
         args.report.parent.mkdir(parents=True, exist_ok=True)
         args.report.write_text(json.dumps(report, indent=2) + "\n")
     print(json.dumps({k: report[k] for k in ["selected", "skill_vs_persistence"]}))
+    print("chronological", json.dumps({k: report["chronological_evaluation"][k] for k in
+                                       ["selected_by_validation", "selected_test", "persistence_test"]}))
     for k, v in report["candidates"].items():
         print(k, v)
     return 0

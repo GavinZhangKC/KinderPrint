@@ -360,3 +360,11 @@ html .health-page-shell{--health-content-width:min(1440px,calc(100vw - 64px))}
 .kh-picker-link .kh-picker-label{font-weight:800}
 :root[data-theme='dark'] .kt-theme-parent .kh-picker-change,:root[data-theme='dark'] .kt-theme-prac .kh-picker-change,
 :root[data-theme='dark'] .kt-theme-parent .kh-picker-ways a,:root[data-theme='dark'] .kt-theme-prac .kh-picker-ways a{color:var(--kt-accent)}
+
+/* Labelled scale under the observed-versus-expected track. */
+.kt-axis{position:relative;height:18px;margin-top:2px;font-size:13px;color:var(--kt-ink2);font-variant-numeric:tabular-nums}
+.kt-axis span{position:absolute;transform:translateX(-50%)}
+.kt-axis span:first-child{transform:none}
+.kt-axis span:last-child{transform:translateX(-100%)}
+.kt-track .obs.is-over{background:#7A4A00}
+.kt-axis span:nth-child(2):not(:last-child){transform:translateX(-50%)}
