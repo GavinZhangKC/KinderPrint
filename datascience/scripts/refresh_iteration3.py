@@ -3,9 +3,11 @@
 Stages
 ------
 1 acquire      acquire_iteration3.py (live, or --offline to re-verify committed files)
-2 build        the six Iteration-3 builders, in dependency order
+2 build        the Iteration-3 builders, in dependency order, including the
+               school-entry outlook and Family Fit (which has its own blocking gates)
 3 gate         the full datascience test suite; on failure every processed file
-               touched in stage 2 is restored, so a bad refresh never ships
+               touched in stage 2, and every served artefact, is restored, so a bad
+               refresh never ships
 4 KPIs         pipeline_kpis.py (validity, coverage, integrity, lineage,
                reproducibility, freshness, null resolution)
 5 record       reports/iteration3/refresh_run.json with timings and outcomes
@@ -70,6 +72,10 @@ def main(argv=None) -> int:
     for name in touched:
         if (PROC / name).is_file():
             shutil.copy2(PROC / name, backup / name)
+    # Served artefacts are restored too, so the API never serves output from a failed refresh.
+    for path in kpis.SERVED_ARTEFACTS:
+        if path.is_file():
+            shutil.copy2(path, backup / f"artefact__{path.name}")
     exit_code = 0
     try:
         with stage("1 acquire", record):
@@ -95,7 +101,10 @@ def main(argv=None) -> int:
         for name in touched:
             if (backup / name).is_file():
                 shutil.copy2(backup / name, PROC / name)
-        record["restored"] = touched
+        for path in kpis.SERVED_ARTEFACTS:
+            if (backup / f"artefact__{path.name}").is_file():
+                shutil.copy2(backup / f"artefact__{path.name}", path)
+        record["restored"] = touched + [str(p.relative_to(ROOT)) for p in kpis.SERVED_ARTEFACTS]
     else:
         record["outcome"] = "published" if record.get("kpis_met") else "published; KPI target missed"
         exit_code = 0 if record.get("kpis_met") else 2

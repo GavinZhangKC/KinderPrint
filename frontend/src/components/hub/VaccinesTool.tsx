@@ -235,7 +235,7 @@ function Finder({ places, under5, locality }: { places: Places; under5: boolean;
     : ['Development checks and advice. Vaccines are given at council sessions.', false]
   return <>
     <p className="kt-sub">{under5 ? 'Free childhood vaccines at GPs and council sessions near ' : 'Free childhood vaccines near '}{locality}. Select a place for details and directions.</p>
-    <div className="ht-facets vx-filters" role="group" aria-label="Show">{filters.map(([id, label]) => <button key={id} type="button" aria-selected={filter === id} onClick={() => { setFilter(id); setMore(false) }}>{label}</button>)}</div>
+    <div className="ht-facets vx-filters" role="group" aria-label="Show">{filters.map(([id, label]) => <button key={id} type="button" aria-pressed={filter === id} onClick={() => { setFilter(id); setMore(false) }}>{label}</button>)}</div>
     <div className="vx-near">
       <ProximityMap places={places.data} visible={shown} number={number} onSelect={setOpen} />
       <div>
@@ -311,7 +311,7 @@ function AreaCover({ immunisation }: { immunisation: ImmunisationContext | null 
   </>
 }
 
-function ProximityMap({ places, visible, number, onSelect }: { places: VaccinationPlaces; visible: VaccinationPlace[]; number: Map<string, number>; onSelect: (place: VaccinationPlace) => void }) {
+export function ProximityMap({ places, visible, number, onSelect }: { places: VaccinationPlaces; visible: VaccinationPlace[]; number: Map<string, number>; onSelect: (place: VaccinationPlace) => void }) {
   const origin = places.origin
   if (!origin) return <div />
   const kx = 111.32 * Math.cos(origin.latitude * Math.PI / 180), ky = 110.57

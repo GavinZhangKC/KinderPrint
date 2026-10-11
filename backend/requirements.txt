@@ -1,3 +1,4 @@
 fastapi==0.141.1
 mangum==0.22.0
 uvicorn==0.52.4
+pg8000==1.31.5

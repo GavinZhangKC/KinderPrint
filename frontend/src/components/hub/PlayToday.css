@@ -1,0 +1,22 @@
+/* Play today: hour strip, goal tracker and tips. Uses the shared --kt-* tokens, so light and dark follow the hub. */
+.pt-hours{display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:8px;margin:12px 0 0;padding:0;list-style:none}
+.pt-hours li{display:flex;flex-direction:column;gap:2px;padding:10px 12px;border-radius:12px;border:1px solid var(--kt-line);background:var(--kt-surface)}
+.pt-hours b{font-size:var(--fs-body2)}
+.pt-level{font-size:var(--fs-body2);font-weight:800}
+.pt-meta{font-size:var(--fs-meta);color:var(--kt-ink2);font-variant-numeric:tabular-nums}
+.pt-hours li.is-good{border-color:var(--kt-ok-ink);background:var(--kt-ok-bg)}
+.pt-hours li.is-good .pt-level{color:var(--kt-ok-ink)}
+.pt-hours li.is-care{border-color:var(--kt-warn-line);background:var(--kt-warn-bg)}
+.pt-hours li.is-care .pt-level{color:var(--kt-warn-ink)}
+.pt-hours li.is-avoid{border-color:var(--kt-limit-mark);background:var(--kt-limit-bg);border-style:dashed}
+.pt-hours li.is-avoid .pt-level{color:var(--kt-limit-ink)}
+.pt-tips{margin:16px 0 0;padding-left:20px;display:flex;flex-direction:column;gap:6px;font-size:var(--fs-body);line-height:1.55}
+.pt-goal{display:flex;flex-direction:column;gap:10px;padding:18px 20px;border-radius:14px;border:1px solid var(--kt-line-soft);background:var(--kt-surface)}
+.pt-goal-num{display:flex;align-items:baseline;gap:10px}
+.pt-goal-num strong{font-size:var(--fs-data);font-weight:800;line-height:1;font-variant-numeric:tabular-nums}
+.pt-goal-num span{font-size:var(--fs-body);color:var(--kt-ink2)}
+.pt-goal-bar{height:12px}
+.pt-goal-left{margin:0;font-size:var(--fs-body);font-weight:700}
+.pt .vx-row{text-decoration:none;color:inherit}
+.pt-habit-val{font-size:var(--fs-h3);font-variant-numeric:tabular-nums}
+@media (max-width:640px){.pt-hours{grid-template-columns:repeat(2,minmax(0,1fr))}}

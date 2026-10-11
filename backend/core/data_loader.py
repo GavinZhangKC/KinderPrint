@@ -8,6 +8,7 @@ from pathlib import Path
 from typing import Any
 
 from core.responses import limitation
+from core.sources import read_json, source_exists
 
 BOUNDARY_DATA_PATH_ENV = "KINDERPRINT_BOUNDARY_DATA_PATH"
 PROFILE_DATA_PATH_ENV = "KINDERPRINT_PROFILE_DATA_PATH"
@@ -192,12 +193,12 @@ def load_json_source(path: Path | None, env_name: str, resource_name: str) -> tu
             f"{resource_name}_dataset_not_configured",
             f"No {resource_name} dataset is configured. Set {env_name} to an approved JSON file.",
             resource_name)]
-    if not path.is_file():
+    if not source_exists(path, env_name):
         return None, [limitation(
             f"{resource_name}_dataset_unavailable",
             f"The configured {resource_name} dataset could not be found.", resource_name)]
     try:
-        source = json.loads(path.read_text(encoding="utf-8"))
+        source = read_json(path, env_name)
     except (OSError, json.JSONDecodeError):
         return None, [limitation(
             f"{resource_name}_dataset_unreadable",
@@ -221,6 +222,9 @@ CARE_CONTEXT_ENV = {
     "child_nutrient_foods": "KINDERPRINT_CHILD_NUTRIENT_FOODS_DATA_PATH",
     "child_nutrient_targets": "KINDERPRINT_CHILD_NUTRIENT_TARGETS_DATA_PATH",
     "practitioner_context": "KINDERPRINT_PRACTITIONER_CONTEXT_DATA_PATH",
+    "play_spaces": "KINDERPRINT_PLAY_SPACES_DATA_PATH",
+    "play_access": "KINDERPRINT_PLAY_ACCESS_DATA_PATH",
+    "future_demand": "KINDERPRINT_FUTURE_DEMAND_DATA_PATH",
 }
 
 

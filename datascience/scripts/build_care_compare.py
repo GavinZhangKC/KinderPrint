@@ -74,12 +74,13 @@ def build(hospitals: pd.DataFrame, clinics: pd.DataFrame, points: pd.DataFrame, 
                                            ("urgent_care_clinic", clinics, "facility_id", MAX_UCC)):
             d = distances_km(sa2.label_point_latitude, sa2.label_point_longitude,
                              frame.latitude.to_numpy(float), frame.longitude.to_numpy(float))
-            for index in np.argsort(d)[:limit]:
+            # Ties in distance are broken by facility id so the output does not depend on input row order.
+            for index in np.lexsort((frame[id_col].astype(str).to_numpy(), np.round(d, 6)))[:limit]:
                 if d[index] > RADIUS_KM:
                     break
                 rows.append({"sa2_code": sa2.sa2_code_2021, "sa2_name": sa2.sa2_name_2021, "kind": kind,
                              "facility_id": frame.loc[index, id_col], "distance_km": round(float(d[index]), 1)})
-    return pd.DataFrame(rows).sort_values(["sa2_code", "kind", "distance_km"]).reset_index(drop=True)
+    return pd.DataFrame(rows).sort_values(["sa2_code", "kind", "distance_km", "facility_id"]).reset_index(drop=True)
 
 
 def clinics_table(clinics: pd.DataFrame) -> pd.DataFrame:

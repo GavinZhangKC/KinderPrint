@@ -670,6 +670,18 @@ async function request<T>(
   >
 }
 
+/** Like request(), but a 4xx that carries an envelope (e.g. an unknown area) is returned, not thrown,
+ *  so the page can show the server's plain-language reason. */
+async function requestEnvelope<T>(path: string, signal?: AbortSignal): Promise<ApiEnvelope<T>> {
+  const response = await fetch(`${API_BASE}${path}`, { method: 'GET', signal, headers: { Accept: 'application/json' } })
+  if (response.ok) return response.json() as Promise<ApiEnvelope<T>>
+  if (response.status >= 400 && response.status < 500) {
+    const body = await response.json().catch(() => null) as ApiEnvelope<T> | null
+    if (body && typeof body === 'object' && 'status' in body && Array.isArray(body.limitations)) return body
+  }
+  throw new Error(`Request failed with status ${response.status}`)
+}
+
 // The map and Insight share this small collection, including in-flight requests.
 let indicatorsCache: Promise<ApiEnvelope<NeighbourhoodIndicatorsCollection>> | null = null
 let indicatorsCachedAt = 0
@@ -685,6 +697,154 @@ function getNeighbourhoodIndicators(refresh = false) {
     }).catch(error => { indicatorsCache = null; throw error })
     .finally(() => clearTimeout(timeout))
   return indicatorsCache
+}
+
+
+export type FamilyFitLevel = 'prefer' | 'essential'
+export interface FamilyFitNeed {
+  id: string
+  label: string
+  measures: Array<{ id: string; direction: 1 | -1 }>
+  explains: string
+  does_not_confirm: string
+}
+export interface FamilyFitPlace { id: string; name: string; sa3: string }
+export interface FamilyFitValidation {
+  old_engine_largest_two_measures_share: number
+  new_engine_measure_share_range: [number, number]
+  adjustment_error_reduction_range: [number, number]
+  adjustment_small_area_error_reduction_range: [number, number]
+  gp_border_credit: [number, number]
+  forecast_model: string
+  forecast_skill_vs_persistence: number
+  forecast_holdout_mae_pp: number
+  forecast_holdout_spearman: number
+  forecast_holdout_coverage_80: number
+  areas_scored_on_every_need: number
+  areas: number
+}
+export interface FamilyFitSetup {
+  needs: FamilyFitNeed[]
+  places: FamilyFitPlace[]
+  essential_percentile: number
+  weights: Record<FamilyFitLevel, number>
+  model_version: string
+  built_utc: string
+  radii_km: number[]
+  validation: FamilyFitValidation
+}
+export interface FamilyFitOutlook { pct: number; lower80: number; upper80: number }
+export interface FamilyFitResult {
+  rank: number
+  id: string
+  name: string
+  sa3: string
+  latitude: number
+  longitude: number
+  distance_km: number
+  match: number
+  reasons: Array<{ need: string; label: string; percentile: number; phrase: string }>
+  limitation:
+    | { type: 'weaker_priority'; need: string; label: string; percentile: number; phrase: string }
+    | { type: 'does_not_confirm'; need: string; label: string; text: string }
+  stability: { share: number; label: 'stable' | 'fairly_stable' | 'could_change' } | null
+  school_entry_change: { pp: number | null; flag: 'up' | 'down' | 'no_clear_change' | 'not_available' }
+  outlook_2027: FamilyFitOutlook | null
+}
+export type FamilyFitMapStatus = 'top' | 'match' | 'filtered_out' | 'no_data' | 'outside'
+export interface FamilyFitSearch {
+  anchor: { id: string; name: string; latitude: number; longitude: number }
+  radius_km: number
+  priorities: Record<string, FamilyFitLevel>
+  counts: { within_distance: number; matching: number; below_essential: number; data_unavailable: number }
+  results: FamilyFitResult[]
+  more_available: number
+  map: Array<{ id: string; status: FamilyFitMapStatus }>
+  suggestions: Array<{ type: 'make_preferred'; need: string; label: string; results: number } | { type: 'widen_distance'; radius_km: number; results: number }>
+  confidence: { draws: number; measures_varied: string[] }
+}
+export interface FamilyFitAreaDetail {
+  id: string
+  name: string
+  sa3: string
+  sa4: string
+  latitude: number
+  longitude: number
+  needs: Array<Omit<FamilyFitNeed, 'measures'> & { percentile: number | null; phrase: string | null; measures: Array<{ id: string; direction: 1 | -1; value: number | null; percentile: number | null }> }>
+  children_assessed_2024: number | null
+  school_entry_change: { pp: number | null; flag: 'up' | 'down' | 'no_clear_change' | 'not_available'; years: string; measure: string }
+  outlook_2027: FamilyFitOutlook | null
+}
+
+// ------------------------------------------------------------------ Your area in 2031
+export interface FutureYear {
+  sa2_code: string; sa2_name: string; projection_year: number
+  children_0_4: number | null; children_5_9: number | null; children_10_14: number | null; children_0_14: number | null
+  population_all_ages: number | null
+  ecec_places_per_100_0_4: number | null; gp_practices_per_10000: number | null
+  primary_campuses: number | null; primary_campuses_per_1000_5_9: number | null
+  children_0_4_change_from_2026_pct: number | null; ecec_places_to_keep_2026_access: number | null
+  ecec_access_percentile: number | null
+}
+export type FutureOverviewRow = Pick<FutureYear, 'sa2_code' | 'sa2_name' | 'projection_year' | 'children_0_4' | 'children_0_14'
+  | 'children_0_4_change_from_2026_pct' | 'ecec_places_per_100_0_4' | 'ecec_places_to_keep_2026_access'>
+
+// ------------------------------------------------------------------ Play today
+export type PlayKind = 'Playground' | 'Swimming pool' | 'Picnic area' | 'Day visitor area'
+export interface PlaySpace {
+  sa2_code: string; kind: PlayKind; rank: number; feature_id: string; name: string | null; park: string | null
+  latitude: number; longitude: number; distance_km: number; direction: string
+}
+export interface PlayAccess { sa2_code: string; kind: PlayKind; within_1km: number; within_2km: number; nearest_km: number | null }
+export interface PlaySpaces {
+  sa2_code: string
+  origin: { latitude: number; longitude: number } | null
+  places: PlaySpace[] | null
+  access: PlayAccess[] | null
+}
+
+// ------------------------------------------------------------------ Plan a change
+export type PlanLeverId = 'tree_cover' | 'urban_heat' | 'open_space' | 'road_traffic'
+export type PlanOutcomeId = 'all_five' | 'physical'
+export interface PlanLever { id: PlanLeverId; label: string; unit: string; better: 'higher' | 'lower'; melbourne_range: [number, number] }
+export interface PlanPreset { id: string; label: string; plan: Partial<Record<PlanLeverId, number>> }
+export interface PlanSetup {
+  levers: PlanLever[]
+  presets: PlanPreset[]
+  outcomes: Record<PlanOutcomeId, string>
+  max_levers: number
+  caveat: string
+  sources: Record<string, string>
+  model: string
+  built_utc: string
+}
+export interface PlanAreaDetail {
+  id: string
+  name: string
+  sa4: string
+  place_features: Record<PlanLeverId, { value: number; melbourne_percentile: number } | null>
+  outcomes_2024: Record<PlanOutcomeId, number | null>
+  outlook_2027: { all_five_pct: number; lower_80: number; upper_80: number } | null
+  children_assessed_2024: number | null
+}
+export interface PlanOutcomeResult {
+  like_plan_pct: number
+  like_now_pct: number
+  difference_pp: number
+  interval_80_pp: [number, number]
+  direction: 'higher' | 'lower' | 'unclear'
+}
+export interface PlanResult {
+  area: { id: string; name: string }
+  plan: Partial<Record<PlanLeverId, number>>
+  status: 'ok' | 'too_few_similar' | 'beyond_observed' | 'no_data'
+  targets?: Partial<Record<PlanLeverId, number>>
+  like_plan?: Array<{ id: string; name: string }>
+  like_now?: Array<{ id: string; name: string }>
+  outcomes?: Record<PlanOutcomeId, PlanOutcomeResult>
+  balance_smd?: Record<string, number>
+  balanced?: boolean
+  levers?: PlanLeverId[]
 }
 
 export const api = {
@@ -814,6 +974,28 @@ export const api = {
     request<SeasonalAir>(
       `/api/digital-health/seasonal-air?sa2_code=${encodeURIComponent(sa2Code)}`, signal,
     ),
+
+  getFutureArea: (sa2Code: string, signal?: AbortSignal) =>
+    requestEnvelope<{ sa2_code: string; sa2_name?: string; years: FutureYear[] }>(`/api/future/area?sa2_code=${encodeURIComponent(sa2Code)}`, signal),
+  getFutureOverview: (signal?: AbortSignal) => request<{ rows: FutureOverviewRow[] }>('/api/future/overview', signal),
+  getPlaySpaces: (sa2Code: string, signal?: AbortSignal) =>
+    request<PlaySpaces>(`/api/digital-health/play-spaces?sa2_code=${encodeURIComponent(sa2Code)}`, signal),
+  getPlanSetup: (signal?: AbortSignal) => request<PlanSetup>('/api/plan-change/setup', signal),
+  getPlanArea: (id: string, signal?: AbortSignal) =>
+    requestEnvelope<PlanAreaDetail>(`/api/plan-change/areas/${encodeURIComponent(id)}`, signal),
+  evaluatePlan: (area: string, plan: Partial<Record<PlanLeverId, number>>, signal?: AbortSignal) =>
+    requestEnvelope<PlanResult | null>(`/api/plan-change/evaluate?area=${encodeURIComponent(area)}${Object.entries(plan)
+      .map(([lever, value]) => `&${lever}=${encodeURIComponent(String(value))}`).join('')}`, signal),
+  getFamilyFitSetup: (signal?: AbortSignal) => request<FamilyFitSetup>('/api/family-fit/setup', signal),
+  getFamilyFitShapes: (signal?: AbortSignal) =>
+    request<{ areas: Record<string, Array<Array<[number, number]>>> }>('/api/family-fit/shapes', signal),
+  searchFamilyFit: (anchor: string, radiusKm: number, priorities: Record<string, FamilyFitLevel>, limit = 30, signal?: AbortSignal) =>
+    requestEnvelope<FamilyFitSearch>(
+      `/api/family-fit/search?anchor=${encodeURIComponent(anchor)}&radius_km=${radiusKm}&limit=${limit}&priorities=${encodeURIComponent(Object.entries(priorities).map(([k, v]) => `${k}:${v}`).join(','))}`,
+      signal,
+    ),
+  getFamilyFitArea: (id: string, signal?: AbortSignal) =>
+    requestEnvelope<FamilyFitAreaDetail>(`/api/family-fit/areas/${encodeURIComponent(id)}`, signal),
 
   getVaccinationPlaces: (sa2Code: string, signal?: AbortSignal) =>
     request<VaccinationPlaces>(

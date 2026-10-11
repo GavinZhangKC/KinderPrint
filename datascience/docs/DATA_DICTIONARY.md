@@ -108,3 +108,43 @@ See `docs/LICENCE_COMPLIANCE.md` for every source. Two licences carry obligation
 |---|---|---|
 | `phidu_child_health_pha.csv`, `phidu_environment_pha.csv`, `phidu_pha_sa2_bridge.csv`, `child_youth_health_context_pha.csv` | CC BY-NC-SA 3.0 AU (non-commercial, share-alike) | Derived from the PHIDU atlas |
 | `food_outlets_sa2.csv`, `food_access_sa2.csv`, `data/reference/iteration3/osm_food_outlets_melbourne.csv` | ODbL 1.0, "© OpenStreetMap contributors" | Derived databases of OpenStreetMap data |
+
+## Table: family_fit_community (Where to live)
+
+`data/processed/family_fit_community.csv`, built by `scripts/build_family_fit.py`. One row per reporting area (346). Model card: `MODEL_CARD_FAMILY_FIT.md`.
+
+| Column(s) | Type | Meaning |
+|---|---|---|
+| `community_id`, `neighbourhood_id`, `community_name`, `sa3_name`, `sa4_name`, `n_component_sa2` | text / int | Area identity (the `neighbourhood_id` is the lead SA2 code used by the API) |
+| `latitude`, `longitude` | float | Label point used for straight-line distance |
+| `aedc_<domain>_on_track_k` / `_n` | float | Children on track / children with valid scores, AEDC 2024 (`<domain>` = all_five, language, social, emotional, physical) |
+| `aedc_<domain>_on_track_alpha` / `_beta` | float | Posterior beta parameters after the empirical-Bayes prior for the SA4 |
+| `aedc_<domain>_on_track_pct` | float, % | Adjusted (posterior mean) share on track: the value used for scoring |
+| `aedc_<domain>_on_track_raw_pct` | float, % | Published share, for reference |
+| `all_five_change_2015_2024_pp` | float, pp | Change in the published (raw) all-five share, 2015 to 2024 |
+| `all_five_change_flag` | up / down / no_clear_change / not_available | `up` or `down` only when a two-proportion z-test is significant at the 5% level (|z| ≥ 1.96) |
+| `tree_cover_pct`, `urban_heat_degc`, `open_space_pct` | float | Cooling and Greening Melbourne 2018; VPA open space |
+| `road_traffic_intensity` | float | Vehicle-km a day per km² on main roads (DTP AADT 2019) |
+| `industrial_sites_count` | int | NPI facilities reporting air emissions, 2024–25 |
+| `transport_stops_per_10000` | float | PTV stops per 10,000 residents (2026) |
+| `primary_schools_per_1000_age5_9`, `kindergartens_per_1000_under5` | float | Campuses / services per 1,000 children of the age group |
+| `gp_access_5km`, `childcare_places_access_5km` | float | E2SFCA access (GP practices per 10,000 people; approved places per 100 children under 5), Gaussian 5 km catchment |
+| `nearest_gp_km` | float, km | Straight-line distance to the nearest general practice |
+| `all_five_forecast_2027_pct`, `_lower80`, `_upper80` | float, % | F3 forecast and 80% interval for the 2027 AEDC |
+| `source_id` | text | Source register ids, semicolon separated |
+
+Need scores (0–100 percentiles, rounded to 4 decimals) are written to the served artefact `outputs/iteration_3/family_fit.json`, not to this table.
+
+## Table: school_entry_forecast_community
+
+`data/processed/school_entry_forecast_community.csv`, built by `scripts/model_school_entry_forecast.py` (342 areas with AEDC history).
+
+| Column | Type | Meaning |
+|---|---|---|
+| `community_id`, `neighbourhood_id`, `community_name` | text | Area identity |
+| `observed_2024_pct` | float, % | Published all-five share, 2024 |
+| `children_assessed_2024` | int | Children with valid AEDC scores, 2024 |
+| `forecast_year` | int | 2027 |
+| `forecast_pct`, `lower_80_pct`, `upper_80_pct` | float, % | Selected model's forecast and 80% interval (includes the cycle-shock variance) |
+| `model` | text | Selected candidate (F3) |
+| `source_id` | text | `aedc_sa2_2009_2024;seifa_2021_sa2` |

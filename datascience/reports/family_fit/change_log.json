@@ -1,0 +1,41 @@
+{
+  "summary": "0 input file(s) changed; 0 area(s) added, 0 removed; 0 need score(s) moved by more than 10 points.",
+  "previous_built_utc": "2026-10-09T050659Z",
+  "changed_inputs": [],
+  "added": [],
+  "removed": [],
+  "need_score_movement": {
+    "early_development": {
+      "areas_moved_over_10_points": 0,
+      "max_change": 0.0
+    },
+    "social_emotional": {
+      "areas_moved_over_10_points": 0,
+      "max_change": 0.0
+    },
+    "physical_outdoor": {
+      "areas_moved_over_10_points": 0,
+      "max_change": 0.0
+    },
+    "shade_cooler": {
+      "areas_moved_over_10_points": 0,
+      "max_change": 0.0
+    },
+    "fewer_pollution_sources": {
+      "areas_moved_over_10_points": 0,
+      "max_change": 0.0
+    },
+    "gp_access": {
+      "areas_moved_over_10_points": 0,
+      "max_change": 0.0
+    },
+    "childcare_kinder": {
+      "areas_moved_over_10_points": 0,
+      "max_change": 0.0
+    },
+    "school_transport": {
+      "areas_moved_over_10_points": 0,
+      "max_change": 0.0
+    }
+  }
+}

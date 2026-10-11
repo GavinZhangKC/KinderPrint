@@ -4,16 +4,17 @@ import logo from '../assets/LogoMark.png'
 import ThemeSwitcher from './ThemeSwitcher'
 
 interface BrandHeaderProps {
-  activePage: 'home' | 'insight' | 'map' | 'simulation' | 'health'
+  activePage: 'home' | 'insight' | 'map' | 'simulation' | 'health' | 'where'
   onHome: () => void
   onInsight: () => void
   onMap: () => void
   onSimulation: () => void
   onHealth: () => void
+  onWhere?: () => void
   leadingAction?: ReactNode
 }
 
-export default function BrandHeader({ activePage, onHome, onInsight, onMap, onSimulation, onHealth, leadingAction }: BrandHeaderProps) {
+export default function BrandHeader({ activePage, onHome, onInsight, onMap, onSimulation, onHealth, onWhere, leadingAction }: BrandHeaderProps) {
   return (
     <header className="glass nav-shell">
       <div className="brand-cluster">
@@ -30,6 +31,7 @@ export default function BrandHeader({ activePage, onHome, onInsight, onMap, onSi
         <button className={activePage === 'map' ? 'active' : undefined} aria-current={activePage === 'map' ? 'page' : undefined} type="button" onClick={onMap}>Map</button>
         <button className={activePage === 'simulation' ? 'active' : undefined} aria-current={activePage === 'simulation' ? 'page' : undefined} type="button" onClick={onSimulation}>Simulation</button>
         <button className={activePage === 'health' ? 'active' : undefined} aria-current={activePage === 'health' ? 'page' : undefined} type="button" onClick={onHealth}>Child Health</button>
+        <button className={activePage === 'where' ? 'active' : undefined} aria-current={activePage === 'where' ? 'page' : undefined} type="button" onClick={onWhere ?? (() => window.location.assign('/where-to-live'))}>Where to live</button>
       </nav>
     </header>
   )

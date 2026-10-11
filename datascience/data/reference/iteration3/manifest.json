@@ -32,7 +32,7 @@
       "source_id": "fsanz_afcd_release_3",
       "source_url": "https://www.foodstandards.gov.au/science-data/food-nutrient-databases/afcd/data-files",
       "status": "offline-verified",
-      "verified_utc": "2026-09-29T151127Z"
+      "verified_utc": "2026-10-09T051251Z"
     },
     "aihw_mbs_local_areas_vic_2024_25.csv": {
       "acquired_utc": "2026-09-29T000000Z",
@@ -52,7 +52,7 @@
       "source_id": "aihw_phc_019_mbs_local_areas_2024_25",
       "source_url": "https://www.aihw.gov.au/reports/primary-health-care/medicare-subsidised-gp-allied-health-specialist/data",
       "status": "offline-verified",
-      "verified_utc": "2026-09-29T151127Z"
+      "verified_utc": "2026-10-09T051251Z"
     },
     "myhospitals_reported_measures.csv": {
       "acquired_utc": "2026-09-29T000000Z",
@@ -69,7 +69,7 @@
       "source_id": "aihw_myhospitals_api_2026",
       "source_url": "https://myhospitalsapi.aihw.gov.au/api/v1/",
       "status": "offline-verified",
-      "verified_utc": "2026-09-29T151127Z"
+      "verified_utc": "2026-10-09T051251Z"
     },
     "myhospitals_vic_data_items.csv": {
       "acquired_utc": "2026-09-29T000000Z",
@@ -88,7 +88,7 @@
       "source_id": "aihw_myhospitals_api_2026",
       "source_url": "https://myhospitalsapi.aihw.gov.au/api/v1/",
       "status": "offline-verified",
-      "verified_utc": "2026-09-29T151127Z"
+      "verified_utc": "2026-10-09T051251Z"
     },
     "myhospitals_vic_hospitals.csv": {
       "acquired_utc": "2026-09-29T000000Z",
@@ -108,7 +108,7 @@
       "source_id": "aihw_myhospitals_api_2026",
       "source_url": "https://myhospitalsapi.aihw.gov.au/api/v1/",
       "status": "offline-verified",
-      "verified_utc": "2026-09-29T151127Z"
+      "verified_utc": "2026-10-09T051251Z"
     },
     "nndss_influenza_vic_monthly.csv": {
       "acquired_utc": "2026-09-29T000000Z",
@@ -123,7 +123,7 @@
       "source_id": "nndss_public_datasets_2025",
       "source_url": "https://www.cdc.gov.au/resources/collections/nndss-public-datasets",
       "status": "offline-verified",
-      "verified_utc": "2026-09-29T151127Z"
+      "verified_utc": "2026-10-09T051251Z"
     },
     "nndss_salmonella_vic_monthly.csv": {
       "acquired_utc": "2026-09-29T000000Z",
@@ -138,7 +138,7 @@
       "source_id": "nndss_public_datasets_2025",
       "source_url": "https://www.cdc.gov.au/resources/collections/nndss-public-datasets",
       "status": "offline-verified",
-      "verified_utc": "2026-09-29T151127Z"
+      "verified_utc": "2026-10-09T051251Z"
     },
     "osm_food_outlets_melbourne.csv": {
       "acquired_utc": "2026-09-29T000000Z",
@@ -160,7 +160,7 @@
       "source_id": "osm_overpass_food_outlets_2026",
       "source_url": "https://overpass-api.de/api/interpreter",
       "status": "offline-verified",
-      "verified_utc": "2026-09-29T151127Z"
+      "verified_utc": "2026-10-09T051251Z"
     },
     "urgent_care_clinics_vic.csv": {
       "acquired_utc": "2026-09-29T000000Z",
@@ -179,7 +179,7 @@
       "source_id": "betterhealth_urgent_care_clinics_2026",
       "source_url": "https://www.betterhealth.vic.gov.au/map-data?pid=29639",
       "status": "offline-verified",
-      "verified_utc": "2026-09-29T151127Z"
+      "verified_utc": "2026-10-09T051251Z"
     }
   },
   "pipeline": "acquire_iteration3.py",
@@ -199,6 +199,18 @@
     {
       "mode": "offline",
       "run_utc": "2026-09-29T151127Z",
+      "status": {
+        "aihw_myhospitals_api_2026": "ok",
+        "aihw_phc_019_mbs_local_areas_2024_25": "ok",
+        "betterhealth_urgent_care_clinics_2026": "ok",
+        "fsanz_afcd_release_3": "ok",
+        "nndss_public_datasets_2025": "ok",
+        "osm_overpass_food_outlets_2026": "ok"
+      }
+    },
+    {
+      "mode": "offline",
+      "run_utc": "2026-10-09T051251Z",
       "status": {
         "aihw_myhospitals_api_2026": "ok",
         "aihw_phc_019_mbs_local_areas_2024_25": "ok",

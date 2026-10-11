@@ -46,7 +46,7 @@
 
   flex-shrink: 0;
 }
-.nav-links { display: flex; align-items: center; gap: clamp(14px, 2.5vw, 36px); color: #60769b; font-size: 14px; font-weight: 600; }
+.nav-links { display: flex; align-items: center; min-width: 0; gap: clamp(14px, 2.5vw, 36px); color: #60769b; font-size: 14px; font-weight: 600; }
 .nav-links button, .nav-links a { border: 0; background: transparent; color: inherit; cursor: pointer; padding: 10px 3px; position: relative; white-space: nowrap; transition: color .2s ease; }
 .nav-links button:hover, .nav-links a:hover { color: var(--brand); }
 .nav-links .active { color: var(--brand); }
@@ -63,6 +63,14 @@
   transform: none;
   padding: 0 30px 0 20px;
   border-radius: 24px;
+}
+
+/* Six destinations: keep the brand and the links from colliding on narrower screens. */
+.brand-cluster { flex-shrink: 0; }
+@media (max-width: 1040px) {
+  .brand-button span { display: none; }
+  .nav-links { overflow-x: auto; scrollbar-width: none; gap: clamp(10px, 2vw, 22px); }
+  .nav-links::-webkit-scrollbar { display: none; }
 }
 
 @media (max-width: 680px) {

@@ -185,6 +185,7 @@ export function TodayParent({ locality, age, controls, onCheckDay, onGo, onPrepa
       {controls}
       <p>Everything below follows the age you choose.</p>
       {onOpenMap && <button type="button" className="kh-btn kt-link-btn" onClick={onOpenMap}>View {locality.name} on the map</button>}
+      <a className="kh-btn kt-link-btn" href={`/where-to-live?anchor=${encodeURIComponent(locality.id)}`}>Thinking of moving? Compare areas</a>
     </div>
 
     <div className="kt-row">

@@ -64,7 +64,11 @@ BUILDERS = [  # (script, output files) in dependency order
     ("build_food_environment.py", ["food_outlets_sa2.csv", "food_access_sa2.csv"]),
     ("build_care_compare.py", ["care_compare_sa2.csv", "urgent_care_clinics_vic.csv"]),
     ("build_access_e2sfca.py", ["access_e2sfca_sa2.csv"]),
+    ("model_school_entry_forecast.py", ["school_entry_forecast_community.csv"]),
+    ("build_family_fit.py", ["family_fit_community.csv"]),
 ]
+SERVED_ARTEFACTS = [ROOT / "outputs" / "iteration_3" / "family_fit.json",  # read by the backend
+                    ROOT / "outputs" / "iteration_3" / "family_fit_shapes.json"]
 DISPLAY_COLUMNS = {
     "hospital_capability_vic.csv": ["hospital_name", "latitude", "longitude", "specialised_units"],
     "primary_care_cost_sa3.csv": ["patients", "services", "provider_fees", "benefits_paid",
@@ -75,6 +79,12 @@ DISPLAY_COLUMNS = {
     "nearby_health_services_sa2.csv": ["nearest_name", "nearest_distance_km"],
     "vaccination_places_sa2.csv": ["name", "distance_km"],
     "council_immunisation_sa2.csv": ["council_name", "immunisation_url"],
+    "school_entry_forecast_community.csv": ["forecast_pct", "lower_80_pct", "upper_80_pct"],
+    "family_fit_community.csv": ["latitude", "longitude", "aedc_all_five_on_track_pct", "tree_cover_pct",
+                                 "urban_heat_degc", "open_space_pct", "road_traffic_intensity", "industrial_sites_count",
+                                 "gp_access_5km", "nearest_gp_km", "childcare_places_access_5km",
+                                 "kindergartens_per_1000_under5", "primary_schools_per_1000_age5_9",
+                                 "transport_stops_per_10000"],
 }
 
 

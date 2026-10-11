@@ -39,6 +39,7 @@ from core.data_loader import (  # noqa: E402
     HEALTH_FACILITY_DATA_PATH_ENV,
 )
 from core.data_loader import CARE_CONTEXT_ENV  # noqa: E402
+from core.sources import DATA_BACKEND_ENV  # noqa: E402
 from loaders.care_context import _read as load_care_context_csv  # noqa: E402
 from main import app  # noqa: E402
 from loaders.digital_health import _read as load_digital_health_csv  # noqa: E402
@@ -53,6 +54,8 @@ from validation import (  # noqa: E402
 
 @pytest.fixture(autouse=True)
 def clear_dataset_environment(monkeypatch: pytest.MonkeyPatch) -> None:
+    # File-based tests always run in files mode; test_db_backend.py opts in to postgres.
+    monkeypatch.delenv(DATA_BACKEND_ENV, raising=False)
     load_digital_health_csv.cache_clear()
     load_care_context_csv.cache_clear()
     for variable in CARE_CONTEXT_ENV.values():

@@ -36,7 +36,7 @@ zinc,Zinc,mg,2,F005978,"Mutton, boneless dice or strips, shoulder, lean, cassero
 zinc,Zinc,mg,3,F000738,"Beef, rump steak, lean, grilled, no added fat","Lean meat, fish, eggs, nuts and legumes",8.2,fsanz_afcd_release_3
 zinc,Zinc,mg,4,F004239,"Goat, meat, all cuts, lean, casseroled, no added fat","Lean meat, fish, eggs, nuts and legumes",7.84,fsanz_afcd_release_3
 zinc,Zinc,mg,5,F009466,"Venison, mince, premium, baked, roasted, fried, stir-fried, grilled or BBQ'd, no added fat","Lean meat, fish, eggs, nuts and legumes",7.81,fsanz_afcd_release_3
-zinc,Zinc,mg,6,F001807,"Breakfast cereal, puffed or popped rice, cocoa coating, added vitamins & minerals (Kellogg's Coco Pops)",Grains and cereals,7.8,fsanz_afcd_release_3
+zinc,Zinc,mg,6,F001803,"Breakfast cereal, puffed or popped rice, added vitamins & minerals (Kellogg's Rice Bubbles)",Grains and cereals,7.8,fsanz_afcd_release_3
 zinc,Zinc,mg,7,F009380,"Veal, diced, lean, stir-fried, no added fat ","Lean meat, fish, eggs, nuts and legumes",7.0,fsanz_afcd_release_3
 zinc,Zinc,mg,8,F004792,"Kangaroo, tail, cooked, no added fat","Lean meat, fish, eggs, nuts and legumes",6.83,fsanz_afcd_release_3
 iodine,Iodine,ug,1,F005968,"Mussel, blue, steamed","Lean meat, fish, eggs, nuts and legumes",267.8,fsanz_afcd_release_3
@@ -51,7 +51,7 @@ vitamin_d,Vitamin D,ug,1,F005948,"Mushroom, common, vitamin D enhanced, fresh, f
 vitamin_d,Vitamin D,ug,2,F007853,"Salmon, pink, canned in brine, drained","Lean meat, fish, eggs, nuts and legumes",20.62,fsanz_afcd_release_3
 vitamin_d,Vitamin D,ug,3,F001720,"Breakfast cereal, mixed grain (rice & wheat), flakes, added vitamins & minerals (Kellogg's Special K)",Grains and cereals,12.03,fsanz_afcd_release_3
 vitamin_d,Vitamin D,ug,4,F009270,"Trout, rainbow, aquacultured, baked, no added fat","Lean meat, fish, eggs, nuts and legumes",10.27,fsanz_afcd_release_3
-vitamin_d,Vitamin D,ug,5,F008258,"Silver perch, aquacultured, baked, no added fat","Lean meat, fish, eggs, nuts and legumes",6.81,fsanz_afcd_release_3
+vitamin_d,Vitamin D,ug,5,F004810,"Kingfish, yellowtail, aquacultured, fillet, with skin, grilled, no added fat","Lean meat, fish, eggs, nuts and legumes",6.81,fsanz_afcd_release_3
 vitamin_d,Vitamin D,ug,6,F005267,"Mackerel, grilled, no added fat","Lean meat, fish, eggs, nuts and legumes",6.81,fsanz_afcd_release_3
-vitamin_d,Vitamin D,ug,7,F004810,"Kingfish, yellowtail, aquacultured, fillet, with skin, grilled, no added fat","Lean meat, fish, eggs, nuts and legumes",6.81,fsanz_afcd_release_3
+vitamin_d,Vitamin D,ug,7,F008258,"Silver perch, aquacultured, baked, no added fat","Lean meat, fish, eggs, nuts and legumes",6.81,fsanz_afcd_release_3
 vitamin_d,Vitamin D,ug,8,F002568,"Chicken, barbecued, with skin","Lean meat, fish, eggs, nuts and legumes",6.37,fsanz_afcd_release_3

@@ -1,0 +1,449 @@
+{
+  "built_utc": "2026-10-09T051301Z",
+  "model_version": "S2.1",
+  "input_sha256": {
+    "communities.csv": "3e0018ad7a2dc35860b2f01ba6d4374c18d5964f8f519d1b0b08a034a04068c6",
+    "community_sa2.csv": "ad81696cb15de890128c2a024d3a09dd37a1649bc42ddbe67e84e0c02a14efde",
+    "child_development.csv": "83f02c8a1ae75d2692ea8db4ffecdc1f962db4b872ae5246c80a3dba728adfd8",
+    "environmental.csv": "99a68f731fb96395303ae912b10a334933a4ffd2af64ed541a151a463f07ddd9",
+    "transport_suitability.csv": "d26925ee3dc475b8150e74fb7aaab3659e9033f7f239ee7d0c5d4619cc55126b",
+    "npi_suitability.csv": "f99334f50354a1fb0f3a066c890e4d43b56cb01183d1babf9d32893d66745aff",
+    "school_child_population_suitability.csv": "8200db63271b55ca87f3643db80f7293114489c8bd9a6ac3a7d5327e7b7b4507",
+    "acecqa_suitability.csv": "b71903ce3f68834da4dc85f94448381609d4cc4889315a70bc9a1f148d708f21",
+    "access_e2sfca_sa2.csv": "724fa32aedeac96f63a750a11615f1968c49588c6714bd92f7689d43c135f5f8",
+    "school_entry_forecast_community.csv": "1468b0d73d25946f76f3d6d38ede60f3c1f1ae17b6e73b52234d3d98c3d37963"
+  },
+  "gates": [
+    {
+      "gate": "one row per reporting area",
+      "passed": true,
+      "value": 346
+    },
+    {
+      "gate": "every area has a location",
+      "passed": true,
+      "value": 1.0
+    },
+    {
+      "gate": "every need scored for >= 90% of areas",
+      "passed": true,
+      "value": {
+        "early_development": 0.9884,
+        "social_emotional": 0.9884,
+        "physical_outdoor": 0.9538,
+        "shade_cooler": 0.9653,
+        "fewer_pollution_sources": 0.9884,
+        "gp_access": 1.0,
+        "childcare_kinder": 0.9942,
+        "school_transport": 0.9884
+      }
+    },
+    {
+      "gate": "need scores within (0, 100]",
+      "passed": true,
+      "value": true
+    },
+    {
+      "gate": "adjustment parameters positive",
+      "passed": true,
+      "value": true
+    },
+    {
+      "gate": "AEDC shares within 0-100",
+      "passed": true,
+      "value": true
+    },
+    {
+      "gate": "count and rate measures non-negative",
+      "passed": true,
+      "value": true
+    },
+    {
+      "gate": "forecast inside its interval",
+      "passed": true,
+      "value": 342
+    },
+    {
+      "gate": "no measure dominates a two-need search (each 15-35%)",
+      "passed": true,
+      "value": [
+        0.2518,
+        0.2934,
+        0.2262,
+        0.2286
+      ]
+    }
+  ],
+  "coverage": {
+    "areas": 346,
+    "areas_scored_on_every_need": 330,
+    "by_need": {
+      "early_development": 342,
+      "social_emotional": 342,
+      "physical_outdoor": 330,
+      "shade_cooler": 334,
+      "fewer_pollution_sources": 342,
+      "gp_access": 346,
+      "childcare_kinder": 344,
+      "school_transport": 342
+    }
+  },
+  "scale_balance_S0_vs_S2": {
+    "search": "shade and cooler streets + healthcare",
+    "S0_variance_share": {
+      "lower_urban_heat": 0.0257,
+      "tree_canopy": 0.0323,
+      "general_practice_access": 0.4609,
+      "pharmacy_access": 0.4811
+    },
+    "S0_score_range": {
+      "lower_urban_heat": [
+        61.8,
+        98.81
+      ],
+      "tree_canopy": [
+        0.84,
+        47.51
+      ],
+      "general_practice_access": [
+        0.0,
+        100.0
+      ],
+      "pharmacy_access": [
+        0.0,
+        100.0
+      ]
+    },
+    "S2_variance_share": {
+      "urban_heat_degc": 0.2518,
+      "tree_cover_pct": 0.2934,
+      "gp_access_5km": 0.2262,
+      "nearest_gp_km": 0.2286
+    },
+    "areas_with_no_gp_inside_border": 20,
+    "of_which_have_gp_access_nearby": 16,
+    "median_nearest_gp_km_for_those": 2.08
+  },
+  "small_numbers_adjustment_backtest_2021_to_2024": {
+    "aedc_all_five_on_track_pct": {
+      "areas": 342,
+      "mae_raw_pp": 8.408,
+      "mae_adjusted_pp": 7.575,
+      "improvement": 0.0991,
+      "small_areas": 32,
+      "mae_raw_small_pp": 12.525,
+      "mae_adjusted_small_pp": 9.734
+    },
+    "aedc_language_on_track_pct": {
+      "areas": 342,
+      "mae_raw_pp": 5.061,
+      "mae_adjusted_pp": 4.662,
+      "improvement": 0.0788,
+      "small_areas": 32,
+      "mae_raw_small_pp": 8.411,
+      "mae_adjusted_small_pp": 6.702
+    },
+    "aedc_social_on_track_pct": {
+      "areas": 342,
+      "mae_raw_pp": 6.413,
+      "mae_adjusted_pp": 5.785,
+      "improvement": 0.0978,
+      "small_areas": 32,
+      "mae_raw_small_pp": 9.751,
+      "mae_adjusted_small_pp": 8.255
+    },
+    "aedc_emotional_on_track_pct": {
+      "areas": 342,
+      "mae_raw_pp": 6.392,
+      "mae_adjusted_pp": 5.798,
+      "improvement": 0.093,
+      "small_areas": 32,
+      "mae_raw_small_pp": 10.459,
+      "mae_adjusted_small_pp": 8.142
+    },
+    "aedc_physical_on_track_pct": {
+      "areas": 342,
+      "mae_raw_pp": 6.849,
+      "mae_adjusted_pp": 6.178,
+      "improvement": 0.098,
+      "small_areas": 32,
+      "mae_raw_small_pp": 10.634,
+      "mae_adjusted_small_pp": 8.454
+    }
+  },
+  "fairness_audit": {
+    "spearman_with_irsd_two_need_searches": {
+      "median": 0.502,
+      "min": -0.031,
+      "max": 0.75
+    },
+    "spearman_with_irsd_by_need": {
+      "early_development": 0.738,
+      "social_emotional": 0.591,
+      "physical_outdoor": 0.366,
+      "shade_cooler": 0.577,
+      "fewer_pollution_sources": 0.13,
+      "gp_access": -0.116,
+      "childcare_kinder": 0.299,
+      "school_transport": 0.141
+    },
+    "note": "Higher IRSD means less disadvantage. IRSD is audited, never scored."
+  },
+  "sensitivity_top10_jaccard": {
+    "toddler near Box Hill": {
+      "essential_40": 1.0,
+      "essential_60": 0.818,
+      "weight_1.5": 0.818,
+      "weight_3": 0.667
+    },
+    "school starter near Footscray": {
+      "essential_40": 1.0,
+      "essential_60": 0.818,
+      "weight_1.5": 0.818,
+      "weight_3": 1.0
+    },
+    "pre-teen near Dandenong": {
+      "essential_40": 1.0,
+      "essential_60": 1.0,
+      "weight_1.5": 1.0,
+      "weight_3": 0.818
+    }
+  },
+  "reference_scenarios": [
+    {
+      "name": "toddler near Box Hill",
+      "anchor": "207031163",
+      "radius_km": 15,
+      "priorities": {
+        "childcare_kinder": "essential",
+        "gp_access": "essential",
+        "shade_cooler": "prefer",
+        "early_development": "prefer"
+      },
+      "eligible": 59,
+      "top10": [
+        {
+          "id": "209011197",
+          "match": 85.9203,
+          "distance_km": 14.337
+        },
+        {
+          "id": "206041125",
+          "match": 85.4638,
+          "distance_km": 12.778
+        },
+        {
+          "id": "207011147",
+          "match": 79.084,
+          "distance_km": 4.356
+        },
+        {
+          "id": "208041194",
+          "match": 78.382,
+          "distance_km": 7.623
+        },
+        {
+          "id": "206061135",
+          "match": 77.9632,
+          "distance_km": 9.733
+        },
+        {
+          "id": "207011152",
+          "match": 77.8624,
+          "distance_km": 6.589
+        },
+        {
+          "id": "209011200",
+          "match": 77.4558,
+          "distance_km": 9.668
+        },
+        {
+          "id": "207021425",
+          "match": 77.0799,
+          "distance_km": 5.107
+        },
+        {
+          "id": "206061515",
+          "match": 76.8316,
+          "distance_km": 11.289
+        },
+        {
+          "id": "207011155",
+          "match": 76.7747,
+          "distance_km": 3.633
+        }
+      ],
+      "stability": {
+        "eligible": 59,
+        "top10_share_in_top10": {
+          "209011197": 1.0,
+          "206041125": 1.0,
+          "207011147": 0.97,
+          "208041194": 0.987,
+          "206061135": 0.823,
+          "207011152": 0.87,
+          "209011200": 0.8,
+          "207021425": 0.723,
+          "206061515": 0.48,
+          "207011155": 0.697
+        }
+      }
+    },
+    {
+      "name": "school starter near Footscray",
+      "anchor": "213031348",
+      "radius_km": 10,
+      "priorities": {
+        "early_development": "essential",
+        "school_transport": "essential",
+        "physical_outdoor": "prefer"
+      },
+      "eligible": 28,
+      "top10": [
+        {
+          "id": "206041125",
+          "match": 89.1662,
+          "distance_km": 8.644
+        },
+        {
+          "id": "206011497",
+          "match": 80.5855,
+          "distance_km": 9.066
+        },
+        {
+          "id": "206071140",
+          "match": 78.437,
+          "distance_km": 6.56
+        },
+        {
+          "id": "206071143",
+          "match": 77.2651,
+          "distance_km": 8.124
+        },
+        {
+          "id": "206051128",
+          "match": 76.3714,
+          "distance_km": 7.538
+        },
+        {
+          "id": "206071139",
+          "match": 75.8235,
+          "distance_km": 9.137
+        },
+        {
+          "id": "206031116",
+          "match": 75.6229,
+          "distance_km": 4.463
+        },
+        {
+          "id": "206071517",
+          "match": 74.8371,
+          "distance_km": 9.817
+        },
+        {
+          "id": "206031502",
+          "match": 72.582,
+          "distance_km": 5.839
+        },
+        {
+          "id": "206021500",
+          "match": 72.14,
+          "distance_km": 8.915
+        }
+      ],
+      "stability": {
+        "eligible": 28,
+        "top10_share_in_top10": {
+          "206041125": 0.997,
+          "206011497": 0.937,
+          "206071140": 0.9,
+          "206071143": 0.91,
+          "206051128": 0.82,
+          "206071139": 0.75,
+          "206031116": 0.807,
+          "206071517": 0.84,
+          "206031502": 0.6,
+          "206021500": 0.497
+        }
+      }
+    },
+    {
+      "name": "pre-teen near Dandenong",
+      "anchor": "212041564",
+      "radius_km": 25,
+      "priorities": {
+        "social_emotional": "essential",
+        "physical_outdoor": "prefer",
+        "fewer_pollution_sources": "prefer"
+      },
+      "eligible": 62,
+      "top10": [
+        {
+          "id": "214021381",
+          "match": 83.3002,
+          "distance_km": 20.522
+        },
+        {
+          "id": "211011255",
+          "match": 80.324,
+          "distance_km": 13.976
+        },
+        {
+          "id": "214011373",
+          "match": 79.7859,
+          "distance_km": 17.452
+        },
+        {
+          "id": "208011172",
+          "match": 79.0387,
+          "distance_km": 18.917
+        },
+        {
+          "id": "207031166",
+          "match": 78.6095,
+          "distance_km": 19.913
+        },
+        {
+          "id": "211051284",
+          "match": 78.2889,
+          "distance_km": 17.913
+        },
+        {
+          "id": "211041273",
+          "match": 77.2846,
+          "distance_km": 19.241
+        },
+        {
+          "id": "207011146",
+          "match": 76.1165,
+          "distance_km": 20.763
+        },
+        {
+          "id": "208031189",
+          "match": 75.5957,
+          "distance_km": 8.246
+        },
+        {
+          "id": "208011168",
+          "match": 75.0938,
+          "distance_km": 14.993
+        }
+      ],
+      "stability": {
+        "eligible": 62,
+        "top10_share_in_top10": {
+          "214021381": 0.997,
+          "211011255": 0.833,
+          "214011373": 0.8,
+          "208011172": 0.893,
+          "207031166": 0.857,
+          "211051284": 0.67,
+          "211041273": 0.65,
+          "207011146": 0.51,
+          "208031189": 0.503,
+          "208011168": 0.5
+        }
+      }
+    }
+  ]
+}

@@ -14,6 +14,34 @@ Vite listens on all network interfaces. The frontend is available locally at
 `http://localhost:5173`, or from another device at
 `http://<this-computer-LAN-IP>:5173`.
 
+### Pages
+
+| Path | Page |
+|---|---|
+| `/` | Home |
+| `/insight-journey` | Insight Journey |
+| `/map` | Melbourne map. Selecting an area opens its Child Health board; `/map?area=<SA2 code>&name=<name>` highlights an area |
+| `/simulation` | Simulation |
+| `/child-health` | Child Health board, parent and practitioner views (`?area=<SA2 code>&name=<name>`; otherwise the last area chosen on this device, or an area chooser) |
+| `/where-to-live` | Where to live: compare areas for a family's priorities (`?focus=<home card key>`, `?anchor=<SA2 code>`) |
+
+## Where to live (Family Fit): handover
+
+* Rebuild the data: `python datascience/scripts/model_school_entry_forecast.py`,
+  then `python datascience/scripts/build_family_fit.py`. Both run inside
+  `datascience/scripts/refresh_iteration3.py`, which also gates on the tests and
+  the pipeline KPIs and restores the previous artefacts on failure.
+* Served files: `datascience/outputs/iteration_3/family_fit.json` and
+  `family_fit_shapes.json`. Set the backend variables
+  `KINDERPRINT_FAMILY_FIT_DATA_PATH` and
+  `KINDERPRINT_FAMILY_FIT_SHAPES_DATA_PATH`.
+* Docs: `datascience/docs/MODEL_CARD_FAMILY_FIT.md`,
+  `datascience/docs/decisions/ADR-009-family-fit-and-forecast.md`,
+  `datascience/docs/FAMILY_FIT_DEPLOYMENT_LOG.md`, and the Family Fit section of
+  `docs/api-contract.md`.
+* Tests: `datascience/tests/test_family_fit.py`,
+  `backend/tests/test_family_fit.py`.
+
 ## Backend
 
 ```bash
@@ -43,7 +71,8 @@ The backend listens on all network interfaces. It is available locally at
 
 ```text
 backend/
-├── core/          # Configuration, response envelopes and readiness checks
+├── core/          # Configuration, response envelopes, readiness checks, file/database dispatch
+├── db/            # PostgreSQL storage: dataset registry, schema, connection, repository
 ├── loaders/       # Validated readers for approved runtime datasets
 ├── tests/         # Backend and deployment tests
 ├── main.py        # FastAPI routes and Lambda entry point
@@ -75,6 +104,23 @@ only as an aggregate quality report; the service never returns address rows.
 
 `GET /api/health` confirms that the FastAPI application is running.
 
+### Data storage: files or PostgreSQL
+
+The API reads datasets from files by default (`KINDERPRINT_DATA_BACKEND=files`),
+which is what local development and the tests use. Production can read the same
+datasets from PostgreSQL instead (`KINDERPRINT_DATA_BACKEND=postgres`). Responses
+are identical in both modes.
+
+```bash
+# Check the files that would be loaded, without a database
+python3 datascience/scripts/load_to_db.py --dry-run
+```
+
+To roll back, set `KINDERPRINT_DATA_BACKEND=files` (or deploy with
+`DataBackend=files`); the data files are still packaged. See
+[`docs/DATABASE.md`](docs/DATABASE.md) for the tables, security and tests, and
+[`docs/AWS_VKINDER.md`](docs/AWS_VKINDER.md) for the Vkinder AWS database stack.
+
 ### Backend tests
 
 ```bash
@@ -97,6 +143,11 @@ suitability datasets, then deploy the prepared package with AWS SAM:
 ./backend/prepare_lambda_package.sh
 sam deploy --template-file template.yaml --guided
 ```
+
+Deploys default to files mode and create no database. To run Vkinder with its
+own private PostgreSQL database, alerts and the daily credit guard, use
+`infra/vkinder_aws.sh deploy <alert email>` (see
+[`docs/AWS_VKINDER.md`](docs/AWS_VKINDER.md)).
 
 The preparation script already assembles the deployable package with Linux x86_64
 native wheels. Do not run a local `sam build` over that package, because it can

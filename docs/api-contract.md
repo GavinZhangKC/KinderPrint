@@ -62,6 +62,19 @@ Service responses use a consistent top-level envelope:
 - `limitations` records missing data, incompatible geography or reference years, unsupported results, unavailable inputs, and other data-quality constraints.
 - `notices` contains explanatory and safety framing. Wording is TBC unless explicitly approved below.
 
+### Storage modes
+
+The contract does not depend on where datasets are stored. The backend reads
+them from files (`KINDERPRINT_DATA_BACKEND=files`, the default) or from
+PostgreSQL (`KINDERPRINT_DATA_BACKEND=postgres`), and every endpoint returns the
+same envelope, data, limitations and notices in both modes; automated tests
+compare the two byte for byte. In postgres mode a dataset that has not been
+loaded, or a database that cannot be reached, is reported with the same
+`*_unavailable` (or `*_invalid`) limitation codes as a missing or unreadable
+file, and `GET /api/datasets/status` reports `configured: false` for it. No
+endpoint exposes database names, hosts or credentials. See
+[`DATABASE.md`](DATABASE.md).
+
 ### Shared structures
 
 ```json
@@ -787,6 +800,85 @@ Every opportunity reference must identify an item in the corresponding complete 
 When the approved output states that no supported prevention opportunity exists, the response uses `no_opportunity`, returns an empty `opportunities` list, and includes the supplied limitation. The backend must not generate an opportunity from outcome, environmental, or pattern data.
 
 Opportunities are investigation leads, not causal findings, intervention recommendations, or resource-allocation decisions. The backend must not decide which conditions are modifiable, recommend an intervention, rank opportunities, fill missing evidence, or create a new analytical conclusion. The final opportunity fields, evidence and pattern references, no-opportunity representation, pair ordering, dataset location, schema, and notice wording are TBC pending the approved Data Science or AI output contract.
+
+## Family Fit: "Where to live"
+
+The Data Science build (`scripts/build_family_fit.py`) publishes
+`outputs/iteration_3/family_fit.json` (need scores, measures and forecasts for
+346 reporting areas) and `family_fit_shapes.json` (simplified outlines). The
+backend validates both on load, refuses an invalid artefact, and computes
+searches in pure Python: percentiles of the published need scores, the weighted
+match score, the Essential filter and a seeded 200-draw stability check. A
+parity test pins its rankings to the Data Science reference searches. Method:
+`datascience/docs/MODEL_CARD_FAMILY_FIT.md`.
+
+Environment: `KINDERPRINT_FAMILY_FIT_DATA_PATH`, `KINDERPRINT_FAMILY_FIT_SHAPES_DATA_PATH`.
+
+### `GET /api/family-fit/setup`
+
+Returns the eight needs (id, label, two measures with direction, `explains`,
+`does_not_confirm`), the allowed `radii_km` (5, 10, 15, 25),
+`essential_percentile` (50), `weights`, `model_version`, `built_utc`, the 346
+searchable `places` (id, name, sa3) and a `validation` summary that the page
+shows in "How the match score works".
+
+### `GET /api/family-fit/search`
+
+| Parameter | Rules |
+|---|---|
+| `anchor` | 9-digit SA2 code from `places`. Malformed: 422 `invalid_request`; unknown code: 404 `unknown_area` |
+| `radius_km` | 5, 10, 15 or 25. Otherwise 422 `invalid_radius` |
+| `priorities` | Comma-separated `need:level`, level `prefer` or `essential`; no duplicates. Otherwise 422 `invalid_priorities`. Empty gives status `missing` with no results. If chosen priorities lack data for some areas, a `family_fit_data_unavailable` limitation is added |
+| `limit` | 1–30 (default 10). Otherwise 422 `invalid_request` |
+
+`data` contains:
+
+* `anchor`, `radius_km` and `priorities`.
+* `counts`: `within_distance`, `matching`, `below_essential`, `data_unavailable`.
+* `results`, best first. Each result has `rank`, `id`, `name`, `sa3`,
+  `latitude`, `longitude`, `distance_km`, `match` (0–100, one decimal), two
+  `reasons` (need, label, percentile, phrase) and one `limitation`.
+  * `limitation` is either `weaker_priority` (the weakest chosen need, with its
+    phrase) or `does_not_confirm` (what the measure cannot tell you).
+  * `stability` is `{share, label: stable | fairly_stable | could_change}`, or
+    `null` when no school-entry priority is chosen.
+  * Also `school_entry_change` `{pp, flag}` and `outlook_2027`
+    `{pct, lower80, upper80}`.
+* `more_available`.
+* `map`: one entry for every area, with `status` of `top`, `match`,
+  `filtered_out`, `no_data` or `outside`.
+* `suggestions` when fewer than 5 areas match. Each is `make_preferred` (need,
+  label) or `widen_distance` (radius_km), with the number of `results` it would
+  give. The backend never applies a relaxation itself.
+* `confidence` `{draws, measures_varied}`.
+
+Notices: `family_fit_comparative_index`, `area_level_information`.
+
+### `GET /api/family-fit/areas/{area_id}`
+
+All eight needs, each with percentile, phrase, `explains`, `does_not_confirm`
+and its two measures (value and percentile). Also `children_assessed_2024`,
+`school_entry_change` `{pp, flag, years: "2015 to 2024", measure}` and
+`outlook_2027`. Unknown id: 404 `unknown_area`.
+
+### `GET /api/family-fit/shapes`
+
+`{areas: {id: [[ [lon, lat], ... ]]}}` for the overview map (outlines
+simplified at 0.0012°, about 180 KB).
+
+### Failure modes
+
+* Artefact not configured: status `unavailable`, limitation
+  `family_fit_dataset_not_configured`.
+* Artefact fails validation: `family_fit_dataset_invalid`. Validation covers
+  missing measures, scores outside 0–100, coordinates outside Greater Melbourne,
+  duplicate ids, a forecast outside its interval, unknown flags and bad
+  metadata.
+* A refreshed artefact is picked up without a restart (cache keyed on path and
+  modification time).
+
+The earlier `GET /api/localities/suitable` (below) is no longer used by the
+frontend. It remains for backward compatibility.
 
 ## Locality Suitability Service (provisional)
 

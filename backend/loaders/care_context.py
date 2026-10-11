@@ -7,13 +7,13 @@ builders. Nothing here scores, ranks or recommends a service.
 from __future__ import annotations
 
 import csv
-from functools import lru_cache
 import math
 from pathlib import Path
 from typing import Any
 
 from core.data_loader import CARE_CONTEXT_ENV, care_context_path
 from core.responses import limitation
+from core.sources import dataset_cache, read_csv_rows, source_exists
 
 HOSPITAL_NUMBERS = (
     "latitude", "longitude", "ed_on_time_resuscitation_pct", "ed_on_time_emergency_pct",
@@ -25,6 +25,8 @@ COST_NUMBERS = (
     "population", "patients", "services", "services_per_100", "percent_people", "provider_fees",
     "benefits_paid", "patient_contribution_per_service", "benefit_share_of_fees_pct",
 )
+
+FUTURE_NUMBERS = ("children_0_4", "children_5_9", "children_10_14", "children_0_14", "population_all_ages", "ecec_places_per_100_0_4", "gp_practices_per_10000", "primary_campuses", "primary_campuses_per_1000_5_9", "children_0_4_change_from_2026_pct", "ecec_places_to_keep_2026_access", "ecec_access_percentile")
 
 SPECS: dict[str, dict[str, Any]] = {
     "hospital_capability": {
@@ -84,6 +86,23 @@ SPECS: dict[str, dict[str, Any]] = {
                     "band_stability", "gp_access_5km", "gp_access_percentile", "gp_nearest_km",
                     "ecec_access_5km", "ecec_access_percentile", "ecec_nearest_km"),
     },
+    "play_spaces": {
+        "required": {"sa2_code", "kind", "rank", "feature_id", "name", "park", "latitude", "longitude",
+                     "distance_km", "direction"},
+        "key": ("sa2_code", "kind", "rank"), "numbers": ("latitude", "longitude", "distance_km"),
+        "integers": ("rank",), "integer_bounds": {"rank": (1, None)},
+    },
+    "play_access": {
+        "required": {"sa2_code", "kind", "origin_latitude", "origin_longitude", "within_1km", "within_2km",
+                     "nearest_km"},
+        "key": ("sa2_code", "kind"), "numbers": ("origin_latitude", "origin_longitude", "nearest_km"),
+        "integers": ("within_1km", "within_2km"),
+    },
+    "future_demand": {
+        "required": {"sa2_code", "sa2_name", "projection_year", *FUTURE_NUMBERS},
+        "key": ("sa2_code", "projection_year"), "numbers": FUTURE_NUMBERS, "integers": ("projection_year",),
+        "integer_bounds": {"projection_year": (2021, 2036)},
+    },
     "child_nutrient_targets": {
         "required": {"nutrient_id", "nutrient", "unit", "basis", "age_1_3", "age_4_8", "age_9_13_boys",
                      "age_9_13_girls", "why_it_matters", "source_url"},
@@ -121,29 +140,28 @@ def _integer(value: str, minimum: int = 0, maximum: int | None = None) -> int:
     return int(number)
 
 
-@lru_cache(maxsize=16)
+@dataset_cache(maxsize=16)
 def _read(path: Path, resource: str) -> tuple[dict[str, Any], ...]:
     spec = SPECS[resource]
-    with path.open(encoding="utf-8-sig", newline="") as source:
-        reader = csv.DictReader(source)
-        if not reader.fieldnames or not spec["required"].issubset(reader.fieldnames):
+    reader = read_csv_rows(path, CARE_CONTEXT_ENV[resource])
+    if not reader.fieldnames or not spec["required"].issubset(reader.fieldnames):
+        raise ValueError
+    rows, keys = [], set()
+    for raw in reader:
+        row: dict[str, Any] = {field: raw[field] for field in spec["required"]}
+        for field in spec.get("numbers", ()):
+            row[field] = _number(raw[field])
+        for field in spec.get("integers", ()):
+            minimum, maximum = spec.get("integer_bounds", {}).get(field, (0, None))
+            row[field] = _integer(raw[field], minimum, maximum)
+        for field in spec.get("booleans", ()):
+            row[field] = _boolean(raw[field])
+        key = tuple(row[field] for field in spec["key"])
+        if key in keys:
             raise ValueError
-        rows, keys = [], set()
-        for raw in reader:
-            row: dict[str, Any] = {field: raw[field] for field in spec["required"]}
-            for field in spec.get("numbers", ()):
-                row[field] = _number(raw[field])
-            for field in spec.get("integers", ()):
-                minimum, maximum = spec.get("integer_bounds", {}).get(field, (0, None))
-                row[field] = _integer(raw[field], minimum, maximum)
-            for field in spec.get("booleans", ()):
-                row[field] = _boolean(raw[field])
-            key = tuple(row[field] for field in spec["key"])
-            if key in keys:
-                raise ValueError
-            keys.add(key)
-            rows.append(row)
-        return tuple(rows)
+        keys.add(key)
+        rows.append(row)
+    return tuple(rows)
 
 
 def load(resource: str) -> tuple[tuple[dict[str, Any], ...] | None, list[dict[str, Any]]]:
@@ -151,7 +169,7 @@ def load(resource: str) -> tuple[tuple[dict[str, Any], ...] | None, list[dict[st
     env = CARE_CONTEXT_ENV[resource]
     if path is None:
         return None, [limitation(f"{resource}_not_configured", f"Set {env} to the validated CSV.", resource)]
-    if not path.is_file():
+    if not source_exists(path, env):
         return None, [limitation(f"{resource}_unavailable", "The configured dataset could not be found.", resource)]
     try:
         return _read(path, resource), []
@@ -264,6 +282,51 @@ def nutrition_report(sa2_code: str) -> tuple[dict[str, Any] | None, list[dict[st
             (dict(row) for row in outlets if row["sa2_code"] == sa2_code), key=lambda r: r["distance_km"]),
         "access": None if access is None else [dict(row) for row in access if row["sa2_code"] == sa2_code],
     }, limitations
+
+
+PLAY_KINDS = ("Playground", "Swimming pool", "Picnic area", "Day visitor area")
+
+
+def play_spaces(sa2_code: str) -> tuple[dict[str, Any] | None, list[dict[str, Any]]]:
+    """Listed play places near an SA2 (Vicmap Features of Interest) and counts by distance."""
+    spaces, a = load("play_spaces")
+    access, b = load("play_access")
+    limitations = [*a, *b]
+    if spaces is None and access is None:
+        return None, limitations
+    order = {kind: index for index, kind in enumerate(PLAY_KINDS)}
+    rows = [] if access is None else [row for row in access if row["sa2_code"] == sa2_code]
+    origin = {"latitude": rows[0]["origin_latitude"], "longitude": rows[0]["origin_longitude"]} if rows else None
+    return {
+        "sa2_code": sa2_code,
+        "origin": origin,
+        "places": None if spaces is None else sorted(
+            (dict(row) for row in spaces if row["sa2_code"] == sa2_code),
+            key=lambda r: (order.get(r["kind"], 99), r["rank"])),
+        "access": None if access is None else sorted(
+            ({k: v for k, v in row.items() if not k.startswith("origin_")} for row in rows),
+            key=lambda r: order.get(r["kind"], 99)),
+    }, limitations
+
+
+FUTURE_OVERVIEW = ("sa2_code", "sa2_name", "projection_year", "children_0_4", "children_0_14",
+                   "children_0_4_change_from_2026_pct", "ecec_places_per_100_0_4", "ecec_places_to_keep_2026_access")
+
+
+def future_area(sa2_code: str) -> tuple[list[dict[str, Any]] | None, list[dict[str, Any]]]:
+    """Projected children and service pressure for one SA2, 2021-2036 (VIF2023; services held fixed)."""
+    rows, limitations = load("future_demand")
+    if rows is None:
+        return None, limitations
+    return sorted((dict(r) for r in rows if r["sa2_code"] == sa2_code), key=lambda r: r["projection_year"]), limitations
+
+
+def future_overview() -> tuple[list[dict[str, Any]] | None, list[dict[str, Any]]]:
+    """A compact row per SA2 and year, for the Greater Melbourne map."""
+    rows, limitations = load("future_demand")
+    if rows is None:
+        return None, limitations
+    return [{k: r[k] for k in FUTURE_OVERVIEW} for r in rows], limitations
 
 
 PRIORITY_BANDS = {"Higher", "Moderate", "Lower"}

@@ -73,7 +73,8 @@ def build(foods: pd.DataFrame, targets: pd.DataFrame) -> pd.DataFrame:
     rows = []
     for nutrient_id, column in COLUMNS.items():
         ranked = foods[pd.to_numeric(foods[column], errors="coerce") > 0] \
-            .assign(value=lambda f: pd.to_numeric(f[column])).sort_values("value", ascending=False)
+            .assign(value=lambda f: pd.to_numeric(f[column])) \
+            .sort_values(["value", foods.columns[0]], ascending=[False, True], kind="mergesort")  # food key breaks ties
         # One entry per food stem so the list is varied (e.g. not five cuts of liver).
         ranked = ranked.assign(stem=ranked["Food Name"].str.split(",").str[0].str.strip().str.lower()) \
             .drop_duplicates("stem").head(TOP_N)
