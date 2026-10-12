@@ -88,8 +88,9 @@ html[data-theme='dark'] :is(input, textarea)::placeholder { color: var(--kp-colo
 html[data-theme='dark'] option { color: var(--kp-color-text-primary); background: var(--kp-color-surface-solid); }
 html[data-theme='dark'] :focus-visible { outline-color: var(--kp-color-border-focus); }
 html[data-theme='dark'] :is(input, textarea, select):focus-visible { outline: 2px solid var(--kp-color-border-focus); outline-offset: 2px; }
+html[data-theme='dark'] .search-input-shell input:focus-visible { outline: none; }
 html[data-theme='dark'] :is(.search-input-shell, .select-shell) { background: var(--kp-color-surface-strong); border-color: var(--kp-color-border-default); }
-html[data-theme='dark'] :is(.search-input-shell, .select-shell):focus-within { outline: 2px solid var(--kp-color-border-focus); outline-offset: 2px; }
+html[data-theme='dark'] .select-shell:focus-within { outline: 2px solid var(--kp-color-border-focus); outline-offset: 2px; }
 html[data-theme='dark'] :is(input, textarea, select):disabled { color: var(--kp-color-text-disabled); }
 
 /* Elevation follows the kit; the original card geometry and interactions remain. */
