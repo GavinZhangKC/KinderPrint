@@ -50,6 +50,8 @@ interface Props {
   onHealth: () => void
   /** Switch between finding areas and "What if this area changed?". */
   viewSwitch?: ReactNode
+  /** Inside the shared page template: no site header or page title (the hero carries them). */
+  bare?: boolean
 }
 
 export default function WhereToLive(props: Props) {
@@ -172,17 +174,17 @@ export default function WhereToLive(props: Props) {
         <button type="button" className="wl-btn primary" onClick={loadSetup}>Try again</button></div></main></div>
   }
 
-  return <div className="app-background where-page">
-    {header}
-    <main className="wl-main" id="main">
+  const body = <main className="wl-main" id="main">
       {props.viewSwitch}
-      <section className="wl-intro" aria-labelledby="wl-title">
+      {props.bare
+        ? <div className="kt-filters wl-hub-bar"><p>Area-level comparison of Greater Melbourne suburbs. It does not describe any home, school or child.</p><button type="button" className="wl-link" onClick={() => setDialog('how')}>How the match score works</button></div>
+        : <section className="wl-intro" aria-labelledby="wl-title">
         <div>
           <h1 id="wl-title">Find an area that fits your family</h1>
           <p>Compare Greater Melbourne areas by nearby services, outdoor spaces and your family’s priorities.</p>
         </div>
         <button type="button" className="wl-link" onClick={() => setDialog('how')}>How the match score works</button>
-      </section>
+      </section>}
 
       <div className="wl-layout">
         <aside className="wl-filters" aria-labelledby="wl-search-title">
@@ -277,11 +279,18 @@ export default function WhereToLive(props: Props) {
       <div className="wl-toast" role="status" aria-live="polite">{toast}</div>
     </main>
 
+  const overlays = <>
     {detail && setup && <DetailPanel id={detail} setup={setup} priorities={applied?.priorities ?? {}} result={result} anchorName={result?.anchor.name}
       saved={saved.some(s => s.id === detail)} onSave={toggleSave} onClose={() => setDetail(null)} onHow={() => setDialog('how')} />}
     {dialog === 'compare' && setup && <CompareDialog ids={saved.map(s => s.id)} setup={setup} priorities={applied?.priorities ?? {}} matching={result ? matchingIds : null} onClose={() => setDialog(null)} />}
     {dialog === 'checklist' && <ChecklistDialog saved={saved} priorities={applied?.priorities ?? draft.priorities} needLabel={needLabel} say={say} onClose={() => setDialog(null)} />}
     {dialog === 'how' && setup && <HowDialog setup={setup} onClose={() => setDialog(null)} />}
+  </>
+  if (props.bare) return <>{body}{overlays}</>
+  return <div className="app-background where-page">
+    {header}
+    {body}
+    {overlays}
   </div>
 }
 

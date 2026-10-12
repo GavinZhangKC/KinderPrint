@@ -1,5 +1,5 @@
 {
-  "run_utc": "2026-10-09T051316Z",
+  "run_utc": "2026-10-11T165734Z",
   "kpis": [
     {
       "kpi": "K1 validity",
@@ -45,7 +45,7 @@
       "value": 1.0,
       "target": 1.0,
       "passed": true,
-      "processed_files": 64,
+      "processed_files": 67,
       "problems": []
     },
     {
@@ -63,6 +63,8 @@
         "care_compare_sa2.csv": "identical",
         "urgent_care_clinics_vic.csv": "identical",
         "access_e2sfca_sa2.csv": "identical",
+        "practitioner_context_sa2.csv": "identical",
+        "future_demand_sa2.csv": "identical",
         "school_entry_forecast_community.csv": "identical",
         "family_fit_community.csv": "identical"
       }
@@ -73,21 +75,21 @@
       "target": 9,
       "passed": true,
       "age_days": {
-        "afcd_r3_selected_per100g.csv": 10,
-        "aihw_mbs_local_areas_vic_2024_25.csv": 10,
-        "myhospitals_reported_measures.csv": 10,
-        "myhospitals_vic_data_items.csv": 10,
-        "myhospitals_vic_hospitals.csv": 10,
-        "nndss_influenza_vic_monthly.csv": 10,
-        "nndss_salmonella_vic_monthly.csv": 10,
-        "osm_food_outlets_melbourne.csv": 10,
-        "urgent_care_clinics_vic.csv": 10
+        "afcd_r3_selected_per100g.csv": 12,
+        "aihw_mbs_local_areas_vic_2024_25.csv": 12,
+        "myhospitals_reported_measures.csv": 12,
+        "myhospitals_vic_data_items.csv": 12,
+        "myhospitals_vic_hospitals.csv": 12,
+        "nndss_influenza_vic_monthly.csv": 12,
+        "nndss_salmonella_vic_monthly.csv": 12,
+        "osm_food_outlets_melbourne.csv": 12,
+        "urgent_care_clinics_vic.csv": 12
       },
       "stale": [],
       "not_in_manifest": []
     },
     {
-      "kpi": "K7 null resolution",
+      "kpi": "K7 display completeness",
       "value": 0.9867,
       "target": 0.9,
       "passed": true,
@@ -103,7 +105,75 @@
         "school_entry_forecast_community.csv": 1.0,
         "family_fit_community.csv": 0.9884
       },
-      "note": "Missing values stay missing (suppressed, not published, or no service in range); none imputed."
+      "cell_counts": {
+        "hospital_capability_vic.csv": {
+          "cells": 1028,
+          "populated": 919,
+          "missing_kept": 109,
+          "imputed": 0
+        },
+        "primary_care_cost_sa3.csv": {
+          "cells": 6030,
+          "populated": 5934,
+          "missing_kept": 96,
+          "imputed": 0
+        },
+        "care_compare_sa2.csv": {
+          "cells": 10546,
+          "populated": 10546,
+          "missing_kept": 0,
+          "imputed": 0
+        },
+        "food_access_sa2.csv": {
+          "cells": 10830,
+          "populated": 10830,
+          "missing_kept": 0,
+          "imputed": 0
+        },
+        "seasonal_air_quality_sa2.csv": {
+          "cells": 12996,
+          "populated": 12996,
+          "missing_kept": 0,
+          "imputed": 0
+        },
+        "nearby_health_services_sa2.csv": {
+          "cells": 10830,
+          "populated": 10830,
+          "missing_kept": 0,
+          "imputed": 0
+        },
+        "vaccination_places_sa2.csv": {
+          "cells": 12494,
+          "populated": 12494,
+          "missing_kept": 0,
+          "imputed": 0
+        },
+        "council_immunisation_sa2.csv": {
+          "cells": 722,
+          "populated": 722,
+          "missing_kept": 0,
+          "imputed": 0
+        },
+        "school_entry_forecast_community.csv": {
+          "cells": 1026,
+          "populated": 1026,
+          "missing_kept": 0,
+          "imputed": 0
+        },
+        "family_fit_community.csv": {
+          "cells": 4844,
+          "populated": 4788,
+          "missing_kept": 56,
+          "imputed": 0
+        }
+      },
+      "cell_totals": {
+        "cells": 71346,
+        "populated": 71085,
+        "missing_kept": 261,
+        "imputed": 0
+      },
+      "note": "Mean of per-table populated-cell shares in displayed columns. Missing values stay missing (suppressed, not published, not applicable or no service in range) and are counted in missing_kept; none are imputed. This is completeness, not accuracy or nulls resolved."
     }
   ],
   "all_met": true

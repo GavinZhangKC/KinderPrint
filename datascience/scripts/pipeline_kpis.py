@@ -18,9 +18,11 @@ K5 reproducibility   100% of Iteration-3 builders, re-run from the committed
                      committed processed files (canonical content hash).
 K6 freshness         every reference file was acquired or verified within its
                      source's refresh cadence (manifest.json).
-K7 null resolution   share of cells that are populated in the columns the product
-                     displays; suppressed or not-published values are counted
-                     separately, never imputed.
+K7 display completeness  share of cells that are populated in the columns the
+                     product displays, with the denominators. It does not measure
+                     "nulls resolved": missing values (suppressed, not published,
+                     not applicable or no service in range) stay missing and are
+                     counted, never imputed to raise the score.
 
 Outputs
 -------
@@ -64,6 +66,9 @@ BUILDERS = [  # (script, output files) in dependency order
     ("build_food_environment.py", ["food_outlets_sa2.csv", "food_access_sa2.csv"]),
     ("build_care_compare.py", ["care_compare_sa2.csv", "urgent_care_clinics_vic.csv"]),
     ("build_access_e2sfca.py", ["access_e2sfca_sa2.csv"]),
+    # Downstream of access: rebuilt whenever access changes.
+    ("build_practitioner_context.py", ["practitioner_context_sa2.csv"]),
+    ("build_future_demand.py", ["future_demand_sa2.csv"]),
     ("model_school_entry_forecast.py", ["school_entry_forecast_community.csv"]),
     ("build_family_fit.py", ["family_fit_community.csv"]),
 ]
@@ -214,14 +219,23 @@ def k6_freshness(now: datetime) -> dict:
 
 
 def k7_nulls() -> dict:
-    detail = {}
+    """Display completeness, with populated and missing cell counts per table."""
+    detail, counts = {}, {}
     for name, columns in DISPLAY_COLUMNS.items():
         frame = pd.read_csv(PROC / name, dtype=str, keep_default_na=False)
-        cells = frame[columns]
-        detail[name] = round(float((cells != "").to_numpy().mean()), 4)
+        cells = frame[columns].to_numpy()
+        total = int(cells.size)
+        populated = int((cells != "").sum())
+        detail[name] = round(populated / total, 4) if total else 0.0
+        counts[name] = {"cells": total, "populated": populated, "missing_kept": total - populated,
+                        "imputed": 0}
     overall = round(sum(detail.values()) / len(detail), 4)
-    return kpi("K7 null resolution", overall, 0.9, overall >= 0.9, by_table=detail,
-               note="Missing values stay missing (suppressed, not published, or no service in range); none imputed.")
+    totals = {k: sum(c[k] for c in counts.values()) for k in ("cells", "populated", "missing_kept", "imputed")}
+    return kpi("K7 display completeness", overall, 0.9, overall >= 0.9, by_table=detail, cell_counts=counts,
+               cell_totals=totals,
+               note="Mean of per-table populated-cell shares in displayed columns. Missing values stay missing "
+                    "(suppressed, not published, not applicable or no service in range) and are counted in "
+                    "missing_kept; none are imputed. This is completeness, not accuracy or nulls resolved.")
 
 
 def render_markdown(result: dict) -> str:

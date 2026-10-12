@@ -216,3 +216,35 @@ def test_loader_has_no_numpy_or_pandas_dependency():
     imported = {alias.name.split(".")[0] for node in ast.walk(tree) if isinstance(node, ast.Import) for alias in node.names}
     imported |= {node.module.split(".")[0] for node in ast.walk(tree) if isinstance(node, ast.ImportFrom) and node.module}
     assert not imported & {"numpy", "pandas", "scipy", "sklearn"}
+
+
+# ------------------------------------------------------------------ stability reruns the whole search
+
+def test_stability_reapplies_essential_thresholds_on_every_draw(live):
+    # Reviewer's counterexample: five matches, early development Essential. Restricting the draws to
+    # the five initially eligible areas reported the anchor as 100% stable, although the anchor fails
+    # the Essential threshold in about a third of draws. Rerunning the full search must show that.
+    result, _ = ff.search("207021424", 5, {"early_development": "essential"})
+    shares = {r["id"]: r["stability"]["share"] for r in result["results"]}
+    assert shares["207021424"] < 0.9
+    assert result["confidence"]["method"].startswith("full search rerun")
+
+
+def test_fewer_than_ten_matches_is_counted(live):
+    result, _ = ff.search("207021424", 5, {"early_development": "essential"})
+    assert result["counts"]["matching"] < 10
+    assert result["confidence"]["draws_with_fewer_than_10_matches"] == ff.DRAWS
+
+
+def test_areas_outside_the_initial_shortlist_can_enter_in_a_draw(live):
+    scenario = json.loads(REFERENCE.read_text())["reference_scenarios"][0]
+    result, _ = ff.search(scenario["anchor"], scenario["radius_km"], scenario["priorities"])
+    assert result["confidence"]["areas_entering_top10_in_some_draws"] >= 1
+    assert scenario["stability"]["areas_entering_top10_in_some_draws"] >= 1
+
+
+def test_shares_are_probabilities_and_carry_their_sampling_error(live):
+    scenario = json.loads(REFERENCE.read_text())["reference_scenarios"][0]
+    result, _ = ff.search(scenario["anchor"], scenario["radius_km"], scenario["priorities"])
+    assert all(0 <= r["stability"]["share"] <= 1 for r in result["results"])
+    assert result["confidence"]["monte_carlo_se_max"] == pytest.approx(0.5 / ff.DRAWS ** 0.5, abs=1e-3)

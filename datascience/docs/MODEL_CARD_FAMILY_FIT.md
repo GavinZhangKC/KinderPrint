@@ -7,7 +7,7 @@
 | Outputs | `data/processed/family_fit_community.csv`, `data/processed/school_entry_forecast_community.csv`, `outputs/iteration_3/family_fit.json`, `outputs/iteration_3/family_fit_shapes.json` |
 | Reports | `reports/family_fit/family_fit_validation.json`, `reports/family_fit/school_entry_forecast.json`, `reports/family_fit/change_log.json` |
 | Served by | `GET /api/family-fit/setup`, `/search`, `/areas/{id}`, `/shapes` (backend `loaders/family_fit.py`). Page: `/where-to-live` |
-| Tests | `datascience/tests/test_family_fit.py` (19), `backend/tests/test_family_fit.py` (27) |
+| Tests | `datascience/tests/test_family_fit.py` (22), `backend/tests/test_family_fit.py` (27) |
 | Decision record | `decisions/ADR-009-family-fit-and-forecast.md` |
 
 ## Intended use
@@ -51,8 +51,16 @@ an outlook for the 2027 AEDC.
    Essential = 2). An area must have a need score at or above 50 (the Melbourne
    median) on every Essential priority. Areas missing data for a chosen priority
    are excluded and counted, never imputed.
-5. **Shortlist stability.** The search is re-run 200 times (backend, seeded
-   deterministically) with AEDC shares drawn from their posterior. Labels:
+5. **Shortlist stability.** The whole search is re-run 200 times (backend, seeded
+   deterministically) with AEDC shares drawn from their posterior: distance,
+   data availability, every Essential threshold and the ranking are applied again
+   on each draw, so areas can enter or leave the shortlist. The share is the
+   chance of being in the top 10 under the search the user ran. Each area's
+   measures are drawn independently (an assumption; related AEDC measures are
+   correlated in reality). Monte Carlo standard error is at most 3.5 points.
+   Corrected 12 October 2026: earlier versions re-ranked only the initially
+   eligible areas, which overstated stability (one review search showed 100%
+   where the full search kept the area in 62.5% of draws). Labels:
    *stable* if the area stays in the top 10 in at least 90% of runs; *fairly
    stable* at 60–89%; otherwise *could change*. Only shown when a school-entry
    priority is chosen, because no other measure is sampled.
@@ -93,7 +101,9 @@ reporting area at the next census (2027).
 **Design.** Rolling origin. Train on 2012→15, 2015→18 and 2018→21; hold out
 2021→24 (342 areas); then refit on all four transitions to forecast 2027.
 Selection rule, fixed in advance: lowest child-weighted MAE on the holdout. A
-more complex model must beat the simpler one by at least 3%.
+more complex model must beat the simpler one by at least 3%. Because 2021→24 is
+used to make that choice, the table below is a validation result, not an
+untouched test. The untouched test is in "Validation design and limits".
 
 | Model | Weighted MAE (pp) | Spearman | 80% coverage | Within ±10 pp |
 |---|---|---|---|---|
@@ -116,12 +126,52 @@ more complex model must beat the simpler one by at least 3%.
 * For that reason the holdout 80% coverage is 0.70, below nominal. Published
   intervals add a cycle-shock variance estimated from all four transitions
   (1.80 pp, against 0.57 pp in the holdout fit), so the 2027 ranges are wider.
-* No leakage: holdout outcomes are never used in fitting or alpha selection
-  (tested).
+* Holdout outcomes are never used in fitting or alpha selection (tested), but
+  they are used to choose the candidate.
+* The 2027 range is labelled a "nominal 80% range (coverage not yet
+  demonstrated)" in the report and in the CSV (`interval_label`).
+
+### Validation design and limits
+
+Source: `chronological_evaluation` in `reports/family_fit/school_entry_forecast.json`.
+
+* **Selection and test are separate.** The candidate is chosen by training on
+  2012→15 and 2015→18 and validating on 2018→21 (337 areas). Ridge alpha is
+  tuned by grouped CV inside training. The selection code refuses any panel
+  that contains years after 2021 (tested). The chosen candidate is refitted on
+  the three earlier transitions and scored once on 2021→24 (342 areas).
+* **Result.** Validation chose F3 (MAE 5.27 pp; F4 5.46, F1 6.22, F0 6.73), the
+  same model as the published rule. On the untouched test F3 has weighted MAE
+  6.43 pp against 7.56 pp for persistence (skill 14.9%) and Spearman 0.65
+  against 0.51.
+* **Bias.** F3 over-predicts by +3.48 pp on the test (persistence +3.25 pp),
+  because Greater Melbourne fell 3.5 pp. The error after removing the common
+  shift (5.68 pp) is a diagnostic only. It assumes the shift was known in
+  advance and is not operational performance.
+* **Coverage, past-only residuals.** Interval SD comes only from out-of-time
+  residuals available at the 2021 origin (2015→18 predicted from 2012→15;
+  2018→21 predicted from 2012→15 and 2015→18). No cycle-shock term is added.
+
+  | Model (test 2021→24) | Observed 80% (nominal 80%) | Mean width 80% | Observed 95% (nominal 95%) | Mean width 95% |
+  |---|---|---|---|---|
+  | F0 persistence | 73.1% | 23.1 pp | 90.1% | 35.3 pp |
+  | F3 ridge (selected) | 69.9% | 17.9 pp | 88.9% | 27.4 pp |
+
+  Both are below nominal. On the 2018→21 validation transition F3 covered
+  79.2% and 92.9%.
+* **2027 intervals are not validated.** They add a cycle-shock SD (1.80 pp)
+  estimated after 2024 was seen. Their coverage has not been tested.
+* **IRSD 2021 is reused for every origin.** The 2012, 2015 and 2018 transitions
+  therefore use information that was not available at their origin.
+* **Weak test.** One test transition; its 342 areas share one Melbourne-wide
+  shift, so their errors are not independent. The outlook is exploratory: it
+  ranks areas better than persistence on one cycle, but its level and interval
+  are not shown to be calibrated.
 
 ## Limitations
 
 * AEDC has four transitions of history, and 2024 followed pandemic-affected cohorts.
+* The 2027 outlook is exploratory; its 80% range is nominal (see "Validation design and limits").
 * Environment measures date from 2018 and 2019. Services come from 2025–26 snapshots.
 * Distances are straight-line from area centroids, not travel time.
 * Childcare figures are approved capacity, not vacancies.
@@ -130,7 +180,9 @@ more complex model must beat the simpler one by at least 3%.
 ## Monitoring and refresh
 
 * `scripts/refresh_iteration3.py` runs acquire → build → test gate → pipeline
-  KPIs (K1–K7). On any failure it restores the previous served artefacts.
+  KPIs (K1–K7). If any stage fails, including a missed KPI target, every file the
+  run could write is put back exactly as it was (tested by fault injection at each
+  stage and recorded in `reports/iteration3/refresh_rejected_run.json`).
 * `.github/workflows/data-refresh.yml` runs it on a schedule. It uploads the
   validation and change-log reports and writes the change-log summary to the
   run.

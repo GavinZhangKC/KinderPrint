@@ -29,6 +29,8 @@ interface Props {
   viewSwitch?: ReactNode
   /** Render inside another page (Where to live): no site header, URL kept on that page. */
   embedded?: boolean
+  /** Inside the shared page template: the page's audience switch decides the view and the hero carries the title. */
+  audience?: 'parent' | 'practitioner'
 }
 
 type Audience = 'parent' | 'practitioner'
@@ -110,9 +112,10 @@ function initialPlan(): { preset: string; custom: Plan } {
 }
 
 export default function PlanChange(props: Props) {
-  const [audience, setAudienceState] = useState<Audience>(() =>
+  const [ownAudience, setAudienceState] = useState<Audience>(() =>
     readJson<Audience>(AUDIENCE_KEY, 'practitioner', (v): v is Audience => v === 'parent' || v === 'practitioner'))
   const setAudience = (value: Audience) => { setAudienceState(value); writeJson(AUDIENCE_KEY, value) }
+  const audience = props.audience ?? ownAudience
   const parent = audience === 'parent'
 
   const [setup, setSetup] = useState<PlanSetup | null>(null)
@@ -182,7 +185,8 @@ export default function PlanChange(props: Props) {
 
   const page = <main className="wl-main pl-main" id="main">
       {props.viewSwitch}
-      <section className="wl-intro" aria-labelledby="pl-title">
+      {props.audience && <div className="kt-filters wl-hub-bar"><p>Compares similar Melbourne areas that already have the change. Area-level evidence: it does not predict what will happen to any child.</p></div>}
+      {!props.audience && <section className="wl-intro" aria-labelledby="pl-title">
         <div>
           <h1 id="pl-title">{props.embedded ? 'What if this area changed?' : 'Plan a change'}</h1>
           <p>{parent
@@ -193,7 +197,7 @@ export default function PlanChange(props: Props) {
           <button type="button" role="radio" aria-checked={parent} onClick={() => setAudience('parent')}>Parent</button>
           <button type="button" role="radio" aria-checked={!parent} onClick={() => setAudience('practitioner')}>Practitioner</button>
         </div>
-      </section>
+      </section>}
 
       {setupError ? <div className="wl-state" role="alert"><h2>Plan a change is unavailable right now</h2>
         <p>Try again in a moment.</p><button type="button" className="wl-btn primary" onClick={() => window.location.reload()}>Try again</button></div>

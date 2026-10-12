@@ -20,6 +20,8 @@ that would catch it if it returned.
 | 13 | Map pins overlapped | Rank 1 and 9 pins stacked in dense inner suburbs | Close area centroids | Spread overlapping pins; text halo on labels | Map screenshot |
 | 14 | Accessibility: nested interactive and unfocusable scroll region | axe: `nested-interactive`, `scrollable-region-focusable` | Map `svg role="img"` contained buttons; compare table wrapper had no tab stop | `role="group"` on the map; table wrapper focusable with a label | axe-core WCAG 2.2 AA run: 0 violations on every state |
 | 15 | Forecast limitation text quoted a stale figure | It said "about 3.8 points"; the computed shift was 3.45 | Hard-coded text | Text computed from `melbourne_level_shift_2021_2024_pp` | Report regenerated on every build |
+| 16 | Shortlist stability overstated | A review search (Doncaster East - North, 5 km, early development Essential) showed 100% stable; the anchor met the Essential threshold in only about two thirds of draws | Draws re-ranked only the initially eligible areas, without reapplying Essential thresholds | Rerun the whole search on every draw, in the API and the engine; report entrants, draws with fewer than 10 matches, and Monte Carlo error | `backend/tests/test_family_fit.py::test_stability_reapplies_essential_thresholds_on_every_draw` and three related tests |
+| 17 | A missed KPI still published the refresh | Fault injection: `published; KPI target missed`, new files left in place | Only exceptions triggered the rollback | A missed KPI is a failure; snapshot and restore every file the run can write, and remove files a failed first run created | `tests/test_refresh_rollback.py` (each stage, first run); `reports/iteration3/refresh_rejected_run.json` |
 
 ## Deployment configuration
 

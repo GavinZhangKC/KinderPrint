@@ -9,9 +9,9 @@ from its public source by one command, and a bad refresh cannot reach the dashbo
 ## What runs
 
 ```
-acquire_iteration3.py  ->  iteration3_qa.py  ->  six builders  ->  pytest gate  ->  pipeline_kpis.py
-   fetch + parse            blocking rules       processed CSVs     266 tests         7 KPIs
-   hash + change log        and warnings                            restore on fail
+acquire_iteration3.py  ->  iteration3_qa.py  ->  builders      ->  pytest gate  ->  pipeline_kpis.py
+   fetch + parse            blocking rules       processed CSVs     test suite        7 KPIs
+   hash + change log        and warnings                            restore on any fail
 ```
 
 | Command | What it does |
@@ -112,7 +112,7 @@ removed and changed row, and names the changed columns.
 
 ## Lineage
 
-* `config/lineage.csv` gives each of the 60 processed files its producer script,
+* `config/lineage.csv` gives each of the 67 processed files its producer script,
   its register source ids and its upstream processed files.
 * `config/source_id_aliases.csv` resolves the six legacy ids still written by
   Iteration-2 scripts. Four are acquisition-register ids and two are combined
@@ -120,21 +120,59 @@ removed and changed row, and names the changed columns.
 * `tests/test_lineage.py` fails if a processed file has no lineage, if a producer
   is missing, or if any `source_id` value cannot be resolved to the register.
 
-## KPIs (run of 29 September 2026)
+## Promotion rule (corrected 12 October 2026)
+
+An independent review found that a missed KPI target still published the new
+files (`published; KPI target missed`). Now:
+
+* Before stage 1 the refresh snapshots every file it can write: the Iteration-3
+  reference files and manifest, every builder output and every served artefact,
+  noting which files did not exist yet.
+* Any failure, including a missed KPI target, restores each file exactly and
+  removes files created during the run. The outcome reads
+  `stopped: …; previous version kept` (exit 2 for a missed KPI, 1 otherwise).
+* `tests/test_refresh_rollback.py` injects a failure at each stage (acquire,
+  build, test gate, KPI) and on a first run with no previous version.
+* `reports/iteration3/refresh_rejected_run.json` records a real run on the
+  repository: builders ran, a bad served artefact was written, a KPI was missed,
+  and all 25 tracked files were byte-identical afterwards.
+* The refresh runs on a CI checkout or a working copy, never on files the API is
+  serving. A person reviews and commits the result, so no reader sees a partial run.
+
+## Scope
+
+The refresh rebuilds 11 builders and 13 processed files: the six Iteration-3
+sources, E2SFCA access, and everything downstream of access (practitioner
+context and In 2031 future demand), the school-entry outlook and Family Fit.
+Priority V2 (`model_expected_vulnerability.py`) is rebuilt by its own command:
+its inputs (AEDC, SEIFA, Census) change only with new releases, not weekly.
+K6 tracks freshness of the nine Iteration-3 reference files only.
+
+## KPIs (latest run, 11 October 2026, after the corrections)
 
 | KPI | Definition | Target | Result |
 |---|---|---|---|
-| K1 validity | Reference files passing every blocking rule | 100% | 100% (9/9; 1 warning, explained above) |
+| K1 validity | Reference files passing every blocking rule | 100% | 100% |
 | K2 join coverage | Scope SA2s (361) present in each SA2 table; scope SA3s (40) with cost rows | ≥ 95% | 100% for every table |
-| K3 key integrity | Foreign keys that resolve (items → units, items → measures, compare → facilities) | 100% | 100% |
-| K4 lineage | Processed files with complete, resolvable lineage | 100% | 100% (60/60) |
-| K5 reproducibility | Builder outputs regenerated identically from committed references | 100% | 100% (9/9 files, including E2SFCA access) |
+| K3 key integrity | Foreign keys that resolve | 100% | 100% |
+| K4 lineage | Processed files with complete, resolvable lineage | 100% | 100% (67/67) |
+| K5 reproducibility | Builder outputs regenerated identically from committed references | 100% | 100% (13/13 files) |
 | K6 freshness | Reference files within their source's refresh cadence | 9/9 | 9/9 |
-| K7 null resolution | Populated cells in columns the product displays | ≥ 90% | 98.0% |
+| K7 display completeness | Populated cells in the columns the product displays (mean of per-table shares) | ≥ 90% | 98.67%: 71,085 of 71,346 cells populated, 261 missing kept, 0 imputed |
 
-K7 is lowest for hospital capability (89.4%). That is expected: most private
-hospitals do not report emergency-department data. Missing values are never
-imputed. They are shown as "not reported".
+K7 was previously called "null resolution". It does not measure nulls resolved
+by cleaning: missing values (suppressed, not published, not applicable, no
+service in range) stay missing and are counted. It is completeness, not accuracy.
+K7 is lowest for hospital capability: most private hospitals do not report
+emergency-department data, shown as "not reported".
+
+## Workflow runs
+
+The scheduled and on-demand jobs run from the default branch, so they will start
+once this workflow is merged there. Until then, the offline gate runs on any pull
+request that touches `datascience/`, and the local evidence is
+`reports/iteration3/refresh_run.json` (successful offline run) and
+`refresh_rejected_run.json` (rejected run).
 
 ## Limitations
 

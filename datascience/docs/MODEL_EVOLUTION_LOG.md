@@ -58,8 +58,10 @@ SEIFA map and added nothing a practitioner did not already know.
 * **Validation.** Expectations are out-of-fold under leave-one-SA4-out spatial CV,
   with nested tuning.
 * **z-scores.** An additive random-effects funnel with a robust τ².
-* **Stability.** Measured with 200 bootstrap refits.
-* **Explanations.** Exact per-community driver contributions.
+* **Stability.** Measured with 200 bootstrap refits (since 12 October 2026,
+  an SA4 block bootstrap; see below).
+* **Explanations.** Exact per-community driver contributions (since 12 October
+  2026, from each community's held-out fold model; see below).
 * **New checks.** Residual bias by IRSD quintile and by SA4, Moran's I of the
   residual, and BH-corrected tests of service access and environment against
   the residual.
@@ -71,7 +73,7 @@ SEIFA map and added nothing a practitioner did not already know.
 | R² | 0.58 out-of-fold (V1 replica 0.53) |
 | Calibration slope | 0.99 |
 | Disadvantage guard | 0.013 |
-| Stability | 38 of 42 Higher communities stable in ≥ 70% of refits |
+| Stability | 35 of 42 Higher communities stable in ≥ 70% of SA4 block-bootstrap replicates (IID refit: 38 of 42) |
 | Residual bias | within ±0.7 pp in every IRSD quintile |
 
 **Kept deliberately.**
@@ -89,6 +91,21 @@ SEIFA map and added nothing a practitioner did not already know.
   practitioner review (DS-18.1).
 * V1 remains the published priority artefact until that review. V2 is served in
   the practitioner Brief with its evidence.
+
+**Explanation fidelity (V2 fix, 12 October 2026).**
+
+* **Problem.** Expectations were out-of-fold, but driver contributions came
+  from the model fitted to all communities. Against published expected values:
+  mean gap 0.43 pp, max 3.22 pp, 32 of 342 communities over 1 pp.
+* **Fix.** Contributions and the reference value now come from each
+  community's held-out fold model. Reconstruction gap: max 7.1e-15 pp, 0 of 342
+  above 0.01 pp. The script asserts this; the report carries
+  `explanation_reconciliation`.
+* **Stability.** The served share is now an SA4 block bootstrap that repeats
+  the spatial holdout with re-tuning (35 of 42 Higher stable, median 95%). The
+  earlier check is kept as "IID refit stability (does not reproduce the
+  spatial holdout)" (38 of 42, median 96%).
+* Bands and expected values are unchanged.
 
 **Next (V3 candidates, not started).**
 
@@ -152,7 +169,10 @@ each area's criterion values into a 0–100 score.
 * **AEDC.** Empirical-Bayes shrinkage.
 * **Services.** E2SFCA access across borders.
 * **Essential.** The Melbourne median or better (weight 2). Prefer has weight 1.
-* **Stability.** A Monte Carlo label for shortlist position.
+* **Stability.** A Monte Carlo label for shortlist position. Corrected on
+  12 October 2026 after an independent review: each draw now reruns the whole
+  search (Essential thresholds included), so areas can enter and leave. Before
+  the fix, a review search showed 100% where the full search gives 62.5%.
 * **Gates.** Nine blocking gates.
 
 **Evidence.**
@@ -194,6 +214,25 @@ Rolling-origin design: train on 2012→15, 15→18 and 18→21; hold out 21→24
   2024.
 * The published 2027 intervals add a cycle-shock variance of 1.80 pp, estimated
   from all four transitions.
+
+#### Validation design and limits
+
+* The table above uses 21→24 both to choose and to score, so it is a
+  validation result. A nested chronological evaluation was added
+  (`chronological_evaluation` in the report): choose on 18→21 after training on
+  12→15 and 15→18 (alpha tuned inside training), then score once on 21→24.
+* Validation chose F3 (5.27 pp; F4 5.46, F1 6.22, F0 6.73). Untouched test:
+  F3 6.43 pp vs persistence 7.56 pp, Spearman 0.65 vs 0.51, bias +3.48 pp
+  (over-prediction).
+* With interval SD from past-only out-of-time residuals, F3 covered 69.9%
+  (nominal 80%, mean width 17.9 pp) and 88.9% (nominal 95%, mean width
+  27.4 pp). Persistence covered 73.1% and 90.1%.
+* The common-shift adjusted error (5.68 pp) is a diagnostic, not operational
+  performance.
+* IRSD 2021 is reused for every origin. The test is one transition (342 areas
+  sharing one shift). The 2027 cycle-shock term was estimated after seeing 2024,
+  so the 2027 range is labelled "nominal 80% range (coverage not yet
+  demonstrated)" and the outlook is exploratory.
 
 ### Plan a change: P0 → P2 (Simulation page)
 
