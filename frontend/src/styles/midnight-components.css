@@ -3461,12 +3461,6 @@ html[data-theme="dark"] .result-status.success {
   color: var(--kp-status-strong-text)
 }
 
-html[data-theme="dark"] .comparison-panel {
-  background: var(--kp-color-surface-strong);
-  border: 1px solid color-mix(in srgb, var(--kp-color-border-subtle) 12%, transparent);
-  box-shadow: 0 8px 22px color-mix(in srgb, var(--kp-color-shadow-ink) 6%, transparent)
-}
-
 html[data-theme="dark"] .comparison-legend {
   color: var(--kp-color-text-secondary)
 }
