@@ -65,7 +65,7 @@
   border-radius: 24px;
 }
 
-/* Six destinations: keep the brand and the links from colliding on narrower screens. */
+/* Keep the brand and the links from colliding on narrower screens. */
 .brand-cluster { flex-shrink: 0; }
 @media (max-width: 1040px) {
   .brand-button span { display: none; }

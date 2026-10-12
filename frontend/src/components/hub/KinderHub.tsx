@@ -166,7 +166,7 @@ export function LocalityPicker({ locality, onSelect, autoOpen = false }: { local
       </li>)}</ul>}
       <div className="kh-picker-ways">
         <a href={mapHref}>Choose on the map</a>
-        <a href="/where-to-live">Compare areas to live in</a>
+        <a href="/map/where-to-live">Compare areas to live in</a>
       </div>
     </div>}
   </div>
