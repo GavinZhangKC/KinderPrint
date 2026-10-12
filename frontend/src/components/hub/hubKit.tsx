@@ -29,7 +29,7 @@ export function useLoad<T>(load: (signal: AbortSignal) => Promise<{ data: T }>, 
 /** Native <dialog>: focus moves in, Escape and the backdrop close it. */
 export function Dialog({ title, onClose, children }: { title: string; onClose: () => void; children: ReactNode }) {
   const ref = useRef<HTMLDialogElement>(null)
-  useEffect(() => { const el = ref.current; if (el && !el.open) el.showModal(); return () => el?.close() }, [])
+  useEffect(() => { const el = ref.current; if (el && !el.open) el.showModal() }, [])
   return <dialog ref={ref} className="vx-dialog" aria-labelledby="hp-dialog-title" onClose={onClose} onClick={event => { if (event.target === ref.current) onClose() }}>
     <div className="vx-dialog-body">
       <div className="vx-dialog-head"><h2 id="hp-dialog-title">{title}</h2><button type="button" className="vx-close" aria-label="Close" onClick={onClose}>×</button></div>

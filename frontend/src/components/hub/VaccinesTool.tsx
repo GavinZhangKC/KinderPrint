@@ -81,7 +81,7 @@ function useLoad<T>(load: (signal: AbortSignal) => Promise<{ data: T }>, key: st
 /** Accessible modal built on the native <dialog>: focus moves in, Escape and the backdrop close it. */
 function Dialog({ title, onClose, children }: { title: string; onClose: () => void; children: ReactNode }) {
   const ref = useRef<HTMLDialogElement>(null)
-  useEffect(() => { const el = ref.current; if (el && !el.open) el.showModal(); return () => el?.close() }, [])
+  useEffect(() => { const el = ref.current; if (el && !el.open) el.showModal() }, [])
   return <dialog ref={ref} className="vx-dialog" aria-labelledby="vx-dialog-title" onClose={onClose} onClick={event => { if (event.target === ref.current) onClose() }}>
     <div className="vx-dialog-body">
       <div className="vx-dialog-head"><h2 id="vx-dialog-title">{title}</h2><button type="button" className="vx-close" aria-label="Close" onClick={onClose}>×</button></div>
@@ -118,6 +118,39 @@ function Hero({ parent, title, text }: { parent: boolean; title: string; text: s
   </section>
 }
 
+
+type ScheduleRow = { item: ScheduleItem; due: Date | null; status: ScheduleStatus | null }
+const esc = (value: string) => value.replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c] as string))
+
+/** A printable vaccination report for the child, built from what the parent entered on this device. */
+function reportHtml(area: string, birthMonth: string, rows: ScheduleRow[], council: string | null): string {
+  const born = birthMonth ? new Date(`${birthMonth}-01T00:00:00`) : null
+  const today = dayMonthYear(new Date())
+  const body = rows.map(r => `<tr><td><b>${esc(r.item.when)}</b></td><td>${esc(r.item.vaccines)}</td><td>${r.status === 'school' ? 'School program' : r.due ? esc(monthYear(r.due)) : '—'}</td><td>${r.status ? esc(STATUS_LABEL[r.status]) : '—'}</td><td>${esc(r.item.where)}</td></tr>`).join('')
+  return `<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Vaccination report · ${esc(area)}</title><style>
+body{font:14px/1.5 Manrope,system-ui,sans-serif;color:#1f2a24;margin:32px}h1{font-size:22px;margin:0 0 4px}p{margin:4px 0}
+table{width:100%;border-collapse:collapse;margin:18px 0}th,td{border-bottom:1px solid #d7dcd8;padding:8px 6px;text-align:left;vertical-align:top}th{font-size:12px;text-transform:uppercase;letter-spacing:.04em;color:#4b5a51}
+.note{font-size:12px;color:#4b5a51}</style></head><body>
+<h1>Vaccination report</h1><p>${born ? `Born ${esc(monthYear(born))}` : 'Birth month not entered: dates are not shown'} · ${esc(area)} · Prepared ${esc(today)}</p>
+<table><thead><tr><th>Visit</th><th>Vaccines</th><th>Due</th><th>Status</th><th>Where</th></tr></thead><tbody>${body}</tbody></table>
+<p><b>Free at</b> your GP${council ? ` or a ${esc(council)} immunisation session` : ' or a council immunisation session'}. Bring your Medicare card and your child’s health record.</p>
+<p><b>Also in Victoria:</b> free flu vaccine from 6 months to under 5; free infant RSV protection for eligible babies, mid-March to 30 September.</p>
+<p class="note">Status uses the visits you marked done in Vkinder. Your child’s official record is the Immunisation History Statement (Medicare app or myGov). National Immunisation Program schedule, June 2026. General guidance, not medical advice.</p>
+</body></html>`
+}
+
+/** Opens the report in a hidden frame and starts the browser's print dialog (Save as PDF). */
+function printReport(html: string) {
+  const frame = document.createElement('iframe')
+  frame.setAttribute('aria-hidden', 'true')
+  frame.style.cssText = 'position:fixed;right:0;bottom:0;width:0;height:0;border:0'
+  document.body.appendChild(frame)
+  const doc = frame.contentDocument
+  if (!doc || !frame.contentWindow) { frame.remove(); return }
+  doc.open(); doc.write(html); doc.close()
+  setTimeout(() => { frame.contentWindow?.focus(); frame.contentWindow?.print(); setTimeout(() => frame.remove(), 1000) }, 250)
+}
+
 /* ------------------------------------------------------------------ parents */
 
 type ParentTab = 'schedule' | 'where' | 'kinder' | 'area'
@@ -127,7 +160,6 @@ function ParentVaccines({ locality, controls, birthMonth, immunisation, onOpenMa
     (value): value is string[] => Array.isArray(value) && value.every(item => typeof item === 'string'))
   const [start, setStart] = useStoredState(START_KEY, '')
   const [tab, setTab] = useState<ParentTab>('schedule')
-  const [fullSchedule, setFullSchedule] = useState(false)
   const [visit, setVisit] = useState<ScheduleItem | null>(null)
   const [bring, setBring] = useState(false)
   const panelRef = useRef<HTMLDivElement>(null)
@@ -146,7 +178,6 @@ function ParentVaccines({ locality, controls, birthMonth, immunisation, onOpenMa
   ]
   const summary = [`Vaccination plan · ${locality.name}`, ...catchUp.map(row => `Catch up: ${row.item.when} — ${row.item.vaccines}`), ...upcoming.slice(0, 3).map(row => `${row.due ? monthYear(row.due) : ''}: ${row.item.when} — ${row.item.vaccines}`), '', 'Check the official record: Immunisation History Statement (Medicare app or myGov).'].join('\n')
   const toggle = (id: string) => setDone(current => current.includes(id) ? current.filter(item => item !== id) : [...current, id])
-  const shownRows = fullSchedule ? rows : rows.filter(row => row.status === 'catch-up' || row.status === 'due-soon' || row.status === 'upcoming').slice(0, 3)
   const visitRow = visit ? rows.find(row => row.item.id === visit.id) : undefined
   const council = places.data?.council ?? null
   const go = (value: ParentTab) => { setTab(value); panelRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }) }
@@ -175,20 +206,22 @@ function ParentVaccines({ locality, controls, birthMonth, immunisation, onOpenMa
       <Tabs label="Vaccine details" value={tab} onChange={setTab} tabs={[['schedule', 'Schedule'], ['where', 'Where to go'], ['kinder', 'Childcare and kinder'], ['area', 'Our area']]} />
       <div id="vx-panel" role="tabpanel" aria-labelledby={`vx-tab-${tab}`} className="vx-tabpanel">
         {tab === 'schedule' && <>
-          <p className="kt-sub">{age === null ? 'Add your child’s birth month above to see due dates.' : `${doneCount} of ${rows.length} visits marked done. Select a visit for the vaccines and where to go.`}</p>
-          <ol className="vx-rows">{shownRows.map(row => <li key={row.item.id}>
-            <button type="button" className="vx-row" onClick={() => setVisit(row.item)}>
-              <span className="vx-txt"><b>{row.item.when}</b><small>{row.due ? monthYear(row.due) : ''}</small></span>
-              <span className={`vx-tag ${row.status ? TAG[row.status] : ''}`}>{row.status ? STATUS_LABEL[row.status] : 'Add birth month'}</span>
+          <p className="kt-sub">{age === null ? 'The free National Immunisation Program schedule. Add your child’s birth month above to see their due dates.' : `Born ${monthYear(new Date(`${birthMonth}-01T00:00:00`))}. ${doneCount} of ${rows.length} visits marked done. Select a visit to mark it done or see where to go.`}</p>
+          <ol className="vx-tl">{rows.map(row => <li key={row.item.id} className={row.status ? `is-${row.status}` : undefined}>
+            <button type="button" className="vx-tl-row" onClick={() => setVisit(row.item)}>
+              <span className="vx-tl-dot" aria-hidden="true" />
+              <span className="vx-tl-when"><b>{row.item.when}</b><small>{row.status === 'school' ? 'School program' : row.due ? `Due ${monthYear(row.due)}` : ''}</small></span>
+              <span className="vx-tl-what">{row.item.vaccines}<small>{row.item.where}</small></span>
+              {row.status && <span className={`vx-tag ${TAG[row.status]}`}>{STATUS_LABEL[row.status]}</span>}
               <span className="vx-chev" aria-hidden="true">›</span>
             </button>
           </li>)}</ol>
-          {!fullSchedule && age !== null && !shownRows.length && <p className="kt-empty">Nothing is due before the school program.</p>}
           <div className="ht-actions">
-            <button type="button" className="kh-btn" aria-expanded={fullSchedule} onClick={() => setFullSchedule(value => !value)}>{fullSchedule ? 'Show upcoming only' : `Show full schedule (${rows.length})`}</button>
-            <button type="button" className="kh-btn primary" disabled={!events.length} onClick={() => downloadFile(`vkinder-vaccines-${slug(locality.name)}.ics`, buildCalendar(events), 'text/calendar')}>Add reminders to calendar</button>
+            <button type="button" className="kh-btn primary" onClick={() => printReport(reportHtml(locality.name, birthMonth, rows, council?.council_name ?? null))}>Download report</button>
+            <button type="button" className="kh-btn" disabled={!events.length} onClick={() => downloadFile(`vkinder-vaccines-${slug(locality.name)}.ics`, buildCalendar(events), 'text/calendar')}>Add reminders to calendar</button>
             <button type="button" className="kh-btn kt-link-btn" onClick={() => emailToSelf(`Vaccination plan · ${locality.name}`, summary)}>Email to myself</button>
           </div>
+          <p className="ht-care-note">The report opens your browser’s print window: choose “Save as PDF” to keep a copy.</p>
         </>}
         {tab === 'where' && <Finder places={places} under5={under5} locality={locality.name} />}
         {tab === 'kinder' && <Kinder start={start} setStart={setStart} rows={rows} age={age} />}
@@ -333,11 +366,14 @@ export function ProximityMap({ places, visible, number, onSelect }: { places: Va
 
 /* ------------------------------------------------------------------ practitioners */
 
-type PracTab = 'coverage' | 'measures' | 'planning' | 'access'
+type PracTab = 'timeline' | 'coverage' | 'measures' | 'planning' | 'access'
+
+/** Which schedule visits each AIR checkpoint measures. */
+const CHECKPOINT_VISITS: Array<[string, string[]]> = [['12 months', ['nip-birth', 'nip-2m', 'nip-4m', 'nip-6m']], ['24 months', ['nip-12m', 'nip-18m']], ['60 months', ['nip-4y']]]
 
 function PractitionerVaccines({ locality, controls, immunisation, phaName, onOpenCare, places }: Props & { places: Places }) {
   const context = useLoad<PractitionerContext>(signal => api.getPractitionerContext(locality.id, signal), `ctx-${locality.id}`)
-  const [tab, setTab] = useState<PracTab>('coverage')
+  const [tab, setTab] = useState<PracTab>('timeline')
   const [copied, setCopied] = useState(false)
   const [detail, setDetail] = useState<ImmunisationIndicator | null>(null)
   const cover = useMemo(() => immunisation?.indicators.filter(item => has(item.pha.percent) && has(item.pha.numerator) && has(item.pha.denominator)) ?? [], [immunisation])
@@ -365,8 +401,9 @@ function PractitionerVaccines({ locality, controls, immunisation, phaName, onOpe
     </section>}
 
     <section className="kt-card kt-cream vx-panel" aria-label="Immunisation details">
-      <Tabs label="Immunisation details" value={tab} onChange={setTab} tabs={[['coverage', 'Coverage'], ['measures', 'Checkpoints'], ['planning', 'Planning questions'], ['access', 'Access to care']]} />
+      <Tabs label="Immunisation details" value={tab} onChange={setTab} tabs={[['timeline', 'Schedule and coverage'], ['coverage', 'Coverage'], ['measures', 'Checkpoints'], ['planning', 'Planning questions'], ['access', 'Access to care']]} />
       <div id="vx-panel" role="tabpanel" aria-labelledby={`vx-tab-${tab}`} className="vx-tabpanel">
+        {tab === 'timeline' && <ScheduleCoverage cover={cover} pha={pha} onSelect={setDetail} />}
         {tab === 'coverage' && (cover.length ? <>
           <p className="kt-sub">Fully immunised, {pha} PHA, AIR {cover[0].reference_period}. Select a checkpoint for counts and comparison.</p>
           <ol className="vx-rows">{cover.map(item => <li key={item.indicator_id}>
@@ -411,4 +448,27 @@ function PractitionerVaccines({ locality, controls, immunisation, phaName, onOpe
       <p className="kt-limit">Late recording can understate coverage.</p>
     </Dialog>}
   </div>
+}
+
+function ScheduleCoverage({ cover, pha, onSelect }: { cover: ImmunisationIndicator[]; pha: string; onSelect: (item: ImmunisationIndicator) => void }) {
+  if (!cover.length) return <p className="kt-empty">Coverage for this area isn’t published.</p>
+  const groups = CHECKPOINT_VISITS.map(([age, ids]) => ({ age, visits: NIP_SCHEDULE.filter(v => ids.includes(v.id)), item: cover.find(c => c.age === age) })).filter(g => g.item)
+  const below = groups.filter(g => (g.item!.pha.percent as number) < g.item!.national_aspirational_target)
+  const gap = [...below].sort((a, b) => (a.item!.pha.percent as number) - (b.item!.pha.percent as number))[0]
+  return <>
+    <p className="kt-sub">The National Immunisation Program schedule, with {pha} PHA coverage at each AIR checkpoint ({cover[0].reference_period}). Each checkpoint counts the doses from the visits before it.</p>
+    <ol className="vx-sc">{groups.map(g => { const pct = g.item!.pha.percent as number; const ok = pct >= g.item!.national_aspirational_target; const short = shortOf(g.item!.pha.numerator as number, g.item!.pha.denominator as number); return <li key={g.age} className={ok ? 'is-ok' : 'is-gap'}>
+      <div className="vx-sc-visits">{g.visits.map(v => <span key={v.id}><b>{v.when}</b><small>{v.vaccines}</small></span>)}</div>
+      <button type="button" className="vx-sc-check" onClick={() => onSelect(g.item!)}>
+        <span className="vx-sc-age">Checkpoint {g.age}</span>
+        <strong>{pct.toFixed(2)}%</strong>
+        <span className="vx-bar" aria-hidden="true"><span style={{ width: `${pct}%` }} />{g.item!.victoria && <b style={{ left: `${g.item!.victoria.percent}%` }} />}<i style={{ left: `${g.item!.national_aspirational_target}%` }} /></span>
+        <small>{ok ? 'Meets 95% target' : `Below 95% target · ${short} children short`}{g.item!.victoria ? ` · Victoria ${g.item!.victoria.percent.toFixed(1)}%` : ''}</small>
+      </button>
+    </li> })}
+      <li className="vx-sc-school"><div className="vx-sc-visits">{NIP_SCHEDULE.filter(v => v.where.startsWith('School')).map(v => <span key={v.id}><b>{v.when}</b><small>{v.vaccines}</small></span>)}</div><p className="ht-care-note">School program: not measured by these checkpoints.</p></li>
+    </ol>
+    <p className="hp-say">{gap ? <>The gap opens at the <b>{gap.age}</b> checkpoint, which counts the <b>{gap.visits.map(v => v.when).join(' and ')}</b> visits ({gap.visits.map(v => v.vaccines).join(' · ')}). Reminders and catch-up on {gap.visits.length > 1 ? 'these visits' : 'this visit'} would close it.</> : <>Every checkpoint meets the 95% target. Keep reminders going for the {groups[groups.length - 1]?.visits[0]?.when ?? '4-year'} visit, where children are easiest to miss.</>}</p>
+    <p className="kt-limit">Coverage is for the Population Health Area, not the SA2. Late recording on the Australian Immunisation Register can understate it.</p>
+  </>
 }
