@@ -1,6 +1,19 @@
 # Insight journey
 
-Implemented locally, without deployment. Enter through the existing landing page → menu → Insight. The reference demo redirected to a ChatGPT login screen; its content could not be inspected. The implementation follows the supplied experience requirements and existing KinderPrint visual system.
+Included in the frontend release code on `main`; production frontend updates are
+deployed through Vercel. The current **Insight Journey** navigation opens the
+Cesium experience at `/insight-journey` (also `/cesium-experiment`). This document
+describes the older procedural Three.js journey, retained at
+`/insight-journey-legacy`; it does not describe the current Cesium page.
+As of 12 October 2026, the production frontend is configured to use
+the team member's RDS-connected backend; frozen frontends retain the original
+backend. See [deployment responsibilities](AWS_VKINDER.md). This update does not
+claim a fresh online or browser verification of Insight.
+
+The following implementation notes and browser results are historical records
+from the original development work. At that time the reference demo redirected
+to a ChatGPT login screen and could not be inspected. The implementation follows
+the supplied experience requirements and existing KinderPrint visual system.
 
 ## Files and responsibilities
 
@@ -25,7 +38,10 @@ The first available AEDC vulnerability record by ascending neighbourhood ID is s
 
 Only three initial business requests are made: the existing `/api/neighbourhoods/indicators` collection, one profile and that area's priority. The collection is shared with the map. Re-entry uses a five-minute evidence cache; explicit retry refreshes it.
 
-Confirmed against the running backend and `datascience/outputs/iteration_1/profiles.json`:
+The following example was historically checked against the running backend and
+`datascience/outputs/iteration_1/profiles.json`. It is not a promise that today's
+production API returns the same record or values; the page follows the configured
+API's statuses and provenance rather than these documented figures.
 
 | Indicator | Source / reference year | Unit | Current raw value |
 | --- | --- | --- | --- |
@@ -47,7 +63,7 @@ Six narrative sections start at 280svh to give the longer route sufficient trave
 
 Three.js loads only when Insight needs its scene. Rendering is capped around 30fps with DPR ≤ 1.5, roughly 79,000 terrain triangles and instanced grove details. Cloud noise renders into a maximum 720×450 texture, refreshing around 11fps when stationary, with two drifting layers and shaded cloud bases. Rain uses one draw call, at most 240 streaks (100 on mobile), with independent deterministic placement, speed, length and depth variation. No ray-marched volumetric clouds or additional dependencies were introduced. Scroll frames update refs/DOM properties; React state changes only for chapter transitions. The animation loop, observers, listeners, materials, textures, render target, geometries and renderer are disposed on exit. Reduced-motion users get the still landscape without loading the 3D scene. WebGL initialization failure or context loss preserves the readable page.
 
-## Verification performed
+## Historical verification performed
 
 - `npm.cmd run build`: TypeScript and production bundling passed. Vite reports its size advisory for the existing main bundle and the separately loaded Three.js scene (~142 kB gzip).
 - Revised browser regression script now covers forward/reverse reading-position state across all seven chapters, seven station states, terrain clearance, hysteresis, real values/years, final freeze, replay and overflow.

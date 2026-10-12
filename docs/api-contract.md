@@ -1,10 +1,10 @@
 # KinderPrint API Contract
 
-**Version:** 0.3
+**Version:** 0.4
 
-**Status:** Working Iteration 1 contract with provisional Iteration 2 and Child Health Today extensions
+**Status:** Working contract covering Iterations 1–3, including Child Health Today, Family Fit, Plan Change and future/play context; unresolved analytical contracts remain provisional
 
-**Last updated:** 9 October 2026
+**Last updated:** 12 October 2026
 
 ## BE-0 — Dataset readiness service
 
@@ -37,7 +37,12 @@ and exclusion counts. Service names, original and normalised addresses, G-NAF id
 and coordinates are never returned. The loader rejects any REVIEW or UNMATCHED row marked
 for inclusion in spatial analysis.
 
-This document describes the agreed API shape for Iteration 1 and provisional Backend + Integration contracts for Iteration 2. It is a design contract only. It does not define implementation logic, connect datasets, or approve Data Science or AI methods. Every unresolved decision is marked `TBC`.
+This document describes the existing API surface and provisional Backend +
+Integration contracts across Iterations 1–3. It is documentation only: it does
+not deploy endpoints, connect datasets, change analytical logic or approve Data
+Science or AI methods. Existing implemented parameters are distinguished from
+unresolved decisions marked `TBC`. The contract describes repository code, not
+proof that every endpoint or dataset is deployed to a particular API URL.
 
 ## Contract conventions
 
@@ -850,7 +855,15 @@ shows in "How the match score works".
 * `suggestions` when fewer than 5 areas match. Each is `make_preferred` (need,
   label) or `widen_distance` (radius_km), with the number of `results` it would
   give. The backend never applies a relaxation itself.
-* `confidence` `{draws, measures_varied}`.
+* `confidence`: `draws`, `measures_varied`, `method`,
+  `areas_entering_top10_in_some_draws`, `draws_with_fewer_than_10_matches`,
+  `monte_carlo_se_max` and `assumption`. For searches using adjusted school-entry
+  measures, the seeded 200-draw check reruns distance eligibility, missing-input
+  checks, Essential thresholds and ranking on each draw. Each area's measures
+  are drawn independently. The reported maximum Monte Carlo standard error is
+  sampling precision, not a guarantee of predictive accuracy; it is `null` when
+  no adjusted measures are used. Stability describes top-ten membership under
+  this search, not confidence in an individual child's outcome.
 
 Notices: `family_fit_comparative_index`, `area_level_information`.
 
@@ -874,11 +887,112 @@ simplified at 0.0012°, about 180 KB).
   missing measures, scores outside 0–100, coordinates outside Greater Melbourne,
   duplicate ids, a forecast outside its interval, unknown flags and bad
   metadata.
-* A refreshed artefact is picked up without a restart (cache keyed on path and
-  modification time).
+* In files mode, caches use path and modification time. In postgres mode,
+  registered dataset caches are invalidated when the database version check
+  detects a changed load; the default check interval is 60 seconds. These are
+  storage-mode-specific mechanisms, not an automatic backend deployment.
 
 The earlier `GET /api/localities/suitable` (below) is no longer used by the
 frontend. It remains for backward compatibility.
+
+## Plan Change: "What if this area changed?"
+
+Runtime input: `KINDERPRINT_PLAN_CHANGE_DATA_PATH`, registered as `plan_change`
+for file or PostgreSQL storage. The backend validates the published artifact
+and runs the existing Plan Change engine; this contract introduces no new rule.
+
+### `GET /api/plan-change/setup`
+
+Returns `levers` (identifier, label, unit, improvement direction and observed
+`melbourne_range`), `presets`, `outcomes`, `max_levers`, `caveat`, `sources`,
+`model` and `built_utc`. The current maximum is two levers.
+
+### `GET /api/plan-change/areas/{area_id}`
+
+Accepts a nine-digit area identifier, or underscore-separated nine-digit
+components, with a maximum length of 80. Returns `id`, `name`, `sa4`,
+`place_features` (value and Melbourne percentile, or `null`), `outcomes_2024`,
+`outlook_2027` and `children_assessed_2024`. Unknown areas return `unavailable`
+with `unknown_area`; this endpoint does not use Family Fit's 404 response.
+
+### `GET /api/plan-change/evaluate`
+
+| Parameter | Implemented validation |
+|---|---|
+| `area` | Required; same identifier pattern and maximum length as area detail. |
+| `tree_cover` | Optional numeric change, greater than 0 and at most 40. |
+| `urban_heat` | Optional numeric change, at least −5 and less than 0. |
+| `open_space` | Optional numeric change, greater than 0 and at most 30. |
+| `road_traffic` | Optional numeric change, at least −90 and less than 0. |
+
+Use the units supplied by setup for these changes. Select one or two levers;
+zero or more than two returns `unavailable` with `invalid_plan`. Malformed
+parameters use the shared request-validation envelope (HTTP 422).
+
+Successful `data` includes `area`, `plan`, internal `status: "ok"`, `targets`,
+`like_plan`, `like_now`, `outcomes`, `balance_smd` and `balanced`. Each outcome
+contains `like_plan_pct`, `like_now_pct`, `difference_pp`, `interval_80_pp` and
+`direction`; internal `clarity` is not exposed. Top-level status is `available`.
+Unbalanced groups add `plan_groups_differ` without withholding the result.
+
+Unsupported comparisons use top-level `no_match`, retaining the engine's
+internal status and available context, with limitations such as
+`plan_too_few_similar`, `plan_beyond_observed` or `plan_no_data`. Unknown areas
+and missing/invalid artifacts use `unavailable`. These states must not be
+presented as a zero effect or a supported result.
+
+Successful setup, detail and evaluation responses carry `plan_change_association`
+and `area_level_information` notices. These are comparisons of existing areas,
+not causal intervention effects or predictions for an individual child.
+
+## Future demand context
+
+Runtime input: `KINDERPRINT_FUTURE_DEMAND_DATA_PATH` (`future_demand`). Values
+are source-supplied projections and service context, not new API forecasts.
+
+### `GET /api/future/area`
+
+Required `sa2_code`: exactly nine digits; malformed values use HTTP 422 and the
+shared validation envelope. Returns `data: {sa2_code, sa2_name, years}`, with
+the matching source rows sorted by `projection_year`, including child population
+and childcare, GP and primary-school context. Units, definitions and source
+coverage follow the dataset and `datascience/docs/FUTURE_DEMAND.md`.
+Unknown codes return `unavailable` with `unknown_area` and an empty `years`
+array. An unavailable dataset also returns `unavailable` and empty `years`,
+with its dataset limitation. Available responses include an area-level notice.
+
+### `GET /api/future/overview`
+
+No query parameters. Returns `data: {rows}` for the map. Each row contains
+`sa2_code`, `sa2_name`, `projection_year`, `children_0_4`, `children_0_14`,
+`children_0_4_change_from_2026_pct`, `ecec_places_per_100_0_4` and
+`ecec_places_to_keep_2026_access`. An unavailable dataset returns `unavailable`
+with `rows: []`. Both future endpoints include `projection_source`, `services`,
+`method` and `interpretation` metadata on available responses. Geography is
+identified by the SA2 codes in the data, not a separate `geographic_unit` field
+in the current future metadata. Projection/context values do
+not confirm future capacity, individual demand or an intervention benefit.
+
+## Play spaces context
+
+### `GET /api/digital-health/play-spaces`
+
+Required `sa2_code`: exactly nine digits, with the shared HTTP 422 validation
+response for malformed input. Runtime inputs are `KINDERPRINT_PLAY_SPACES_DATA_PATH`
+and `KINDERPRINT_PLAY_ACCESS_DATA_PATH` (`play_spaces` and `play_access`).
+
+When either dataset is readable, top-level status is currently `available` and
+`data` contains `sa2_code`, `origin`, `places` and `access`. Place/access records
+are ordered by kind and rank where applicable. `origin` is `null` without a
+matching access record; an unavailable section is `null` and carries its
+limitation. Loaded datasets without matching records yield empty lists, not a
+fabricated place or an automatic `unknown_area` error.
+
+When both datasets are unavailable, status is `unavailable` with
+`data: {sa2_code, places: null, access: null}` and dataset limitations. Metadata
+identifies Vicmap Features of Interest and straight-line distances from an SA2
+label point. Listed playgrounds, pools, picnic and day-visitor areas do not
+confirm shade, fencing, toilets, current condition or live suitability.
 
 ## Locality Suitability Service (provisional)
 
@@ -1067,9 +1181,14 @@ It confirms that the FastAPI service is running and makes no statement about bus
 
 ## Change policy and version roadmap
 
-This is a working Iteration 1 contract with provisional Iteration 2 extensions. It may be revised when geographic decisions are confirmed, approved Data Science or AI outputs become available, frontend requirements become more specific, or acceptance criteria are refined.
+This is a working contract spanning Iterations 1–3, with provisional analytical
+extensions where inputs or approval are unresolved. It may be revised when
+geographic decisions are confirmed, approved Data Science or AI outputs become
+available, frontend requirements become more specific, or acceptance criteria
+are refined. Document updates do not imply remote deployment or data approval.
 
 - **v0.1 — Initial Iteration 1 draft**
-- **v0.2 — Added provisional Iteration 2 Backend + Integration contracts** (this document)
-- **v0.3 — Updated after geographic unit / Data Science structures are confirmed**
-- **v1.0 — Stabilised Iteration 1 API contract**
+- **v0.2 — Added provisional Iteration 2 Backend + Integration contracts**
+- **v0.3 — Added dataset readiness, storage modes, Child Health Today and Family Fit documentation**
+- **v0.4 — Documented Plan Change, future demand and play spaces; updated Family Fit confidence and storage-specific cache behaviour (12 October 2026)** (current)
+- **v1.0 — Stabilised API contract** (planned; not yet declared stable)

@@ -1,9 +1,12 @@
 # Database storage (PostgreSQL)
 
 The KinderPrint API can read its datasets from PostgreSQL instead of from files
-bundled with the Lambda. Production uses PostgreSQL; local development and the
-test suite can keep using files. Both modes serve byte-for-byte identical API
-responses, and switching back to files is a single setting.
+bundled with Lambda. As of 12 October 2026, the production frontend uses the
+team member's RDS-connected API; the original Lambda remains on file-based
+storage for historical frontends. Local development can keep using files.
+The storage adapter is designed to preserve API responses in both modes; live
+PostgreSQL parity tests require an actual test database and are skipped without
+its configuration. See [deployment responsibilities](AWS_VKINDER.md).
 
 ## Contents
 
@@ -25,20 +28,20 @@ responses, and switching back to files is a single setting.
 ```text
 datascience/ outputs (CSV, JSON, GeoJSON)
         │
-        │  datascience/scripts/load_to_db.py   (run from a laptop, one transaction)
+        │  datascience/scripts/load_to_db.py (reachable host or private loader Lambda)
         ▼
-PostgreSQL schema "kinderprint"
+PostgreSQL configured schema (default "kinderprint"; built-in AWS stack "vkinder")
   ├── dataset_versions      one row per dataset: sha256, row count, columns
   ├── json_artefacts        JSON and GeoJSON documents
   └── ds_<dataset_key>      one typed table per CSV dataset
         │
-        │  pg8000 (pure Python), TLS, credentials from Secrets Manager
+        │  pg8000, TLS, runtime secret lookup or deploy-time injected credentials
         ▼
 backend/db/repository.py    rows exactly as csv.DictReader / json.loads give them
         │
 backend/core/sources.py     read_csv_rows / read_json: files or database
         │
-backend/loaders/*.py, validation.py, geography.py   (validation unchanged)
+backend/loaders/*.py, backend/validation.py, backend/geography.py
         │
 FastAPI routes (main.py)    same envelopes, limitations and responses
 ```
@@ -67,11 +70,11 @@ Key points:
 | --- | --- | --- |
 | `KINDERPRINT_DATA_BACKEND` | `files` | `files` or `postgres`. Unknown values fall back to `files` with a warning. |
 | `KINDERPRINT_*_DATA_PATH` | – | Still required in both modes. In postgres mode the value is not read, but an unset variable still means "not configured", exactly as before. |
-| `KINDERPRINT_DB_SECRET_ARN` | – | Secrets Manager secret with the credentials (production). |
-| `KINDERPRINT_DB_HOST`, `_PORT`, `_NAME`, `_USER`, `_PASSWORD` | port `5432` | Local development, or host/port/name when the secret holds only a username and password (RDS-managed master secrets). |
+| `KINDERPRINT_DB_SECRET_ARN` | – | Optional runtime Secrets Manager credential lookup, used by the external-database configuration. |
+| `KINDERPRINT_DB_HOST`, `_PORT`, `_NAME`, `_USER`, `_PASSWORD` | port `5432` | Local connections, deploy-time injected credentials, or connection details absent from a runtime secret. |
 | `KINDERPRINT_DB_SSL` | `true` | `true` verifies the server certificate and host name; `require` encrypts without verifying; `false` is for a local database only. |
 | `KINDERPRINT_DB_SSL_ROOT_CERT` | bundled RDS CA | CA bundle used when `KINDERPRINT_DB_SSL=true`. |
-| `KINDERPRINT_DB_SCHEMA` | `kinderprint` | Schema holding the tables. Must be a lower-case identifier. |
+| `KINDERPRINT_DB_SCHEMA` | `kinderprint` | Schema holding the tables. The built-in `CreateDatabase=true` stack sets `vkinder`; importer and API must use the same schema. Must be a lower-case identifier. |
 | `KINDERPRINT_DB_CACHE_SECONDS` | `60` | How often the API checks for a newer load. |
 | `KINDERPRINT_DB_CONNECT_TIMEOUT` | `5` | Seconds for connecting and for each network read. |
 | `KINDERPRINT_DB_STATEMENT_TIMEOUT_MS` | `15000` | Server-side statement timeout for API queries. |
@@ -79,6 +82,13 @@ Key points:
 When a secret ARN is set, the username and password always come from the
 secret. Host, port and database name come from the secret when it has them
 (standard RDS secrets do) and otherwise from the `KINDERPRINT_DB_*` variables.
+
+The built-in AWS stack resolves its generated Secrets Manager passwords through
+CloudFormation at deployment and injects them into Lambda environment variables.
+This differs from runtime secret lookup: environment credentials do not refresh
+automatically when a secret rotates. Update the deployment after rotation, and
+restrict access to Lambda configuration. Do not place credentials in `VITE_*`
+variables, browser code, documentation or Git.
 
 Datasets that are not in the registry (the unapproved pattern-insight and
 prevention-opportunity paths) are always read from files.
@@ -162,6 +172,13 @@ return exactly the strings that were in the file, in the same column order.
 
 ## One-off database set-up
 
+This section describes a generic existing database using schema `kinderprint`
+and roles `kinderprint_loader` / `kinderprint_api`. It is not the built-in private
+stack procedure. That stack uses schema `vkinder`, an administrative loader
+Lambda and the `vkinder_api` read-only role; follow [AWS_VKINDER.md](AWS_VKINDER.md)
+in its owning account instead. Do not open the private database to the internet
+just to run a laptop import.
+
 The steps below assume an Amazon RDS for PostgreSQL instance or Aurora
 PostgreSQL cluster in `ap-southeast-2`, reachable from your laptop (for loading)
 and from the Lambda's subnets. Use two roles: a loader that owns the schema, and
@@ -191,8 +208,9 @@ it), for example `kinderprint/db/api` and `kinderprint/db/loader`:
  "username": "kinderprint_api", "password": "<strong random password>", "dbname": "kinderprint"}
 ```
 
-Turn on automatic rotation if your organisation requires it; the API re-reads
-the secret automatically after an authentication failure.
+When runtime secret lookup is configured, the API re-reads the secret after an
+authentication failure. Deploy-time injected credentials instead require a
+deployment update after rotation.
 
 ## Loading data
 
@@ -291,15 +309,17 @@ Template parameters (all optional; a deploy without them behaves exactly as befo
 | `DataBackend` | `files` | Sets `KINDERPRINT_DATA_BACKEND`. |
 | `DbSecretArn` | empty | Sets `KINDERPRINT_DB_SECRET_ARN` and, only when set, adds an IAM statement allowing `secretsmanager:GetSecretValue` on that one secret. |
 | `SubnetIds`, `SecurityGroupIds` | empty | When both are set, the function runs in those subnets (`VpcConfig`). |
+| `CreateDatabase` | `false` | Creates the built-in private RDS stack when `true`, using schema `vkinder` and deploy-time injected credentials. See the separate stack procedure before enabling it. |
 
 Networking notes:
 
 - If the database is not publicly reachable (recommended), give the function
   private subnets and a security group, and allow inbound TCP 5432 on the
   database's security group from the function's security group.
-- A function inside a VPC has no internet access. It needs a route to Secrets
-  Manager: add an interface VPC endpoint for `secretsmanager` in those subnets
-  (or a NAT gateway).
+- Private subnets do not provide internet access by themselves. Runtime secret
+  lookup needs connectivity to Secrets Manager, such as an interface endpoint or
+  NAT. The built-in stack uses deploy-time credential injection and does not
+  require that runtime lookup route.
 - Each warm Lambda container keeps one connection. Keep reserved concurrency
   within the database's connection limit, or put RDS Proxy in front.
 - Aurora Serverless v2 scaled to zero can take several seconds to resume. The
@@ -323,18 +343,21 @@ Networking notes:
 
 ## Security
 
-- **No credentials in code or chat.** Production credentials live only in AWS
-  Secrets Manager. Local passwords are typed into the shell (`read -rs`), never
+- **No credentials in code or chat.** Secrets Manager stores the built-in
+  stack's passwords, but deploy-time injection also places them in Lambda
+  environment configuration. Restrict access to both. Local passwords are typed into the shell (`read -rs`), never
   written into files, scripts or messages. `.env.example` contains no secrets.
   Connection settings never print the password.
 - **Least privilege.**
-  - The Lambda role gets `secretsmanager:GetSecretValue` on the one configured
-    secret ARN, and nothing else is added. No account IDs or ARNs are written
-    into `template.yaml`.
-  - The API connects as `kinderprint_api`, which only has `USAGE` on the
-    `kinderprint` schema and `SELECT` on its tables. The API itself only runs
+  - External-database runtime lookup grants `secretsmanager:GetSecretValue` on
+    the configured secret ARN; the built-in stack uses deploy-time injection.
+    Network, logging and other permissions depend on the selected stack.
+  - The generic API connects as `kinderprint_api` (`vkinder_api` in the built-in
+    stack), with `USAGE` on the configured schema and `SELECT` on its tables.
+    The API itself only runs
     `SELECT` statements (CSV reads inside read-only transactions).
-  - The loader role owns only the `kinderprint` schema.
+  - The generic loader owns the configured schema. The built-in loader uses
+    administrative credentials and must remain separate from the public API.
 - **Encryption in transit.** TLS is on by default and verifies the server
   certificate and host name against the Amazon RDS certificate bundle. Turn on
   `rds.force_ssl` on the database parameter group so plain connections are
@@ -346,6 +369,12 @@ Networking notes:
   column names are checked against strict identifier patterns and quoted.
 
 ## Rollback
+
+Apply rollback only to the intended backend in its owning account. Switching
+Vercel's API base URL and redeploying the frontend is a separate operation; do
+not alter frozen deployments or the original Lambda unintentionally. For the
+built-in `vkinder` stack, use the parameter-preserving command in
+[AWS_VKINDER.md](AWS_VKINDER.md), rather than an unqualified deployment below.
 
 The data files are still packaged with the Lambda, so returning to files mode
 needs no rebuild:
