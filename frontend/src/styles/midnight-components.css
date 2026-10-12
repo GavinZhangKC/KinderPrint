@@ -95,8 +95,8 @@ html[data-theme="dark"] .map-cursor-orb::after {
 
 html[data-theme="dark"] .real-map .mapboxgl-ctrl-group {
   border: 1px solid color-mix(in srgb, var(--kp-color-border-subtle) 75%, transparent);
-  background: var(--kp-color-surface-default);
-  box-shadow: 0 10px 26px color-mix(in srgb, var(--kp-color-shadow-ink) 14%, transparent);
+  background: linear-gradient(135deg, rgba(24, 41, 66, .5), rgba(14, 27, 48, .3));
+  box-shadow: 0 10px 26px color-mix(in srgb, var(--kp-color-shadow-ink) 14%, transparent), inset 0 1px 0 rgba(169, 182, 255, .15);
   backdrop-filter: blur(var(--kp-glass-blur));
   -webkit-backdrop-filter: blur(var(--kp-glass-blur))
 }

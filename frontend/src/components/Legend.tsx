@@ -22,6 +22,7 @@ export default function Legend({ preference }: LegendProps) {
       <div className="legend-row"><i className={`legend-swatch ${positive ? 'positive-low' : 'risk-low'}`} />{active.low}</div>
       <div className="legend-row"><i className="legend-swatch mid" />{active.middle}</div>
       <div className="legend-row"><i className={`legend-swatch ${positive ? 'positive-high' : 'risk-high'}`} />{active.high}</div>
+      <div className="legend-row"><i className="legend-swatch no-data" />No data</div>
     </section>
   )
 }

@@ -740,7 +740,6 @@ setMapSelectedId(null)
               />
             )}
 
-          {view === 'map' && <p className="map-click-hint glass">Select any area on the map to see its profile and open its child health board.</p>}
 
         </section>
       </main>

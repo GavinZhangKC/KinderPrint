@@ -7,7 +7,6 @@ export const HOVER_SHADOW_LAYER_ID = 'kinderprint-neighbourhood-hover-shadow'
 export const HOVER_FILL_LAYER_ID = 'kinderprint-neighbourhood-hover-fill'
 export const OUTLINE_LAYER_ID = 'kinderprint-neighbourhood-outline'
 export const HOVER_BORDER_LAYER_ID = 'kinderprint-neighbourhood-hover-border'
-export const SELECTED_LAYER_ID = 'kinderprint-neighbourhood-selected'
 export const COMPARISON_LAYER_ID = 'kinderprint-neighbourhood-comparison'
 
 export const EMPTY_COLLECTION: BoundaryFeatureCollection = {
@@ -26,6 +25,14 @@ const CHOROPLETH_STYLE: Record<
   'green-space': { property: 'green_space', stops: [10, 20, 35] },
 }
 
+export const NO_DATA_FILL = '#AEB7C4'
+
+export function hasHeatmapData(properties: Record<string, unknown> | null | undefined, preference: PreferenceId | null) {
+  if (!preference) return true
+  const value = properties?.[CHOROPLETH_STYLE[preference].property]
+  return typeof value === 'number' && Number.isFinite(value)
+}
+
 export function choroplethFill(preference: PreferenceId | null) {
   if (!preference) return '#FFFFFF'
 
@@ -38,17 +45,20 @@ export function choroplethFill(preference: PreferenceId | null) {
   const high = positive ? '#9ADBB8' : '#F5B6A8'
 
   return [
+    'case',
+    ['==', ['typeof', ['get', property]], 'number'],
+    [
     'interpolate',
     ['linear'],
     ['coalesce', ['get', property], -999],
-    -999,
-    'rgba(255,255,255,0.08)',
     stops[0],
     low,
     stops[1],
     '#F6E7A8',
     stops[2],
     high,
+    ],
+    NO_DATA_FILL,
   ] as any
 }
 

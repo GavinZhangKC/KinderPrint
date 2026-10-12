@@ -21,8 +21,8 @@ import {
   HOVER_BORDER_LAYER_ID,
   HOVER_FILL_LAYER_ID,
   HOVER_SHADOW_LAYER_ID,
+  hasHeatmapData,
   OUTLINE_LAYER_ID,
-  SELECTED_LAYER_ID,
   selectionFilter,
   SOURCE_ID,
 } from './mapStyles'
@@ -236,6 +236,7 @@ export default function NeighbourhoodMap({
     useRef<HTMLDivElement | null>(
       null,
     )
+  const captionRef = useRef<HTMLSpanElement | null>(null)
 
 
   const preferenceRef = useRef<PreferenceId | null>(preference)
@@ -731,38 +732,6 @@ map.addSource(
 
         map.addLayer({
           id:
-            SELECTED_LAYER_ID,
-
-          type:
-            'line',
-
-          slot:
-            'top',
-
-          source:
-            SOURCE_ID,
-
-          filter:
-            selectionFilter(
-              selectedIdRef.current,
-            ),
-
-          paint: {
-            'line-color': '#4F6FFF',
-
-            'line-width':
-              3,
-
-            'line-opacity':
-              0.95,
-
-            'line-blur':
-              0.15,
-          },
-        })
-
-        map.addLayer({
-          id:
             COMPARISON_LAYER_ID,
 
           type:
@@ -800,9 +769,9 @@ map.addSource(
           map.on(
           'mouseenter',
           FILL_LAYER_ID,
-          () => {
+          (event: MapLayerMouseEvent) => {
             map.getCanvas().style.cursor =
-              selectionEnabledRef.current ? 'pointer' : ''
+              selectionEnabledRef.current && hasHeatmapData(getFirstNeighbourhoodFeature(event)?.properties, preferenceRef.current) ? 'pointer' : ''
           },
         )
         map.on(
@@ -821,6 +790,13 @@ map.addSource(
               return
             }
 
+            if (!hasHeatmapData(feature.properties, preferenceRef.current)) {
+              clearHover()
+              map.getCanvas().style.cursor = 'not-allowed'
+              return
+            }
+            map.getCanvas().style.cursor = 'pointer'
+
             const properties =
               feature.properties
 
@@ -837,6 +813,10 @@ map.addSource(
               typeof featureId !==
                 'number'
             ) {
+              return
+            }
+            if (String(featureId) === selectedIdRef.current) {
+              clearHover()
               return
             }
 if (
@@ -923,6 +903,8 @@ map.on(
               return
             }
 
+            if (!hasHeatmapData(feature.properties, preferenceRef.current)) return
+
             const properties =
               feature.properties
 
@@ -939,6 +921,7 @@ map.on(
               return
             }
 
+            clearHover()
             onSelectRef.current(
               id,
 
@@ -1132,30 +1115,23 @@ useEffect(() => {
     map.setPaintProperty(FILL_LAYER_ID, 'fill-color', choroplethFill(preference))
     map.setPaintProperty(FILL_LAYER_ID, 'fill-opacity', preference ? 0.62 : 0.01)
   }, [preference])
+  useEffect(() => { clearHoverRef.current() }, [preference])
+  useEffect(() => {
+    const caption = captionRef.current
+    const container = mapContainerRef.current
+    if (!caption || !container) return
+    const surface = container.closest<HTMLElement>('.map-surface') ?? container
+    const updateClearance = () => {
+      const captionClearance = Math.ceil(caption.getBoundingClientRect().height) + 24
+      surface.style.setProperty('--map-footer-clearance', `${captionClearance}px`)
+    }
+    const observer = new ResizeObserver(updateClearance)
+    observer.observe(caption)
+    updateClearance()
+    return () => observer.disconnect()
+  }, [])
 useEffect(() => {
-    const map =
-      mapRef.current
-
-    if (
-      !map ||
-      !map.isStyleLoaded()
-    ) {
-      return
-    }
-
-    if (
-      map.getLayer(
-        SELECTED_LAYER_ID,
-      )
-    ) {
-      map.setFilter(
-        SELECTED_LAYER_ID,
-
-        selectionFilter(
-          selectedId,
-        ),
-      )
-    }
+    if (selectedId) clearHoverRef.current()
   }, [
     selectedId,
   ])
@@ -1305,7 +1281,7 @@ useEffect(() => {
         </div>
       )}
 
-      <span className="map-caption">
+      <span className="map-caption" ref={captionRef}>
         Greater Melbourne · SA2
         (ASGS Edition 3, 2021)
 
