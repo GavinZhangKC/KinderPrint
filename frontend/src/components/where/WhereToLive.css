@@ -273,8 +273,7 @@
   font-family: 'Manrope', 'Segoe UI', sans-serif; color: var(--kt-ink); background: none;
 }
 .wl-page-shell .kh-top { margin-bottom: 14px; }
-.kp-hub .kh-nav.wl-hub-label { margin: 0; padding: 10px 18px; gap: 8px; background: var(--kt-primary); color: var(--kt-on-primary); font-weight: 700; border-color: transparent; backdrop-filter: none; }
-.wl-hub-label svg { stroke: currentColor; }
+.kp-hub .wl-area-title { margin: 0; min-width: 0; max-width: 100%; color: var(--kt-accent); font-family: var(--kh-display); font-size: clamp(26px, 3vw, 36px); font-weight: 650; line-height: 1.15; letter-spacing: -.025em; overflow-wrap: anywhere; }
 .kp-hub .wl-hub .wl-main { width: auto; max-width: none; margin: 0; padding: 0 0 80px; }
 .kp-hub .wl-hub .kt-hero h1, .kp-hub .wl-hub .kt-hero p { color: #fff; }
 .kp-hub .wl-hub .wl-hub-bar { justify-content: space-between; margin-bottom: 28px; }

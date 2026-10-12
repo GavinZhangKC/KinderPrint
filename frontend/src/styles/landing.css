@@ -1389,7 +1389,9 @@ html:has(.home-page) body::-webkit-scrollbar {
 @media (max-width: 680px) {
   .home-header {
     --home-header-bar-height: 62px;
-    padding: 0 20px;
+    padding: 0 12px;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    column-gap: 8px;
   }
 
   .home-brand span {
@@ -1408,7 +1410,8 @@ html:has(.home-page) body::-webkit-scrollbar {
 
   .home-nav-cta {
     min-height: 36px;
-    padding-inline: 10px;
+    max-width: 112px;
+    padding-inline: 8px;
     font-size: 9px;
     letter-spacing: .08em;
   }

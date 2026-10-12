@@ -56,7 +56,7 @@ const homeDiscoveryFocusKeys = ['learning', 'social', 'physical', 'respiratory',
 const exploreItems = [
   { id: 'insight', number: '01', label: 'Insight Journey', videoSrc: '/insight-preview.mp4' },
   { id: 'map', number: '02', label: 'Interactive Map', videoSrc: '/map-preview.mp4' },
-  { id: 'about', number: '03', label: 'About Us', videoSrc: '/about-preview.mp4' },
+  { id: 'simulation', number: '03', label: 'Simulation', videoSrc: '/about-preview.mp4' },
 ] as const
 
 type ExploreItemId = typeof exploreItems[number]['id']
@@ -125,7 +125,7 @@ function ExploreMenuLink({ item, onSelect }: ExploreMenuLinkProps) {
   )
 }
 
-function HomeHeader({ onHome, onInsight, onSimulation, onMap, onHealth }: HomeHeaderProps) {
+function HomeHeader({ onHome, onInsight, onSimulation, onMap }: HomeHeaderProps) {
   return (
     <header className="glass home-header" data-no-ripple>
       <div className="home-brand-cluster">
@@ -139,10 +139,8 @@ function HomeHeader({ onHome, onInsight, onSimulation, onMap, onHealth }: HomeHe
         <button type="button" aria-current="page" onClick={onHome}>Home</button>
         <button type="button" onClick={onInsight}>Insight Journey</button>
         <button type="button" onClick={onSimulation}>Simulation</button>
-        <button type="button" onClick={onHealth}>Child Health</button>
-        <button type="button" onClick={() => window.location.assign('/where-to-live')}>Where to live</button>
       </nav>
-      <button className="home-nav-cta" type="button" onClick={onMap}>Explore Map</button>
+      <button className="home-nav-cta" type="button" onClick={onMap}>Child Health Explore</button>
     </header>
   )
 }
@@ -387,8 +385,8 @@ function HomeDiscoverySection() {
         <p className="home-discovery-where">
           <span>Thinking of moving?</span>
           <a href={selectedPriority
-            ? `/where-to-live?focus=${homeDiscoveryFocusKeys[homeDiscoveryPriorities.indexOf(selectedPriority as typeof homeDiscoveryPriorities[number])]}`
-            : '/where-to-live'}>
+            ? `/map/where-to-live?focus=${homeDiscoveryFocusKeys[homeDiscoveryPriorities.indexOf(selectedPriority as typeof homeDiscoveryPriorities[number])]}`
+            : '/map/where-to-live'}>
             {selectedPriority ? `Compare areas for ${selectedPriority.toLowerCase()}` : 'Compare areas for your family'}
             <span aria-hidden="true">→</span>
           </a>
@@ -531,7 +529,7 @@ export default function LandingPage({ onInsight, onSimulation, onMap, onHealth }
   const openExploreItem = (id: ExploreItemId) => {
     if (id === 'insight') onInsight()
     else if (id === 'map') onMap()
-    else scrollToSection('home-about')
+    else if (id === 'simulation') onSimulation()
   }
 
   return (

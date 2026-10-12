@@ -51,7 +51,7 @@ function initialAppPage(): AppPage {
   if (pathname === '/map') return 'map'
   if (pathname === '/simulation') return 'simulation'
   if (pathname === '/child-health' || pathname === '/health') return 'health'
-  if (pathname === '/where-to-live') return 'where'
+  if (pathname === '/map/where-to-live' || pathname === '/where-to-live') return 'where'
 
   // Keep old shared-page links working while navigation moves to real paths.
   const requestedPage = new URLSearchParams(window.location.search).get('page')
@@ -66,7 +66,7 @@ function appPagePath(page: Exclude<AppPage, 'insight-legacy'>) {
   if (page === 'map') return '/map'
   if (page === 'simulation') return '/simulation'
   if (page === 'health') return '/child-health'
-  if (page === 'where') return '/where-to-live'
+  if (page === 'where') return '/map/where-to-live'
   return '/'
 }
 
@@ -597,8 +597,8 @@ setMapSelectedId(null)
 
           </div>
 
-          <a className="glass map-where-link" href="/where-to-live">
-            Compare areas for your family
+          <a className="glass map-where-link" href="/map/where-to-live">
+            Where to live · Compare areas
           </a>
 
 
@@ -671,7 +671,7 @@ setMapSelectedId(null)
 
                   onOpenHealth={() => window.location.assign(childHealthUrl(selected.id, selected.name))}
 
-                  onOpenWhere={() => window.location.assign(`/where-to-live?anchor=${encodeURIComponent(selected.id)}`)}
+                  onOpenWhere={() => window.location.assign(`/map/where-to-live?anchor=${encodeURIComponent(selected.id)}`)}
 
                   showCompareAndData={false}
 
@@ -740,7 +740,6 @@ setMapSelectedId(null)
               />
             )}
 
-          {view === 'map' && <p className="map-click-hint glass">Select any area on the map to see its profile and open its child health board.</p>}
 
         </section>
       </main>

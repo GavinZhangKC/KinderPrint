@@ -19,6 +19,9 @@ html:has(.simulation-shell) body::-webkit-scrollbar {
 }
 
 .simulation-page {
+  --simulation-radius-card: 24px;
+  --simulation-radius-surface: 16px;
+  --simulation-radius-control: 12px;
   min-height: 100dvh;
   padding: clamp(8px, 1.5dvh, 16px) clamp(10px, 2vw, 32px) 12px;
 }
@@ -99,7 +102,7 @@ html:has(.simulation-shell) body::-webkit-scrollbar {
   padding: 13px 15px;
   color: #526b94;
   border: 1px solid rgba(109, 120, 232, .16);
-  border-radius: 14px;
+  border-radius: var(--simulation-radius-surface, 14px);
   background: rgba(255, 255, 255, .97);
   box-shadow: 0 10px 26px rgba(35, 58, 99, .12);
   opacity: 0;
@@ -193,7 +196,7 @@ html:has(.simulation-shell) body::-webkit-scrollbar {
   width: min(360px, 78vw);
   background: rgba(16, 30, 57, 0.96);
   color: #edf4ff;
-  border-radius: 14px;
+  border-radius: var(--simulation-radius-surface, 14px);
   padding: 12px 14px;
   box-shadow: 0 18px 34px rgba(10, 23, 41, 0.2);
   opacity: 0;
@@ -243,23 +246,8 @@ html:has(.simulation-shell) body::-webkit-scrollbar {
   justify-content: stretch;
 }
 
-.simulation-grid.has-results .simulation-builder-panel {
-  animation: simulation-builder-to-left 360ms cubic-bezier(.2, .72, .25, 1) both;
-}
-
 .simulation-results-panel {
   animation: simulation-results-enter 360ms cubic-bezier(.2, .72, .25, 1) both;
-}
-
-@keyframes simulation-builder-to-left {
-  from {
-    opacity: .92;
-    transform: translateX(30%);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
 }
 
 @keyframes simulation-results-enter {
@@ -277,7 +265,7 @@ html:has(.simulation-shell) body::-webkit-scrollbar {
   min-width: 0;
   background: rgba(246, 250, 255, .68);
   border: 1px solid rgba(255, 255, 255, .78);
-  border-radius: 24px;
+  border-radius: var(--simulation-radius-card, 24px);
   padding: 22px 20px 18px;
   box-shadow: 0 7px 18px rgba(45, 75, 118, .08), inset 0 1px 0 rgba(255,255,255,.35);
 }
@@ -311,7 +299,8 @@ html:has(.simulation-shell) body::-webkit-scrollbar {
   margin-bottom: 18px;
 }
 
-.scenario-heading h2 {
+.scenario-heading h2,
+.results-header h2 {
   margin-bottom: 0;
   font-family: 'Bricolage Grotesque', 'Segoe UI', sans-serif;
   font-weight: 650;
@@ -351,7 +340,7 @@ html:has(.simulation-shell) body::-webkit-scrollbar {
   padding: 16px;
   color: #5f7a9f;
   border: 1px solid rgba(109, 120, 232, .14);
-  border-radius: 18px;
+  border-radius: var(--simulation-radius-surface, 18px);
   background: rgba(255, 255, 255, .98);
   box-shadow: 0 10px 28px rgba(41, 77, 122, .14);
   opacity: 0;
@@ -402,6 +391,7 @@ html:has(.simulation-shell) body::-webkit-scrollbar {
 }
 
 .simulation-search-shell {
+  border-radius: var(--simulation-radius-surface);
   width: 100%;
   height: 56px;
   padding-right: 56px;
@@ -416,7 +406,7 @@ html:has(.simulation-shell) body::-webkit-scrollbar {
   max-height: 248px;
   overflow-y: auto;
   background: rgba(255,255,255,0.9);
-  border-radius: 16px;
+  border-radius: var(--simulation-radius-surface, 16px);
   box-shadow: 0 18px 40px rgba(30, 52, 92, 0.14);
   border: 1px solid rgba(255,255,255,0.8);
 }
@@ -453,7 +443,7 @@ html:has(.simulation-shell) body::-webkit-scrollbar {
 .select-shell {
   background: rgba(255,255,255,0.5);
   border: 1px solid rgba(255,255,255,0.8);
-  border-radius: 16px;
+  border-radius: var(--simulation-radius-surface, 16px);
   overflow: hidden;
 }
 
@@ -468,7 +458,30 @@ html:has(.simulation-shell) body::-webkit-scrollbar {
   outline: none;
 }
 
-.scenario-variables { margin-top: 24px; }
+.simulation-controls-reveal { overflow: hidden; }
+.scenario-variables { min-width: 0; margin: 24px 0 0; padding: 0; border: 0; }
+
+.simulation-selected-area {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 10px;
+  color: var(--text);
+  font-size: 13px;
+}
+
+.simulation-selected-area span { min-width: 0; overflow-wrap: anywhere; }
+.simulation-selected-area button {
+  flex-shrink: 0;
+  padding: 6px 8px;
+  border: 1px solid var(--primary);
+  border-radius: var(--simulation-radius-control, 8px);
+  background: transparent;
+  color: var(--brand);
+  font: inherit;
+  cursor: pointer;
+}
 
 .simulation-preset-controls {
   display: grid;
@@ -491,7 +504,7 @@ html:has(.simulation-shell) body::-webkit-scrollbar {
   padding: 7px 10px;
   color: #35557f;
   border: 1px solid rgba(109, 120, 232, .18);
-  border-radius: 9px;
+  border-radius: var(--simulation-radius-control, 9px);
   background: rgba(255, 255, 255, .65);
   font-size: 11px;
   font-weight: 700;
@@ -522,7 +535,7 @@ html:has(.simulation-shell) body::-webkit-scrollbar {
   padding: 7px 10px;
   color: #35557f;
   border: 1px solid rgba(109, 120, 232, .16);
-  border-radius: 8px;
+  border-radius: var(--simulation-radius-control, 8px);
   background: rgba(255, 255, 255, .6);
   font-size: 11px;
 }
@@ -638,7 +651,7 @@ html:has(.simulation-shell) body::-webkit-scrollbar {
   margin-top: 18px;
   background: rgba(255, 255, 255, 0.42);
   border: 1px solid rgba(255, 255, 255, 0.7);
-  border-radius: 18px;
+  border-radius: var(--simulation-radius-surface, 18px);
   padding: 14px 16px;
 }
 
@@ -668,7 +681,7 @@ html:has(.simulation-shell) body::-webkit-scrollbar {
 
 .button {
   border: 0;
-  border-radius: 14px;
+  border-radius: var(--simulation-radius-control, 14px);
   padding: 14px 22px;
   font-weight: 800;
   font-size: 17px;
@@ -713,7 +726,7 @@ html:has(.simulation-shell) body::-webkit-scrollbar {
   margin: 0 0 10px;
   padding: 8px 10px;
   border: 1px solid rgba(109, 120, 232, .14);
-  border-radius: 9px;
+  border-radius: var(--simulation-radius-surface, 9px);
   background: rgba(255, 255, 255, .5);
 }
 
@@ -723,7 +736,7 @@ html:has(.simulation-shell) body::-webkit-scrollbar {
   padding: 6px 11px;
   color: #fff;
   border: 0;
-  border-radius: 7px;
+  border-radius: var(--simulation-radius-control, 7px);
   background: #5069d5;
   font-size: 11px;
   font-weight: 750;
@@ -893,7 +906,7 @@ html:has(.simulation-shell) body::-webkit-scrollbar {
   padding: 5px 26px 5px 8px;
   color: #35557f;
   border: 1px solid rgba(109, 120, 232, .2);
-  border-radius: 8px;
+  border-radius: var(--simulation-radius-control, 8px);
   background: rgba(255, 255, 255, .78);
   font-size: 10px;
   font-weight: 700;
@@ -911,7 +924,7 @@ html:has(.simulation-shell) body::-webkit-scrollbar {
   max-height: 420px;
   overflow: hidden;
   border: 1px solid rgba(109, 120, 232, .13);
-  border-radius: 12px;
+  border-radius: var(--simulation-radius-surface, 12px);
   background: rgba(244, 248, 253, .8);
 }
 
@@ -1220,7 +1233,7 @@ html:has(.simulation-shell) body::-webkit-scrollbar {
   width: 100%;
   max-height: 150px;
   border: 1px solid rgba(109, 120, 232, .13);
-  border-radius: 10px;
+  border-radius: var(--simulation-radius-surface, 10px);
   background: rgba(255, 255, 255, .45);
 }
 
@@ -1476,7 +1489,7 @@ html:has(.simulation-shell) body::-webkit-scrollbar {
 .result-card {
   background: rgba(255,255,255,0.42);
   border: 1px solid rgba(255,255,255,0.7);
-  border-radius: 18px;
+  border-radius: var(--simulation-radius-surface, 18px);
   padding: 12px 10px 10px;
   min-height: 126px;
 }
@@ -1530,14 +1543,9 @@ html:has(.simulation-shell) body::-webkit-scrollbar {
   color: #287d59;
 }
 
-.comparison-panel {
+.simulation-outcomes {
   position: relative;
-  background: rgba(255,255,255,.82);
-  border: 1px solid rgba(109, 120, 232, .12);
-  border-radius: 20px;
-  padding: 18px 14px 14px;
   margin-bottom: 14px;
-  box-shadow: 0 8px 22px rgba(51, 82, 140, .06);
   overflow: visible;
 }
 
@@ -1571,7 +1579,7 @@ html:has(.simulation-shell) body::-webkit-scrollbar {
   min-height: 66px;
   margin-bottom: 0;
   padding: 9px 10px;
-  border-radius: 12px;
+  border-radius: var(--simulation-radius-control, 12px);
   outline: none;
   transition: background 180ms ease;
 }
@@ -1584,7 +1592,7 @@ html:has(.simulation-shell) body::-webkit-scrollbar {
 }
 
 .comparison-empty {
-  border-radius: 12px;
+  border-radius: var(--simulation-radius-surface, 12px);
   border: 1px dashed rgba(120, 139, 181, 0.38);
   background: rgba(255, 255, 255, 0.45);
   padding: 12px;
@@ -1738,7 +1746,7 @@ html:has(.simulation-shell) body::-webkit-scrollbar {
   padding: 12px 13px;
   color: #57739a;
   border: 1px solid #d9e8f7;
-  border-radius: 14px;
+  border-radius: var(--simulation-radius-surface, 14px);
   background: rgba(255, 255, 255, .98);
   box-shadow: 0 8px 22px rgba(41, 77, 122, .13);
   opacity: 0;
@@ -1815,7 +1823,7 @@ html:has(.simulation-shell) body::-webkit-scrollbar {
 .insight-box {
   background: linear-gradient(135deg, #263b67, #314f82);
   border: 1px solid rgba(255, 255, 255, .14);
-  border-radius: 18px;
+  border-radius: var(--simulation-radius-surface, 18px);
   padding: 16px 18px;
   margin-bottom: 14px;
   box-shadow: 0 10px 24px rgba(35, 58, 99, .16);
@@ -1849,7 +1857,7 @@ html:has(.simulation-shell) body::-webkit-scrollbar {
   padding: 0;
   color: #dfe9ff;
   border: 1px solid rgba(255, 255, 255, .18);
-  border-radius: 11px;
+  border-radius: var(--simulation-radius-control, 11px);
   background: rgba(255, 255, 255, .08);
   cursor: pointer;
 }
@@ -1946,7 +1954,7 @@ html:has(.simulation-shell) body::-webkit-scrollbar {
   padding: 10px 16px;
   color: #5067bd;
   border: 1px solid rgba(109, 120, 232, .18);
-  border-radius: 14px;
+  border-radius: var(--simulation-radius-control, 14px);
   background: rgba(109, 120, 232, .1);
   box-shadow: 0 5px 14px rgba(69, 82, 166, .06);
   font-size: 13px;
@@ -1959,7 +1967,7 @@ html:has(.simulation-shell) body::-webkit-scrollbar {
   padding: 10px 16px;
   color: #58749c;
   border: 1px solid rgba(109, 120, 232, .14);
-  border-radius: 14px;
+  border-radius: var(--simulation-radius-control, 14px);
   background: rgba(255, 255, 255, .58);
   box-shadow: 0 5px 14px rgba(51, 82, 140, .05);
   font-size: 13px;
@@ -1985,7 +1993,7 @@ html:has(.simulation-shell) body::-webkit-scrollbar {
   margin: 0;
   overflow: hidden;
   border: 1px solid rgba(109, 120, 232, .12);
-  border-radius: 16px;
+  border-radius: var(--simulation-radius-surface, 16px);
   background: rgba(255, 255, 255, .34);
   box-shadow: none;
 }
@@ -2078,14 +2086,9 @@ html:has(.simulation-shell) body::-webkit-scrollbar {
     white-space: normal;
   }
 
-  .simulation-grid,
   .simulation-grid.has-results {
     grid-template-columns: minmax(0, 1fr);
     justify-content: stretch;
-  }
-
-  .simulation-grid.has-results .simulation-builder-panel {
-    animation: none;
   }
 
   .method-info-tooltip {
@@ -2205,75 +2208,42 @@ html:has(.simulation-shell) body::-webkit-scrollbar {
   }
 }
 
-.simulation-results-pager {
-  display: flex;
-  justify-content: center;
-  margin-top: 16px;
+.simulation-results-tabs {
+  --results-tabs-radius: var(--simulation-radius-surface);
+  --results-tabs-inset: 4px;
+  --results-tabs-border: 1px;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 4px;
+  margin: 14px 0;
+  padding: var(--results-tabs-inset);
+  border: var(--results-tabs-border) solid rgba(109, 120, 232, .2);
+  border-radius: var(--results-tabs-radius);
+  background: rgba(109, 120, 232, .08);
 }
 
-.simulation-results-pager > button {
-  position: absolute;
-  top: 50%;
-  z-index: 3;
-  width: 40px;
-  height: 40px;
-  padding: 0 0 4px;
+.simulation-results-tabs button {
+  min-width: 0;
+  min-height: 42px;
+  padding: 8px;
   border: 0;
-  border-radius: 50%;
-  background: var(--brand);
-  color: #fff;
-  font-size: 26px;
-  line-height: 1;
-  box-shadow: 0 4px 12px rgba(45, 75, 118, .25);
-  transform: translateY(-50%);
+  border-radius: calc(var(--results-tabs-radius) - var(--results-tabs-inset) - var(--results-tabs-border));
+  background: transparent;
+  color: var(--brand);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 650;
   cursor: pointer;
+  transition: background .18s ease, color .18s ease;
 }
 
-.simulation-results-pager > button.prev {
-  left: 6px;
-}
+.simulation-results-tabs button:hover { background: rgba(109, 120, 232, .12); }
+.simulation-results-tabs button[aria-current='page'] { background: var(--primary); color: #fff; }
+.simulation-results-tabs button:focus-visible,
+.simulation-selected-area button:focus-visible { outline: 3px solid var(--primary); outline-offset: 2px; }
 
-.simulation-results-pager > button.next {
-  right: 6px;
-}
-
-.simulation-results-pager > button:disabled {
-  opacity: .35;
-  cursor: default;
-}
-
-.simulation-results-dots {
-  display: flex;
-  gap: 8px;
-}
-
-.simulation-results-dots button {
-  width: 10px;
-  height: 10px;
-  padding: 0;
-  border: 0;
-  border-radius: 50%;
-  background: rgba(70, 100, 170, .28);
-  cursor: pointer;
-}
-
-.simulation-results-dots button.active {
-  width: 24px;
-  border-radius: 999px;
-  background: var(--brand);
-}
-
-.simulation-panel.simulation-results-panel {
-  padding-left: 56px;
-  padding-right: 56px;
-}
-
-.simulation-results-pager > button.prev {
-  left: 8px;
-}
-
-.simulation-results-pager > button.next {
-  right: 8px;
+@media (max-width: 680px) {
+  .simulation-results-tabs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
 .simulation-preset-select {
@@ -2336,7 +2306,7 @@ html:has(.simulation-shell) body::-webkit-scrollbar {
   gap: 8px;
   color: #35557f;
   border: 1px solid rgba(109, 120, 232, .2);
-  border-radius: 8px;
+  border-radius: var(--simulation-radius-control, 8px);
   background: rgba(255, 255, 255, .78);
   font-size: 10px;
   font-weight: 700;
@@ -2360,7 +2330,7 @@ html:has(.simulation-shell) body::-webkit-scrollbar {
 .simulation-waterfall-legend {
   margin: 0 0 14px;
   padding: 10px 12px;
-  border-radius: 12px;
+  border-radius: var(--simulation-radius-surface, 12px);
   background: rgba(119, 154, 255, .08);
   color: #4b6288;
   font-size: 12px;

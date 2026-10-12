@@ -347,8 +347,8 @@ html[data-theme='dark'][data-kt-theme=prac]{--kt-nav-mark:#5FD4DF}
 .kp-hub.kt-theme-prac{--kt-overlay:linear-gradient(90deg,rgba(10,36,54,.86) 0%,rgba(10,36,54,.74) 34%,rgba(10,36,54,.3) 58%,rgba(10,36,54,0) 76%)}
 :root[data-theme='dark'] .kp-hub.kt-theme-prac{--kt-overlay:linear-gradient(90deg,rgba(6,20,27,.88) 0%,rgba(6,20,27,.74) 36%,rgba(6,20,27,.3) 60%,rgba(6,20,27,0) 78%)}
 
-/* One page width for Child Health and Where to live. */
-html .health-page-shell{--health-content-width:min(1440px,calc(100vw - 64px))}
+/* One slightly narrower page width for Child Health and Where to live. */
+html .health-page-shell{--health-content-width:min(1360px,calc(100vw - clamp(64px,6vw,96px)))}
 
 /* "Child Health › area": back to the map with this area's profile open. */
 .kh-crumbs{display:flex;align-items:center;gap:8px;margin:0 0 12px;font-size:15px;color:var(--kt-ink2,#4C5D7E)}

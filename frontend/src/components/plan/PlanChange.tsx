@@ -31,6 +31,7 @@ interface Props {
   embedded?: boolean
   /** Inside the shared page template: the page's audience switch decides the view and the hero carries the title. */
   audience?: 'parent' | 'practitioner'
+  onAreaNameChange?: (name: string | null) => void
 }
 
 type Audience = 'parent' | 'practitioner'
@@ -121,6 +122,9 @@ export default function PlanChange(props: Props) {
   const [setup, setSetup] = useState<PlanSetup | null>(null)
   const [setupError, setSetupError] = useState(false)
   const [area, setArea] = useState<Area | null>(initialArea)
+  useEffect(() => {
+    props.onAreaNameChange?.(area?.name || null)
+  }, [area?.name, props.onAreaNameChange])
   const [detail, setDetail] = useState<PlanAreaDetail | null>(null)
   const [detailError, setDetailError] = useState<string | null>(null)
   const start = useMemo(initialPlan, [])
@@ -166,7 +170,7 @@ export default function PlanChange(props: Props) {
     if (preset === 'custom') for (const [l, v] of Object.entries(custom)) q.set(l, String(v))
     else q.set('plan', preset)
     q.set('view', 'plan')
-    window.history.replaceState(null, '', `${props.embedded ? '/where-to-live' : '/simulation'}?${q.toString()}`)
+    window.history.replaceState(null, '', `${props.embedded ? '/map/where-to-live' : '/simulation'}?${q.toString()}`)
   }, [area, preset, custom])
 
   const run = () => {

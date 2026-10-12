@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { motion, useReducedMotion } from 'framer-motion'
 
 import BrandHeader from './BrandHeader'
 import { useNeighbourhoodSearch } from '../hooks/useNeighbourhoodSearch'
@@ -774,6 +775,8 @@ export default function SimulationPage({
   const autoRunPendingRef = useRef(false)
   const playbackFrameRef = useRef<number | null>(null)
   const playbackTargetRef = useRef<ScenarioValues | null>(null)
+  const scenarioRequestRef = useRef(0)
+  const reduceMotion = useReducedMotion()
 
   const {
     search,
@@ -787,7 +790,6 @@ export default function SimulationPage({
     submitSearch,
   } = useNeighbourhoodSearch({
     onSelectResult: async (item) => {
-      setSelectedNeighbourhood(item.name)
       setSearch(item.name)
       await loadNeighbourhoodScenario(item.id, item.name)
     },
@@ -811,14 +813,36 @@ export default function SimulationPage({
     }
   }
 
-  async function loadNeighbourhoodScenario(id: string, name: string) {
+  function clearNeighbourhood() {
+    scenarioRequestRef.current += 1
     cancelScenarioPlayback()
+    autoRunPendingRef.current = false
+    setSelectedNeighbourhood('')
+    setBaseline(null)
+    setAiModel(null)
+    setScenarioResult(null)
+    setScenarioLoading(false)
+    setScenarioError(null)
+    setShowResults(false)
+    setUpdateStatus('idle')
+    setPresetOpen(false)
+    setMapFactorOpen(false)
+    setScenarioName('')
+    setInsightExpanded(false)
+    setResultsPage(0)
+  }
+
+  async function loadNeighbourhoodScenario(id: string, name: string) {
+    clearNeighbourhood()
+    const requestNumber = scenarioRequestRef.current
+    setSelectedNeighbourhood(name)
     setScenarioLoading(true)
     setScenarioError(null)
     setUpdateStatus('updating')
 
     try {
       const indicatorsResponse = await api.getNeighbourhoodIndicators()
+      if (requestNumber !== scenarioRequestRef.current) return
       if (indicatorsResponse.status !== 'available' && indicatorsResponse.status !== 'limited') {
         throw new Error(indicatorsResponse.limitations[0]?.message ?? 'Neighbourhood indicators are unavailable.')
       }
@@ -870,6 +894,7 @@ export default function SimulationPage({
       setShowResults(true)
       setUpdateStatus('updated')
     } catch (error) {
+      if (requestNumber !== scenarioRequestRef.current) return
       console.error('Failed to load simulation baseline:', error)
       setScenarioError(error instanceof Error ? error.message : 'The neighbourhood scenario could not be loaded.')
       setBaseline(null)
@@ -878,7 +903,7 @@ export default function SimulationPage({
       setShowResults(false)
       setUpdateStatus('idle')
     } finally {
-      setScenarioLoading(false)
+      if (requestNumber === scenarioRequestRef.current) setScenarioLoading(false)
     }
   }
 
@@ -1324,7 +1349,11 @@ export default function SimulationPage({
         </div>
 
         <div className={`simulation-grid${baseline && showResults ? ' has-results' : ''}`}>
-          <section className="simulation-panel simulation-builder-panel">
+          <motion.section
+            className="simulation-panel simulation-builder-panel"
+            layout="position"
+            transition={{ layout: { duration: reduceMotion ? 0 : 0.42, ease: [0.2, 0.72, 0.25, 1] } }}
+          >
             <div className="scenario-heading">
               <h2>Build a Scenario</h2>
               <div className="method-info-wrap">
@@ -1360,6 +1389,7 @@ export default function SimulationPage({
                     onChange={(event) => {
                       const nextValue = event.target.value
                       setSearch(nextValue)
+                      if (!nextValue.trim()) clearNeighbourhood()
                       setShowSearchResults(true)
                     }}
                   />
@@ -1398,11 +1428,27 @@ export default function SimulationPage({
                   </div>
                 )}
               </div>
+              {selectedNeighbourhood && <div className="simulation-selected-area">
+                <span>{selectedNeighbourhood}{scenarioLoading ? ' · Loading…' : ''}</span>
+                <button type="button" aria-label={`Remove ${selectedNeighbourhood}`} onClick={() => {
+                  clearNeighbourhood()
+                  setSearch('')
+                  setShowSearchResults(false)
+                }}>Remove area</button>
+              </div>}
             </div>
 
             {scenarioError && <p className="simulation-load-error" role="alert">{scenarioError}</p>}
 
-            <div className="field-group scenario-variables">
+            <motion.div
+              className="simulation-controls-reveal"
+              initial={false}
+              animate={{ height: baseline ? 'auto' : 0, opacity: baseline ? 1 : 0 }}
+              transition={{ duration: reduceMotion ? 0 : 0.32, ease: [0.2, 0.72, 0.25, 1] }}
+              aria-hidden={!baseline}
+              inert={!baseline}
+            >
+            <fieldset className="field-group scenario-variables" disabled={!baseline}>
               <h3>Environmental factors</h3>
               <div className="simulation-preset-controls">
                 <label htmlFor="simulation-quick-preset">Quick scenario</label>
@@ -1566,12 +1612,13 @@ export default function SimulationPage({
                   </div>
                 </div>
               </div>
-            </div>
+            </fieldset>
+            </motion.div>
 
             {showResults && <div className="action-row simulation-actions">
               <button type="button" className="button button-tertiary" onClick={() => setShowResults(false)}>Scenario only</button>
             </div>}
-          </section>
+          </motion.section>
 
           {baseline && showResults && <section className="simulation-panel simulation-results-panel">
             <div className="results-header">
@@ -1580,6 +1627,15 @@ export default function SimulationPage({
                 {updateStatus === 'updating' ? 'Updating…' : '✓ Updated'}
               </span>}
             </div>
+
+            <nav className="simulation-results-tabs" aria-label="Results pages">
+              {RESULTS_PAGES.map((label, index) => <button
+                type="button"
+                key={label}
+                aria-current={index === resultsPage ? 'page' : undefined}
+                onClick={() => setResultsPage(index)}
+              >{label}</button>)}
+            </nav>
 
             <div className="simulation-playback">
               <button
@@ -1718,9 +1774,9 @@ export default function SimulationPage({
             </>}
 
             {resultsPage === 1 && <>
-            <div className="comparison-panel">
+            <section className="simulation-outcomes" aria-labelledby="simulation-outcomes-title">
               <div className="comparison-header">
-                <h3>Environmental Conditions &amp; Child Outcomes</h3>
+                <h3 id="simulation-outcomes-title">Environmental Conditions &amp; Child Outcomes</h3>
                 <div className="comparison-legend">
                   <span>Baseline</span>
                   <span>Simulated</span>
@@ -1779,7 +1835,7 @@ export default function SimulationPage({
                   </div>
                 )
               })}
-            </div>
+            </section>
             </>}
 
             {resultsPage === 2 && <>
@@ -1931,22 +1987,6 @@ export default function SimulationPage({
               </div>}
             </div>
             </>}
-
-            <nav className="simulation-results-pager" aria-label="Results pages">
-              <button type="button" className="prev" aria-label="Previous page" disabled={resultsPage === 0} onClick={() => setResultsPage((page) => Math.max(page - 1, 0))}>‹</button>
-              <div className="simulation-results-dots">
-                {RESULTS_PAGES.map((label, index) => <button
-                  type="button"
-                  key={label}
-                  className={index === resultsPage ? 'active' : ''}
-                  aria-label={`${label} (page ${index + 1} of ${RESULTS_PAGES.length})`}
-                  aria-current={index === resultsPage ? 'page' : undefined}
-                  title={label}
-                  onClick={() => setResultsPage(index)}
-                />)}
-              </div>
-              <button type="button" className="next" aria-label={`Next: ${RESULTS_PAGES[Math.min(resultsPage + 1, RESULTS_PAGES.length - 1)]}`} disabled={resultsPage === RESULTS_PAGES.length - 1} onClick={() => setResultsPage((page) => Math.min(page + 1, RESULTS_PAGES.length - 1))}>›</button>
-            </nav>
 
           </section>}
         </div>

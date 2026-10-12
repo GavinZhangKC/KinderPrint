@@ -99,3 +99,32 @@
   .vx-facts{grid-template-columns:minmax(0,1fr)}
 }
 @media print{.vx-tabs,.vx-filters,.vx-map{display:none}}
+
+/* Parent: vaccine timeline (always visible; dates once a birth month is entered) */
+.vx-tl{position:relative;margin:4px 0 0;padding:0;list-style:none}
+.vx-tl::before{content:'';position:absolute;left:17px;top:22px;bottom:22px;width:2px;background:var(--kt-line-soft)}
+.vx-tl-row{position:relative;display:grid;grid-template-columns:20px minmax(120px,170px) minmax(0,1fr) auto 16px;align-items:center;gap:14px;width:100%;padding:12px 8px;border:0;border-radius:12px;background:transparent;color:var(--kt-ink);font:inherit;text-align:left;cursor:pointer;transition:background-color .15s ease}
+.vx-tl-row:hover{background:var(--kt-icon-bg)}
+.vx-tl-dot{width:14px;height:14px;margin-left:3px;border:2px solid var(--kt-ink2);border-radius:50%;background:var(--kt-card,#fff)}
+.vx-tl .is-done .vx-tl-dot{border-color:var(--kt-ok-ink);background:var(--kt-ok-ink)}
+.vx-tl .is-catch-up .vx-tl-dot{border-color:var(--kt-warn-ink);background:var(--kt-warn-ink)}
+.vx-tl .is-due-soon .vx-tl-dot{border-color:var(--kt-primary);background:var(--kt-primary)}
+.vx-tl-when b{display:block;font-size:var(--fs-body)}
+.vx-tl-when small,.vx-tl-what small{display:block;font-size:var(--fs-meta);color:var(--kt-ink2)}
+.vx-tl-what{font-size:var(--fs-body2);line-height:1.4}
+.vx-tl .is-done .vx-tl-what{color:var(--kt-ink2)}
+
+/* Practitioner: schedule visits grouped under the AIR checkpoint that measures them */
+.vx-sc{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:8px 0 14px;padding:0;list-style:none}
+.vx-sc>li{display:flex;flex-direction:column;gap:10px;padding:14px;border:1px solid var(--kt-line-soft);border-radius:14px;min-width:0}
+.vx-sc>li.is-gap{border-color:var(--kt-warn-ink)}
+.vx-sc-visits{display:grid;gap:8px;flex:1;align-content:start}
+.vx-sc-visits span{display:block}
+.vx-sc-visits b{display:block;font-size:var(--fs-body2)}
+.vx-sc-visits small{display:block;font-size:var(--fs-meta);color:var(--kt-ink2);line-height:1.35}
+.vx-sc-check{display:grid;gap:6px;width:100%;padding:12px;border:0;border-radius:12px;background:var(--kt-icon-bg);color:var(--kt-ink);font:inherit;text-align:left;cursor:pointer}
+.vx-sc-check strong{font-size:28px;line-height:1.1}
+.vx-sc-check small{font-size:var(--fs-meta);color:var(--kt-ink2)}
+.vx-sc-age{font-size:var(--fs-label);font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:var(--kt-ink2)}
+.is-gap .vx-sc-check{background:var(--kt-warn-bg)}
+@media (max-width:1100px){.vx-sc{grid-template-columns:repeat(2,minmax(0,1fr))}}

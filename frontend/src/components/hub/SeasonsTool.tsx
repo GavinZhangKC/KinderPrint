@@ -13,6 +13,8 @@ import './VaccinesTool.css'
 import './HubPages.css'
 
 interface Season { id: string; title: string; months: number[]; why: string; actions: string[]; link: string; linkLabel: string }
+/** Parent view: the health issue a season brings, signs to watch for and what to do (Better Health and Asthma Australia guidance). */
+interface Issue { name: string; context: string; signs: string[]; todo: string[] }
 const SEASONS: Season[] = [
   { id: 'heat', title: 'Extreme heat', months: [11, 0, 1, 2], why: 'Hot days are harder on young children, especially where shade is limited.', actions: ['Play outside before 11 am or after 4 pm', 'Offer water often and dress children in light clothing', 'Never leave a child in a parked car'], link: OFFICIAL.heat, linkLabel: 'Heat-health warnings' },
   { id: 'uv', title: 'Sun and UV', months: [8, 9, 10, 11, 0, 1, 2, 3], why: 'UV is high enough to damage skin from spring to autumn.', actions: ['Hat, sunscreen, covering clothing, shade and sunglasses', 'Check the daily sun protection times', 'Choose shaded play spaces'], link: OFFICIAL.sunSmart, linkLabel: 'SunSmart' },
@@ -21,6 +23,14 @@ const SEASONS: Season[] = [
   { id: 'water', title: 'Water safety', months: [10, 11, 0, 1, 2], why: 'Summer brings more time at pools and beaches.', actions: ['Always watch young children in and near water', 'Check pool gates close by themselves', 'Enrol in swimming and water-safety lessons'], link: OFFICIAL.waterSafety, linkLabel: 'Royal Life Saving' },
   { id: 'flu', title: 'Flu and RSV', months: [4, 5, 6, 7, 8], why: 'Winter brings the biggest rise in children’s coughs, colds and flu.', actions: ['Flu vaccine in April or May', 'Ask about free infant RSV protection for babies', 'Keep sick children home and wash hands'], link: OFFICIAL.rsv, linkLabel: 'RSV immunisation' },
 ]
+const ISSUES: Record<string, Issue> = {
+  heat: { name: 'Dehydration and heat illness', context: 'Hot days', signs: ['Fewer wet nappies or dark yellow urine', 'Unusually sleepy, irritable or floppy', 'Hot, flushed or very pale skin, headache or vomiting'], todo: ['Move your child somewhere cool and offer water often', 'Cool the skin with a damp cloth or a lukewarm bath', 'Call 000 if your child is floppy, confused or not responding'] },
+  uv: { name: 'Sunburn and eye damage', context: 'High UV', signs: ['Red, hot or tender skin a few hours after being outside', 'Blisters, fever or chills with sunburn', 'Sore, red or watery eyes after bright sun'], todo: ['Cool the skin with a cool bath or a damp cloth', 'Offer extra water and keep out of the sun until it heals', 'See a GP for blistering, or for any sunburn in a baby under 12 months'] },
+  asthma: { name: 'Asthma attacks in storms', context: 'Thunderstorm asthma', signs: ['Coughing, wheezing or a tight chest', 'Fast breathing or trouble talking', 'Sucking in at the ribs or the base of the throat'], todo: ['Follow your child’s asthma action plan', 'Give the reliever puffer with a spacer, using the asthma first aid steps', 'Call 000 if breathing is very hard or the reliever is not helping'] },
+  smoke: { name: 'Breathing problems from smoke', context: 'Bushfire smoke', signs: ['Coughing, a sore throat or itchy, watery eyes', 'Wheezing or shortness of breath, especially with asthma', 'Unusual tiredness on smoky days'], todo: ['Go inside, close windows and doors, and set air conditioning to recirculate', 'Follow the asthma action plan if your child has asthma', 'Call 000 if your child has trouble breathing'] },
+  water: { name: 'Drowning', context: 'Pools, beaches and baths', signs: ['Drowning is quick and silent: children slip under without splashing or calling out', 'If a child is missing, check water first: pools, baths, ponds and buckets', 'Coughing or trouble breathing after being in water needs checking'], todo: ['Call 000 and start CPR if a child is not breathing', 'Learn CPR for babies and children', 'Keep children under 5 within arm’s reach in and near water'] },
+  flu: { name: 'Flu, RSV and chest infections', context: 'Winter', signs: ['Fever, cough, runny nose or poor feeding', 'Fast or hard breathing, or sucking in at the ribs', 'Fewer wet nappies, very drowsy or hard to wake'], todo: ['Rest, fluids, and keep your child home until they are well', 'Call NURSE-ON-CALL on 1300 60 60 24 for advice, or see your GP', 'Call 000 for blue lips, severe trouble breathing or a floppy child'] },
+}
 const CHECK: Array<[string, string, string]> = [
   ['Heat-health warning', 'Victorian Department of Health', OFFICIAL.heat],
   ['Thunderstorm asthma forecast', 'Victorian Department of Health', OFFICIAL.asthmaForecast],
@@ -73,12 +83,12 @@ function MonthBars({ values, label, now, unit, highlight, showValues }: { values
   </div>
 }
 
-function Planner({ selected, onSelect, month }: { selected?: string; onSelect: (s: Season) => void; month: number }) {
+function Planner({ selected, onSelect, month, parent }: { selected?: string; onSelect: (s: Season) => void; month: number; parent?: boolean }) {
   return <div className="hp-cal-wrap"><table className="hp-cal">
     <thead><tr><th scope="col"><span className="kh-sr">Season</span></th>{MONTHS_SHORT.map((m, i) => <th key={m} scope="col" className={i === month ? 'is-now' : undefined} aria-label={MONTHS[i]}>{m[0]}</th>)}</tr></thead>
     <tbody>{SEASONS.map(s => <tr key={s.id} className={s.id === selected ? 'is-sel' : undefined}>
-      <th scope="row"><button type="button" onClick={() => onSelect(s)}>{s.title}<span aria-hidden="true">›</span></button></th>
-      {MONTHS.map((m, i) => <td key={m} className={[s.months.includes(i) ? 'on' : '', i === month ? 'is-now' : ''].join(' ').trim() || undefined}><span className="kh-sr">{s.months.includes(i) ? `${s.title} in ${m}` : ''}</span></td>)}
+      <th scope="row"><button type="button" onClick={() => onSelect(s)}>{parent ? <span className="hp-issue"><b>{ISSUES[s.id].name}</b><small>{ISSUES[s.id].context}</small></span> : s.title}<span aria-hidden="true">›</span></button></th>
+      {MONTHS.map((m, i) => <td key={m} className={[s.months.includes(i) ? 'on' : '', i === month ? 'is-now' : ''].join(' ').trim() || undefined}><span className="kh-sr">{s.months.includes(i) ? `${parent ? ISSUES[s.id].name : s.title} in ${m}` : ''}</span></td>)}
     </tr>)}</tbody>
   </table></div>
 }
@@ -107,8 +117,8 @@ function ParentSeasons(props: Props & { air: Air; illness: Illness }) {
       <button type="button" className="kh-btn primary" onClick={() => downloadFile(`vkinder-seasons-${slug(locality.name)}.ics`, buildCalendar(events), 'text/calendar')}>Add season reminders</button>
       {active[0] && <button type="button" className="kh-btn" onClick={() => setOpen(active[0])}>What to do now</button>}
     </>}>
-      <p className="vx-big">{active.map(s => s.title).join(' · ') || 'A quieter month'}</p>
-      {coming.length > 0 && <p className="vx-when">Coming next month: {coming.map(s => s.title.toLowerCase()).join(', ')}</p>}
+      <p className="vx-big">{active.map(s => ISSUES[s.id].name).join(' · ') || 'A quieter month'}</p>
+      {coming.length > 0 && <p className="vx-when">Coming next month: {coming.map(s => ISSUES[s.id].name.toLowerCase()).join(', ')}</p>}
       <p className="vx-lead">Reminders arrive two weeks before each season starts.</p>
     </Summary>
 
@@ -117,7 +127,7 @@ function ParentSeasons(props: Props & { air: Air; illness: Illness }) {
       <TabPanel tab={tab}>
         {tab === 'year' && <>
           <p className="kt-sub">Shaded months are when each one matters. Select a season for what to do.</p>
-          <Planner month={month} onSelect={setOpen} />
+          <Planner parent month={month} onSelect={setOpen} />
         </>}
         {tab === 'air' && (air.data?.station ? <>
           <p className="hp-say">{worstAir ? <><b>{MONTHS[worstAir.month - 1]}</b> has had the most smoky or polluted days near you: <b>{worstAir.days_above_standard} days</b> over the safe level since {air.data.station.first_year}.</> : null}</p>
@@ -136,13 +146,19 @@ function ParentSeasons(props: Props & { air: Air; illness: Illness }) {
       </TabPanel>
     </section>
 
-    <footer className="kt-foot"><p>EPA Victoria air monitoring; Victorian notifiable disease data; Victorian Department of Health, SunSmart and Royal Life Saving guidance; 2018 environment measures for {locality.name}. General guidance, not medical advice for your child.</p></footer>
+    <footer className="kt-foot"><p>EPA Victoria air monitoring; Victorian notifiable disease data; Victorian Department of Health, Better Health Channel, Asthma Australia, SunSmart and Royal Life Saving guidance; 2018 environment measures for {locality.name}. General guidance, not medical advice for your child.</p></footer>
 
-    {open && <Dialog title={open.title} onClose={() => setOpen(null)}>
-      <p className="vx-when">{span(open)}</p>
+    {open && <Dialog title={ISSUES[open.id].name} onClose={() => setOpen(null)}>
+      <p className="vx-when">{ISSUES[open.id].context} · {span(open)}</p>
       <p>{open.why}</p>
       <dl className="vx-facts">{evidence(open.id, props, air, illness).flatMap(([k, v]) => [<dt key={`${k}-t`}>{k}</dt>, <dd key={`${k}-d`}>{v}</dd>])}</dl>
+      <p className="vx-eyebrow">Get ready</p>
       <ol className="ht-questions">{open.actions.map((a, i) => <li key={a}><span aria-hidden="true">{i + 1}</span>{a}</li>)}</ol>
+      <p className="vx-eyebrow">Signs to watch for</p>
+      <ul className="hp-signs">{ISSUES[open.id].signs.map(a => <li key={a}>{a}</li>)}</ul>
+      <p className="vx-eyebrow">What to do</p>
+      <ol className="ht-questions">{ISSUES[open.id].todo.map((a, i) => <li key={a}><span aria-hidden="true">{i + 1}</span>{a}</li>)}</ol>
+      <p className="kt-limit">General guidance, not medical advice. If you are worried, call NURSE-ON-CALL on 1300 60 60 24. In an emergency call 000.</p>
       <div className="ht-actions"><a className="kh-btn primary" href={open.link} target="_blank" rel="noreferrer">{open.linkLabel}</a></div>
     </Dialog>}
   </div>

@@ -114,3 +114,10 @@ a.hp-call,button.hp-call{text-decoration:underline;text-underline-offset:4px;tex
 :root[data-theme='dark'] .vx-num.hp-k-general_practice{background:#4E7A52}
 :root[data-theme='dark'] .vx-num.hp-k-pharmacy{background:#9A6410}
 :root[data-theme='dark'] .vx-num.hp-k-maternal_child_health{background:#3A7FA2}
+
+/* Seasons (parent): health issue with its season underneath; signs list in the dialog */
+.hp-cal tbody th button .hp-issue{display:flex;flex-direction:column;gap:2px;padding:6px 0;color:var(--kt-ink);font-size:inherit}
+.hp-cal tbody th button .hp-issue b{font-weight:700}
+.hp-cal tbody th button .hp-issue small{color:var(--kt-ink2);font-size:var(--fs-label);font-weight:600}
+.hp-signs{display:grid;gap:8px;margin:0 0 4px;padding-left:20px;color:var(--kt-ink)}
+.hp-signs li{line-height:1.45}

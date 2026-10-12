@@ -40,12 +40,10 @@ function initialAudience(): Audience {
 
 const COPY = {
   parent: {
-    label: 'Find an area',
     title: 'Find an area that fits your family',
     text: 'Compare Greater Melbourne areas by nearby services, outdoor spaces and what matters most to your family.',
   },
   practitioner: {
-    label: 'What if this area changed?',
     title: 'What if this area changed?',
     text: 'Choose an area and a planned change, such as more tree cover or cooler streets. See how children are doing in similar Melbourne areas that already have it.',
   },
@@ -53,8 +51,11 @@ const COPY = {
 
 export default function WhereToLivePage(props: Props) {
   const [audience, setAudienceState] = useState<Audience>(initialAudience)
+  const [parentAreaName, setParentAreaName] = useState<string | null>(null)
+  const [practitionerAreaName, setPractitionerAreaName] = useState<string | null>(null)
   const parent = audience === 'parent'
   const copy = COPY[audience]
+  const areaName = parent ? parentAreaName : practitionerAreaName
 
   const setAudience = (next: Audience) => {
     setAudienceState(next)
@@ -62,7 +63,7 @@ export default function WhereToLivePage(props: Props) {
     // Keep the address shareable; the plan view keeps its own area and plan in the query.
     const q = new URLSearchParams(next === 'practitioner' ? window.location.search : '')
     if (next === 'practitioner') q.set('view', 'plan'); else q.delete('view')
-    window.history.replaceState(null, '', `/where-to-live${q.toString() ? `?${q}` : ''}`)
+    window.history.replaceState(null, '', `/map/where-to-live${q.toString() ? `?${q}` : ''}`)
     window.scrollTo({ top: 0 })
   }
 
@@ -78,8 +79,11 @@ export default function WhereToLivePage(props: Props) {
     <div className="digital-health-hub dh-global-shell">
       <div className={`kp-hub ${parent ? 'is-parent kt-theme-parent' : 'is-practitioner kt-theme-prac'}`}>
         <div className="kh-shell">
+          <nav className="kh-crumbs" aria-label="Breadcrumb">
+            <a href="/map">Child Health Explore</a><span aria-hidden="true">›</span><span aria-current="page">Where to live</span>
+          </nav>
           <header className="kh-top">
-            <p className="kh-nav wl-hub-label"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11Z" /><circle cx="12" cy="10" r="2.4" /></svg>{copy.label}</p>
+            <h2 className="wl-area-title" aria-live="polite">{areaName || 'Greater Melbourne'}</h2>
             <div className="kh-seg" role="group" aria-label="Who is using Vkinder">
               <button type="button" aria-pressed={parent} onClick={() => setAudience('parent')}>Parent</button>
               <button type="button" aria-pressed={!parent} onClick={() => setAudience('practitioner')}>Practitioner</button>
@@ -88,8 +92,8 @@ export default function WhereToLivePage(props: Props) {
           <div className={`kt ht vx hp where-page fu-hub wl-hub ${parent ? 'kt-parent' : 'kt-prac'}`} key={audience}>
             <Hero parent={parent} title={copy.title} text={copy.text} />
             {parent
-              ? <WhereToLive {...props} bare />
-              : <PlanChange {...props} embedded audience="practitioner" />}
+              ? <WhereToLive {...props} bare onAreaNameChange={setParentAreaName} />
+              : <PlanChange {...props} embedded audience="practitioner" onAreaNameChange={setPractitionerAreaName} />}
           </div>
         </div>
       </div>

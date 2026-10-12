@@ -52,6 +52,7 @@ interface Props {
   viewSwitch?: ReactNode
   /** Inside the shared page template: no site header or page title (the hero carries them). */
   bare?: boolean
+  onAreaNameChange?: (name: string | null) => void
 }
 
 export default function WhereToLive(props: Props) {
@@ -163,6 +164,9 @@ export default function WhereToLive(props: Props) {
 
   const needLabel = (id: string) => setup?.needs.find(n => n.id === id)?.label ?? id
   const anchorName = setup?.places.find(p => p.id === draft.anchor)?.name
+  useEffect(() => {
+    props.onAreaNameChange?.(anchorName ?? null)
+  }, [anchorName, props.onAreaNameChange])
   const matchingIds = useMemo(() => new Set(result?.map.filter(m => m.status === 'top' || m.status === 'match').map(m => m.id) ?? []), [result])
 
   const header = <BrandHeader activePage="where" onHome={props.onHome} onInsight={props.onInsight} onMap={props.onMap} onSimulation={props.onSimulation} onHealth={props.onHealth} />
