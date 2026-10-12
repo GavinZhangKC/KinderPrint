@@ -455,6 +455,80 @@ function HomeCompareSection({ onMap }: Pick<LandingPageProps, 'onMap'>) {
   )
 }
 
+function HomeSimulationSection({ onSimulation }: Pick<LandingPageProps, 'onSimulation'>) {
+  const [hasEntered, setHasEntered] = useState(false)
+  const sectionRef = useRef<HTMLElement>(null)
+
+  useEffect(() => {
+    const section = sectionRef.current
+    if (!section) return
+
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)')
+    if (reducedMotion.matches) {
+      setHasEntered(true)
+      return
+    }
+
+    const observer = new IntersectionObserver(([entry]) => {
+      if (!entry.isIntersecting) return
+      setHasEntered(true)
+      observer.disconnect()
+    }, {
+      threshold: 0.18,
+      rootMargin: '0px 0px -10% 0px',
+    })
+
+    observer.observe(section)
+    return () => observer.disconnect()
+  }, [])
+
+  const scenarioInputs = [
+    'Tree canopy',
+    'Urban heat',
+    'Open space',
+    'Road traffic intensity',
+    'Bushfire-prone land share',
+  ]
+
+  return (
+    <section
+      ref={sectionRef}
+      className={`home-simulation-story ${hasEntered ? 'is-visible' : ''}`}
+      id="home-simulation"
+      aria-labelledby="home-simulation-title"
+    >
+      <div className="home-simulation-copy">
+        <p className="home-section-kicker">Simulation Engine</p>
+        <h2 id="home-simulation-title">Change the conditions.<br />Explore the pattern.</h2>
+        <p>
+          Adjust environmental conditions and compare area-level child-development patterns.
+          Explore how a scenario changes the picture, with the evidence and its limits kept visible.
+        </p>
+        <button type="button" onClick={onSimulation}>
+          Open the Simulation Engine <span aria-hidden="true">↗</span>
+        </button>
+      </div>
+
+      <div className="home-simulation-model" role="group" aria-label="Simulation model inputs">
+        <div className="home-simulation-model-heading">
+          <span>Scenario inputs</span>
+          <span>01 / 05</span>
+        </div>
+        <ul>
+          {scenarioInputs.map((input, index) => (
+            <li key={input} style={{ '--input-index': index } as CSSProperties}>
+              <span>{String(index + 1).padStart(2, '0')}</span>
+              <strong>{input}</strong>
+              <i aria-hidden="true" />
+            </li>
+          ))}
+        </ul>
+        <p>Area-level associations, not individual predictions.</p>
+      </div>
+    </section>
+  )
+}
+
 const homeEvidencePrinciples = [
   'Aggregate, never individual',
   'Description, not diagnosis',
@@ -569,6 +643,8 @@ export default function LandingPage({ onInsight, onSimulation, onMap, onHealth }
         <HomeDiscoverySection />
 
         <HomeCompareSection onMap={onMap} />
+
+        <HomeSimulationSection onSimulation={onSimulation} />
 
         <HomeEvidenceSection />
 

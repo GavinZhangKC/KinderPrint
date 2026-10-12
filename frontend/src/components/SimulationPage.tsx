@@ -79,6 +79,11 @@ const QUICK_PRESET_OPTIONS: Array<{ id: QuickPresetId; label: string }> = [
 const SAVED_SCENARIOS_STORAGE_KEY = 'kinderprint-simulation-scenarios'
 const GREATER_MELBOURNE_BOUNDARY_BBOX = '144.0,-38.6,145.9,-37.2'
 const MAP_FACTOR_COLORS = ['#b96361', '#d08e6d', '#d9bb70', '#92b49a', '#338b7b']
+const MAP_WIDTH = 900
+const MAP_HEIGHT = 500
+const MAP_MAX_ZOOM = 12
+const MAP_BASE_VIEW = { x: 0, y: 0, w: MAP_WIDTH, h: MAP_HEIGHT }
+type MapView = typeof MAP_BASE_VIEW
 
 interface ScenarioResult {
   scenarioSupported: boolean
@@ -760,6 +765,9 @@ export default function SimulationPage({
   const [mapFactor, setMapFactor] = useState<EnvironmentFeature>('treeCanopy')
   const [mapFactorOpen, setMapFactorOpen] = useState(false)
   const mapFactorWrapRef = useRef<HTMLDivElement>(null)
+  const [mapView, setMapView] = useState<MapView>(MAP_BASE_VIEW)
+  const mapSvgRef = useRef<SVGSVGElement>(null)
+  const mapDraggedRef = useRef(false)
   const [isPlayingScenario, setIsPlayingScenario] = useState(false)
   const [playbackProgress, setPlaybackProgress] = useState(0)
   const [aiModel, setAiModel] = useState<AiSimulationModel | null>(null)
@@ -911,6 +919,95 @@ export default function SimulationPage({
     event.preventDefault()
     await submitSearch()
   }
+
+  const clampMapView = (view: MapView): MapView => ({
+    ...view,
+    x: clamp(view.x, 0, MAP_WIDTH - view.w),
+    y: clamp(view.y, 0, MAP_HEIGHT - view.h),
+  })
+
+  // Zooms around a point given as fractions (0-1) of the current viewport.
+  const zoomMap = (factor: number, fractionX = 0.5, fractionY = 0.5) => {
+    setMapView((view) => {
+      const width = clamp(view.w / factor, MAP_WIDTH / MAP_MAX_ZOOM, MAP_WIDTH)
+      const height = (width * MAP_HEIGHT) / MAP_WIDTH
+      return clampMapView({
+        x: view.x + (fractionX * view.w) - (fractionX * width),
+        y: view.y + (fractionY * view.h) - (fractionY * height),
+        w: width,
+        h: height,
+      })
+    })
+  }
+
+  const zoomMapToSelected = () => {
+    const shape = factorMapShapes.find((item) => item.id === baseline?.id)
+    if (!shape) return
+    const numbers = [...shape.path.matchAll(/[ML]([\d.-]+),([\d.-]+)/g)].map((match) => [Number(match[1]), Number(match[2])])
+    if (numbers.length === 0) return
+    const xs = numbers.map(([x]) => x)
+    const ys = numbers.map(([, y]) => y)
+    const minX = Math.min(...xs)
+    const maxX = Math.max(...xs)
+    const minY = Math.min(...ys)
+    const maxY = Math.max(...ys)
+    const width = clamp(Math.max((maxX - minX) * 3, ((maxY - minY) * 3 * MAP_WIDTH) / MAP_HEIGHT), MAP_WIDTH / MAP_MAX_ZOOM, MAP_WIDTH)
+    const height = (width * MAP_HEIGHT) / MAP_WIDTH
+    setMapView(clampMapView({
+      x: ((minX + maxX) / 2) - (width / 2),
+      y: ((minY + maxY) / 2) - (height / 2),
+      w: width,
+      h: height,
+    }))
+  }
+
+  const handleMapPointerDown = (event: React.PointerEvent<SVGSVGElement>) => {
+    mapDraggedRef.current = false
+    const svg = mapSvgRef.current
+    const scale = svg?.getScreenCTM()?.a
+    if (!svg || !scale || mapView.w >= MAP_WIDTH) return
+    const start = { x: event.clientX, y: event.clientY, view: mapView }
+    const handleMove = (moveEvent: PointerEvent) => {
+      const dx = moveEvent.clientX - start.x
+      const dy = moveEvent.clientY - start.y
+      if (Math.hypot(dx, dy) > 4) mapDraggedRef.current = true
+      if (!mapDraggedRef.current) return
+      setMapView(clampMapView({ ...start.view, x: start.view.x - (dx / scale), y: start.view.y - (dy / scale) }))
+    }
+    const handleUp = () => {
+      window.removeEventListener('pointermove', handleMove)
+      window.removeEventListener('pointerup', handleUp)
+    }
+    window.addEventListener('pointermove', handleMove)
+    window.addEventListener('pointerup', handleUp)
+  }
+
+  useEffect(() => {
+    const svg = mapSvgRef.current
+    if (!svg) return
+    // Wheel zoom needs ctrl/cmd (also sent by trackpad pinch) so normal page scrolling still works.
+    const handleWheel = (event: WheelEvent) => {
+      if (!event.ctrlKey && !event.metaKey) return
+      event.preventDefault()
+      const matrix = svg.getScreenCTM()
+      if (!matrix) return
+      const point = new DOMPoint(event.clientX, event.clientY).matrixTransform(matrix.inverse())
+      setMapView((view) => {
+        const width = clamp(view.w * Math.exp(event.deltaY * 0.01), MAP_WIDTH / MAP_MAX_ZOOM, MAP_WIDTH)
+        const height = (width * MAP_HEIGHT) / MAP_WIDTH
+        const fractionX = (point.x - view.x) / view.w
+        const fractionY = (point.y - view.y) / view.h
+        return clampMapView({
+          x: point.x - (fractionX * width),
+          y: point.y - (fractionY * height),
+          w: width,
+          h: height,
+        })
+      })
+    }
+    svg.addEventListener('wheel', handleWheel, { passive: false })
+    return () => svg.removeEventListener('wheel', handleWheel)
+  }, [factorMapStatus, resultsPage, showResults, baseline])
 
   const runSimulation = useCallback(() => {
     autoRunPendingRef.current = false
@@ -1725,24 +1822,37 @@ export default function SimulationPage({
               {factorMapStatus === 'loading' && <p className="simulation-factor-map-state">Loading SA2 boundaries…</p>}
               {factorMapStatus === 'unavailable' && <p className="simulation-factor-map-state">The SA2 environment map is unavailable.</p>}
               {factorMapStatus === 'available' && <div className="simulation-factor-map-canvas">
-                <svg viewBox="0 0 900 500" role="img" aria-label={`Greater Melbourne SA2 map showing ${ENVIRONMENT_FEATURE_LABELS[mapFactor]}`}>
-                  {factorMapShapes.map((shape) => {
+                <div className="simulation-map-zoom" role="group" aria-label="Map zoom controls">
+                  <button type="button" aria-label="Zoom in" disabled={mapView.w <= MAP_WIDTH / MAP_MAX_ZOOM + 0.01} onClick={() => zoomMap(1.6)}>+</button>
+                  <button type="button" aria-label="Zoom out" disabled={mapView.w >= MAP_WIDTH} onClick={() => zoomMap(1 / 1.6)}>−</button>
+                  <button type="button" aria-label="Zoom to selected area" disabled={!baseline} onClick={zoomMapToSelected}>Selected</button>
+                  <button type="button" aria-label="Reset map view" disabled={mapView.w >= MAP_WIDTH} onClick={() => setMapView(MAP_BASE_VIEW)}>Reset</button>
+                </div>
+                <svg ref={mapSvgRef} className={`${baseline ? 'has-selection' : ''}${mapView.w < MAP_WIDTH ? ' is-zoomed' : ''}`} viewBox={`${mapView.x} ${mapView.y} ${mapView.w} ${mapView.h}`} onPointerDown={handleMapPointerDown} role="img" aria-label={`Greater Melbourne SA2 map showing ${ENVIRONMENT_FEATURE_LABELS[mapFactor]}`}>
+                  {[...factorMapShapes]
+                    .sort((left, right) => Number(left.id === nearestAnalogue?.id) - Number(right.id === nearestAnalogue?.id)
+                      || Number(left.id === baseline?.id) - Number(right.id === baseline?.id))
+                    .flatMap((shape) => {
                     const observedValue = observedLocalitiesById.get(shape.id)?.[mapFactor] ?? null
                     const isSelected = shape.id === baseline?.id
                     const isAnalogue = shape.id === nearestAnalogue?.id
                     const value = isSelected ? scenarioValues[mapFactor] : observedValue
-                    return <path
+                    const halo = isSelected
+                      ? <path key={`${shape.id}-halo`} className="simulation-map-halo" d={shape.path} fill="none" fillRule="evenodd" pointerEvents="none" aria-hidden="true" />
+                      : null
+                    return [halo, <path
                       key={shape.id}
+                      className={isSelected ? 'is-selected' : isAnalogue ? 'is-analogue' : undefined}
                       d={shape.path}
                       fill={factorMapColor(value, mapFactor, selectedFactorRange)}
-                      stroke={isSelected ? '#273f72' : isAnalogue ? '#218c78' : 'rgba(255,255,255,.8)'}
-                      strokeWidth={isSelected ? 2.4 : isAnalogue ? 1.8 : 0.45}
+                      stroke={isSelected ? '#1c2f5c' : isAnalogue ? '#218c78' : 'rgba(255,255,255,.8)'}
+                      strokeWidth={isSelected ? 3 : isAnalogue ? 2 : 0.45}
                       fillRule="evenodd"
                       tabIndex={0}
                       role="button"
                       aria-label={`${shape.name}, ${ENVIRONMENT_FEATURE_LABELS[mapFactor]} ${value === null ? 'unavailable' : formatEnvironmentValue(mapFactor, value)}${isSelected ? ', active scenario' : ''}${isAnalogue ? ', closest observed match' : ''}`}
                       onClick={() => {
-                        if (shape.id === baseline?.id) return
+                        if (mapDraggedRef.current || shape.id === baseline?.id) return
                         setSelectedNeighbourhood(shape.name)
                         setSearch(shape.name)
                         setShowSearchResults(false)
@@ -1758,7 +1868,7 @@ export default function SimulationPage({
                           void loadNeighbourhoodScenario(shape.id, shape.name)
                         }
                       }}
-                    ><title>{shape.name}: {value === null ? 'data unavailable' : formatEnvironmentValue(mapFactor, value)}</title></path>
+                    ><title>{shape.name}: {value === null ? 'data unavailable' : formatEnvironmentValue(mapFactor, value)}</title></path>]
                   })}
                 </svg>
               </div>}
@@ -1769,7 +1879,7 @@ export default function SimulationPage({
                 <b><i />Selected area</b>
                 <b><i />Closest observed match</b>
               </div>}
-              <p className="simulation-factor-map-note">The map colors non-selected SA2s by observed values; it does not distribute the selected scenario across surrounding areas.</p>
+              <p className="simulation-factor-map-note">The map colors non-selected SA2s by observed values; it does not distribute the selected scenario across surrounding areas. Zoom with the buttons or Ctrl/⌘ + scroll, and drag to pan.</p>
             </section>
             </>}
 
@@ -1898,53 +2008,61 @@ export default function SimulationPage({
             <section className="simulation-driver-breakdown" aria-labelledby="simulation-driver-title">
               <div className="simulation-driver-header">
                 <div>
-                  <h3 id="simulation-driver-title">Outcome driver waterfall</h3>
-                  <p>Each segment adds one factor’s fitted association to the baseline outcome.</p>
+                  <h3 id="simulation-driver-title">What drives the change</h3>
+                  <p>How much each factor you adjusted shifts each outcome, compared with today.</p>
                 </div>
               </div>
               <div className="simulation-waterfall-legend" aria-label="How to read the driver chart">
-                <p>Each row shows how much one environmental factor moves the outcome between today and your scenario. Longer bars mean a bigger effect; “pp” means percentage points of children.</p>
+                <p>Each bar shows one factor’s share of the change, in percentage points (pp) of children. A bar to the right raises the outcome; to the left lowers it. The centre line means no change.</p>
                 <div>
-                  <span><i className="key-favorable" />Moves the outcome in a better direction</span>
-                  <span><i className="key-adverse" />Moves the outcome in a worse direction</span>
-                  <span><i className="key-baseline" />Today (baseline)</span>
-                  <span><i className="key-scenario" />Your scenario</span>
+                  <span><i className="key-favorable" />Better for children</span>
+                  <span><i className="key-adverse" />Worse for children</span>
                 </div>
               </div>
               {!scenarioResult?.predictionsAvailable
                 ? <p className="simulation-driver-empty">Breakdown unavailable outside the model’s observed feature ranges.</p>
                 : <div className="simulation-waterfalls">
-                  {outcomeWaterfalls.map((outcome) => <article className="simulation-waterfall" key={outcome.id}>
-                    <header>
-                      <strong>{outcome.label}</strong>
-                      <span>{outcome.baseline.toFixed(1)}% → {outcome.scenario.toFixed(1)}%</span>
-                      <small>{outcome.range ? `80% held-out range ${outcome.range.low.toFixed(1)}–${outcome.range.high.toFixed(1)}%` : 'Held-out range unavailable'}</small>
-                    </header>
-                    <div className="simulation-waterfall-body" role="img" aria-label={`${outcome.label}: baseline ${outcome.baseline.toFixed(1)} percent to scenario ${outcome.scenario.toFixed(1)} percent, factor contributions shown in percentage points`}>
-                      <div className="simulation-waterfall-labels">
-                        {outcome.steps.map((step) => <span key={step.feature}>{ENVIRONMENT_FEATURE_LABELS[step.feature]}</span>)}
-                      </div>
-                      <div className="simulation-waterfall-track">
-                        <i className="simulation-waterfall-baseline" style={{ left: `${clamp(outcome.baseline, 0, 100)}%` }} />
-                        {outcome.steps.map((step, index) => {
-                          const value = step.value ?? 0
-                          const left = clamp(Math.min(step.start, step.end), 0, 100)
-                          const width = Math.max(Math.min(Math.abs(value), 100 - left), value === 0 ? 0 : 0.35)
-                          return <i
-                            className={`simulation-waterfall-segment ${step.favorable === null ? 'neutral' : step.favorable ? 'favorable' : 'adverse'}`}
-                            key={step.feature}
-                            style={{ left: `${left}%`, width: `${width}%`, top: `${index * 18 + 4}px` }}
-                            title={`${ENVIRONMENT_FEATURE_LABELS[step.feature]} ${formatContribution(step.value)}`}
-                          />
-                        })}
-                        <i className="simulation-waterfall-scenario" style={{ left: `${clamp(outcome.scenario, 0, 100)}%` }} />
-                      </div>
-                      <div className="simulation-waterfall-values">
-                        {outcome.steps.map((step) => <b key={step.feature}>{formatContribution(step.value)}</b>)}
-                      </div>
-                    </div>
-                    <div className="simulation-waterfall-axis"><span>0%</span><span>Outcome level</span><span>100%</span></div>
-                  </article>)}
+                  {outcomeWaterfalls.map((outcome) => {
+                    const net = Number((outcome.scenario - outcome.baseline).toFixed(1))
+                    const lowerIsBetter = outcome.id === 'vulnerability'
+                    const netVerdict = net === 0 ? 'No net change' : (lowerIsBetter ? net < 0 : net > 0) ? 'Better' : 'Worse'
+                    const maxShift = Math.max(1, ...outcome.steps.map((step) => Math.abs(step.value ?? 0)))
+                    const hasShift = outcome.steps.some((step) => Math.abs(step.value ?? 0) >= 0.05)
+                    return <article className="simulation-waterfall" key={outcome.id}>
+                      <header>
+                        <strong>{outcome.label}</strong>
+                        <span>{outcome.baseline.toFixed(1)}% today → {outcome.scenario.toFixed(1)}% scenario</span>
+                        <small>
+                          {net === 0 ? netVerdict : `${netVerdict}: ${net > 0 ? '+' : ''}${net.toFixed(1)} pp`}
+                          {outcome.range ? ` · likely range ${outcome.range.low.toFixed(1)}–${outcome.range.high.toFixed(1)}%` : ''}
+                        </small>
+                      </header>
+                      {!hasShift
+                        ? <p className="simulation-driver-empty">Move a slider to see which factor drives the change.</p>
+                        : <div className="simulation-driver-rows">
+                          {outcome.steps.map((step) => {
+                            const value = step.value ?? 0
+                            const widthPct = (Math.abs(value) / maxShift) * 50
+                            const side = value < 0 ? 'left' : 'right'
+                            return <div
+                              className="simulation-driver-row"
+                              key={step.feature}
+                              role="img"
+                              aria-label={`${ENVIRONMENT_FEATURE_LABELS[step.feature]}: ${formatContribution(step.value)}${step.favorable === null || value === 0 ? '' : step.favorable ? ', better' : ', worse'}`}
+                            >
+                              <span className="simulation-driver-name">{ENVIRONMENT_FEATURE_LABELS[step.feature]}</span>
+                              <div className="simulation-driver-track">
+                                {value !== 0 && <i
+                                  className={`simulation-driver-bar ${side} ${step.favorable ? 'favorable' : 'adverse'}`}
+                                  style={{ width: `${Math.max(widthPct, 1.5)}%` }}
+                                />}
+                              </div>
+                              <b className={value === 0 ? 'neutral' : step.favorable ? 'favorable' : 'adverse'}>{formatContribution(step.value)}</b>
+                            </div>
+                          })}
+                        </div>}
+                    </article>
+                  })}
                 </div>}
               <p className="simulation-driver-caveat">These fitted cross-sectional contributions are decompositions, not causal effects.</p>
             </section>
