@@ -58,7 +58,7 @@ screen does not mean every optional evidence product is available.
 - Comparisons, projections and scenarios are investigation aids. Association
   does not establish causation, and final decisions remain with people.
 
-## Current deployment — 12 October 2026
+## Current deployment
 
 - Production website: `https://vkinder.me` / `https://www.vkinder.me`, hosted on Vercel.
 - Production API: `https://aockxpua5f.execute-api.ap-southeast-2.amazonaws.com`,
