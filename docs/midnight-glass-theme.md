@@ -19,7 +19,24 @@ The kit supplies navy canvas stops (`#091525`, `#10233e`, `#172b47`), 22/32/65% 
 - `frontend/src/theme/ThemeProvider.tsx`: shared theme state. `kinderprint-theme` in localStorage contains `light` or `dark`; absent or invalid preferences default to Light. Storage events sync open tabs. The script in `frontend/index.html` restores the preference before React renders.
 - `frontend/src/components/ThemeSwitcher.tsx`: sun/moon buttons, sliding indicator, native keyboard activation plus Left/Right and Home/End selection. View transitions provide a brief page colour crossfade where supported, with reduced motion respected.
 
-The existing Mapbox style receives an in-place day/night lighting change; globe atmosphere and Cesium background use the shared tokens. Maps are not recreated on theme switches, and cameras, geometry, data layers and scene materials retain their existing behaviour. The homepage ripple keeps its original timing and geometry, with a cyan trail only in Dark. Existing images and videos are retained.
+`frontend/src/components/mapTheme.ts` adapts the Mapbox basemap to the shared
+theme without replacing its style. The current custom style has no Standard
+`basemap` import, so its existing colour paint properties are saved and recoloured
+in Dark (navy land, blue water and pale labels). Light restores the exact original
+values, including expressions. Layers using the neighbourhood overlay source are
+excluded: indicator, hover and selection colours are not changed. Styles with a
+Standard `basemap` import continue to use the supported day/night lighting preset.
+
+`NeighbourhoodMap.tsx` applies the adapter after style load and on theme changes.
+The map is not recreated, preserving its camera, geometry and selection. Globe
+atmosphere and Cesium background retain their existing shared-token behaviour.
+The homepage ripple keeps its original timing and geometry, with a cyan trail only
+in Dark. Existing images and videos are retained.
+
+The neighbourhood search has no purple container or input focus outline in Dark,
+as requested after local preview. This is scoped to `.search-input-shell`; other
+inputs and select controls keep their existing focus indicators. The search
+remains keyboard-operable, but these outlines no longer indicate focus there.
 
 Homepage sections below the sticky hero use opaque midnight backgrounds so the underlying video and text do not show through. Their decorative gradients are deliberately subdued; glass translucency remains on floating panels rather than full-page sections.
 
@@ -27,4 +44,16 @@ Concern chart fills and below-standard habit bars use a shared bright coral `--k
 
 For subsequent styling changes, leave the Light CSS intact and add or update the matching dark selector using semantic tokens. Keep separate chart-series colours and status meanings. Avoid introducing theme changes into layout or data logic.
 
-No tests, builds, linting, type-checking, browser checks or other verification were run for this change, as requested.
+## Verification record — 12 October 2026
+
+- `npm run build` passed TypeScript and production bundling for the map adapter;
+  the existing large-chunk advisory remains.
+- `node --test tests/map-theme.test.cjs tests/map-data.test.cjs tests/simulation-selection.test.cjs`:
+  8 tests passed, covering dark/light colour restoration, Standard configuration,
+  overlay exclusion, missing-value handling and simulation selection behaviour.
+- The owner previewed and accepted the map theme change locally. The search
+  outline changes passed `git diff --check`; no automated visual or accessibility
+  audit was performed for those CSS changes.
+
+The original Midnight Glass implementation recorded no verification at that time;
+the checks above concern the later map-theme update, not a complete theme audit.
