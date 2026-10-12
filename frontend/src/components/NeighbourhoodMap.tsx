@@ -12,6 +12,7 @@ import 'mapbox-gl/dist/mapbox-gl.css'
 
 import { api } from '../services/api'
 import { useTheme } from '../theme/ThemeProvider'
+import { createBasemapTheme } from './mapTheme'
 
 import {
   choroplethFill,
@@ -223,6 +224,7 @@ export default function NeighbourhoodMap({
   selectionEnabled = true,
 }: NeighbourhoodMapProps) {
   const { theme } = useTheme()
+  const applyBasemapThemeRef = useRef<ReturnType<typeof createBasemapTheme> | null>(null)
   const mapContainerRef =
     useRef<HTMLDivElement | null>(
       null,
@@ -356,6 +358,7 @@ center: [
       })
 
     mapRef.current = map
+    applyBasemapThemeRef.current = createBasemapTheme(map, SOURCE_ID)
 
     const resizeObserver = new ResizeObserver(() => {
       map.resize()
@@ -964,6 +967,7 @@ return () => {
 
       mapRef.current =
         null
+      applyBasemapThemeRef.current = null
       clearHoverRef.current = () => {}
     }
   }, [])
@@ -971,10 +975,7 @@ return () => {
     const map = mapRef.current
     if (!map) return
     const updateLighting = () => {
-      // Change the existing basemap preset in place, retaining custom data layers and camera.
-      if (map.getStyle().imports?.some((entry) => entry.id === 'basemap')) {
-        map.setConfigProperty('basemap', 'lightPreset', theme === 'dark' ? 'night' : 'day')
-      }
+      applyBasemapThemeRef.current?.(theme)
     }
     if (map.isStyleLoaded()) updateLighting()
     map.on('style.load', updateLighting)
