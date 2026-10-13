@@ -1,7 +1,7 @@
 /**
- * User Journey: a short guided tour of what Vkinder does. A muted drone flight across Melbourne
- * (suburbs and the Yarra, Albert Park, Brighton) plays in the background; scrolling moves through
- * six cards, one per part of the site, each with a link to try it. The last panel links to
+ * User Journey: a short guided tour of what Vkinder does. A muted film plays in the background:
+ * the Vkinder opening image for one second, then Melbourne at night, Albert Park, forest, solar,
+ * the Great Ocean Road, digital health and families. Scrolling moves through six cards, one per part of the site, each with a link to try it. The last panel links to
  * About us (/about), the previous home page.
  */
 import { useEffect, useRef, useState } from 'react'
@@ -100,7 +100,7 @@ export default function UserJourneyPage({ onHome, onInsight, onMap, onSimulation
       {steps.map((item, index) => <button key={item.kicker} type="button" aria-current={index === step ? 'step' : undefined} aria-label={`${index + 1} of ${steps.length}: ${item.kicker}`} onClick={() => goTo(index)}><span>{item.kicker}</span><i /></button>)}
     </nav>
     <div className="uj-bar" style={{ transform: `scaleX(${progress})` }} />
-    <p className="uj-credit">Footage: Pexels (Tetrakis Sphericon, Danilo Riba, New Zealand)</p>
+    <p className="uj-credit">Footage: Pexels (Peter Erb, Andy Nguyen, Tetrakis Sphericon, Danilo Riba, K, Pat Whelen, Ketut Subiyanto, Evgenij Mikhailov, Yan Krukau)</p>
     <div className="uj-spacer" />
   </div>
 }
