@@ -1,7 +1,7 @@
 /**
  * User Journey: a short guided tour of what Vkinder does. A muted film plays in the background:
- * the Vkinder opening image for one second, then Melbourne at night, Albert Park, forest, solar,
- * the Great Ocean Road, digital health and families. Scrolling moves through six cards, one per part of the site, each with a link to try it. The last panel links to
+ * the Vkinder opening image for one second, a Flinders Street tram at night, Albert Park, forest,
+ * solar, the Great Ocean Road, digital health, families, then the Arts Centre and the bay at dusk. Scrolling moves through six cards, one per part of the site, each with a link to try it. The last panel links to
  * About us (/about), the previous home page.
  */
 import { useEffect, useRef, useState } from 'react'
