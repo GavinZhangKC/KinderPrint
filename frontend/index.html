@@ -16,6 +16,12 @@
     </script>
     <style>html[data-theme="dark"], html[data-theme="dark"] body { background: #091525; }</style>
     <meta name="description" content="Vkinder neighbourhood evidence explorer" />
+    <script>
+      // Home only: fetch the opening image first so it is on screen while the tour video loads.
+      if (location.pathname === '/' || location.pathname === '/user-journey') {
+        const l = document.createElement('link'); l.rel = 'preload'; l.as = 'image'; l.href = '/user-journey/journey_poster.jpg'; l.setAttribute('fetchpriority', 'high'); document.head.appendChild(l)
+      }
+    </script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,650;12..96,750&family=Manrope:wght@400;500;600;650;700;800&display=swap" />
