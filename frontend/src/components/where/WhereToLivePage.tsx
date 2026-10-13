@@ -1,5 +1,5 @@
 /* Where to live, in the same page template as Child Health: hero, Parent / Practitioner switch.
- * Parents: "Find an area" (area matching). Practitioners: "What if this area changed?" (Plan a change).
+ * Both audiences can find an area or explore a planned change.
  * The audience is shared with Child Health, so a practitioner stays a practitioner across pages. */
 import { useEffect, useState } from 'react'
 
@@ -28,9 +28,6 @@ type Audience = 'parent' | 'practitioner'
 const AUDIENCE_KEY = 'kinderprint-audience'
 
 function initialAudience(): Audience {
-  const view = new URLSearchParams(window.location.search).get('view')
-  if (view === 'plan') return 'practitioner'
-  if (view === 'find') return 'parent'
   try {
     const stored = JSON.parse(window.localStorage.getItem(AUDIENCE_KEY) ?? 'null')
     if (stored === 'parent' || stored === 'practitioner') return stored
@@ -51,20 +48,23 @@ const COPY = {
 
 export default function WhereToLivePage(props: Props) {
   const [audience, setAudienceState] = useState<Audience>(initialAudience)
+  const [view, setView] = useState<'find' | 'plan'>(() => new URLSearchParams(window.location.search).get('view') === 'plan' ? 'plan' : 'find')
   const [parentAreaName, setParentAreaName] = useState<string | null>(null)
   const [practitionerAreaName, setPractitionerAreaName] = useState<string | null>(null)
   const parent = audience === 'parent'
-  const copy = COPY[audience]
-  const areaName = parent ? parentAreaName : practitionerAreaName
+  const copy = COPY[view === 'find' ? 'parent' : 'practitioner']
+  const areaName = view === 'find' ? parentAreaName : practitionerAreaName
 
   const setAudience = (next: Audience) => {
     setAudienceState(next)
     try { window.localStorage.setItem(AUDIENCE_KEY, JSON.stringify(next)) } catch { /* storage unavailable */ }
-    // Keep the address shareable; the plan view keeps its own area and plan in the query.
-    const q = new URLSearchParams(next === 'practitioner' ? window.location.search : '')
-    if (next === 'practitioner') q.set('view', 'plan'); else q.delete('view')
-    window.history.replaceState(null, '', `/map/where-to-live${q.toString() ? `?${q}` : ''}`)
-    window.scrollTo({ top: 0 })
+  }
+
+  const changeView = (next: 'find' | 'plan') => {
+    setView(next)
+    const q = new URLSearchParams(window.location.search)
+    q.set('view', next)
+    window.history.replaceState(null, '', `/map/where-to-live?${q}`)
   }
 
   // The site header and page background take the same audience theme as Child Health.
@@ -89,11 +89,15 @@ export default function WhereToLivePage(props: Props) {
               <button type="button" aria-pressed={!parent} onClick={() => setAudience('practitioner')}>Practitioner</button>
             </div>
           </header>
-          <div className={`kt ht vx hp where-page fu-hub wl-hub ${parent ? 'kt-parent' : 'kt-prac'}`} key={audience}>
+          <div className={`kt ht vx hp where-page fu-hub wl-hub ${parent ? 'kt-parent' : 'kt-prac'}`}>
             <Hero parent={parent} title={copy.title} text={copy.text} />
-            {parent
+            <div className="kh-seg" role="group" aria-label="Where to live tools">
+              <button type="button" aria-pressed={view === 'find'} onClick={() => changeView('find')}>Find an area</button>
+              <button type="button" aria-pressed={view === 'plan'} onClick={() => changeView('plan')}>What if this area changed?</button>
+            </div>
+            {view === 'find'
               ? <WhereToLive {...props} bare onAreaNameChange={setParentAreaName} />
-              : <PlanChange {...props} embedded audience="practitioner" onAreaNameChange={setPractitionerAreaName} />}
+              : <PlanChange {...props} embedded audience={audience} onAreaNameChange={setPractitionerAreaName} />}
           </div>
         </div>
       </div>

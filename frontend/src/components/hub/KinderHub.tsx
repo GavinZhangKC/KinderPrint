@@ -116,11 +116,13 @@ export function LocalityPicker({ locality, onSelect, autoOpen = false }: { local
   const inputRef = useRef<HTMLInputElement>(null)
   useEffect(() => {
     if (query.trim().length < 2) { setResults([]); setState('idle'); return }
+    let current = true
+    setResults([])
     setState('loading')
     const timer = window.setTimeout(() => api.searchNeighbourhoods(query)
-      .then(response => { setResults(response.data.filter(item => /^\d{9}$/.test(item.id)).slice(0, 8)); setActive(0); setState('idle') })
-      .catch(() => { setResults([]); setState('error') }), 220)
-    return () => window.clearTimeout(timer)
+      .then(response => { if (!current) return; setResults(response.data.filter(item => /^\d{9}$/.test(item.id)).slice(0, 8)); setActive(0); setState('idle') })
+      .catch(() => { if (!current) return; setResults([]); setState('error') }), 220)
+    return () => { current = false; window.clearTimeout(timer) }
   }, [query])
   useEffect(() => { if (open) inputRef.current?.focus() }, [open])
   useEffect(() => {
@@ -131,18 +133,11 @@ export function LocalityPicker({ locality, onSelect, autoOpen = false }: { local
   }, [open])
   const choose = (item: NeighbourhoodSearchResult) => { onSelect(item); setQuery(''); setResults([]); setOpen(false) }
   const mapHref = locality ? `/map?area=${encodeURIComponent(locality.id)}&name=${encodeURIComponent(locality.name)}` : '/map'
-  // With an area chosen, the pin and "Change" go back to the map, where the area's profile opens.
-  if (locality) return <div className="kh-picker">
-    <a className="kh-chip kh-picker-trigger kh-picker-link" href={mapHref} aria-label={`${locality.name}. Change area on the map`}>
-      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="10" r="3" /><path d="M12 21s-7-6.5-7-11a7 7 0 0 1 14 0c0 4.5-7 11-7 11z" /></svg>
-      <span className="kh-picker-label">{locality.name}</span>
-      <span className="kh-picker-change">Change</span>
-    </a>
-  </div>
   return <div className={`kh-picker${open ? ' is-open' : ''}`} ref={rootRef}>
     <button type="button" className="kh-chip kh-picker-trigger" aria-haspopup="dialog" aria-expanded={open} onClick={() => setOpen(value => !value)}>
       <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="10" r="3" /><path d="M12 21s-7-6.5-7-11a7 7 0 0 1 14 0c0 4.5-7 11-7 11z" /></svg>
-      <span className="kh-picker-label">Choose an area</span>
+      <span className="kh-picker-label">{locality?.name ?? 'Choose an area'}</span>
+      {locality && <span className="kh-picker-change">Change</span>}
       <i aria-hidden="true" className={open ? 'is-open' : undefined} />
     </button>
     {open && <div className="kh-picker-panel" role="dialog" aria-label="Choose an area">
