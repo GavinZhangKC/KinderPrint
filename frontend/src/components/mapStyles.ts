@@ -1,3 +1,4 @@
+import type { FilterSpecification } from 'mapbox-gl'
 import type { BoundaryFeatureCollection } from '../services/api'
 import type { PreferenceId } from '../types/neighbourhood'
 
@@ -8,6 +9,7 @@ export const HOVER_FILL_LAYER_ID = 'kinderprint-neighbourhood-hover-fill'
 export const OUTLINE_LAYER_ID = 'kinderprint-neighbourhood-outline'
 export const HOVER_BORDER_LAYER_ID = 'kinderprint-neighbourhood-hover-border'
 export const COMPARISON_LAYER_ID = 'kinderprint-neighbourhood-comparison'
+export const BOUNDARY_OUTLINE_COLORS = { light: '#637CA8', dark: '#B0BFDF' }
 
 export const EMPTY_COLLECTION: BoundaryFeatureCollection = {
   type: 'FeatureCollection',
@@ -26,6 +28,16 @@ const CHOROPLETH_STYLE: Record<
 }
 
 export const NO_DATA_FILL = '#AEB7C4'
+
+export function boundaryDataFilter(preference: PreferenceId | null): FilterSpecification {
+  if (preference) {
+    return ['==', ['typeof', ['get', CHOROPLETH_STYLE[preference].property]], 'number']
+  }
+
+  return ['any', ...Object.values(CHOROPLETH_STYLE).map(({ property }) =>
+    ['==', ['typeof', ['get', property]], 'number'],
+  )] as FilterSpecification
+}
 
 export function hasHeatmapData(properties: Record<string, unknown> | null | undefined, preference: PreferenceId | null) {
   if (!preference) return true

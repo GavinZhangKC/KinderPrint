@@ -15,6 +15,8 @@ import { useTheme } from '../theme/ThemeProvider'
 import { createBasemapTheme } from './mapTheme'
 
 import {
+  BOUNDARY_OUTLINE_COLORS,
+  boundaryDataFilter,
   choroplethFill,
   COMPARISON_LAYER_ID,
   EMPTY_COLLECTION,
@@ -224,6 +226,8 @@ export default function NeighbourhoodMap({
   selectionEnabled = true,
 }: NeighbourhoodMapProps) {
   const { theme } = useTheme()
+  const themeRef = useRef(theme)
+  themeRef.current = theme
   const applyBasemapThemeRef = useRef<ReturnType<typeof createBasemapTheme> | null>(null)
   const mapContainerRef =
     useRef<HTMLDivElement | null>(
@@ -666,15 +670,17 @@ map.addSource(
             'line',
 
           slot:
-            'middle',
+            'top',
 
           source:
             SOURCE_ID,
 
+          filter: boundaryDataFilter(preferenceRef.current),
+
           paint: {
-            'line-color': '#FFFFFF',
-            'line-width': 0.8,
-            'line-opacity': 0.38,
+            'line-color': BOUNDARY_OUTLINE_COLORS[themeRef.current],
+            'line-width': ['interpolate', ['linear'], ['zoom'], 7, 0.65, 10, 0.85, 13, 1.1, 16, 1.35],
+            'line-opacity': 0.45,
           },
         })
 
@@ -976,6 +982,9 @@ return () => {
     if (!map) return
     const updateLighting = () => {
       applyBasemapThemeRef.current?.(theme)
+      if (map.getLayer(OUTLINE_LAYER_ID)) {
+        map.setPaintProperty(OUTLINE_LAYER_ID, 'line-color', BOUNDARY_OUTLINE_COLORS[theme])
+      }
     }
     if (map.isStyleLoaded()) updateLighting()
     map.on('style.load', updateLighting)
@@ -1115,6 +1124,9 @@ useEffect(() => {
 
     map.setPaintProperty(FILL_LAYER_ID, 'fill-color', choroplethFill(preference))
     map.setPaintProperty(FILL_LAYER_ID, 'fill-opacity', preference ? 0.62 : 0.01)
+    if (map.getLayer(OUTLINE_LAYER_ID)) {
+      map.setFilter(OUTLINE_LAYER_ID, boundaryDataFilter(preference))
+    }
   }, [preference])
   useEffect(() => { clearHoverRef.current() }, [preference])
   useEffect(() => {

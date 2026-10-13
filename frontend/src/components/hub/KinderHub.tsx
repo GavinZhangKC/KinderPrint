@@ -285,7 +285,7 @@ export default function KinderHub({ locality, data, onSelectLocality, onOpenPlan
     (value): value is Audience => value === 'parent' || value === 'practitioner')
   const [storedPage, setPage] = useStored<Page>(PAGE_KEY, 'home',
     (value): value is Page => typeof value === 'string' && ['home', 'day', 'health', 'vaccines', 'food', 'seasons', 'care', 'future'].includes(value))
-  const [navExpanded, setNavExpanded] = useState(false)
+  const [navExpanded, setNavExpanded] = useState(true)
   const [birthMonth, setBirthMonth] = useStored(BIRTH_KEY, '')
   const [age, setAge] = useState(() => { try { return window.localStorage.getItem(AGE_KEY) ?? '5–9 years' } catch { return '5–9 years' } })
   const [body, setBody] = useState<BodyId>('brain')
@@ -362,9 +362,30 @@ export default function KinderHub({ locality, data, onSelectLocality, onOpenPlan
     <div className="kh-shell">
       <nav className="kh-crumbs" aria-label="Breadcrumb"><a href={`/map?area=${encodeURIComponent(locality.id)}&name=${encodeURIComponent(locality.name)}`}>Child Health</a><span aria-hidden="true">›</span><span aria-current="page">{locality.name}</span></nav>
       <header className="kh-top">
-        <nav className={`kh-nav${navExpanded ? ' is-expanded' : ''}`} aria-label="Dashboard sections" onMouseEnter={() => setNavExpanded(true)} onMouseLeave={() => setNavExpanded(false)} onFocus={() => setNavExpanded(true)} onBlur={event => { if (!event.currentTarget.contains(event.relatedTarget as Node)) setNavExpanded(false) }}>{orderedNav.map(item => <button key={item.id} type="button" aria-current={page === item.id ? 'page' : undefined} onClick={event => { go(item.id); setNavExpanded(false); event.currentTarget.blur() }}>
-          <svg viewBox="0 0 24 24" aria-hidden="true">{item.icon}</svg>{item.label}
-        </button>)}<button className="kh-nav-expand" type="button" aria-label={navExpanded ? 'Collapse Child Health menu' : 'Expand Child Health menu'} aria-expanded={navExpanded} onClick={event => { setNavExpanded(value => !value); event.currentTarget.blur() }}>›</button></nav>
+        <nav className={`kh-nav${navExpanded ? ' is-expanded' : ''}`} aria-label="Dashboard sections">
+          {orderedNav.map(item => <button
+            key={item.id}
+            type="button"
+            aria-current={page === item.id ? 'page' : undefined}
+            aria-hidden={!navExpanded && page !== item.id ? true : undefined}
+            tabIndex={!navExpanded && page !== item.id ? -1 : undefined}
+            onClick={() => go(item.id)}
+          >
+            <svg viewBox="0 0 24 24" aria-hidden="true">{item.icon}</svg>{item.label}
+          </button>)}
+          <button
+            className="kh-nav-expand"
+            type="button"
+            aria-label={navExpanded ? 'Collapse Child Health menu' : 'Expand Child Health menu'}
+            title={navExpanded ? 'Collapse menu' : 'Expand menu'}
+            aria-expanded={navExpanded}
+            onClick={() => setNavExpanded(value => !value)}
+          >
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d={navExpanded ? 'M15 6l-6 6 6 6' : 'M9 6l6 6-6 6'} />
+            </svg>
+          </button>
+        </nav>
         <div className="kh-seg" role="group" aria-label="Who is using KinderPrint">
           <button type="button" aria-pressed={parent} onClick={() => setAudience('parent')}>Parent</button>
           <button type="button" aria-pressed={!parent} onClick={() => setAudience('practitioner')}>Practitioner</button>
