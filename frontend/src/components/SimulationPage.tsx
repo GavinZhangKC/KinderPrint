@@ -666,7 +666,10 @@ function buildScenarioResult(
     && isWithinJointSupport(values) && isWithinJointSupport(baselineValues)
   const nearestAnalogue = aiModel?.supportScales
     ? aiModel.observedLocalities
-      .filter((locality) => locality.id !== baseline.id)
+      .filter((locality) => locality.id !== baseline.id
+        && locality.vulnerability !== null
+        && locality.physicalHealth !== null
+        && locality.socialCompetence !== null)
       .map((locality) => ({
         ...locality,
         distance: Math.sqrt(ENVIRONMENT_FEATURES.reduce((total, feature) =>
