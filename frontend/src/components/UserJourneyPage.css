@@ -1,0 +1,46 @@
+/* User Journey: full-screen background video with scroll-driven tour cards. The page is always
+   dark over the footage, so its colours are fixed rather than theme tokens. */
+.uj-page { --uj-ink: #fff; --uj-ink2: rgba(255, 255, 255, .8); --uj-glass: rgba(14, 22, 40, .6); --uj-line: rgba(255, 255, 255, .2); --uj-accent: #f6b38a; --uj-accent2: #7fd6c8; min-height: 100vh; background: #0d1424; color: var(--uj-ink); font-family: Manrope, system-ui, -apple-system, 'Segoe UI', sans-serif }
+.uj-stage { position: fixed; inset: 0; z-index: 0; overflow: hidden; background: #0d1424 }
+.uj-stage video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover }
+.uj-shade { position: absolute; inset: 0; background: linear-gradient(90deg, rgba(9, 14, 28, .8) 0%, rgba(9, 14, 28, .45) 42%, rgba(9, 14, 28, .05) 75%), linear-gradient(0deg, rgba(9, 14, 28, .55), transparent 35%) }
+.uj-header { position: fixed; top: 0; left: 0; right: 0; z-index: 6 }
+.uj-intro, .uj-end, .uj-cards { position: fixed; left: 7vw; top: 52%; transform: translateY(-50%); z-index: 3 }
+.uj-intro { max-width: 640px; opacity: 0; transition: opacity .45s ease; pointer-events: none }
+.uj-intro.is-on { opacity: 1; pointer-events: auto }
+.uj-kicker { margin: 0 0 10px; font-size: 14px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; color: var(--uj-accent) }
+.uj-intro h1 { margin: 0 0 16px; font-size: clamp(40px, 4.4vw, 60px); line-height: 1.05; letter-spacing: -.02em; text-wrap: balance; color: #fff }
+.uj-intro p:not(.uj-kicker) { margin: 0; font-size: 19px; line-height: 1.55; color: var(--uj-ink2) }
+.uj-cue { margin-top: 28px; display: inline-flex; gap: 10px; align-items: center; font-weight: 700; font-size: 15px; color: var(--uj-ink2) }
+.uj-cue i { position: relative; display: block; width: 22px; height: 34px; border: 2px solid var(--uj-ink2); border-radius: 12px }
+.uj-cue i::after { content: ''; position: absolute; left: 50%; top: 6px; width: 4px; height: 7px; margin-left: -2px; border-radius: 2px; background: var(--uj-ink2); animation: uj-cue 1.6s infinite }
+@keyframes uj-cue { 0% { opacity: 0; transform: translateY(0) } 40% { opacity: 1 } 100% { opacity: 0; transform: translateY(10px) } }
+.uj-cards { width: min(540px, 42vw); height: 380px }
+.uj-card { position: absolute; top: 0; left: 0; right: 0; padding: 30px 32px 28px; border: 1px solid var(--uj-line); border-radius: 24px; background: var(--uj-glass); backdrop-filter: blur(18px); box-shadow: 0 30px 80px rgba(0, 0, 0, .35); opacity: 0; transform: translateY(40px) scale(.98); transition: opacity .45s ease, transform .45s ease; pointer-events: none }
+.uj-card.is-on { opacity: 1; transform: none; pointer-events: auto }
+.uj-card.is-past { transform: translateY(-40px) scale(.98) }
+.uj-card-n { display: flex; justify-content: space-between; align-items: center; margin: 0 0 14px; font-size: 13px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; color: var(--uj-accent) }
+.uj-card-n em { font-style: normal; letter-spacing: .06em; color: var(--uj-ink2) }
+.uj-card h2 { margin: 0 0 12px; font-size: 34px; line-height: 1.12; letter-spacing: -.015em; color: #fff }
+.uj-card > p { margin: 0 0 18px; font-size: 17px; line-height: 1.55; color: var(--uj-ink2) }
+.uj-card ul { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 22px; padding: 0; list-style: none }
+.uj-card li { padding: 5px 12px; border: 1px solid var(--uj-line); border-radius: 999px; background: rgba(255, 255, 255, .06); font-size: 13.5px; font-weight: 700; color: #fff }
+.uj-card button, .uj-end button { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 20px; border: 1px solid #fff; border-radius: 12px; background: #fff; color: #14203a; font: 800 15px/1 inherit; cursor: pointer }
+.uj-end button.ghost { background: transparent; color: #fff; border-color: rgba(255, 255, 255, .6) }
+.uj-card button:focus-visible, .uj-end button:focus-visible, .uj-dots button:focus-visible { outline: 3px solid var(--uj-accent2); outline-offset: 3px }
+.uj-end { max-width: 640px; opacity: 0; transition: opacity .45s; pointer-events: none }
+.uj-end.is-on { opacity: 1; pointer-events: auto }
+.uj-end h2 { margin: 0 0 12px; font-size: 46px; letter-spacing: -.02em; color: #fff }
+.uj-end p { margin: 0 0 24px; font-size: 18px; line-height: 1.55; color: var(--uj-ink2) }
+.uj-end-row { display: flex; flex-wrap: wrap; gap: 12px }
+.uj-dots { position: fixed; right: 34px; top: 52%; transform: translateY(-50%); z-index: 4; display: grid; gap: 12px }
+.uj-dots button { display: flex; align-items: center; justify-content: flex-end; gap: 10px; min-height: 24px; padding: 0; border: 0; background: none; color: var(--uj-ink2); font: 700 13px inherit; cursor: pointer }
+.uj-dots button span { opacity: 0; transition: opacity .2s }
+.uj-dots button:hover span, .uj-dots button[aria-current] span { opacity: 1 }
+.uj-dots button i { width: 10px; height: 10px; border: 2px solid rgba(255, 255, 255, .75); border-radius: 50%; transition: all .25s }
+.uj-dots button[aria-current] i { background: var(--uj-accent); border-color: var(--uj-accent); transform: scale(1.25) }
+.uj-bar { position: fixed; left: 0; bottom: 0; z-index: 6; width: 100%; height: 3px; transform-origin: 0 50%; background: linear-gradient(90deg, var(--uj-accent), var(--uj-accent2)) }
+.uj-credit { position: fixed; right: 16px; bottom: 10px; z-index: 5; margin: 0; font-size: 12px; color: rgba(255, 255, 255, .7) }
+.uj-spacer { height: 800vh }
+@media (prefers-reduced-motion: reduce) { .uj-card, .uj-intro, .uj-end { transition: none } .uj-cue i::after { animation: none } }
+@media (max-width: 760px) { .uj-cards { width: calc(100vw - 32px); left: 16px } .uj-intro, .uj-end { left: 16px; right: 16px } .uj-dots { display: none } }

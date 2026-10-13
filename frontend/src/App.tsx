@@ -8,6 +8,7 @@ import ComparePanel from './components/ComparePanel'
 import DetailedDataDrawer from './components/DetailedDataDrawer'
 import DigitalHealthHub, { ChildHealthComparisonPage } from './components/DigitalHealthHub'
 import InsightPage from './components/InsightPage'
+import UserJourneyPage from './components/UserJourneyPage'
 import Legend from './components/Legend'
 import LandingPage from './components/LandingPage'
 import NeighbourhoodMap from './components/NeighbourhoodMap'
@@ -40,6 +41,7 @@ type View =
 type AppPage =
   | 'landing'
   | 'insight-legacy'
+  | 'journey'
   | 'map'
   | 'simulation'
   | 'health'
@@ -48,6 +50,7 @@ type AppPage =
 function initialAppPage(): AppPage {
   const pathname = window.location.pathname.replace(/\/+$/, '') || '/'
   if (pathname === '/insight-journey-legacy') return 'insight-legacy'
+  if (pathname === '/user-journey') return 'journey'
   if (pathname === '/map') return 'map'
   if (pathname === '/simulation') return 'simulation'
   if (pathname === '/child-health' || pathname === '/health') return 'health'
@@ -67,6 +70,7 @@ function appPagePath(page: Exclude<AppPage, 'insight-legacy'>) {
   if (page === 'simulation') return '/simulation'
   if (page === 'health') return '/child-health'
   if (page === 'where') return '/map/where-to-live'
+  if (page === 'journey') return '/user-journey'
   return '/'
 }
 
@@ -188,9 +192,10 @@ function openMapPage() {
 function openSimulationPage() {
     navigateToAppPage('simulation')
   }
+/** The menu's User Journey: a guided tour of the site (the Parkville 3D journey stays at /insight-journey). */
 function openInsightPage() {
     resetExplore()
-    window.location.assign('/insight-journey')
+    window.location.assign('/user-journey')
   }
 /** Child Health starts on the map: choose an area, then open its board. */
 function openHealthPage() {
@@ -386,6 +391,18 @@ if (appPage === 'landing') {
         onHome={backToLanding}
         onInsight={openInsightPage}
         onExploreMap={openMapPage}
+        onSimulation={openSimulationPage}
+        onHealth={openHealthPage}
+      />
+    )
+  }
+
+  if (appPage === 'journey') {
+    return (
+      <UserJourneyPage
+        onHome={backToLanding}
+        onInsight={openInsightPage}
+        onMap={openMapPage}
         onSimulation={openSimulationPage}
         onHealth={openHealthPage}
       />
