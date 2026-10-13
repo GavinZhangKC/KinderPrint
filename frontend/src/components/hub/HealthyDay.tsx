@@ -132,13 +132,13 @@ export default function HealthyDay({ age, ageControl }: { age: string; ageContro
           <label className="hd-field">Wakes up<select value={s.wake} onChange={e => patch({ wake: Number(e.target.value) })}>{WAKE_TIMES.map(h => <option key={h} value={h}>{clock(h)}</option>)}</select></label>
         </div>
         <h3>Moving and screens</h3>
-        <label className="hd-field hd-range">
+        <label className="hd-field hd-range" htmlFor="hd-active">
           <span>{band === '0' ? 'Active play, all day' : 'Active minutes that leave them puffed'}</span><output>{dur(s.active)}</output>
-          <input type="range" min={0} max={band === '0' ? 300 : 150} step={5} value={s.active} onChange={e => patch({ active: Number(e.target.value) })} />
+          <input id="hd-active" aria-valuetext={dur(s.active)} type="range" min={0} max={band === '0' ? 300 : 150} step={5} value={s.active} onChange={e => patch({ active: Number(e.target.value) })} />
         </label>
-        <label className="hd-field hd-range">
+        <label className="hd-field hd-range" htmlFor="hd-screens">
           <span>Screen time for fun</span><output>{dur(s.screens)}</output>
-          <input type="range" min={0} max={360} step={15} value={s.screens} onChange={e => patch({ screens: Number(e.target.value) })} />
+          <input id="hd-screens" aria-valuetext={dur(s.screens)} type="range" min={0} max={360} step={15} value={s.screens} onChange={e => patch({ screens: Number(e.target.value) })} />
         </label>
         <h3>Food and drinks</h3>
         <Stepper label="Vegetable serves" value={s.veg} step={0.5} max={8} onChange={veg => patch({ veg })} />

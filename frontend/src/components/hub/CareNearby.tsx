@@ -56,9 +56,9 @@ function ChildcareFacts({ childcare, prevention, parent }: { childcare: EarlyChi
   if (!childcare) return <p className="kt-empty">Childcare counts aren’t available for this area.</p>
   return <>
     <div className="hp-facts">
-      <div><strong>{childcare.active_education_care_services ?? '—'}</strong><span>childcare services</span><small>{childcare.long_day_care_services ?? 0} long day care · {childcare.kindergarten_services ?? 0} kindergarten</small></div>
+      <div><strong>{childcare.active_education_care_services ?? '—'}</strong><span>childcare services</span><small>{childcare.long_day_care_services ?? 'Unavailable'} long day care · {childcare.kindergarten_services ?? 'Unavailable'} kindergarten</small></div>
       <div><strong>{childcare.total_approved_places ?? '—'}</strong><span>approved places</span><small>Approved, not currently vacant</small></div>
-      <div><strong>{has(childcare.rating_coverage_pct) ? `${Math.round(childcare.rating_coverage_pct)}%` : '—'}</strong><span>have a quality rating</span><small>{childcare.services_with_current_rating ?? 0} services rated</small></div>
+      <div><strong>{has(childcare.rating_coverage_pct) ? `${Math.round(childcare.rating_coverage_pct)}%` : '—'}</strong><span>have a quality rating</span><small>{childcare.services_with_current_rating ?? 'Unavailable'} services rated</small></div>
       {!parent && <div><strong>{prevention?.transport?.public_transport_stop_count ?? '—'}</strong><span>public transport stops</span><small>Inside the SA2</small></div>}
     </div>
     {parent && <div className="ht-actions"><a className="kh-btn primary" href={STARTING_BLOCKS} target="_blank" rel="noreferrer">Find childcare and check ratings</a><span className="ht-care-note">Starting Blocks, Australian Government</span></div>}
@@ -88,7 +88,7 @@ function ParentCare({ locality, controls, childcare, prevention, onOpenMap, care
       <h2 id="hp-which" className="vx-eyebrow">Which care do I need?</h2>
       <div className="hp-triage-grid">
         <div className="is-urgent"><b>Emergency</b><a className="hp-call" href="tel:000">Call 000</a><p>Struggling to breathe, a seizure, or very hard to wake.</p>{eds[0] && <button type="button" className="hp-link" onClick={() => setHospital(eds[0])}>{hospitalName(eds[0].name)}, {eds[0].distance_km.toFixed(1)} km</button>}</div>
-        <div><b>Urgent, not life-threatening</b>{ucc[0] ? <><button type="button" className="hp-call" onClick={() => setClinic(ucc[0])}>{ucc[0].name.replace(' Medicare Urgent Care Clinic', ' urgent care')}</button><p>{ucc[0].distance_km.toFixed(1)} km. Free, no appointment needed.</p></> : <p>No urgent care clinic listed nearby.</p>}</div>
+        <div><b>Urgent, not life-threatening</b>{ucc[0] ? <><button type="button" className="hp-call" onClick={() => setClinic(ucc[0])}>{ucc[0].name.replace(' Medicare Urgent Care Clinic', ' urgent care')}</button><p>{ucc[0].distance_km.toFixed(1)} km. Free, no appointment needed.</p></> : <p role="status">{care.loading ? 'Loading nearby urgent care…' : care.data ? 'No urgent care clinic listed nearby.' : 'Urgent care information is unavailable right now.'}</p>}</div>
         <div><b>Not sure what to do</b><a className="hp-call" href={tel(NURSE_ON_CALL)}>{NURSE_ON_CALL}</a><p>NURSE-ON-CALL, a registered nurse, 24 hours a day.</p></div>
         <div><b>Everyday care</b>{gp ? <><span className="hp-call">{gp.name}</span><p>Nearest GP, {gp.distance_km.toFixed(1)} km.</p></> : <p>See the list below.</p>}</div>
       </div>
@@ -206,7 +206,7 @@ function PractitionerCare({ controls, childcare, prevention, care }: Props & { c
     {gp && has(gp.patient_contribution_per_service) && has(gp.national_patient_contribution_per_service) && <Summary id="hp-c-kf" eyebrow="Key finding">
       <p className="vx-lead">Out-of-pocket cost per GP service is <b>{money(gp.patient_contribution_per_service)}</b> in {costs!.sa3_name}, <b>{pctDiff(gp.patient_contribution_per_service, gp.national_patient_contribution_per_service)}% above</b> the national {money(gp.national_patient_contribution_per_service)} ({period(costs!.reference_period)}).</p>
       <details className="vx-more"><summary>More findings</summary><ul className="kt-findings kt-one">
-        {eds[0]?.emergency_department && <li>Nearest children’s emergency department: {hospitalName(eds[0].name)}, {eds[0].distance_km.toFixed(1)} km; {Math.round(eds[0].emergency_department.departed_within_4h_pct ?? 0)}% of patients left within 4 hours.</li>}
+        {eds[0]?.emergency_department && <li>Nearest children’s emergency department: {hospitalName(eds[0].name)}, {eds[0].distance_km.toFixed(1)} km; {has(eds[0].emergency_department.departed_within_4h_pct) ? `${Math.round(eds[0].emergency_department.departed_within_4h_pct)}% of patients left within 4 hours.` : 'Four-hour performance is unavailable.'}</li>}
         {ucc.length > 0 && <li>{ucc.length} Medicare urgent care clinics within {Math.ceil(Math.max(...ucc.map(c => c.distance_km)))} km; nearest {ucc[0].distance_km.toFixed(1)} km.</li>}
         <li>{above.length} of {(costs?.services ?? []).filter(r => r.demographic === 'All persons').length} Medicare service types cost more out of pocket here than nationally.</li>
       </ul></details>

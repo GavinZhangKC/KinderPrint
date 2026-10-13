@@ -87,7 +87,7 @@ function Planner({ selected, onSelect, month, parent }: { selected?: string; onS
   return <div className="hp-cal-wrap"><table className="hp-cal">
     <thead><tr><th scope="col"><span className="kh-sr">Season</span></th>{MONTHS_SHORT.map((m, i) => <th key={m} scope="col" className={i === month ? 'is-now' : undefined} aria-label={MONTHS[i]}>{m[0]}</th>)}</tr></thead>
     <tbody>{SEASONS.map(s => <tr key={s.id} className={s.id === selected ? 'is-sel' : undefined}>
-      <th scope="row"><button type="button" onClick={() => onSelect(s)}>{parent ? <span className="hp-issue"><b>{ISSUES[s.id].name}</b><small>{ISSUES[s.id].context}</small></span> : s.title}<span aria-hidden="true">›</span></button></th>
+      <th scope="row"><button type="button" onClick={() => onSelect(s)}>{parent ? <span className="hp-issue"><b>{s.title}</b><small>{ISSUES[s.id].name}</small></span> : s.title}<span aria-hidden="true">›</span></button></th>
       {MONTHS.map((m, i) => <td key={m} className={[s.months.includes(i) ? 'on' : '', i === month ? 'is-now' : ''].join(' ').trim() || undefined}><span className="kh-sr">{s.months.includes(i) ? `${parent ? ISSUES[s.id].name : s.title} in ${m}` : ''}</span></td>)}
     </tr>)}</tbody>
   </table></div>
@@ -148,7 +148,7 @@ function ParentSeasons(props: Props & { air: Air; illness: Illness }) {
 
     <footer className="kt-foot"><p>EPA Victoria air monitoring; Victorian notifiable disease data; Victorian Department of Health, Better Health Channel, Asthma Australia, SunSmart and Royal Life Saving guidance; 2018 environment measures for {locality.name}. General guidance, not medical advice for your child.</p></footer>
 
-    {open && <Dialog title={ISSUES[open.id].name} onClose={() => setOpen(null)}>
+    {open && <Dialog title={open.title} onClose={() => setOpen(null)}>
       <p className="vx-when">{ISSUES[open.id].context} · {span(open)}</p>
       <p>{open.why}</p>
       <dl className="vx-facts">{evidence(open.id, props, air, illness).flatMap(([k, v]) => [<dt key={`${k}-t`}>{k}</dt>, <dd key={`${k}-d`}>{v}</dd>])}</dl>
