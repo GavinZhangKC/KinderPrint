@@ -10,14 +10,14 @@
 
 :root {
   font-family: 'Manrope', 'Segoe UI', sans-serif;
-  color: #233a63;
-  background: #edf4ff;
+  color: #2d4222;
+  background: #f0f5ed;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
-  --brand: #2c5eaf;
-  --primary: #6d78e8;
-  --text: #233a63;
-  --muted: #6b7b9d;
+  --brand: #466e2c;
+  --primary: #68944f;
+  --text: #2d4222;
+  --muted: #718168;
   --glass: rgba(255, 255, 255, .50);
   --glass-strong: rgba(255, 255, 255, .74);
   --glass-subtle: rgba(255, 255, 255, .48);
@@ -28,7 +28,7 @@
   --moderate-text: #8b6b16;
   --concern-bg: #f5b6a8;
   --concern-text: #9a4638;
-  --shadow: 0 18px 42px rgba(51, 82, 140, .16);
+  --shadow: 0 18px 42px rgba(65, 93, 48, .16);
 }
 
 * { box-sizing: border-box; }
@@ -56,7 +56,7 @@ html *::-webkit-scrollbar-button:vertical:end:increment {
   background-image: none !important;
 }
 html { scroll-behavior: smooth; }
-body { margin: 0; min-width: 320px; min-height: 100vh; background: #edf4ff; }
+body { margin: 0; min-width: 320px; min-height: 100vh; background: #f0f5ed; }
 button, input { font: inherit; }
 button { color: inherit; }
 a { color: inherit; text-decoration: none; }
@@ -67,14 +67,14 @@ a { color: inherit; text-decoration: none; }
   overflow-x: hidden;
   padding: 20px 24px 56px;
   background:
-    radial-gradient(circle at 18% 25%, rgba(184,178,255,.32), transparent 33%),
-    radial-gradient(circle at 82% 55%, rgba(131,214,255,.28), transparent 34%),
-    linear-gradient(135deg, #eff2ff 0%, #e8f5ff 52%, #e8efff 100%);
+    radial-gradient(circle at 18% 25%, rgba(166, 201, 148,.32), transparent 33%),
+    radial-gradient(circle at 82% 55%, rgba(181, 213, 165,.28), transparent 34%),
+    linear-gradient(135deg, #eff5ec 0%, #eff5ec 52%, #eaf2e6 100%);
 }
 
 .ambient { position: fixed; border-radius: 999px; pointer-events: none; filter: blur(90px); opacity: .6; z-index: 0; }
-.ambient-one { width: 520px; height: 520px; left: -150px; top: 160px; background: rgba(184,178,255,.34); }
-.ambient-two { width: 500px; height: 500px; right: -90px; top: 380px; background: rgba(131,214,255,.28); }
+.ambient-one { width: 520px; height: 520px; left: -150px; top: 160px; background: rgba(166, 201, 148,.34); }
+.ambient-two { width: 500px; height: 500px; right: -90px; top: 380px; background: rgba(181, 213, 165,.28); }
 
 .glass {
   background: var(--glass);
@@ -83,5 +83,5 @@ a { color: inherit; text-decoration: none; }
   backdrop-filter: blur(22px);
   -webkit-backdrop-filter: blur(22px);
 }
-.glass-subtle { background: var(--glass-subtle); border: 1px solid rgba(255,255,255,.78); box-shadow: 0 12px 30px rgba(51,82,140,.10); }
+.glass-subtle { background: var(--glass-subtle); border: 1px solid rgba(255,255,255,.78); box-shadow: 0 12px 30px rgba(65, 93, 48,.10); }
 

@@ -80,10 +80,16 @@ export default function WhereToLivePage(props: Props) {
       <div className={`kp-hub ${parent ? 'is-parent kt-theme-parent' : 'is-practitioner kt-theme-prac'}`}>
         <div className="kh-shell">
           <nav className="kh-crumbs" aria-label="Breadcrumb">
-            <a href="/map">Child Health Explore</a><span aria-hidden="true">›</span><span aria-current="page">Where to live</span>
+            <a href="/map">Child Health Explore</a><span aria-hidden="true">›</span>
+            {areaName
+              ? <><a href="/where-to-live" onClick={event => { event.preventDefault(); window.location.assign(`/where-to-live?view=${view}`) }}>Where to live</a><span aria-hidden="true">›</span><span aria-current="page" className="wl-area-title" aria-live="polite">{areaName}</span></>
+              : <span aria-current="page">Where to live</span>}
           </nav>
           <header className="kh-top">
-            <h2 className="wl-area-title" aria-live="polite">{areaName || 'Greater Melbourne'}</h2>
+            <div className="kh-seg wl-tools" role="group" aria-label="Where to live tools">
+              <button type="button" aria-pressed={view === 'find'} onClick={() => changeView('find')}>Find an area</button>
+              <button type="button" aria-pressed={view === 'plan'} onClick={() => changeView('plan')}>What if this area changed?</button>
+            </div>
             <div className="kh-seg" role="group" aria-label="Who is using Vkinder">
               <button type="button" aria-pressed={parent} onClick={() => setAudience('parent')}>Parent</button>
               <button type="button" aria-pressed={!parent} onClick={() => setAudience('practitioner')}>Practitioner</button>
@@ -91,10 +97,6 @@ export default function WhereToLivePage(props: Props) {
           </header>
           <div className={`kt ht vx hp where-page fu-hub wl-hub ${parent ? 'kt-parent' : 'kt-prac'}`}>
             <Hero parent={parent} title={copy.title} text={copy.text} />
-            <div className="kh-seg" role="group" aria-label="Where to live tools">
-              <button type="button" aria-pressed={view === 'find'} onClick={() => changeView('find')}>Find an area</button>
-              <button type="button" aria-pressed={view === 'plan'} onClick={() => changeView('plan')}>What if this area changed?</button>
-            </div>
             {view === 'find'
               ? <WhereToLive {...props} bare onAreaNameChange={setParentAreaName} />
               : <PlanChange {...props} embedded audience={audience} onAreaNameChange={setPractitionerAreaName} />}

@@ -1,22 +1,22 @@
 /* Source: KinderPrint Figma, Midnight Glass Concept (125:6), UI Kit (134:2).
    Light mode deliberately uses the existing styles, not the UI kit's Light mode. */
 :root[data-theme='dark'] {
-  --kp-color-bg-canvas-start: #091525;
-  --kp-color-bg-canvas-mid: #10233e;
-  --kp-color-bg-canvas-end: #172b47;
-  --kp-color-surface-soft: rgba(14, 27, 48, .22);
-  --kp-color-surface-default: rgba(14, 27, 48, .32);
-  --kp-color-surface-strong: rgba(14, 27, 48, .65);
+  --kp-color-bg-canvas-start: #0f170b;
+  --kp-color-bg-canvas-mid: #1a2812;
+  --kp-color-bg-canvas-end: #213019;
+  --kp-color-surface-soft: rgba(20, 31, 14, .22);
+  --kp-color-surface-default: rgba(20, 31, 14, .32);
+  --kp-color-surface-strong: rgba(20, 31, 14, .65);
   --kp-color-text-primary: #f3f7ff;
-  --kp-color-text-secondary: #afc0d9;
-  --kp-color-text-disabled: #8497b6;
+  --kp-color-text-secondary: #b7c3b0;
+  --kp-color-text-disabled: #8c9c84;
   --kp-color-text-on-accent: #f7faff;
-  --kp-color-action-primary: #7183f3;
-  --kp-color-action-primary-hover: #8292fa;
-  --kp-color-action-secondary: #7b8cf5;
-  --kp-color-accent-glow: #61c8f3;
-  --kp-color-border-default: rgba(14, 27, 48, 0);
-  --kp-color-border-focus: #7183f3;
+  --kp-color-action-primary: #719e58;
+  --kp-color-action-primary-hover: #7eac65;
+  --kp-color-action-secondary: #79a65f;
+  --kp-color-accent-glow: #a3c790;
+  --kp-color-border-default: rgba(20, 31, 14, 0);
+  --kp-color-border-focus: #719e58;
   --kp-status-strong-bg: #173d35;
   --kp-status-strong-text: #8fe0bf;
   --kp-status-strong-border: #2a6b59;
@@ -29,21 +29,21 @@
   --kp-status-concern-border: color-mix(in srgb, var(--kp-status-concern-fill) 55%, var(--kp-color-surface-solid));
   --kp-glass-blur: 18px;
   --kp-overlay-blur: 30px;
-  --kp-shadow-glass: 0 8px 24px -6px rgba(4, 6, 17, .13);
-  --kp-shadow-overlay: 0 16px 48px -6px rgba(4, 6, 17, .28);
+  --kp-shadow-glass: 0 8px 24px -6px rgba(4, 8, 3, .13);
+  --kp-shadow-overlay: 0 16px 48px -6px rgba(4, 8, 3, .28);
 
   /* Readability extensions for native controls, data charts and opaque popovers. */
-  --kp-color-surface-solid: #0e1b30;
-  --kp-color-surface-popover: rgba(14, 27, 48, .96);
-  --kp-color-surface-nav: rgba(14, 27, 48, .5);
-  --kp-color-surface-hover: rgba(113, 131, 243, .12);
-  --kp-color-border-subtle: rgba(175, 192, 217, .12);
-  --kp-color-backdrop: rgba(4, 6, 17, .5);
-  --kp-color-shadow: rgba(4, 6, 17, .28);
-  --kp-color-shadow-ink: #040611;
-  --kp-color-highlight: rgba(175, 192, 217, .08);
+  --kp-color-surface-solid: #141f0e;
+  --kp-color-surface-popover: rgba(20, 31, 14, .96);
+  --kp-color-surface-nav: rgba(20, 31, 14, .5);
+  --kp-color-surface-hover: rgba(113, 158, 88, .12);
+  --kp-color-border-subtle: rgba(183, 195, 176, .12);
+  --kp-color-backdrop: rgba(4, 8, 3, .5);
+  --kp-color-shadow: rgba(4, 8, 3, .28);
+  --kp-color-shadow-ink: #040803;
+  --kp-color-highlight: rgba(183, 195, 176, .08);
   --kp-canvas: linear-gradient(135deg, var(--kp-color-bg-canvas-start), var(--kp-color-bg-canvas-mid) 55%, var(--kp-color-bg-canvas-end));
-  --kp-canvas-ambient: radial-gradient(circle at 18% 25%, rgba(113, 131, 243, .12), transparent 33%), radial-gradient(circle at 82% 55%, rgba(97, 200, 243, .1), transparent 34%), var(--kp-canvas);
+  --kp-canvas-ambient: radial-gradient(circle at 18% 25%, rgba(113, 158, 88, .12), transparent 33%), radial-gradient(circle at 82% 55%, rgba(163, 199, 144, .1), transparent 34%), var(--kp-canvas);
 
   --brand: var(--kp-color-action-secondary);
   --primary: var(--kp-color-action-primary);

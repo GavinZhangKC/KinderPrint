@@ -50,7 +50,8 @@ type AppPage =
 function initialAppPage(): AppPage {
   const pathname = window.location.pathname.replace(/\/+$/, '') || '/'
   if (pathname === '/insight-journey-legacy') return 'insight-legacy'
-  if (pathname === '/user-journey') return 'journey'
+  if (pathname === '/user-journey') { window.history.replaceState(null, '', '/'); return 'journey' }
+  if (pathname === '/about') return 'landing'
   if (pathname === '/map') return 'map'
   if (pathname === '/simulation') return 'simulation'
   if (pathname === '/child-health' || pathname === '/health') return 'health'
@@ -62,7 +63,7 @@ function initialAppPage(): AppPage {
     return requestedPage
   }
 
-  return 'landing'
+  return 'journey'
 }
 
 function appPagePath(page: Exclude<AppPage, 'insight-legacy'>) {
@@ -70,8 +71,8 @@ function appPagePath(page: Exclude<AppPage, 'insight-legacy'>) {
   if (page === 'simulation') return '/simulation'
   if (page === 'health') return '/child-health'
   if (page === 'where') return '/map/where-to-live'
-  if (page === 'journey') return '/user-journey'
-  return '/'
+  if (page === 'journey') return '/'
+  return '/about'
 }
 
 function navigateToAppPage(page: Exclude<AppPage, 'insight-legacy'>) {
@@ -184,7 +185,7 @@ function resetExplore() {
     setShowDataDrawer(false)
   }
 function backToLanding() {
-    navigateToAppPage('landing')
+    navigateToAppPage('journey')
   }
 function openMapPage() {
     navigateToAppPage('map')
@@ -195,7 +196,7 @@ function openSimulationPage() {
 /** The menu's User Journey: a guided tour of the site (the Parkville 3D journey stays at /insight-journey). */
 function openInsightPage() {
     resetExplore()
-    window.location.assign('/user-journey')
+    window.location.assign('/')
   }
 /** Child Health starts on the map: choose an area, then open its board. */
 function openHealthPage() {

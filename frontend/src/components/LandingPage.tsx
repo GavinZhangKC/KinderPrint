@@ -1,8 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import type { CSSProperties } from 'react'
-import logo from '../assets/LogoMark.png'
 import InfiniteImageGallery from './InfiniteImageGallery'
-import ThemeSwitcher from './ThemeSwitcher'
+import BrandHeader from './BrandHeader'
 import '../styles/landing.css'
 
 interface LandingPageProps {
@@ -10,10 +9,6 @@ interface LandingPageProps {
   onSimulation: () => void
   onMap: () => void
   onHealth: () => void
-}
-
-interface HomeHeaderProps extends LandingPageProps {
-  onHome: () => void
 }
 
 const heroVideoSources = [
@@ -54,7 +49,7 @@ const homeDiscoveryPriorities = [
 const homeDiscoveryFocusKeys = ['learning', 'social', 'physical', 'respiratory', 'heat', 'parks', 'healthcare', 'early-childhood'] as const
 
 const exploreItems = [
-  { id: 'insight', number: '01', label: 'User Journey', videoSrc: '/insight-preview.mp4' },
+  { id: 'insight', number: '01', label: 'Guided tour', videoSrc: '/insight-preview.mp4' },
   { id: 'map', number: '02', label: 'Interactive Map', videoSrc: '/map-preview.mp4' },
   { id: 'simulation', number: '03', label: 'Simulation', videoSrc: '/about-preview.mp4' },
 ] as const
@@ -125,25 +120,6 @@ function ExploreMenuLink({ item, onSelect }: ExploreMenuLinkProps) {
   )
 }
 
-function HomeHeader({ onHome, onInsight, onSimulation, onMap }: HomeHeaderProps) {
-  return (
-    <header className="glass home-header" data-no-ripple>
-      <div className="home-brand-cluster">
-      <button className="home-brand" type="button" onClick={onHome} aria-label="Go to Vkinder home">
-        <img src={logo} alt="" />
-        <span>Vkinder</span>
-      </button>
-      <ThemeSwitcher />
-      </div>
-      <nav className="home-nav" aria-label="Primary navigation">
-        <button type="button" aria-current="page" onClick={onHome}>Home</button>
-        <button type="button" onClick={onInsight}>User Journey</button>
-        <button type="button" onClick={onSimulation}>Simulation</button>
-      </nav>
-      <button className="home-nav-cta" type="button" onClick={onMap}>Child Health Explore</button>
-    </header>
-  )
-}
 
 function HeroBackgroundVideo() {
   const videoARef = useRef<HTMLVideoElement>(null)
@@ -595,10 +571,6 @@ function HomeEvidenceSection() {
   )
 }
 
-function scrollToSection(id: string) {
-  document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
-}
-
 export default function LandingPage({ onInsight, onSimulation, onMap, onHealth }: LandingPageProps) {
   const openExploreItem = (id: ExploreItemId) => {
     if (id === 'insight') onInsight()
@@ -608,13 +580,9 @@ export default function LandingPage({ onInsight, onSimulation, onMap, onHealth }
 
   return (
     <div className="landing-page home-page" id="home" data-ripple-surface>
-      <HomeHeader
-        onHome={() => scrollToSection('home-hero')}
-        onInsight={onInsight}
-        onSimulation={onSimulation}
-        onMap={onMap}
-        onHealth={onHealth}
-      />
+      <div className="about-header">
+        <BrandHeader activePage="about" onHome={onInsight} onInsight={onInsight} onMap={onMap} onSimulation={onSimulation} onHealth={onHealth} />
+      </div>
 
       <main className="home-content">
         <section className="home-hero" id="home-hero" aria-labelledby="landing-title">

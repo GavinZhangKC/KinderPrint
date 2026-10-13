@@ -1,0 +1,97 @@
+/* Vkinder site shell: one header, one typeface and one palette on every page.
+   The palette is the Child Health parent palette (forest green on warm ivory; deep green at night).
+   Selectors repeat .nav-shell to outrank the older per-page header rules without !important. */
+
+:root {
+  --site-font: 'Manrope', 'Segoe UI', system-ui, sans-serif;
+  --site-width: min(1440px, calc(100vw - 64px));
+  --site-bg: linear-gradient(180deg, #FCFBF3 0%, #F5F8EA 45%, #FFF8E4 100%);
+  --site-ink: #203F30;
+  --site-ink2: #465B42;
+  --site-primary: #355C38;
+  --site-primary-hover: #2B4B2E;
+  --site-accent: #536B35;
+  --site-line: #DCE3C8;
+  --site-surface: #FFFFFF;
+  --site-cream: #FFFDF6;
+  --site-tint: #E9F2DB;
+  --site-on-primary: #FFFFFF;
+  --site-header-bg: rgba(255, 253, 246, .92);
+  --site-header-shadow: 0 10px 28px -18px rgba(32, 63, 48, .45);
+  --site-shadow: 0 8px 24px -18px rgba(32, 63, 48, .35);
+}
+:root[data-theme='dark'] {
+  --site-bg: linear-gradient(180deg, #0F1812 0%, #121C14 50%, #17190F 100%);
+  --site-ink: #F1F5EA;
+  --site-ink2: #C3CFB6;
+  --site-primary: #4C7A3A;
+  --site-primary-hover: #426D32;
+  --site-accent: #B9D98C;
+  --site-line: rgba(195, 215, 170, .2);
+  --site-surface: #152019;
+  --site-cream: #1A271E;
+  --site-tint: rgba(185, 217, 140, .14);
+  --site-header-bg: rgba(21, 32, 25, .9);
+  --site-header-shadow: 0 10px 28px -18px rgba(0, 0, 0, .6);
+  --site-shadow: 0 8px 24px -12px rgba(0, 0, 0, .6);
+}
+
+/* Header: same size, surface, type and active mark everywhere. */
+html .nav-shell.nav-shell {
+  height: 72px;
+  padding: 0 28px 0 18px;
+  border: 1px solid var(--site-line);
+  border-radius: 20px;
+  background: var(--site-header-bg);
+  box-shadow: var(--site-header-shadow);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+  font-family: var(--site-font);
+}
+html .nav-shell.nav-shell .brand-button { color: var(--site-primary); font-family: var(--site-font); font-size: 28px; font-weight: 800; }
+html[data-theme='dark'] .nav-shell.nav-shell .brand-button { color: var(--site-accent); }
+html .nav-shell.nav-shell .brand-logo { width: 52px; height: 52px; }
+html .nav-shell.nav-shell .nav-links { gap: clamp(14px, 2.4vw, 34px); color: var(--site-ink2); font-family: var(--site-font); font-size: 15px; font-weight: 700; }
+html .nav-shell.nav-shell .nav-links button { min-height: 44px; font: inherit; }
+html .nav-shell.nav-shell .nav-links button:hover,
+html .nav-shell.nav-shell .nav-links .active { color: var(--site-ink); }
+html .nav-shell.nav-shell .nav-links .active::after { left: 12%; right: 12%; bottom: 4px; height: 3px; background: var(--site-accent); }
+html .nav-shell.nav-shell :focus-visible { outline: 3px solid var(--site-accent); outline-offset: 2px; }
+
+/* Same width and position on every page that lays the header out in the page flow. */
+html .health-page-shell > .nav-shell.nav-shell,
+html .where-page > .nav-shell.nav-shell,
+html .map-page > .nav-shell.nav-shell,
+html .simulation-page > .nav-shell.nav-shell,
+html .about-header > .nav-shell.nav-shell,
+html .uj-header > .nav-shell.nav-shell {
+  width: var(--site-width);
+  max-width: none;
+  margin: 0 auto;
+  transform: none;
+}
+html .health-page-shell > .nav-shell.nav-shell,
+html .where-page > .nav-shell.nav-shell { position: sticky; top: 12px; }
+html .about-header,
+html .uj-header { position: fixed; top: 12px; left: 0; right: 0; z-index: 60; }
+html .about-header > .nav-shell.nav-shell,
+html .uj-header > .nav-shell.nav-shell { position: relative; top: 0; }
+
+/* Page canvas and type for the shared pages. */
+html .map-page,
+html .simulation-page { background: var(--site-bg); font-family: var(--site-font); color: var(--site-ink); }
+
+/* One typeface across the site (the old global h2 used Changa; the About page used a serif). */
+html .map-page :is(h1, h2, h3, h4, button, input, select, label),
+html .simulation-page :is(h1, h2, h3, h4, button, input, select, label),
+html .home-page :is(h1, h2, h3, h4, p, button, a, span) { font-family: var(--site-font); }
+html .map-page :is(h1, h2, h3),
+html .simulation-page :is(h1, h2, h3),
+html .home-page :is(h1, h2, h3) { letter-spacing: -.01em; }
+html .home-page { background: var(--site-bg); color: var(--site-ink); }
+
+/* Header sits 12px from the top on every page. */
+html .health-page-shell { padding-top: 12px; }
+html .map-page, html .simulation-page { padding-top: 12px; }
+html .kh-top > .wl-tools.wl-tools { margin-left: 0; margin-right: auto; }
+html .kh-crumbs .wl-area-title.wl-area-title { font: inherit; color: inherit; letter-spacing: inherit; }

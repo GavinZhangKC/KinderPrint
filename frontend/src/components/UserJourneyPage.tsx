@@ -66,11 +66,11 @@ export default function UserJourneyPage({ onHome, onInsight, onMap, onSimulation
     </div>
 
     <div className="uj-header">
-      <BrandHeader activePage="insight" onHome={onHome} onInsight={onInsight} onMap={onMap} onSimulation={onSimulation} onHealth={onHealth} />
+      <BrandHeader activePage="home" onHome={onHome} onInsight={onInsight} onMap={onMap} onSimulation={onSimulation} onHealth={onHealth} />
     </div>
 
     <section className={`uj-intro${step < 0 ? ' is-on' : ''}`} aria-hidden={step >= 0}>
-      <p className="uj-kicker">User Journey</p>
+      <p className="uj-kicker">Welcome to Vkinder</p>
       <h1>Healthier childhoods start with the place you live.</h1>
       <p>A short flight across Melbourne and six things you can do with Vkinder, from finding your area to planning for 2031. Scroll to take the tour.</p>
       <div className="uj-cue" aria-hidden="true"><i />Scroll</div>
@@ -93,6 +93,7 @@ export default function UserJourneyPage({ onHome, onInsight, onMap, onSimulation
         <button type="button" onClick={onMap}>Open the map</button>
         <button type="button" className="ghost" onClick={() => window.location.assign('/where-to-live?view=find')}>Where to live</button>
         <button type="button" className="ghost" onClick={() => window.location.assign('/insight-journey')}>Parkville in 3D</button>
+        <button type="button" className="ghost" onClick={() => window.location.assign('/about')}>About Vkinder</button>
       </div>
     </section>
 

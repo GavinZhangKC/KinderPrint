@@ -355,7 +355,7 @@ export default function KinderHub({ locality, data, onSelectLocality, onOpenPlan
 
   return <div className={`kp-hub ${parent ? 'is-parent' : 'is-practitioner'}${themeClass}`} data-page={page}>
     <div className="kh-shell">
-      <nav className="kh-crumbs" aria-label="Breadcrumb"><a href={`/map?area=${encodeURIComponent(locality.id)}&name=${encodeURIComponent(locality.name)}`}>Child Health</a><span aria-hidden="true">›</span><span aria-current="page">{locality.name}</span></nav>
+      <nav className="kh-crumbs" aria-label="Breadcrumb"><a href={`/map?area=${encodeURIComponent(locality.id)}&name=${encodeURIComponent(locality.name)}`}>Child Health Explore</a><span aria-hidden="true">›</span><span aria-current="page">{locality.name}</span></nav>
       <header className="kh-top">
         <nav className={`kh-nav${navExpanded ? ' is-expanded' : ''}`} aria-label="Dashboard sections" onMouseEnter={() => setNavExpanded(true)} onMouseLeave={() => setNavExpanded(false)} onFocus={() => setNavExpanded(true)} onBlur={event => { if (!event.currentTarget.contains(event.relatedTarget as Node)) setNavExpanded(false) }}>{orderedNav.map(item => <button key={item.id} type="button" aria-current={page === item.id ? 'page' : undefined} onClick={event => { go(item.id); setNavExpanded(false); event.currentTarget.blur() }}>
           <svg viewBox="0 0 24 24" aria-hidden="true">{item.icon}</svg>{item.label}

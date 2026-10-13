@@ -64,7 +64,7 @@
   opacity: 0;
   pointer-events: none;
   touch-action: none;
-  background: rgba(73, 103, 132, .34);
+  background: rgba(89, 106, 81, .34);
   backdrop-filter: blur(11px) saturate(78%);
   -webkit-backdrop-filter: blur(11px) saturate(78%);
   transition: opacity .55s ease;
@@ -138,10 +138,10 @@
   border: 1px solid rgba(255, 255, 255, 0.75);
   border-radius: 12px;
 
-  background: linear-gradient(135deg, rgba(255, 255, 255, .38), rgba(239, 246, 255, .2));
+  background: linear-gradient(135deg, rgba(255, 255, 255, .38), rgba(242, 247, 240, .2));
 
   box-shadow:
-    0 10px 26px rgba(51, 82, 140, .14), inset 0 1px 0 rgba(255, 255, 255, .65);
+    0 10px 26px rgba(65, 93, 48, .14), inset 0 1px 0 rgba(255, 255, 255, .65);
 
   backdrop-filter: blur(18px) saturate(135%);
   -webkit-backdrop-filter: blur(18px) saturate(135%);
@@ -158,7 +158,7 @@
 }
 
 .real-map .mapboxgl-ctrl-group button:not(:disabled):hover {
-  background: rgba(109, 120, 232, .14);
+  background: rgba(104, 148, 79, .14);
   color: var(--primary);
 }
 
@@ -215,9 +215,9 @@
   opacity: .45;
 }
 
-:root[data-theme='dark'] .real-map .mapboxgl-ctrl-group button { color: #A9B6FF; }
+:root[data-theme='dark'] .real-map .mapboxgl-ctrl-group button { color: #a6c795; }
 :root[data-theme='dark'] .real-map .mapboxgl-ctrl-group button:not(:disabled):hover {
-  background: rgba(109, 120, 232, .2);
+  background: rgba(104, 148, 79, .2);
   color: #F3F7FF;
 }
 
@@ -268,10 +268,7 @@
 
   box-shadow:
     0 12px 30px
-    rgba(
-      51,
-      82,
-      140,
+    rgba(65, 93, 48,
       0.16
     );
 
@@ -282,7 +279,7 @@
     blur(28px);
 
   color:
-    #355b91;
+    #486439;
 
   font-size:
     13px;
@@ -340,7 +337,7 @@
 
   background: rgba(255, 255, 255, 0.84);
 
-  color: #60769b;
+  color: #697c60;
 
   font-size: 11px;
 
@@ -393,7 +390,7 @@
 
   background: rgba(255, 255, 255, 0.65);
 
-  color: #71819d;
+  color: #788570;
 
   font-size: 10px;
   line-height: 1.4;
@@ -403,10 +400,10 @@
   pointer-events: none;
 }
 .neighbourhood-search-block { position: absolute; left: clamp(16px, 3vw, 42px); top: clamp(14px, 2.6dvh, 28px); z-index: 15; width: clamp(260px, 30vw, 420px); max-width: calc(100% - 32px); }
-.neighbourhood-search-block > label { display: block; margin: 0 0 6px 6px; font-size: 12px; font-weight: 700; color: #6d83a8; }
+.neighbourhood-search-block > label { display: block; margin: 0 0 6px 6px; font-size: 12px; font-weight: 700; color: #76896d; }
 .search-input-shell { position: relative; height: 54px; border-radius: 16px; padding: 0 55px 0 15px; display: flex; align-items: center; gap: 10px; background: rgba(255,255,255,.58); }
 .search-input-shell input { border: 0; outline: 0; background: transparent; flex: 1; color: var(--text); min-width: 0; }
-.search-input-shell input::placeholder { color: #8797b2; }
+.search-input-shell input::placeholder { color: #8e9b87; }
 .search-submit-button span { display: block; font-size: 24px; color: inherit; line-height: 1; transform: translateY(-1px); }
 .search-submit-button svg { display: block; width: 22px; height: 22px; transform: translateY(-1px); }
 .search-submit-button {
@@ -423,7 +420,7 @@
   border-radius: 12px;
   padding: 0;
   background: transparent;
-  color: #6079a9;
+  color: #6a825e;
   cursor: pointer;
   transition:
     background .18s ease,
@@ -431,8 +428,8 @@
     transform .18s ease;
 }
 .search-submit-button:hover:not(:disabled) {
-  background: rgba(83, 103, 255, .09);
-  color: #5367ff;
+  background: rgba(95, 139, 70, .09);
+  color: #5f8b46;
 }
 .search-submit-button:active:not(:disabled) {
   transform: translateY(-50%) scale(.94);
@@ -461,7 +458,7 @@
   padding: 7px;
 
   box-shadow:
-    0 18px 42px rgba(51, 82, 140, .15);
+    0 18px 42px rgba(65, 93, 48, .15);
 
   backdrop-filter: blur(22px);
   -webkit-backdrop-filter: blur(22px);
@@ -504,7 +501,7 @@
   font-size: 13px;
   font-weight: 600;
 
-  color: #314c78;
+  color: #3e5431;
 }
 
 .search-results button small {
@@ -516,14 +513,14 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 
-  color: #7b8daa;
+  color: #83917b;
 
   font-size: 10px;
 }
 
 .search-results button:hover {
   background:
-    rgba(109, 120, 232, .10);
+    rgba(104, 148, 79, .10);
 
   transform: translateX(2px);
 }
@@ -533,7 +530,7 @@
 
   text-align: center;
 
-  color: #7b8daa;
+  color: #83917b;
 
   font-size: 11px;
 }

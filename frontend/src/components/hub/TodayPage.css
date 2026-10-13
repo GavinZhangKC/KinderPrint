@@ -226,18 +226,6 @@
 /* Site header and page background around the themed hub pages (set by KinderHub on <html>). */
 html[data-kt-theme=parent] .health-page-shell{background:linear-gradient(180deg,#FCFBF3 0%,#F5F8EA 45%,#FFF8E4 100%)}
 html[data-kt-theme=prac] .health-page-shell{background:linear-gradient(180deg,#F3F8FA 0%,#EEF5F8 100%)}
-html[data-kt-theme] .health-page-shell>.nav-shell{border:1px solid;backdrop-filter:blur(14px)}
-html[data-kt-theme=parent] .health-page-shell>.nav-shell{background:rgba(255,253,246,.9);border-color:#DCE3C8;box-shadow:0 10px 28px -18px rgba(32,63,48,.45)}
-html[data-kt-theme=prac] .health-page-shell>.nav-shell{background:rgba(255,255,255,.92);border-color:#D5E5EA;box-shadow:0 10px 28px -18px rgba(18,49,74,.45)}
-html[data-kt-theme=parent] .health-page-shell>.nav-shell .brand-button{color:#355C38}
-html[data-kt-theme=prac] .health-page-shell>.nav-shell .brand-button{color:#146171}
-html[data-kt-theme=parent] .health-page-shell>.nav-shell .nav-links{color:#465B42}
-html[data-kt-theme=prac] .health-page-shell>.nav-shell .nav-links{color:#466174}
-html[data-kt-theme=parent] .health-page-shell>.nav-shell .nav-links button:hover,html[data-kt-theme=parent] .health-page-shell>.nav-shell .nav-links .active{color:#203F30}
-html[data-kt-theme=prac] .health-page-shell>.nav-shell .nav-links button:hover,html[data-kt-theme=prac] .health-page-shell>.nav-shell .nav-links .active{color:#12314A}
-html[data-kt-theme=parent] .health-page-shell>.nav-shell .nav-links .active::after{background:#536B35}
-html[data-kt-theme=prac] .health-page-shell>.nav-shell .nav-links .active::after{background:#176477}
-html[data-kt-theme] .health-page-shell>.nav-shell :focus-visible{outline:3px solid currentColor;outline-offset:2px}
 
 /* Practitioner "More context": one container with tabs instead of four separate cards. */
 .kt-context{display:flex;flex-direction:column;gap:16px}
@@ -284,10 +272,6 @@ html[data-kt-theme] .health-page-shell>.nav-shell :focus-visible{outline:3px sol
 :root[data-theme='dark'] .kt .kh-btn.primary{background:var(--kt-primary);border-color:var(--kt-primary)}
 :root[data-theme='dark'] .kt .kh-btn.primary:hover{background:var(--kt-primary-hover)}
 html[data-theme='dark'][data-kt-theme] .health-page-shell{background:var(--kp-canvas-ambient)}
-html[data-theme='dark'][data-kt-theme] .health-page-shell>.nav-shell{background:rgba(14,27,48,.86);border-color:rgba(175,192,217,.16);box-shadow:0 10px 28px -18px rgba(4,6,17,.6)}
-html[data-theme='dark'][data-kt-theme] .health-page-shell>.nav-shell .brand-button{color:#61C8F3}
-html[data-theme='dark'][data-kt-theme] .health-page-shell>.nav-shell .nav-links{color:#B8C7DE}
-html[data-theme='dark'][data-kt-theme] .health-page-shell>.nav-shell .nav-links button:hover,html[data-theme='dark'][data-kt-theme] .health-page-shell>.nav-shell .nav-links .active{color:#F3F7FF}
 :root[data-theme='dark'] .kt-help-row.is-urgent b,:root[data-theme='dark'] .kt-help-row.is-urgent a{color:#FFB8AB}
 :root[data-theme='dark'] .kt-track .band{background:#1D4250}
 .kt .kh-picker-change{color:var(--kt-accent)}
@@ -328,16 +312,9 @@ html[data-theme='dark'][data-kt-theme] .health-page-shell>.nav-shell .nav-links 
 }
 html[data-theme='dark'][data-kt-theme=parent] .health-page-shell{background:#0F1812}
 html[data-theme='dark'][data-kt-theme=prac] .health-page-shell{background:#0A161C}
-html[data-theme='dark'][data-kt-theme=parent] .health-page-shell>.nav-shell{background:rgba(21,32,25,.9);border-color:rgba(195,215,170,.16)}
-html[data-theme='dark'][data-kt-theme=prac] .health-page-shell>.nav-shell{background:rgba(15,33,41,.9);border-color:rgba(150,205,215,.16)}
-html[data-theme='dark'][data-kt-theme=parent] .health-page-shell>.nav-shell .brand-button{color:#B9D98C}
-html[data-theme='dark'][data-kt-theme=prac] .health-page-shell>.nav-shell .brand-button{color:#5FD4DF}
 html[data-theme='dark'][data-kt-theme=parent] .kp-hub .kh-seg button[aria-pressed=true],html[data-theme='dark'][data-kt-theme=parent] .kp-hub .kh-nav button[aria-current=page]{background:var(--kt-primary);color:#fff}
 html[data-theme='dark'][data-kt-theme=prac] .kp-hub .kh-seg button[aria-pressed=true],html[data-theme='dark'][data-kt-theme=prac] .kp-hub .kh-nav button[aria-current=page]{background:var(--kt-primary);color:#fff}
 :root[data-theme='dark'] .kt-track .band{background:var(--kt-geo-sa2)}
-html[data-theme='dark'][data-kt-theme] .health-page-shell>.nav-shell .nav-links .active::after{background:var(--kt-nav-mark,#A9B6FF)}
-html[data-theme='dark'][data-kt-theme=parent]{--kt-nav-mark:#B9D98C}
-html[data-theme='dark'][data-kt-theme=prac]{--kt-nav-mark:#5FD4DF}
 
 
 /* Practitioner banner: the original photo runs under the whole banner; a translucent shade on the
