@@ -78,7 +78,7 @@ html:has(.simulation-shell) body::-webkit-scrollbar {
   display: grid;
   place-items: center;
   padding: 0;
-  color: #6b8060;
+  color: #6079a2;
   border: 2px solid currentColor;
   border-radius: 50%;
   background: rgba(255, 255, 255, .4);
@@ -88,7 +88,7 @@ html:has(.simulation-shell) body::-webkit-scrollbar {
 }
 
 .simulation-page-info > button:focus-visible {
-  outline: 3px solid rgba(93, 137, 67, .24);
+  outline: 3px solid rgba(85, 107, 235, .24);
   outline-offset: 3px;
 }
 
@@ -100,11 +100,11 @@ html:has(.simulation-shell) body::-webkit-scrollbar {
   display: grid;
   gap: 7px;
   padding: 13px 15px;
-  color: #5d7252;
-  border: 1px solid rgba(104, 148, 79, .16);
+  color: #526b94;
+  border: 1px solid rgba(109, 120, 232, .16);
   border-radius: var(--simulation-radius-surface, 14px);
   background: rgba(255, 255, 255, .97);
-  box-shadow: 0 10px 26px rgba(45, 66, 34, .12);
+  box-shadow: 0 10px 26px rgba(35, 58, 99, .12);
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
@@ -120,13 +120,13 @@ html:has(.simulation-shell) body::-webkit-scrollbar {
 }
 
 .simulation-page-info-tooltip strong {
-  color: #496838;
+  color: #365d99;
   font-size: 12px;
   line-height: 1.45;
 }
 
 .simulation-page-info-tooltip span {
-  color: #83957a;
+  color: #7890b2;
   font-size: 10px;
   font-weight: 700;
 }
@@ -140,7 +140,7 @@ html:has(.simulation-shell) body::-webkit-scrollbar {
 
 .simulation-subtitle {
   margin: 6px 0 0;
-  color: #5a704e;
+  color: #4d6995;
   font-size: 13px;
   line-height: 1.5;
 }
@@ -149,7 +149,7 @@ html:has(.simulation-shell) body::-webkit-scrollbar {
   display: inline-flex;
   align-items: center;
   margin-top: 7px;
-  color: #83957a;
+  color: #7890b2;
   font-size: 10px;
   font-weight: 600;
   letter-spacing: .02em;
@@ -194,11 +194,11 @@ html:has(.simulation-shell) body::-webkit-scrollbar {
   bottom: calc(100% + 12px);
   transform: translateX(-50%);
   width: min(360px, 78vw);
-  background: rgba(22, 35, 14, 0.96);
-  color: #f0f5ed;
+  background: rgba(16, 30, 57, 0.96);
+  color: #edf4ff;
   border-radius: var(--simulation-radius-surface, 14px);
   padding: 12px 14px;
-  box-shadow: 0 18px 34px rgba(17, 26, 12, 0.2);
+  box-shadow: 0 18px 34px rgba(10, 23, 41, 0.2);
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
@@ -218,14 +218,14 @@ html:has(.simulation-shell) body::-webkit-scrollbar {
   font-size: 12px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: #c3d9b8;
+  color: #b7d3ff;
 }
 
 .assumption-info-tooltip p {
   margin: 0 0 6px;
   font-size: 12px;
   line-height: 1.5;
-  color: #f0f5ed;
+  color: #edf4ff;
 }
 
 .assumption-info-tooltip p:last-child {
@@ -267,7 +267,7 @@ html:has(.simulation-shell) body::-webkit-scrollbar {
   border: 1px solid rgba(255, 255, 255, .78);
   border-radius: var(--simulation-radius-card, 24px);
   padding: 22px 20px 18px;
-  box-shadow: 0 7px 18px rgba(60, 82, 48, .08), inset 0 1px 0 rgba(255,255,255,.35);
+  box-shadow: 0 7px 18px rgba(45, 75, 118, .08), inset 0 1px 0 rgba(255,255,255,.35);
 }
 
 .simulation-builder-panel {
@@ -318,7 +318,7 @@ html:has(.simulation-shell) body::-webkit-scrollbar {
   display: grid;
   place-items: center;
   padding: 0;
-  color: #475d3c;
+  color: #35577f;
   border: 2px solid currentColor;
   border-radius: 50%;
   background: transparent;
@@ -328,7 +328,7 @@ html:has(.simulation-shell) body::-webkit-scrollbar {
 }
 
 .method-info-trigger:focus-visible {
-  outline: 3px solid rgba(93, 137, 67, .24);
+  outline: 3px solid rgba(85, 107, 235, .24);
   outline-offset: 3px;
 }
 
@@ -338,11 +338,11 @@ html:has(.simulation-shell) body::-webkit-scrollbar {
   left: calc(100% + 14px);
   width: 380px;
   padding: 16px;
-  color: #6c7f62;
-  border: 1px solid rgba(104, 148, 79, .14);
+  color: #5f7a9f;
+  border: 1px solid rgba(109, 120, 232, .14);
   border-radius: var(--simulation-radius-surface, 18px);
   background: rgba(255, 255, 255, .98);
-  box-shadow: 0 10px 28px rgba(60, 84, 47, .14);
+  box-shadow: 0 10px 28px rgba(41, 77, 122, .14);
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
@@ -381,7 +381,7 @@ html:has(.simulation-shell) body::-webkit-scrollbar {
 .field-group > label {
   display: inline-block;
   margin-bottom: 8px;
-  color: #5b6f51;
+  color: #4f698f;
   font-size: 14px;
   font-weight: 600;
 }
@@ -407,7 +407,7 @@ html:has(.simulation-shell) body::-webkit-scrollbar {
   overflow-y: auto;
   background: rgba(255,255,255,0.9);
   border-radius: var(--simulation-radius-surface, 16px);
-  box-shadow: 0 18px 40px rgba(40, 60, 29, 0.14);
+  box-shadow: 0 18px 40px rgba(30, 52, 92, 0.14);
   border: 1px solid rgba(255,255,255,0.8);
 }
 
@@ -421,22 +421,22 @@ html:has(.simulation-shell) body::-webkit-scrollbar {
   gap: 8px;
   padding: 12px 14px;
   text-align: left;
-  color: #324725;
+  color: #23406b;
   cursor: pointer;
 }
 
 .simulation-search-results button + button {
-  border-top: 1px solid rgba(126, 147, 116, 0.18);
+  border-top: 1px solid rgba(120, 139, 181, 0.18);
 }
 
 .simulation-search-results button:hover,
 .simulation-search-results button:focus-visible {
-  background: rgba(130, 175, 104, 0.08);
+  background: rgba(119, 154, 255, 0.08);
   outline: none;
 }
 
 .simulation-search-results small {
-  color: #788a6f;
+  color: #7184a8;
   font-size: 12px;
 }
 
@@ -451,7 +451,7 @@ html:has(.simulation-shell) body::-webkit-scrollbar {
   width: 100%;
   border: 0;
   background: transparent;
-  color: #223815;
+  color: #162f5b;
   padding: 18px 18px;
   font-size: 18px;
   appearance: none;
@@ -492,7 +492,7 @@ html:has(.simulation-shell) body::-webkit-scrollbar {
 }
 
 .simulation-preset-controls label {
-  color: #7a8972;
+  color: #7185a3;
   font-size: 11px;
   font-weight: 700;
 }
@@ -502,8 +502,8 @@ html:has(.simulation-shell) body::-webkit-scrollbar {
   min-width: 0;
   min-height: 36px;
   padding: 7px 10px;
-  color: #455b3a;
-  border: 1px solid rgba(104, 148, 79, .18);
+  color: #35557f;
+  border: 1px solid rgba(109, 120, 232, .18);
   border-radius: var(--simulation-radius-control, 9px);
   background: rgba(255, 255, 255, .65);
   font-size: 11px;
@@ -533,8 +533,8 @@ html:has(.simulation-shell) body::-webkit-scrollbar {
   min-width: 0;
   min-height: 34px;
   padding: 7px 10px;
-  color: #455b3a;
-  border: 1px solid rgba(104, 148, 79, .16);
+  color: #35557f;
+  border: 1px solid rgba(109, 120, 232, .16);
   border-radius: var(--simulation-radius-control, 8px);
   background: rgba(255, 255, 255, .6);
   font-size: 11px;
@@ -567,7 +567,7 @@ html:has(.simulation-shell) body::-webkit-scrollbar {
 
 .simulation-saved-item > span {
   overflow: hidden;
-  color: #6a7d61;
+  color: #60779b;
   font-size: 11px;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -590,7 +590,7 @@ html:has(.simulation-shell) body::-webkit-scrollbar {
   align-items: center;
   justify-content: space-between;
   gap: 10px;
-  color: #5b7050;
+  color: #4d6a93;
   font-size: 13px;
 }
 
@@ -602,7 +602,7 @@ html:has(.simulation-shell) body::-webkit-scrollbar {
 
 .slider-labels label {
   font-weight: 700;
-  color: #415636;
+  color: #354f78;
 }
 
 .slider-control {
@@ -612,7 +612,7 @@ html:has(.simulation-shell) body::-webkit-scrollbar {
 
 .slider-control input[type='range'] {
   width: 100%;
-  accent-color: #68944f;
+  accent-color: #6d78e8;
   height: 6px;
 }
 
@@ -622,20 +622,20 @@ html:has(.simulation-shell) body::-webkit-scrollbar {
   justify-content: space-between;
   gap: 10px;
   font-size: 13px;
-  color: #66765e;
+  color: #5a728f;
 }
 
 .slider-meta strong {
   min-width: 0;
   font-weight: 800;
-  color: #2f4622;
+  color: #243d6b;
   text-align: right;
   overflow-wrap: anywhere;
 }
 
 .scenario-note {
   margin: 12px 0 0;
-  color: #6a7d61;
+  color: #60779b;
   font-size: 13px;
   line-height: 1.5;
 }
@@ -663,7 +663,7 @@ html:has(.simulation-shell) body::-webkit-scrollbar {
 .method-panel ul {
   margin: 0;
   padding-left: 18px;
-  color: #586b4e;
+  color: #4d658a;
   font-size: 13px;
   line-height: 1.6;
 }
@@ -693,15 +693,15 @@ html:has(.simulation-shell) body::-webkit-scrollbar {
 
 .button-secondary {
   background: rgba(255,255,255,0.5);
-  color: #3e582f;
+  color: #2d4f82;
   border: 1px solid rgba(255,255,255,0.8);
   flex: 1;
 }
 
 .button-primary {
-  background: linear-gradient(135deg, #67944e, #57823d);
+  background: linear-gradient(135deg, #5f73ff, #4b69d9);
   color: white;
-  box-shadow: 0 10px 20px rgba(93, 136, 67, 0.25);
+  box-shadow: 0 10px 20px rgba(88, 106, 233, 0.25);
   flex: 1.2;
 }
 
@@ -725,7 +725,7 @@ html:has(.simulation-shell) body::-webkit-scrollbar {
   gap: 10px;
   margin: 0 0 10px;
   padding: 8px 10px;
-  border: 1px solid rgba(104, 148, 79, .14);
+  border: 1px solid rgba(109, 120, 232, .14);
   border-radius: var(--simulation-radius-surface, 9px);
   background: rgba(255, 255, 255, .5);
 }
@@ -737,15 +737,15 @@ html:has(.simulation-shell) body::-webkit-scrollbar {
   color: #fff;
   border: 0;
   border-radius: var(--simulation-radius-control, 7px);
-  background: #57823d;
+  background: #5069d5;
   font-size: 11px;
   font-weight: 750;
   cursor: pointer;
 }
 
 .simulation-playback > button:disabled {
-  color: #879580;
-  background: #eaeee8;
+  color: #7f91ad;
+  background: #e8edf5;
   cursor: not-allowed;
 }
 
@@ -753,19 +753,19 @@ html:has(.simulation-shell) body::-webkit-scrollbar {
   height: 6px;
   overflow: hidden;
   border-radius: 99px;
-  background: rgba(131, 148, 123, .18);
+  background: rgba(122, 143, 176, .18);
 }
 
 .simulation-playback-track i {
   display: block;
   height: 100%;
   border-radius: inherit;
-  background: linear-gradient(90deg, #35a88c, #5e8a45);
+  background: linear-gradient(90deg, #35a88c, #596fe2);
   transition: width 70ms linear;
 }
 
 .simulation-playback > span {
-  color: #7e8d76;
+  color: #7589a7;
   font-size: 9px;
   text-align: right;
 }
@@ -777,7 +777,7 @@ html:has(.simulation-shell) body::-webkit-scrollbar {
   gap: 10px;
   margin: 0 0 12px;
   padding: 8px 4px 12px;
-  border-bottom: 1px solid rgba(104, 148, 79, .14);
+  border-bottom: 1px solid rgba(109, 120, 232, .14);
 }
 
 .simulation-radar-copy h3 {
@@ -788,7 +788,7 @@ html:has(.simulation-shell) body::-webkit-scrollbar {
 
 .simulation-radar-copy p {
   margin: 0;
-  color: #6d7e64;
+  color: #62799a;
   font-size: 11px;
   line-height: 1.5;
 }
@@ -798,7 +798,7 @@ html:has(.simulation-shell) body::-webkit-scrollbar {
   flex-wrap: wrap;
   gap: 8px 14px;
   margin-top: 12px;
-  color: #617358;
+  color: #566e91;
   font-size: 10px;
   font-weight: 700;
 }
@@ -816,11 +816,11 @@ html:has(.simulation-shell) body::-webkit-scrollbar {
 }
 
 .simulation-radar-legend .baseline-key {
-  background: #a0ac9a;
+  background: #9aa9c1;
 }
 
 .simulation-radar-legend .scenario-key {
-  background: #5e8a45;
+  background: #596fe2;
 }
 
 .simulation-radar-chart {
@@ -832,32 +832,32 @@ html:has(.simulation-shell) body::-webkit-scrollbar {
 
 .simulation-radar-grid {
   fill: none;
-  stroke: rgba(120, 137, 111, .22);
+  stroke: rgba(111, 132, 166, .22);
   stroke-width: 1;
 }
 
 .simulation-radar-axis {
-  stroke: rgba(120, 137, 111, .22);
+  stroke: rgba(111, 132, 166, .22);
   stroke-width: 1;
 }
 
 .simulation-radar-label {
-  fill: #6e7f65;
+  fill: #637a9b;
   font-size: 9px;
   font-weight: 650;
 }
 
 .simulation-radar-baseline {
-  fill: rgba(160, 172, 154, .13);
-  stroke: #94a18d;
+  fill: rgba(154, 169, 193, .13);
+  stroke: #8d9db7;
   stroke-width: 2;
   stroke-dasharray: 4 3;
   vector-effect: non-scaling-stroke;
 }
 
 .simulation-radar-scenario {
-  fill: rgba(94, 138, 69, .19);
-  stroke: #5e8a45;
+  fill: rgba(89, 111, 226, .19);
+  stroke: #596fe2;
   stroke-width: 2.5;
   vector-effect: non-scaling-stroke;
   animation: radar-scenario-enter 460ms cubic-bezier(.2, .72, .25, 1) both;
@@ -866,7 +866,7 @@ html:has(.simulation-shell) body::-webkit-scrollbar {
 .simulation-factor-map {
   margin: 0 0 14px;
   padding: 12px 0 14px;
-  border-block: 1px solid rgba(104, 148, 79, .14);
+  border-block: 1px solid rgba(109, 120, 232, .14);
 }
 
 .simulation-factor-map-header {
@@ -886,7 +886,7 @@ html:has(.simulation-shell) body::-webkit-scrollbar {
 .simulation-factor-map-note,
 .simulation-factor-map-state {
   margin: 0;
-  color: #718268;
+  color: #667d9e;
   font-size: 10px;
   line-height: 1.5;
 }
@@ -895,7 +895,7 @@ html:has(.simulation-shell) body::-webkit-scrollbar {
   display: grid;
   gap: 3px;
   flex: 0 0 auto;
-  color: #7a8972;
+  color: #7185a3;
   font-size: 9px;
   font-weight: 700;
 }
@@ -904,8 +904,8 @@ html:has(.simulation-shell) body::-webkit-scrollbar {
   max-width: 190px;
   min-height: 34px;
   padding: 5px 26px 5px 8px;
-  color: #455b3a;
-  border: 1px solid rgba(104, 148, 79, .2);
+  color: #35557f;
+  border: 1px solid rgba(109, 120, 232, .2);
   border-radius: var(--simulation-radius-control, 8px);
   background: rgba(255, 255, 255, .78);
   font-size: 10px;
@@ -914,7 +914,7 @@ html:has(.simulation-shell) body::-webkit-scrollbar {
 
 .simulation-factor-map-selected {
   margin: 8px 0 4px;
-  color: #4a653b;
+  color: #365d91;
   font-size: 11px;
   font-weight: 750;
 }
@@ -924,7 +924,7 @@ html:has(.simulation-shell) body::-webkit-scrollbar {
   width: 100%;
   max-height: 420px;
   overflow: hidden;
-  border: 1px solid rgba(104, 148, 79, .13);
+  border: 1px solid rgba(109, 120, 232, .13);
   border-radius: var(--simulation-radius-surface, 12px);
   background: rgba(244, 248, 253, .8);
 }
@@ -954,17 +954,17 @@ html:has(.simulation-shell) body::-webkit-scrollbar {
   min-width: 30px;
   height: 28px;
   padding: 0 8px;
-  border: 1px solid rgba(104, 148, 79, .28);
+  border: 1px solid rgba(109, 120, 232, .28);
   border-radius: 8px;
   background: rgba(255, 255, 255, .92);
-  color: #425936;
+  color: #36517f;
   font-size: 12px;
   font-weight: 700;
   cursor: pointer;
 }
 
 .simulation-map-zoom button:hover:not(:disabled) {
-  background: #eef4eb;
+  background: #eef1ff;
 }
 
 .simulation-map-zoom button:disabled {
@@ -973,7 +973,7 @@ html:has(.simulation-shell) body::-webkit-scrollbar {
 }
 
 .simulation-map-zoom button:focus-visible {
-  outline: 2px solid #5e8a45;
+  outline: 2px solid #596fe2;
   outline-offset: 2px;
 }
 
@@ -984,7 +984,7 @@ html:has(.simulation-shell) body::-webkit-scrollbar {
 }
 
 .simulation-factor-map-canvas path:hover {
-  stroke: #2f4523 !important;
+  stroke: #233d68 !important;
   stroke-width: 1.4 !important;
 }
 
@@ -1003,12 +1003,12 @@ html:has(.simulation-shell) body::-webkit-scrollbar {
 }
 
 .simulation-factor-map-canvas path.is-selected {
-  filter: drop-shadow(0 0 4px rgba(35, 57, 22, .75));
+  filter: drop-shadow(0 0 4px rgba(28, 47, 92, .75));
 }
 
 .simulation-factor-map-canvas path:focus-visible {
   outline: none;
-  stroke: #223518 !important;
+  stroke: #172e53 !important;
   stroke-width: 2 !important;
 }
 
@@ -1018,7 +1018,7 @@ html:has(.simulation-shell) body::-webkit-scrollbar {
   flex-wrap: wrap;
   gap: 6px 10px;
   margin: 7px 0;
-  color: #76856e;
+  color: #6c819f;
   font-size: 9px;
 }
 
@@ -1036,7 +1036,7 @@ html:has(.simulation-shell) body::-webkit-scrollbar {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  color: #5d7153;
+  color: #506b91;
   font-size: 9px;
 }
 
@@ -1048,7 +1048,7 @@ html:has(.simulation-shell) body::-webkit-scrollbar {
 }
 
 .simulation-factor-map-legend b:nth-last-child(2) i {
-  border: 2px solid #233916;
+  border: 2px solid #1c2f5c;
   background: #fff;
 }
 
@@ -1076,8 +1076,8 @@ html:has(.simulation-shell) body::-webkit-scrollbar {
 }
 
 .simulation-update-status.updating {
-  color: #697c5f;
-  background: rgba(226, 233, 223, .72);
+  color: #5d779c;
+  background: rgba(220, 232, 243, .72);
 }
 
 .simulation-update-status.updated {
@@ -1108,7 +1108,7 @@ html:has(.simulation-shell) body::-webkit-scrollbar {
   grid-template-columns: repeat(3, minmax(0, 1fr));
   margin-bottom: 14px;
   padding: 8px 4px;
-  border-block: 1px solid rgba(104, 148, 79, .12);
+  border-block: 1px solid rgba(109, 120, 232, .12);
 }
 
 .outcome-summary-item {
@@ -1117,7 +1117,7 @@ html:has(.simulation-shell) body::-webkit-scrollbar {
   grid-template-columns: minmax(0, 1fr) auto;
   gap: 2px 6px;
   padding: 5px 10px;
-  border-right: 1px solid rgba(104, 148, 79, .12);
+  border-right: 1px solid rgba(109, 120, 232, .12);
 }
 
 .outcome-summary-item:last-child {
@@ -1126,7 +1126,7 @@ html:has(.simulation-shell) body::-webkit-scrollbar {
 
 .outcome-summary-item span {
   overflow: hidden;
-  color: #788970;
+  color: #6f84a5;
   font-size: 9px;
   font-weight: 700;
   text-overflow: ellipsis;
@@ -1142,7 +1142,7 @@ html:has(.simulation-shell) body::-webkit-scrollbar {
 }
 
 .outcome-summary-item small {
-  color: #5f7155;
+  color: #536c90;
   font-size: 10px;
   font-weight: 700;
 }
@@ -1159,15 +1159,15 @@ html:has(.simulation-shell) body::-webkit-scrollbar {
 
 .outcome-summary-item.neutral b,
 .outcome-summary-item.neutral small {
-  color: #788970;
+  color: #6f84a5;
 }
 
 .simulation-model-validation {
   margin: -4px 0 12px;
   padding: 8px 10px;
-  color: #6a7d61;
-  border-left: 2px solid rgba(104, 148, 79, .5);
-  background: rgba(104, 148, 79, .05);
+  color: #60779b;
+  border-left: 2px solid rgba(109, 120, 232, .5);
+  background: rgba(109, 120, 232, .05);
   font-size: 10px;
   line-height: 1.5;
 }
@@ -1175,7 +1175,7 @@ html:has(.simulation-shell) body::-webkit-scrollbar {
 .simulation-model-validation > strong {
   display: block;
   margin-bottom: 5px;
-  color: #5d7252;
+  color: #526b94;
 }
 
 .simulation-model-validation-grid {
@@ -1191,11 +1191,11 @@ html:has(.simulation-shell) body::-webkit-scrollbar {
 }
 
 .simulation-model-validation-grid span {
-  color: #7a8972;
+  color: #7185a3;
 }
 
 .simulation-model-validation-grid b {
-  color: #506644;
+  color: #425f8b;
   font-weight: 700;
   overflow-wrap: anywhere;
 }
@@ -1213,9 +1213,9 @@ html:has(.simulation-shell) body::-webkit-scrollbar {
 .simulation-evidence-note {
   margin: 0 0 14px;
   padding: 10px 12px;
-  color: #5e7055;
-  border-left: 3px solid #68944f;
-  background: rgba(104, 148, 79, .07);
+  color: #526b8d;
+  border-left: 3px solid #6d78e8;
+  background: rgba(109, 120, 232, .07);
   font-size: 11px;
   line-height: 1.5;
 }
@@ -1223,13 +1223,13 @@ html:has(.simulation-shell) body::-webkit-scrollbar {
 .simulation-driver-breakdown {
   margin: 0 0 14px;
   padding: 12px 0 14px;
-  border-block: 1px solid rgba(104, 148, 79, .14);
+  border-block: 1px solid rgba(109, 120, 232, .14);
 }
 
 .simulation-scenario-comparison {
   margin: 0 0 14px;
   padding: 12px 0 14px;
-  border-block: 1px solid rgba(104, 148, 79, .14);
+  border-block: 1px solid rgba(109, 120, 232, .14);
 }
 
 .simulation-scenario-table {
@@ -1240,19 +1240,19 @@ html:has(.simulation-shell) body::-webkit-scrollbar {
 .simulation-scenario-row {
   display: grid;
   min-width: max-content;
-  border-top: 1px solid rgba(104, 148, 79, .1);
+  border-top: 1px solid rgba(109, 120, 232, .1);
 }
 
 .simulation-scenario-row > span {
   min-width: 0;
   padding: 8px 7px;
-  color: #5f7155;
+  color: #536c90;
   font-size: 11px;
   overflow-wrap: anywhere;
 }
 
 .simulation-scenario-row > span:not(:first-child) {
-  color: #4a7330;
+  color: #2e63b5;
   text-align: center;
 }
 
@@ -1261,7 +1261,7 @@ html:has(.simulation-shell) body::-webkit-scrollbar {
 }
 
 .simulation-scenario-row.header > span {
-  color: #7a8972;
+  color: #7185a3;
   font-size: 10px;
   font-weight: 700;
   text-align: center;
@@ -1274,7 +1274,7 @@ html:has(.simulation-shell) body::-webkit-scrollbar {
 .simulation-analogue {
   margin: 0 0 14px;
   padding: 12px 0 14px;
-  border-block: 1px solid rgba(104, 148, 79, .14);
+  border-block: 1px solid rgba(109, 120, 232, .14);
 }
 
 .simulation-analogue-content {
@@ -1294,7 +1294,7 @@ html:has(.simulation-shell) body::-webkit-scrollbar {
   display: block;
   width: 100%;
   max-height: 150px;
-  border: 1px solid rgba(104, 148, 79, .13);
+  border: 1px solid rgba(109, 120, 232, .13);
   border-radius: var(--simulation-radius-surface, 10px);
   background: rgba(255, 255, 255, .45);
 }
@@ -1305,8 +1305,8 @@ html:has(.simulation-shell) body::-webkit-scrollbar {
 }
 
 .simulation-analogue-map .selected-boundary {
-  fill: rgba(104, 148, 79, .18);
-  stroke: #638f49;
+  fill: rgba(109, 120, 232, .18);
+  stroke: #6575dd;
 }
 
 .simulation-analogue-map .analogue-boundary {
@@ -1319,7 +1319,7 @@ html:has(.simulation-shell) body::-webkit-scrollbar {
   flex-wrap: wrap;
   gap: 6px 12px;
   margin-top: 6px;
-  color: #6f7f66;
+  color: #647b9b;
   font-size: 10px;
 }
 
@@ -1336,7 +1336,7 @@ html:has(.simulation-shell) body::-webkit-scrollbar {
 }
 
 .simulation-analogue-map .selected-key {
-  background: #638f49;
+  background: #6575dd;
 }
 
 .simulation-analogue-map .analogue-key {
@@ -1355,7 +1355,7 @@ html:has(.simulation-shell) body::-webkit-scrollbar {
 }
 
 .simulation-analogue-outcomes > small {
-  color: #7a8972;
+  color: #7185a3;
   font-size: 10px;
 }
 
@@ -1365,28 +1365,28 @@ html:has(.simulation-shell) body::-webkit-scrollbar {
   align-items: center;
   gap: 6px;
   padding-top: 6px;
-  border-top: 1px solid rgba(104, 148, 79, .1);
+  border-top: 1px solid rgba(109, 120, 232, .1);
 }
 
 .simulation-analogue-row span {
-  color: #5f7155;
+  color: #536c90;
   font-size: 10px;
 }
 
 .simulation-analogue-row b {
-  color: #4a7330;
+  color: #2e63b5;
   font-size: 11px;
 }
 
 .simulation-analogue-row i {
-  color: #909f88;
+  color: #879bb9;
   font-size: 11px;
   font-style: normal;
 }
 
 .simulation-analogue-outcomes > p {
   margin: 3px 0 0;
-  color: #808f78;
+  color: #778ba8;
   font-size: 10px;
   line-height: 1.5;
 }
@@ -1409,7 +1409,7 @@ html:has(.simulation-shell) body::-webkit-scrollbar {
 .simulation-driver-empty,
 .simulation-driver-caveat {
   margin: 4px 0 0;
-  color: #6a7d61;
+  color: #60779b;
   font-size: 11px;
   line-height: 1.5;
 }
@@ -1422,7 +1422,7 @@ html:has(.simulation-shell) body::-webkit-scrollbar {
 
 .simulation-waterfall {
   padding: 8px 0 10px;
-  border-top: 1px solid rgba(104, 148, 79, .1);
+  border-top: 1px solid rgba(109, 120, 232, .1);
 }
 
 .simulation-waterfall > header {
@@ -1434,19 +1434,19 @@ html:has(.simulation-shell) body::-webkit-scrollbar {
 }
 
 .simulation-waterfall > header strong {
-  color: #4a633c;
+  color: #395b8c;
   font-size: 12px;
 }
 
 .simulation-waterfall > header span {
-  color: #4a7330;
+  color: #2e63b5;
   font-size: 11px;
   font-weight: 750;
 }
 
 .simulation-waterfall > header small {
   grid-column: 1 / -1;
-  color: #7a8972;
+  color: #7185a3;
   font-size: 9px;
 }
 
@@ -1464,7 +1464,7 @@ html:has(.simulation-shell) body::-webkit-scrollbar {
 
 .simulation-driver-name {
   overflow: hidden;
-  color: #55684b;
+  color: #4b6288;
   font-size: 11px;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -1474,7 +1474,7 @@ html:has(.simulation-shell) body::-webkit-scrollbar {
   position: relative;
   height: 14px;
   border-radius: 4px;
-  background: rgba(104, 148, 79, .06);
+  background: rgba(109, 120, 232, .06);
 }
 
 .simulation-driver-track::before {
@@ -1484,7 +1484,7 @@ html:has(.simulation-shell) body::-webkit-scrollbar {
   bottom: -2px;
   left: 50%;
   width: 1px;
-  background: #8e9c88;
+  background: #8798b2;
 }
 
 .simulation-driver-bar {
@@ -1528,12 +1528,12 @@ html:has(.simulation-shell) body::-webkit-scrollbar {
 }
 
 .simulation-driver-row b.neutral {
-  color: #929e8b;
+  color: #8a9bb4;
 }
 
 .simulation-driver-caveat {
   margin-top: 8px;
-  color: #75836f;
+  color: #6e7f99;
 }
 
 .result-cards {
@@ -1557,7 +1557,7 @@ html:has(.simulation-shell) body::-webkit-scrollbar {
   font-size: 9px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: #7c8b73;
+  color: #7287a6;
   font-weight: 700;
 }
 
@@ -1569,7 +1569,7 @@ html:has(.simulation-shell) body::-webkit-scrollbar {
   flex-wrap: wrap;
   gap: 8px;
   font-size: 13px;
-  color: #324725;
+  color: #23406b;
   font-weight: 800;
   margin-bottom: 12px;
 }
@@ -1582,7 +1582,7 @@ html:has(.simulation-shell) body::-webkit-scrollbar {
 
 .result-arrow {
   flex: 0 0 auto;
-  color: #6a815e;
+  color: #6179a8;
 }
 
 .result-status {
@@ -1624,7 +1624,7 @@ html:has(.simulation-shell) body::-webkit-scrollbar {
   align-items: center;
   gap: 10px;
   font-size: 11px;
-  color: #697c5f;
+  color: #5d779c;
 }
 
 .comparison-row {
@@ -1650,10 +1650,10 @@ html:has(.simulation-shell) body::-webkit-scrollbar {
 
 .comparison-empty {
   border-radius: var(--simulation-radius-surface, 12px);
-  border: 1px dashed rgba(126, 147, 116, 0.38);
+  border: 1px dashed rgba(120, 139, 181, 0.38);
   background: rgba(255, 255, 255, 0.45);
   padding: 12px;
-  color: #697b60;
+  color: #5e7698;
   font-size: 13px;
 }
 
@@ -1663,13 +1663,13 @@ html:has(.simulation-shell) body::-webkit-scrollbar {
 }
 
 .comparison-label {
-  color: #5f7155;
+  color: #536c90;
   font-size: 13px;
   font-weight: 700;
 }
 
 .comparison-rule {
-  color: #7b8c72;
+  color: #7087a8;
   font-size: 11px;
   text-transform: uppercase;
   letter-spacing: 0.04em;
@@ -1688,11 +1688,11 @@ html:has(.simulation-shell) body::-webkit-scrollbar {
 }
 
 .comparison-value.baseline {
-  color: #73846b;
+  color: #6a7f9f;
 }
 
 .comparison-value.simulated {
-  color: #466435;
+  color: #2e5b95;
 }
 
 .comparison-delta {
@@ -1715,8 +1715,8 @@ html:has(.simulation-shell) body::-webkit-scrollbar {
 }
 
 .comparison-delta.neutral {
-  color: #627459;
-  background: rgba(161, 175, 155, 0.18);
+  color: #576f92;
+  background: rgba(154, 171, 197, 0.18);
 }
 
 .comparison-track {
@@ -1733,11 +1733,11 @@ html:has(.simulation-shell) body::-webkit-scrollbar {
 }
 
 .comparison-track-fill.baseline {
-  background: rgba(154, 167, 147, 0.18);
+  background: rgba(145, 164, 190, 0.18);
 }
 
 .comparison-track-fill.simulated {
-  background: linear-gradient(90deg, rgba(104, 148, 79, .62), rgba(93, 137, 67, .94));
+  background: linear-gradient(90deg, rgba(109, 120, 232, .62), rgba(85, 107, 235, .94));
 }
 
 .comparison-readout {
@@ -1755,13 +1755,13 @@ html:has(.simulation-shell) body::-webkit-scrollbar {
 }
 
 .comparison-readout small {
-  color: #8b9a84;
+  color: #8396b3;
   font-size: 9px;
 }
 
 .comparison-readout strong {
   overflow: hidden;
-  color: #476238;
+  color: #34598d;
   font-size: 11px;
   font-weight: 750;
   text-overflow: ellipsis;
@@ -1769,7 +1769,7 @@ html:has(.simulation-shell) body::-webkit-scrollbar {
 }
 
 .comparison-readout-arrow {
-  color: #99a692;
+  color: #91a3bd;
   font-size: 12px;
 }
 
@@ -1790,7 +1790,7 @@ html:has(.simulation-shell) body::-webkit-scrollbar {
 }
 
 .comparison-readout-delta.neutral {
-  color: #788970;
+  color: #6f84a5;
 }
 
 .comparison-detail {
@@ -1801,11 +1801,11 @@ html:has(.simulation-shell) body::-webkit-scrollbar {
   width: 270px;
   min-height: 120px;
   padding: 12px 13px;
-  color: #64795a;
-  border: 1px solid #e1e9dc;
+  color: #57739a;
+  border: 1px solid #d9e8f7;
   border-radius: var(--simulation-radius-surface, 14px);
   background: rgba(255, 255, 255, .98);
-  box-shadow: 0 8px 22px rgba(60, 84, 47, .13);
+  box-shadow: 0 8px 22px rgba(41, 77, 122, .13);
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
@@ -1820,8 +1820,8 @@ html:has(.simulation-shell) body::-webkit-scrollbar {
   right: 100%;
   width: 10px;
   height: 10px;
-  border-bottom: 1px solid #e1e9dc;
-  border-left: 1px solid #e1e9dc;
+  border-bottom: 1px solid #d9e8f7;
+  border-left: 1px solid #d9e8f7;
   background: #fff;
   transform: translate(5px, -50%) rotate(45deg);
 }
@@ -1857,13 +1857,13 @@ html:has(.simulation-shell) body::-webkit-scrollbar {
 }
 
 .comparison-detail dt {
-  color: #8e9d86;
+  color: #8499b7;
   font-size: 9px;
 }
 
 .comparison-detail dd {
   margin: 0;
-  color: #4a7330;
+  color: #2e63b5;
   font-size: 11px;
   font-weight: 800;
 }
@@ -1878,12 +1878,12 @@ html:has(.simulation-shell) body::-webkit-scrollbar {
 }
 
 .insight-box {
-  background: linear-gradient(135deg, #2e4422, #3f5831);
+  background: linear-gradient(135deg, #263b67, #314f82);
   border: 1px solid rgba(255, 255, 255, .14);
   border-radius: var(--simulation-radius-surface, 18px);
   padding: 16px 18px;
   margin-bottom: 14px;
-  box-shadow: 0 10px 24px rgba(45, 66, 34, .16);
+  box-shadow: 0 10px 24px rgba(35, 58, 99, .16);
 }
 
 .insight-box-header {
@@ -1912,7 +1912,7 @@ html:has(.simulation-shell) body::-webkit-scrollbar {
   display: grid;
   place-items: center;
   padding: 0;
-  color: #e2eddd;
+  color: #dfe9ff;
   border: 1px solid rgba(255, 255, 255, .18);
   border-radius: var(--simulation-radius-control, 11px);
   background: rgba(255, 255, 255, .08);
@@ -1938,7 +1938,7 @@ html:has(.simulation-shell) body::-webkit-scrollbar {
 }
 
 .insight-toggle:focus-visible {
-  outline: 3px solid rgba(93, 137, 67, .24);
+  outline: 3px solid rgba(85, 107, 235, .24);
   outline-offset: 2px;
 }
 
@@ -1983,7 +1983,7 @@ html:has(.simulation-shell) body::-webkit-scrollbar {
   gap: 10px;
   margin-top: 12px;
   font-size: 12px;
-  color: #ccd9c6;
+  color: #c6d5ef;
 }
 
 .projected-change.secondary {
@@ -2009,11 +2009,11 @@ html:has(.simulation-shell) body::-webkit-scrollbar {
   width: 100%;
   min-height: 44px;
   padding: 10px 16px;
-  color: #537b3c;
-  border: 1px solid rgba(104, 148, 79, .18);
+  color: #5067bd;
+  border: 1px solid rgba(109, 120, 232, .18);
   border-radius: var(--simulation-radius-control, 14px);
-  background: rgba(104, 148, 79, .1);
-  box-shadow: 0 5px 14px rgba(66, 104, 42, .06);
+  background: rgba(109, 120, 232, .1);
+  box-shadow: 0 5px 14px rgba(69, 82, 166, .06);
   font-size: 13px;
 }
 
@@ -2022,23 +2022,23 @@ html:has(.simulation-shell) body::-webkit-scrollbar {
   min-width: 150px;
   min-height: 44px;
   padding: 10px 16px;
-  color: #657a5b;
-  border: 1px solid rgba(104, 148, 79, .14);
+  color: #58749c;
+  border: 1px solid rgba(109, 120, 232, .14);
   border-radius: var(--simulation-radius-control, 14px);
   background: rgba(255, 255, 255, .58);
-  box-shadow: 0 5px 14px rgba(65, 93, 48, .05);
+  box-shadow: 0 5px 14px rgba(51, 82, 140, .05);
   font-size: 13px;
 }
 
 .simulation-actions .button-tertiary:hover {
   color: var(--brand);
-  border-color: rgba(104, 148, 79, .26);
+  border-color: rgba(109, 120, 232, .26);
   background: rgba(255, 255, 255, .82);
 }
 
 .simulation-actions .button-secondary:hover {
-  border-color: rgba(104, 148, 79, .28);
-  background: rgba(104, 148, 79, .16);
+  border-color: rgba(109, 120, 232, .28);
+  background: rgba(109, 120, 232, .16);
 }
 
 .outcome-summary-item.improves small {
@@ -2049,7 +2049,7 @@ html:has(.simulation-shell) body::-webkit-scrollbar {
   padding: 0;
   margin: 0;
   overflow: hidden;
-  border: 1px solid rgba(104, 148, 79, .12);
+  border: 1px solid rgba(109, 120, 232, .12);
   border-radius: var(--simulation-radius-surface, 16px);
   background: rgba(255, 255, 255, .34);
   box-shadow: none;
@@ -2063,7 +2063,7 @@ html:has(.simulation-shell) body::-webkit-scrollbar {
   justify-content: space-between;
   gap: 16px;
   padding: 10px 14px;
-  color: #5d7252;
+  color: #526b94;
   border: 0;
   background: transparent;
   text-align: left;
@@ -2071,11 +2071,11 @@ html:has(.simulation-shell) body::-webkit-scrollbar {
 }
 
 .insight-summary:hover {
-  background: rgba(104, 148, 79, .05);
+  background: rgba(109, 120, 232, .05);
 }
 
 .insight-summary:focus-visible {
-  outline: 3px solid rgba(93, 137, 67, .22);
+  outline: 3px solid rgba(85, 107, 235, .22);
   outline-offset: -3px;
 }
 
@@ -2118,18 +2118,18 @@ html:has(.simulation-shell) body::-webkit-scrollbar {
 
 .insight-box .insight-content > p {
   margin: 0;
-  color: #586b4e;
+  color: #4d658a;
   font-size: 12px;
   font-weight: 400;
   line-height: 1.55;
 }
 
 .insight-box .projected-change {
-  color: #6c7e62;
+  color: #61799d;
 }
 
 .insight-box .projected-change strong {
-  color: #4a7330;
+  color: #2e63b5;
 }
 
 @media (max-width: 1000px) {
@@ -2269,9 +2269,9 @@ html:has(.simulation-shell) body::-webkit-scrollbar {
   gap: 4px;
   margin: 14px 0;
   padding: var(--results-tabs-inset);
-  border: var(--results-tabs-border) solid rgba(104, 148, 79, .2);
+  border: var(--results-tabs-border) solid rgba(109, 120, 232, .2);
   border-radius: var(--results-tabs-radius);
-  background: rgba(104, 148, 79, .08);
+  background: rgba(109, 120, 232, .08);
 }
 
 .simulation-results-tabs button {
@@ -2289,7 +2289,7 @@ html:has(.simulation-shell) body::-webkit-scrollbar {
   transition: background .18s ease, color .18s ease;
 }
 
-.simulation-results-tabs button:hover { background: rgba(104, 148, 79, .12); }
+.simulation-results-tabs button:hover { background: rgba(109, 120, 232, .12); }
 .simulation-results-tabs button[aria-current='page'] { background: var(--primary); color: #fff; }
 .simulation-results-tabs button:focus-visible,
 .simulation-selected-area button:focus-visible { outline: 3px solid var(--primary); outline-offset: 2px; }
@@ -2331,7 +2331,7 @@ html:has(.simulation-shell) body::-webkit-scrollbar {
 }
 
 .simulation-preset-select .simulation-search-results button.selected {
-  background: rgba(130, 175, 104, 0.14);
+  background: rgba(119, 154, 255, 0.14);
   font-weight: 700;
 }
 
@@ -2339,7 +2339,7 @@ html:has(.simulation-shell) body::-webkit-scrollbar {
   display: grid;
   gap: 3px;
   flex: 0 0 auto;
-  color: #7a8972;
+  color: #7185a3;
   font-size: 9px;
   font-weight: 700;
 }
@@ -2356,8 +2356,8 @@ html:has(.simulation-shell) body::-webkit-scrollbar {
   align-items: center;
   justify-content: space-between;
   gap: 8px;
-  color: #455b3a;
-  border: 1px solid rgba(104, 148, 79, .2);
+  color: #35557f;
+  border: 1px solid rgba(109, 120, 232, .2);
   border-radius: var(--simulation-radius-control, 8px);
   background: rgba(255, 255, 255, .78);
   font-size: 10px;
@@ -2374,7 +2374,7 @@ html:has(.simulation-shell) body::-webkit-scrollbar {
 }
 
 .comparison-readout-unit {
-  color: #83937b;
+  color: #7a8fae;
   font-size: 9px;
   line-height: 1.2;
 }
@@ -2383,8 +2383,8 @@ html:has(.simulation-shell) body::-webkit-scrollbar {
   margin: 0 0 14px;
   padding: 10px 12px;
   border-radius: var(--simulation-radius-surface, 12px);
-  background: rgba(130, 175, 104, .08);
-  color: #55684b;
+  background: rgba(119, 154, 255, .08);
+  color: #4b6288;
   font-size: 12px;
   line-height: 1.5;
 }

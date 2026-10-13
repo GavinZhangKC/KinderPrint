@@ -4,7 +4,7 @@
 .status-moderate { background: #F6E7A8; color: #8B6B16; border-color: #FFF3C9; }
 .status-concern { background: #F5B6A8; color: #9A4638; border-color: #FFD2C8; }
 
-.metric-ring { margin: 4px auto 10px; border-radius: 50%; display: grid; place-items: center; position: relative; background: conic-gradient(var(--ring-color) 0 var(--ring-value), rgba(136, 154, 127,.18) var(--ring-value) 360deg); }
+.metric-ring { margin: 4px auto 10px; border-radius: 50%; display: grid; place-items: center; position: relative; background: conic-gradient(var(--ring-color) 0 var(--ring-value), rgba(127,148,184,.18) var(--ring-value) 360deg); }
 .metric-ring::before { content: ''; position: absolute; inset: 8px; border-radius: 50%; background: rgba(248,250,255,.92); }
 .metric-ring-small { width: 76px; height: 76px; }
 .metric-ring-large { width: 148px; height: 148px; }
@@ -12,11 +12,11 @@
 .metric-ring-inner { position: relative; z-index: 1; display: grid; place-items: center; }
 .metric-ring-inner strong { color: var(--text); font-size: 18px; }
 .metric-ring-large .metric-ring-inner strong { font-size: 32px; }
-.ring-primary { --ring-color: #68944f; }.ring-positive { --ring-color: #73c6a0; }.ring-concern { --ring-color: #e99889; }
+.ring-primary { --ring-color: #6d78e8; }.ring-positive { --ring-color: #73c6a0; }.ring-concern { --ring-color: #e99889; }
 
 .button { min-height: 44px; min-width: 158px; border-radius: 999px; padding: 0 20px; cursor: pointer; font-weight: 700; border: 1px solid rgba(255,255,255,.78); transition: transform .2s ease, box-shadow .2s ease, opacity .2s ease; }
-.button:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 10px 24px rgba(61, 90, 45,.14); }
-.button.primary { background: linear-gradient(135deg, #68944f, #78a260); color: white; }
-.button.secondary { background: rgba(255,255,255,.62); color: #557a3f; }
+.button:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 10px 24px rgba(57,76,137,.14); }
+.button.primary { background: linear-gradient(135deg, #6d78e8, #728ee9); color: white; }
+.button.secondary { background: rgba(255,255,255,.62); color: #5367b8; }
 .button:disabled { opacity: .38; cursor: not-allowed; }
 

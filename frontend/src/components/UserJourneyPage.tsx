@@ -1,8 +1,8 @@
 /**
  * User Journey: a short guided tour of what Vkinder does. A muted drone flight across Melbourne
  * (suburbs and the Yarra, Albert Park, Brighton) plays in the background; scrolling moves through
- * six cards, one per part of the site, each with a link to try it. The Parkville 3D experience
- * stays available at /insight-journey and is linked from the last step.
+ * six cards, one per part of the site, each with a link to try it. The last panel links to
+ * About us (/about), the previous home page.
  */
 import { useEffect, useRef, useState } from 'react'
 import BrandHeader from './BrandHeader'
@@ -92,8 +92,7 @@ export default function UserJourneyPage({ onHome, onInsight, onMap, onSimulation
       <div className="uj-end-row">
         <button type="button" onClick={onMap}>Open the map</button>
         <button type="button" className="ghost" onClick={() => window.location.assign('/where-to-live?view=find')}>Where to live</button>
-        <button type="button" className="ghost" onClick={() => window.location.assign('/insight-journey')}>Parkville in 3D</button>
-        <button type="button" className="ghost" onClick={() => window.location.assign('/about')}>About Vkinder</button>
+        <button type="button" className="ghost" onClick={() => window.location.assign('/about')}>About us</button>
       </div>
     </section>
 

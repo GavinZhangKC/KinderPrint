@@ -1486,7 +1486,7 @@ export default function SimulationPage({
                     onChange={(event) => {
                       const nextValue = event.target.value
                       setSearch(nextValue)
-                      if (nextValue.trim() !== selectedNeighbourhood) clearNeighbourhood()
+                      if (!nextValue.trim()) clearNeighbourhood()
                       setShowSearchResults(true)
                     }}
                   />

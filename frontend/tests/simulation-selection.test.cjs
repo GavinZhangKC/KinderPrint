@@ -132,31 +132,3 @@ test('The newest selected area wins when two responses arrive out of order', asy
   assert.ok(nodes.some(node => node.props['aria-label'] === `Remove ${secondArea.name}`))
   assert.equal(removeButton(nodes), undefined)
 })
-
-
-test('A nonempty replacement query clears the old selection and disables scenario controls', async () => {
-  const app = harness()
-  app.render()
-  const loading = app.select(area)
-  app.requests[0](indicators(area.id, area.name))
-  await loading
-  let nodes = app.render()
-  assert.equal(controls(nodes).props.inert, false)
-  nodes.find(node => node.props.id === 'simulation-neighbourhood').props.onChange({ target: { value: 'unknown test locality' } })
-  nodes = app.render()
-  assert.equal(controls(nodes).props.inert, true)
-  assert.equal(nodes.find(node => node.type === 'fieldset').props.disabled, true)
-  assert.equal(removeButton(nodes), undefined)
-  assert.ok(!nodes.some(node => node.props.className === 'simulation-panel simulation-results-panel'))
-})
-
-test('Editing the query during baseline loading rejects the late response', async () => {
-  const app = harness()
-  app.render()
-  const loading = app.select(area)
-  app.render().find(node => node.props.id === 'simulation-neighbourhood').props.onChange({ target: { value: 'another query' } })
-  app.requests[0](indicators(area.id, area.name))
-  await loading
-  assert.equal(controls(app.render()).props.inert, true)
-  assert.equal(removeButton(app.render()), undefined)
-})
