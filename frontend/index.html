@@ -17,7 +17,7 @@
     <style>html[data-theme="dark"], html[data-theme="dark"] body { background: #091525; }</style>
     <meta name="description" content="Vkinder neighbourhood evidence explorer" />
     <script>
-      // Home only: fetch the opening image first so it is on screen while the tour video loads.
+      // Home only: fetch the first frame of the tour video early so it is on screen while the video loads.
       if (location.pathname === '/' || location.pathname === '/user-journey') {
         const l = document.createElement('link'); l.rel = 'preload'; l.as = 'image'; l.href = '/user-journey/journey_poster.jpg'; l.setAttribute('fetchpriority', 'high'); document.head.appendChild(l)
       }
