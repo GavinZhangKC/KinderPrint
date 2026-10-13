@@ -28,7 +28,7 @@ export default function BrandHeader({ activePage, onHome, onInsight, onMap, onSi
       </div>
       <nav className="nav-links" aria-label="Primary navigation">
         <button className={activePage === 'home' ? 'active' : undefined} aria-current={activePage === 'home' ? 'page' : undefined} type="button" onClick={onHome}>Home</button>
-        <button className={activePage === 'insight' ? 'active' : undefined} aria-current={activePage === 'insight' ? 'page' : undefined} type="button" onClick={onInsight}>Insight Journey</button>
+        <button className={activePage === 'insight' ? 'active' : undefined} aria-current={activePage === 'insight' ? 'page' : undefined} type="button" onClick={onInsight}>User Journey</button>
         <button className={activePage === 'simulation' ? 'active' : undefined} aria-current={activePage === 'simulation' ? 'page' : undefined} type="button" onClick={onSimulation}>Simulation</button>
         <button className={explore ? 'active' : undefined} aria-current={explore ? 'page' : undefined} type="button" onClick={onMap}>Child Health Explore</button>
       </nav>

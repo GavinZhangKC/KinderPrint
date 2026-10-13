@@ -54,7 +54,7 @@ const homeDiscoveryPriorities = [
 const homeDiscoveryFocusKeys = ['learning', 'social', 'physical', 'respiratory', 'heat', 'parks', 'healthcare', 'early-childhood'] as const
 
 const exploreItems = [
-  { id: 'insight', number: '01', label: 'Insight Journey', videoSrc: '/insight-preview.mp4' },
+  { id: 'insight', number: '01', label: 'User Journey', videoSrc: '/insight-preview.mp4' },
   { id: 'map', number: '02', label: 'Interactive Map', videoSrc: '/map-preview.mp4' },
   { id: 'simulation', number: '03', label: 'Simulation', videoSrc: '/about-preview.mp4' },
 ] as const
@@ -137,7 +137,7 @@ function HomeHeader({ onHome, onInsight, onSimulation, onMap }: HomeHeaderProps)
       </div>
       <nav className="home-nav" aria-label="Primary navigation">
         <button type="button" aria-current="page" onClick={onHome}>Home</button>
-        <button type="button" onClick={onInsight}>Insight Journey</button>
+        <button type="button" onClick={onInsight}>User Journey</button>
         <button type="button" onClick={onSimulation}>Simulation</button>
       </nav>
       <button className="home-nav-cta" type="button" onClick={onMap}>Child Health Explore</button>
