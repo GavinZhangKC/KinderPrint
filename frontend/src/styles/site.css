@@ -1,0 +1,129 @@
+/* Vkinder site shell: one header, one typeface and one palette on every page.
+   The palette is the Child Health parent palette (forest green on warm ivory; deep green at night).
+   Selectors repeat .nav-shell to outrank the older per-page header rules without !important. */
+
+:root {
+  --site-font: 'Manrope', 'Segoe UI', system-ui, sans-serif;
+  --site-width: min(1440px, calc(100vw - 64px));
+  --site-bg: linear-gradient(180deg, #FCFBF3 0%, #F5F8EA 45%, #FFF8E4 100%);
+  --site-ink: #203F30;
+  --site-ink2: #465B42;
+  --site-primary: #355C38;
+  --site-primary-hover: #2B4B2E;
+  --site-accent: #536B35;
+  --site-line: #DCE3C8;
+  --site-surface: #FFFFFF;
+  --site-cream: #FFFDF6;
+  --site-tint: #E9F2DB;
+  --site-on-primary: #FFFFFF;
+  --site-header-bg: rgba(255, 253, 246, .92);
+  --site-header-shadow: 0 10px 28px -18px rgba(32, 63, 48, .45);
+  --site-shadow: 0 8px 24px -18px rgba(32, 63, 48, .35);
+}
+:root[data-theme='dark'] {
+  --site-bg: linear-gradient(180deg, #0F1812 0%, #121C14 50%, #17190F 100%);
+  --site-ink: #F1F5EA;
+  --site-ink2: #C3CFB6;
+  --site-primary: #4C7A3A;
+  --site-primary-hover: #426D32;
+  --site-accent: #B9D98C;
+  --site-line: rgba(195, 215, 170, .2);
+  --site-surface: #152019;
+  --site-cream: #1A271E;
+  --site-tint: rgba(185, 217, 140, .14);
+  --site-header-bg: rgba(21, 32, 25, .9);
+  --site-header-shadow: 0 10px 28px -18px rgba(0, 0, 0, .6);
+  --site-shadow: 0 8px 24px -12px rgba(0, 0, 0, .6);
+}
+
+/* Header: same size, shape, type and active mark everywhere. Its colours follow the page:
+   green on Child Health and Where to live, navy on the map, Simulation and About,
+   and see-through dark glass over the Home video. */
+html {
+  --hdr-bg: var(--site-header-bg); --hdr-line: var(--site-line); --hdr-shadow: var(--site-header-shadow);
+  --hdr-brand: var(--site-primary); --hdr-ink: var(--site-ink); --hdr-ink2: var(--site-ink2); --hdr-mark: var(--site-accent);
+}
+html[data-theme='dark'] { --hdr-brand: var(--site-accent); }
+html .map-page, html .simulation-page, html .about-header {
+  --hdr-bg: rgba(255, 255, 255, .88); --hdr-line: rgba(31, 74, 143, .14); --hdr-shadow: 0 12px 30px -18px rgba(27, 47, 82, .45);
+  --hdr-brand: #12314A; --hdr-ink: #12314A; --hdr-ink2: #466174; --hdr-mark: #1d4f86;
+}
+html[data-theme='dark'] .map-page, html[data-theme='dark'] .simulation-page, html[data-theme='dark'] .about-header {
+  --hdr-bg: rgba(14, 27, 48, .86); --hdr-line: rgba(175, 192, 217, .16); --hdr-shadow: 0 10px 28px -18px rgba(4, 6, 17, .6);
+  --hdr-brand: #61c8f3; --hdr-ink: #f3f7ff; --hdr-ink2: #b8c7de; --hdr-mark: #a9b6ff;
+}
+html .uj-header, html[data-theme='dark'] .uj-header {
+  --hdr-bg: transparent; --hdr-line: transparent; --hdr-shadow: none;
+  --hdr-brand: #fff; --hdr-ink: #fff; --hdr-ink2: rgba(255, 255, 255, .86); --hdr-mark: #f6b38a;
+}
+/* Home: no box. The logo and menu sit on the video with a soft navy fade behind them. */
+html body .uj-header { top: 0; padding-top: 12px; padding-bottom: 36px; background: linear-gradient(180deg, rgba(9, 14, 28, .72) 0%, rgba(9, 14, 28, .38) 60%, rgba(9, 14, 28, 0) 100%); }
+html .uj-header > .nav-shell.nav-shell { -webkit-backdrop-filter: none; backdrop-filter: none; }
+html .uj-header .nav-shell .nav-links button { text-shadow: 0 1px 8px rgba(0, 0, 0, .45); }
+html .uj-header .nav-shell .theme-switcher { background: rgba(255, 255, 255, .14); border-color: rgba(255, 255, 255, .28); }
+html .nav-shell.nav-shell {
+  height: 72px;
+  padding: 0 28px 0 18px;
+  border: 1px solid var(--hdr-line);
+  border-radius: 20px;
+  background: var(--hdr-bg);
+  box-shadow: var(--hdr-shadow);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+  font-family: var(--site-font);
+}
+html .nav-shell.nav-shell .brand-button { color: var(--hdr-brand); font-family: var(--site-font); font-size: 28px; font-weight: 800; }
+html .nav-shell.nav-shell .brand-logo { width: 52px; height: 52px; }
+html .nav-shell.nav-shell .nav-links { gap: clamp(14px, 2.4vw, 34px); color: var(--hdr-ink2); font-family: var(--site-font); font-size: 15px; font-weight: 700; }
+html .nav-shell.nav-shell .nav-links button { min-height: 44px; font: inherit; }
+html .nav-shell.nav-shell .nav-links button:hover,
+html .nav-shell.nav-shell .nav-links .active { color: var(--hdr-ink); }
+html .nav-shell.nav-shell .nav-links .active::after { left: 12%; right: 12%; bottom: 4px; height: 3px; background: var(--hdr-mark); }
+html .nav-shell.nav-shell :focus-visible { outline: 3px solid var(--hdr-mark); outline-offset: 2px; }
+
+/* Same width and position on every page that lays the header out in the page flow. */
+html .health-page-shell > .nav-shell.nav-shell,
+html .where-page > .nav-shell.nav-shell,
+html .map-page > .nav-shell.nav-shell,
+html .simulation-page > .nav-shell.nav-shell,
+html .about-header > .nav-shell.nav-shell,
+html .uj-header > .nav-shell.nav-shell {
+  width: var(--site-width);
+  max-width: none;
+  margin: 0 auto;
+  transform: none;
+}
+html .health-page-shell > .nav-shell.nav-shell,
+html .where-page > .nav-shell.nav-shell { position: sticky; top: 12px; }
+html .about-header,
+html .uj-header { position: fixed; top: 12px; left: 0; right: 0; z-index: 60; }
+html .about-header > .nav-shell.nav-shell,
+html .uj-header > .nav-shell.nav-shell { position: relative; top: 0; }
+
+/* Page canvas and type for the shared pages. */
+/* Map and Simulation keep their own blue-violet look, one step darker and closer to the
+   practitioner navy. Only page-level tokens change; their component files are untouched. */
+html .map-page,
+html .simulation-page {
+  --brand: #1a3a66; --primary: #4452b8; --text: #12314A; --muted: #4f6178;
+  background: radial-gradient(circle at 16% 20%, rgba(29, 79, 134, .16), transparent 36%), radial-gradient(circle at 86% 50%, rgba(20, 97, 113, .14), transparent 36%), linear-gradient(135deg, #d9e2ef 0%, #d3dfeb 52%, #d6ddeb 100%);
+  font-family: var(--site-font); color: #12314A;
+}
+html .simulation-page :is(h1, h2, h3) { color: #12314A; }
+html[data-theme='dark'] .map-page,
+html[data-theme='dark'] .simulation-page { --brand: #61c8f3; --primary: #7183f3; --text: #f3f7ff; --muted: #afc0d9; background: var(--kp-canvas-ambient); color: #f3f7ff; }
+html[data-theme='dark'] .simulation-page :is(h1, h2, h3) { color: #f3f7ff; }
+
+/* One typeface across the site (the old global h2 used Changa; the About page used a serif). */
+html .map-page :is(h1, h2, h3, h4, button, input, select, label),
+html .simulation-page :is(h1, h2, h3, h4, button, input, select, label),
+html .home-page :is(h1, h2, h3, h4, p, button, a, span) { font-family: var(--site-font); }
+html .map-page :is(h1, h2, h3),
+html .simulation-page :is(h1, h2, h3),
+html .home-page :is(h1, h2, h3) { letter-spacing: -.01em; }
+
+/* Header sits 12px from the top on every page. */
+html .health-page-shell { padding-top: 12px; }
+html .map-page, html .simulation-page { padding-top: 12px; }
+html .kh-top > .wl-tools.wl-tools { margin-left: 0; margin-right: auto; }
+html .kh-crumbs .wl-area-title.wl-area-title { font: inherit; color: inherit; letter-spacing: inherit; }

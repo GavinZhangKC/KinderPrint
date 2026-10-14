@@ -455,7 +455,7 @@ function DetailPanel({ id, setup, priorities, result, anchorName, saved, onSave,
       <div className="wl-facts">
         <div><span>Change since 2015 (children on track in all five areas)</span><b>{data.school_entry_change.pp === null ? 'Not available' : `${data.school_entry_change.pp > 0 ? '+' : ''}${data.school_entry_change.pp.toFixed(1)} points`}</b><p>{CHANGE_TEXT(data.school_entry_change.flag, data.school_entry_change.pp)}</p></div>
         <div><span>Outlook for the 2027 census</span><b>{data.outlook_2027 ? `About ${Math.round(data.outlook_2027.pct)}% on track` : 'Not available'}</b>
-          <p>{data.outlook_2027 && `Likely range ${Math.round(data.outlook_2027.lower80)}–${Math.round(data.outlook_2027.upper80)}% (80% range). `}A model forecast for the area as a whole, from past school-entry results. It says nothing about any one child.</p></div>
+          <p>{data.outlook_2027 && `Nominal range ${Math.round(data.outlook_2027.lower80)}–${Math.round(data.outlook_2027.upper80)}% (nominal 80%; coverage not established). `}A model forecast for the area as a whole, from past school-entry results. It says nothing about any one child.</p></div>
       </div>
       {data.children_assessed_2024 !== null && <p className="wl-help">{data.children_assessed_2024} children were assessed here in 2024. Fewer children means more uncertainty, which the adjusted figures allow for.</p>}
       {others.length > 0 && <><button type="button" className="wl-link" aria-expanded={all} onClick={() => setAll(a => !a)}>{all ? 'Hide other measures' : `Show all measures (${others.length} more priorities)`}</button>
@@ -501,7 +501,7 @@ function CompareDialog({ ids, setup, priorities, matching, onClose }: { ids: str
           })}
           <tr className="wl-group"><th scope="rowgroup" colSpan={areas.length + 1}>Children starting school</th></tr>
           <tr><td>Change since 2015 (all five areas)<span className="wl-unit">percentage points · AEDC</span></td>{areas.map(a => <td key={a.id} className="num">{a.school_entry_change.pp === null ? '—' : `${a.school_entry_change.pp > 0 ? '+' : ''}${a.school_entry_change.pp.toFixed(1)}`}</td>)}</tr>
-          <tr><td>Outlook for 2027<span className="wl-unit">% on track, 80% range · model forecast</span></td>{areas.map(a => <td key={a.id} className="num">{a.outlook_2027 ? `${Math.round(a.outlook_2027.pct)} (${Math.round(a.outlook_2027.lower80)}–${Math.round(a.outlook_2027.upper80)})` : '—'}</td>)}</tr>
+          <tr><td>Outlook for 2027<span className="wl-unit">% on track, nominal 80% range · exploratory forecast</span></td>{areas.map(a => <td key={a.id} className="num">{a.outlook_2027 ? `${Math.round(a.outlook_2027.pct)} (${Math.round(a.outlook_2027.lower80)}–${Math.round(a.outlook_2027.upper80)})` : '—'}</td>)}</tr>
         </tbody>
       </table></div>
       <p className="wl-caveat">Area-level figures. They do not confirm childcare vacancies, GP appointments or school enrolment.</p>
@@ -551,7 +551,7 @@ function HowDialog({ setup, onClose }: { setup: FamilyFitSetup; onClose: () => v
         <li><b>Services across borders.</b> GP and childcare access count services in neighbouring areas, weighted by distance and how many people share them. {v.gp_border_credit[0]} of {v.gp_border_credit[1]} areas with no GP inside their border have one nearby.</li>
         <li><b>Small numbers of children.</b> School-entry results from areas with few children are adjusted toward their region. Tested on later results, this cut prediction error by {pct(v.adjustment_error_reduction_range[0])}–{pct(v.adjustment_error_reduction_range[1])} overall and {pct(v.adjustment_small_area_error_reduction_range[0])}–{pct(v.adjustment_small_area_error_reduction_range[1])} for the smallest areas.</li>
         <li><b>Shortlist position.</b> Each search is re-run 200 times with plausible variation in those results, to show which positions could change by chance.</li>
-        <li><b>2027 outlook.</b> A ridge regression chosen from five candidates by a rule set in advance. On 2024 results it never saw, it was {pct(v.forecast_skill_vs_persistence)} more accurate than assuming no change (average error {v.forecast_holdout_mae_pp.toFixed(1)} points; ranking agreement {v.forecast_holdout_spearman.toFixed(2)}). Its 80% ranges held {pct(v.forecast_holdout_coverage_80)} of the time in that test, because results fell across Melbourne in 2024; the published ranges are widened to allow for shifts like that.</li>
+        <li><b>2027 outlook.</b> An exploratory school-entry forecast from historical area data. The nominal 80% ranges are not a demonstrated probability for a particular area. Chronological evaluation covers only one test cycle; coverage remains uncertain and the result is not an individual child forecast.</li>
       </ul>
       <p className="wl-caveat">Model {setup.model_version}, built {setup.built_utc.slice(0, 10)}. Area-level only. The family’s own visit and enquiries are always needed.</p>
     </details>
