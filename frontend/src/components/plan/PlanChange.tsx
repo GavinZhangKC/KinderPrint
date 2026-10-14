@@ -356,12 +356,12 @@ function Outlook({ detail, parent }: { detail: PlanAreaDetail; parent: boolean }
   const now = detail.outcomes_2024.all_five
   return <article className="pl-card" aria-labelledby="pl-outlook">
     <p className="pl-eyebrow">Where {detail.name} is heading</p>
-    <h2 id="pl-outlook">{o ? <>About <span className="pl-big">{Math.round(o.all_five_pct)} in 100</span> children likely on track at school entry in 2027</> : 'No 2027 outlook for this area'}</h2>
+    <h2 id="pl-outlook">{o ? <>About <span className="pl-big">{Math.round(o.all_five_pct)} in 100</span> children estimated on track at school entry in 2027</> : 'No 2027 outlook for this area'}</h2>
     {o && <>
       <RangeBar low={o.lower_80} high={o.upper_80} point={o.all_five_pct} now={now} />
       <p className="pl-sub">{parent
-        ? <>Likely between {Math.round(o.lower_80)} and {Math.round(o.upper_80)} in 100. In 2024 it was {now !== null ? Math.round(now) : '–'} in 100.</>
-        : <>80% range {o.lower_80.toFixed(1)}–{o.upper_80.toFixed(1)}%. 2024: {now !== null ? `${now.toFixed(1)}%` : 'not available'} (small-number adjusted, {detail.children_assessed_2024 ?? '–'} children assessed). Forecast F3; on track in all five AEDC domains.</>}</p>
+        ? <>Exploratory range: {Math.round(o.lower_80)} to {Math.round(o.upper_80)} in 100. Nominal 80%; coverage not established. In 2024 it was {now !== null ? Math.round(now) : '–'} in 100.</>
+        : <>Nominal 80% range (coverage not established) {o.lower_80.toFixed(1)}–{o.upper_80.toFixed(1)}%. 2024: {now !== null ? `${now.toFixed(1)}%` : 'not available'} (small-number adjusted, {detail.children_assessed_2024 ?? '–'} children assessed). Forecast F3; on track in all five AEDC domains.</>}</p>
     </>}
   </article>
 }
@@ -435,7 +435,7 @@ function Result({ result, parent, plan, detail, headingRef, copied, onCopy }: {
     `Plan a change: ${detail.name}, ${words}.`,
     sentence,
     `All five domains: ${main.difference_pp > 0 ? '+' : ''}${main.difference_pp} points (80% range ${main.interval_80_pp[0]} to ${main.interval_80_pp[1]}); based on ${data.like_plan?.length ?? 0} matched pairs of areas.`,
-    detail.outlook_2027 ? `2027 outlook for ${detail.name}: ${detail.outlook_2027.all_five_pct}% (80% range ${detail.outlook_2027.lower_80}–${detail.outlook_2027.upper_80}%).` : '',
+    detail.outlook_2027 ? `2027 outlook for ${detail.name}: ${detail.outlook_2027.all_five_pct}% (nominal 80% range, coverage not established: ${detail.outlook_2027.lower_80}–${detail.outlook_2027.upper_80}%).` : '',
     'This compares areas; it is not the effect of making the change. Area-level only. Source: Vkinder (AEDC 2024; place features 2018–2019).',
   ].filter(Boolean).join('\n')
 

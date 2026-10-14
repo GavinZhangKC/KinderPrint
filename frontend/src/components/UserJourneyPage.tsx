@@ -1,8 +1,7 @@
 /**
- * User Journey: a short guided tour of what Vkinder does. A muted drone flight across Melbourne
- * (suburbs and the Yarra, Albert Park, Brighton) plays in the background; scrolling moves through
- * six cards, one per part of the site, each with a link to try it. The Parkville 3D experience
- * stays available at /insight-journey and is linked from the last step.
+ * User Journey: a short guided tour of what Vkinder does. A muted film plays in the background:
+ * a Flinders Street tram at night, city lights, Albert Park, forest, solar, the Great Ocean Road, digital health, families, then the Arts Centre and the bay at dusk. Scrolling moves through six cards, one per part of the site, each with a link to try it. The last panel links to
+ * About us (/about), the previous home page.
  */
 import { useEffect, useRef, useState } from 'react'
 import BrandHeader from './BrandHeader'
@@ -66,11 +65,11 @@ export default function UserJourneyPage({ onHome, onInsight, onMap, onSimulation
     </div>
 
     <div className="uj-header">
-      <BrandHeader activePage="insight" onHome={onHome} onInsight={onInsight} onMap={onMap} onSimulation={onSimulation} onHealth={onHealth} />
+      <BrandHeader activePage="home" onHome={onHome} onInsight={onInsight} onMap={onMap} onSimulation={onSimulation} onHealth={onHealth} />
     </div>
 
     <section className={`uj-intro${step < 0 ? ' is-on' : ''}`} aria-hidden={step >= 0}>
-      <p className="uj-kicker">User Journey</p>
+      <p className="uj-kicker">Welcome to Vkinder</p>
       <h1>Healthier childhoods start with the place you live.</h1>
       <p>A short flight across Melbourne and six things you can do with Vkinder, from finding your area to planning for 2031. Scroll to take the tour.</p>
       <div className="uj-cue" aria-hidden="true"><i />Scroll</div>
@@ -92,7 +91,7 @@ export default function UserJourneyPage({ onHome, onInsight, onMap, onSimulation
       <div className="uj-end-row">
         <button type="button" onClick={onMap}>Open the map</button>
         <button type="button" className="ghost" onClick={() => window.location.assign('/where-to-live?view=find')}>Where to live</button>
-        <button type="button" className="ghost" onClick={() => window.location.assign('/insight-journey')}>Parkville in 3D</button>
+        <button type="button" className="ghost" onClick={() => window.location.assign('/about')}>About us</button>
       </div>
     </section>
 
@@ -100,7 +99,7 @@ export default function UserJourneyPage({ onHome, onInsight, onMap, onSimulation
       {steps.map((item, index) => <button key={item.kicker} type="button" aria-current={index === step ? 'step' : undefined} aria-label={`${index + 1} of ${steps.length}: ${item.kicker}`} onClick={() => goTo(index)}><span>{item.kicker}</span><i /></button>)}
     </nav>
     <div className="uj-bar" style={{ transform: `scaleX(${progress})` }} />
-    <p className="uj-credit">Footage: Pexels (Tetrakis Sphericon, Danilo Riba, New Zealand)</p>
+    <p className="uj-credit">Footage: Pexels (Peter Erb, Andy Nguyen, Tetrakis Sphericon, Danilo Riba, K, Pat Whelen, Ketut Subiyanto, Evgenij Mikhailov, Yan Krukau)</p>
     <div className="uj-spacer" />
   </div>
 }

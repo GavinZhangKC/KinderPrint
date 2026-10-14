@@ -170,7 +170,7 @@ export function TodayParent({ locality, age, controls, onCheckDay, onGo, onPrepa
   const topics: Array<{ icon: keyof typeof ICONS; title: string; text: string; action: () => void }> = [
     { icon: 'season', title: 'Seasons and health', text: 'Storm asthma, heat and smoke: signs and plans.', action: () => onGo('seasons') },
     { icon: 'vaccine', title: 'Vaccines', text: 'What is due for your child, with reminders.', action: () => onGo('vaccines') },
-    { icon: 'food', title: 'Food and drinks', text: 'Daily serves and a simple tracker.', action: () => onGo('food') },
+    { icon: 'food', title: 'Play today', text: 'Play conditions, nearby places and active minutes.', action: () => onGo('food') },
     { icon: 'clipboard', title: 'Prepare for a GP visit', text: 'Note what you have noticed about growth, sleep or development.', action: onPrepareVisit },
   ]
   return <div className="kt kt-parent">
