@@ -1,6 +1,6 @@
 import { lazy, StrictMode, Suspense } from 'react'
 import { createRoot } from 'react-dom/client'
-import logo from './assets/LogoMark.png'
+import BrandLogo from './components/BrandLogo'
 import { ThemeProvider } from './theme/ThemeProvider'
 import './components/cesium/CesiumExperimentPage.css'
 import './styles/midnight-tokens.css'
@@ -18,7 +18,7 @@ function CesiumPageFallback() {
       <span className="cesium-loading-glow cesium-loading-glow-two" aria-hidden="true" />
       <section className="cesium-loading-panel">
         <div className="cesium-loading-brand" aria-hidden="true">
-          <img src={logo} alt="" />
+          <BrandLogo />
           <span>Vkinder</span>
         </div>
         <p className="cesium-loading-kicker">Parkville in 3D</p>

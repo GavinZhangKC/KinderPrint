@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import logo from '../../assets/LogoMark.png'
+import BrandLogo from '../BrandLogo'
 import BrandHeader from '../BrandHeader'
 import CesiumScene, {
   journeyChapterIndexAtProgress,
@@ -446,7 +446,7 @@ export default function CesiumExperimentPage({
             aria-live="polite"
           >
             <div className="cesium-loading-brand" aria-hidden="true">
-              <img src={logo} alt="" />
+              <BrandLogo />
               <span>Vkinder</span>
             </div>
             <p className="cesium-loading-kicker">Parkville in 3D</p>

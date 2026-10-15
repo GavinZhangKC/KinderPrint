@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 
-import logo from '../assets/LogoMark.png'
+import BrandLogo from './BrandLogo'
 import ThemeSwitcher from './ThemeSwitcher'
 import '../styles/site.css'
 
@@ -20,14 +20,17 @@ export default function BrandHeader({ activePage, onInsight, onMap, onSimulation
   const home = activePage === 'home' || activePage === 'insight'
   const explore = activePage === 'health' || activePage === 'map'
   const where = activePage === 'where'
+  const logoVariant = activePage === 'health' || where
+    ? 'audience'
+    : activePage === 'map' || activePage === 'simulation' ? 'practitioner' : 'home'
   const item = (on: boolean) => ({ className: on ? 'active' : undefined, 'aria-current': on ? 'page' as const : undefined })
   return (
     <header className="glass nav-shell">
       <div className="brand-cluster">
         {leadingAction ?? null}
         <button className="brand-button" type="button" onClick={onInsight} aria-label="Go to Vkinder home">
-          <img src={logo} alt="" className="brand-logo" />
-          <span>Vkinder</span>
+          <BrandLogo variant={logoVariant} />
+          <span className="brand-wordmark">Vkinder</span>
         </button>
         <ThemeSwitcher />
       </div>

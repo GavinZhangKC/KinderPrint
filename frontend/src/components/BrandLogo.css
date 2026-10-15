@@ -1,0 +1,29 @@
+.brand-logo {
+  display: inline-flex;
+  flex: 0 0 auto;
+  width: 52px;
+  height: 52px;
+  overflow: hidden;
+  background: transparent;
+}
+
+.brand-logo > img {
+  display: none;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.brand-logo--home > .brand-logo-home,
+.brand-logo--practitioner > .brand-logo-practitioner,
+.brand-logo--audience > .brand-logo-parent {
+  display: block;
+}
+
+html[data-kt-theme='prac'] .brand-logo--audience > .brand-logo-parent {
+  display: none;
+}
+
+html[data-kt-theme='prac'] .brand-logo--audience > .brand-logo-practitioner {
+  display: block;
+}

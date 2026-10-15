@@ -174,10 +174,10 @@ body { margin: 0; }
   letter-spacing: -.03em;
 }
 
-.cesium-loading-brand img {
+.cesium-loading-brand > .brand-logo {
   width: 34px;
   height: 34px;
-  object-fit: contain;
+  border-radius: 8px;
 }
 
 .cesium-loading-kicker {

@@ -68,14 +68,14 @@
 /* Keep the brand and the links from colliding on narrower screens. */
 .brand-cluster { flex-shrink: 0; }
 @media (max-width: 1040px) {
-  .brand-button span { display: none; }
+  .brand-button > .brand-wordmark { display: none; }
   .nav-links { overflow-x: auto; scrollbar-width: none; gap: clamp(10px, 2vw, 22px); }
   .nav-links::-webkit-scrollbar { display: none; }
 }
 
 @media (max-width: 680px) {
   .nav-shell { width: calc(100vw - 20px); height: 62px; padding: 0 12px 0 8px; border-radius: 20px; }
-  .brand-button span { display: none; }
+  .brand-button > .brand-wordmark { display: none; }
   .brand-logo { width: 44px; height: 44px; }
   .nav-links { gap: clamp(5px, 2vw, 10px); font-size: clamp(9px, 2.7vw, 11px); }
   .nav-links button, .nav-links a { padding-inline: 1px; }
