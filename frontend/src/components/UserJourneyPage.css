@@ -11,6 +11,8 @@ body:has(.uj-page)::-webkit-scrollbar { display: none; width: 0; height: 0; }
 .uj-shade { position: absolute; inset: 0; background: linear-gradient(90deg, rgba(9, 14, 28, .8) 0%, rgba(9, 14, 28, .45) 42%, rgba(9, 14, 28, .05) 75%), linear-gradient(0deg, rgba(9, 14, 28, .55), transparent 35%) }
 .uj-header { position: fixed; top: 0; left: 0; right: 0; z-index: 6 }
 .uj-intro, .uj-end, .uj-cards { position: fixed; left: 7vw; top: 52%; transform: translateY(-50%); z-index: 3 }
+/* Headings use the page font (Manrope), not the global h2 display font, so each card reads as one typeface */
+.uj-page h1, .uj-page h2 { font-family: inherit; font-weight: 800 }
 .uj-intro { max-width: 640px; opacity: 0; transition: opacity .45s ease; pointer-events: none }
 .uj-intro.is-on { opacity: 1; pointer-events: auto }
 .uj-kicker { margin: 0 0 10px; font-size: 14px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; color: var(--uj-accent) }
