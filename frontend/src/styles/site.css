@@ -4,7 +4,7 @@
 
 :root {
   --site-font: 'Manrope', 'Segoe UI', system-ui, sans-serif;
-  --site-width: min(1440px, calc(100vw - 64px));
+  --site-width: calc(100vw - 64px);
   --site-bg: linear-gradient(180deg, #FCFBF3 0%, #F5F8EA 45%, #FFF8E4 100%);
   --site-ink: #203F30;
   --site-ink2: #465B42;
